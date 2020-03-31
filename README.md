@@ -15,7 +15,7 @@
  * TCP连接池、Http2
 
 ### 前世：[HttpUtils, V2.3.0 之后重命名为 OkHttps](https://gitee.com/ejlchina-zhxu/httputils)
-### 当前文档版本[1.0.0]（近期发布到中央仓库）
+### 当前文档版本[1.0.0]
 
 ## 目录
 
