@@ -1,12 +1,12 @@
-# HttpUtils
+# OkHttps
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.ejlchina/httputils/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.ejlchina/httputils/)
-[![License](https://img.shields.io/hexpm/l/plug.svg)](https://gitee.com/ejlchina-zhxu/httputils/blob/master/LICENSE)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.ejlchina/okhttps/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.ejlchina/okhttps/)
+[![License](https://img.shields.io/hexpm/l/plug.svg)](https://gitee.com/ejlchina-zhxu/okhttps/blob/master/LICENSE)
 [![Troy.Zhou](https://img.shields.io/badge/%E4%BD%9C%E8%80%85-ejlchina-orange.svg)](https://github.com/ejlchina)
 
 ## 介绍
 
-　　HttpUtils 是近期开源的对 OkHttp 轻量封装的框架，它独创的异步预处理器，特色的标签，灵活的上传下载进度监听与过程控制功能，在轻松解决很多原本另人头疼问题的同时，设计上也力求纯粹与优雅。
+　　OkHttps 是近期开源的对 OkHttp3 轻量封装的框架，它独创的异步预处理器，特色的标签，灵活的上传下载进度监听与过程控制功能，在轻松解决很多原本另人头疼问题的同时，设计上也力求纯粹与优雅。
 
  * 链式调用，一点到底
  * BaseURL、URL占位符、JSON自动封装与解析
@@ -14,8 +14,7 @@
  * 文件上传下载（过程控制、进度监听）
  * TCP连接池、Http2
 
-### 当前文档版本[2.3.0]（近期发布到中央仓库）
-#### [查阅[2.1.x]点我](https://gitee.com/ejlchina-zhxu/httputils/blob/master/README-2.1.2.md) | [查阅[2.0.x]点我](https://gitee.com/ejlchina-zhxu/httputils/blob/master/README-2.0.0.md) | [查阅[1.0.x]点我](https://gitee.com/ejlchina-zhxu/httputils/blob/1.x/README.md)
+### 当前文档版本[1.0.0]（近期发布到中央仓库）
 
 ## 目录
 
@@ -62,13 +61,13 @@
 ```
 <dependency>
      <groupId>com.ejlchina</groupId>
-     <artifactId>httputils</artifactId>
-     <version>2.3.0</version>
+     <artifactId>okhttps</artifactId>
+     <version>1.0.0</version>
 </dependency>
 ```
 ### Gradle
 
-`compile 'com.ejlchina:httputils:2.3.0'`
+`compile 'com.ejlchina:okhttps:1.0.0'`
 
 ## 使用说明
 
@@ -345,7 +344,7 @@ HTTP http = HTTP.builder()
 
 #### 6.3 配置 OkHttpClient
 
-　　与其他封装 OkHttp 的框架不同，HttpUtils 并不会遮蔽 OkHttp 本身就很好用的功能，如下：
+　　与其他封装 OkHttp3 的框架不同，OkHttps 并不会遮蔽 OkHttp3 本身就很好用的功能，如下：
 
 ```java
 HTTP http = HTTP.builder()
@@ -391,7 +390,7 @@ HTTP http = HTTP.builder()
 
 　　普通预处理器都是可并行处理的，然而有时我们希望某个预处理器同时只处理一个任务。比如 当`Token`过期时我们需要去刷新获取新`Token`，而刷新`Token`这个操作只能有一个任务去执行，因为如果`n`个任务同时执行的话，那么必有`n-1`个任务刚刷新得到的`Token`可能就立马失效了，而这是我们所不希望的。
 
-　　为了解决这个问题，HttpUtils 提供了串行预处理器，它可以让 HTTP 任务排好队，一个一个地进入预处理器：
+　　为了解决这个问题，OkHttps 提供了串行预处理器，它可以让 HTTP 任务排好队，一个一个地进入预处理器：
 
 ```java
 HTTP http = HTTP.builder()
@@ -474,7 +473,7 @@ List<User> users = HttpUtils.sync("/users")
 
 ### 8 文件下载
 
-　　HttpUtils 并没有把文件的下载排除在常规的请求之外，同一套API，它优雅的设计使得下载与常规请求融合的毫无违和感，一个最简单的示例：
+　　OkHttps 并没有把文件的下载排除在常规的请求之外，同一套API，它优雅的设计使得下载与常规请求融合的毫无违和感，一个最简单的示例：
 
 ```java
 http.sync("/download/test.zip")
@@ -517,7 +516,7 @@ http.sync("/download/test.zip")
         })
         .start();
 ```
-　　值得一提的是：由于 HttpUtils 并没有把下载做的很特别，这里设置的进度回调不只对下载文件起用作，即使对响应JSON的常规请求，只要设置了进度回调，它也会告诉你报文接收的进度（提前是服务器响应的报文有`Content-Length`头），例如：
+　　值得一提的是：由于 OkHttps 并没有把下载做的很特别，这里设置的进度回调不只对下载文件起用作，即使对响应JSON的常规请求，只要设置了进度回调，它也会告诉你报文接收的进度（提前是服务器响应的报文有`Content-Length`头），例如：
 
 ```java
 List<User> users = http.sync("/users")
@@ -562,7 +561,7 @@ http.async("/download/test.zip")
 
 #### 8.3 实现断点续传
 
-　　HttpUtils 对断点续传并没有再做更高层次的封装，因为这是app该去做的事情，它在设计上使各种网络问题的处理变简单的同时力求纯粹。下面的例子可以看到，HttpUtils 通过一个失败回调拿到**断点**，便将复杂的问题变得简单：
+　　OkHttps 对断点续传并没有再做更高层次的封装，因为这是app该去做的事情，它在设计上使各种网络问题的处理变简单的同时力求纯粹。下面的例子可以看到，OkHttps 通过一个失败回调拿到**断点**，便将复杂的问题变得简单：
 
 ```java
 http.sync("/download/test.zip")
@@ -651,7 +650,7 @@ http.async("/upload")
 
 #### 9.1 上传进度监听
 
-　　HttpUtils 的上传进度监听，监听的是所有请求报文体的发送进度，示例代码：
+　　OkHttps 的上传进度监听，监听的是所有请求报文体的发送进度，示例代码：
 
 ```java
 http.sync("/upload")
@@ -668,7 +667,7 @@ http.sync("/upload")
         })
         .post()
 ```
-　　咦！怎么感觉和下载的进度回调的一样？没错！HttpUtils 还是使用同一套API处理上传和下载的进度回调，区别只在于上传是在`get/post`方法之前使用这些API，下载是在`getBody`方法之后使用。很好理解：`get/post`之前是准备发送请求时段，有上传的含义，而`getBody`之后，已是报文响应的时段，当然是下载。
+　　咦！怎么感觉和下载的进度回调的一样？没错！OkHttps 还是使用同一套API处理上传和下载的进度回调，区别只在于上传是在`get/post`方法之前使用这些API，下载是在`getBody`方法之后使用。很好理解：`get/post`之前是准备发送请求时段，有上传的含义，而`getBody`之后，已是报文响应的时段，当然是下载。
 
 #### 9.2 上传过程控制
 
@@ -688,11 +687,11 @@ call.cancel();  // 取消上传
 
 ### 10 执行线程自由切换（for Android）
 
-　　在 Android 开发中，经常会把某些代码放到特点的线程去执行，比如网络请求响应后的页面更新在主线程（UI线程）执行，而保存文件则在IO线程操作。HttpUtils 为这类问题提供了良好的方案。
+　　在 Android 开发中，经常会把某些代码放到特点的线程去执行，比如网络请求响应后的页面更新在主线程（UI线程）执行，而保存文件则在IO线程操作。OkHttps 为这类问题提供了良好的方案。
 
-　　在 **默认** 情况下，**所有回调** 函数都会 **在 IO 线程** 执行。为什么会设计如此呢？这是因为 HttpUtils 只是纯粹的 Java 领域 Http工具包，本身对 Android 不会有任何依赖，因此也不知 Android 的 UI 线程为何物。这么设计也让它在 Android 之外有更多的可能性。
+　　在 **默认** 情况下，**所有回调** 函数都会 **在 IO 线程** 执行。为什么会设计如此呢？这是因为 OkHttps 只是纯粹的 Java 领域 Http工具包，本身对 Android 不会有任何依赖，因此也不知 Android 的 UI 线程为何物。这么设计也让它在 Android 之外有更多的可能性。
 
-　　但是在 Android 里使用  HttpUtils 的话，UI线程的问题能否优雅的解决呢？当然可以！简单粗暴的方法就是配置一个 回调执行器：
+　　但是在 Android 里使用  OkHttps 的话，UI线程的问题能否优雅的解决呢？当然可以！简单粗暴的方法就是配置一个 回调执行器：
 
  ```java
 HTTP http = HTTP.builder()
@@ -721,7 +720,7 @@ http.async("/users")
         })
         .post();
 ```
-　　但是，如果同时还想让某些回调放在IO线程，实现 **自由切换**，怎么办呢?HttpUtils 给出了非常灵活的方法，如下：
+　　但是，如果同时还想让某些回调放在IO线程，实现 **自由切换**，怎么办呢？OkHttps 给出了非常灵活的方法，如下：
 
 ```java
 http.async("/users")
