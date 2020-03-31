@@ -36,6 +36,8 @@ public class HttpUtils {
     public static void of(HTTP http) {
         if (http != null) {
             HttpUtils.http = http;
+        } else {
+        	throw new IllegalArgumentException("Parameter http can not be null!");
         }
     }
 
