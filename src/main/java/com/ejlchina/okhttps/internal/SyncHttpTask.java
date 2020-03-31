@@ -1,10 +1,10 @@
-package com.ejlchina.http.internal;
+package com.ejlchina.okhttps.internal;
 
 import java.io.IOException;
 
-import com.ejlchina.http.HttpResult;
-import com.ejlchina.http.HttpResult.State;
-import com.ejlchina.http.HttpTask;
+import com.ejlchina.okhttps.HttpResult;
+import com.ejlchina.okhttps.HttpTask;
+import com.ejlchina.okhttps.HttpResult.State;
 
 import okhttp3.Call;
 import okhttp3.Response;

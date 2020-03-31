@@ -1,10 +1,10 @@
-package com.ejlchina.http.internal;
+package com.ejlchina.okhttps.internal;
 
 import java.io.IOException;
 import java.util.concurrent.Executor;
 
-import com.ejlchina.http.OnCallback;
-import com.ejlchina.http.Process;
+import com.ejlchina.okhttps.OnCallback;
+import com.ejlchina.okhttps.Process;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;

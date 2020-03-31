@@ -1,4 +1,4 @@
-package com.ejlchina.http;
+package com.ejlchina.okhttps;
 
 public interface HttpCall {
 

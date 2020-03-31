@@ -1,4 +1,4 @@
-package com.ejlchina.http;
+package com.ejlchina.okhttps;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 
-import com.ejlchina.http.internal.HttpException;
-import com.ejlchina.http.internal.TaskExecutor;
+import com.ejlchina.okhttps.internal.HttpException;
+import com.ejlchina.okhttps.internal.TaskExecutor;
 
 import okhttp3.internal.Util;
 

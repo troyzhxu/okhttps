@@ -1,4 +1,4 @@
-package com.ejlchina.http;
+package com.ejlchina.okhttps;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,10 +10,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
-import com.ejlchina.http.HttpResult.State;
-import com.ejlchina.http.internal.HttpClient;
-import com.ejlchina.http.internal.HttpException;
-import com.ejlchina.http.internal.ProcessRequestBody;
+import com.ejlchina.okhttps.HttpResult.State;
+import com.ejlchina.okhttps.internal.HttpClient;
+import com.ejlchina.okhttps.internal.HttpException;
+import com.ejlchina.okhttps.internal.ProcessRequestBody;
 
 import okhttp3.Call;
 import okhttp3.FormBody;

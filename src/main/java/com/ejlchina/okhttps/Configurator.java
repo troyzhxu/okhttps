@@ -1,4 +1,4 @@
-package com.ejlchina.http;
+package com.ejlchina.okhttps;
 
 import okhttp3.OkHttpClient.Builder;
 

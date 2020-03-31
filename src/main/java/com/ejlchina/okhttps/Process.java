@@ -1,4 +1,4 @@
-package com.ejlchina.http;
+package com.ejlchina.okhttps;
 
 /**
  * 进度（上传或下载）

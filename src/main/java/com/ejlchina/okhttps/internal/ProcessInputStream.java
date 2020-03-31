@@ -1,11 +1,11 @@
-package com.ejlchina.http.internal;
+package com.ejlchina.okhttps.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Executor;
 
-import com.ejlchina.http.OnCallback;
-import com.ejlchina.http.Process;
+import com.ejlchina.okhttps.OnCallback;
+import com.ejlchina.okhttps.Process;
 
 public class ProcessInputStream extends InputStream {
 

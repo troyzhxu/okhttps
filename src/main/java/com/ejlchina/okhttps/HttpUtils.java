@@ -1,8 +1,8 @@
-package com.ejlchina.http;
+package com.ejlchina.okhttps;
 
-import com.ejlchina.http.internal.AsyncHttpTask;
-import com.ejlchina.http.internal.SyncHttpTask;
-import com.ejlchina.http.internal.TaskExecutor;
+import com.ejlchina.okhttps.internal.AsyncHttpTask;
+import com.ejlchina.okhttps.internal.SyncHttpTask;
+import com.ejlchina.okhttps.internal.TaskExecutor;
 
 import okhttp3.Call;
 import okhttp3.Request;

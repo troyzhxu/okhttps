@@ -1,4 +1,4 @@
-package com.ejlchina.http.internal;
+package com.ejlchina.okhttps.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,15 +11,15 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.Executor;
 
-import com.ejlchina.http.Configurator;
-import com.ejlchina.http.DownListener;
-import com.ejlchina.http.HTTP;
-import com.ejlchina.http.HttpCall;
-import com.ejlchina.http.HttpResult;
-import com.ejlchina.http.HttpResult.State;
-import com.ejlchina.http.HttpTask;
-import com.ejlchina.http.Preprocessor;
-import com.ejlchina.http.TaskListener;
+import com.ejlchina.okhttps.Configurator;
+import com.ejlchina.okhttps.DownListener;
+import com.ejlchina.okhttps.HTTP;
+import com.ejlchina.okhttps.HttpCall;
+import com.ejlchina.okhttps.HttpResult;
+import com.ejlchina.okhttps.HttpTask;
+import com.ejlchina.okhttps.Preprocessor;
+import com.ejlchina.okhttps.TaskListener;
+import com.ejlchina.okhttps.HttpResult.State;
 
 import okhttp3.Call;
 import okhttp3.MediaType;

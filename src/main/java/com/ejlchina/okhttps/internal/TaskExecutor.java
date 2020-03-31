@@ -1,17 +1,17 @@
-package com.ejlchina.http.internal;
+package com.ejlchina.okhttps.internal;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Executor;
 
-import com.ejlchina.http.DownListener;
-import com.ejlchina.http.Download;
-import com.ejlchina.http.HttpResult;
-import com.ejlchina.http.HttpResult.State;
-import com.ejlchina.http.HttpTask;
-import com.ejlchina.http.OnCallback;
-import com.ejlchina.http.TaskListener;
+import com.ejlchina.okhttps.DownListener;
+import com.ejlchina.okhttps.Download;
+import com.ejlchina.okhttps.HttpResult;
+import com.ejlchina.okhttps.HttpTask;
+import com.ejlchina.okhttps.OnCallback;
+import com.ejlchina.okhttps.TaskListener;
+import com.ejlchina.okhttps.HttpResult.State;
 
 public class TaskExecutor {
 

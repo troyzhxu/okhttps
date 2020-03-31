@@ -1,4 +1,4 @@
-package com.ejlchina.http.internal;
+package com.ejlchina.okhttps.internal;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -17,11 +17,11 @@ import java.util.List;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ejlchina.http.Download;
-import com.ejlchina.http.HttpTask;
-import com.ejlchina.http.HttpResult.Body;
-import com.ejlchina.http.OnCallback;
-import com.ejlchina.http.Process;
+import com.ejlchina.okhttps.Download;
+import com.ejlchina.okhttps.HttpTask;
+import com.ejlchina.okhttps.OnCallback;
+import com.ejlchina.okhttps.Process;
+import com.ejlchina.okhttps.HttpResult.Body;
 
 import okhttp3.MediaType;
 import okhttp3.Response;

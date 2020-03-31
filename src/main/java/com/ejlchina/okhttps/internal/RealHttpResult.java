@@ -1,9 +1,9 @@
-package com.ejlchina.http.internal;
+package com.ejlchina.okhttps.internal;
 
 import java.util.List;
 
-import com.ejlchina.http.HttpResult;
-import com.ejlchina.http.HttpTask;
+import com.ejlchina.okhttps.HttpResult;
+import com.ejlchina.okhttps.HttpTask;
 
 import okhttp3.Headers;
 import okhttp3.Response;

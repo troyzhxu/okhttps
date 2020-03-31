@@ -8,19 +8,19 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-import com.ejlchina.http.Download;
-import com.ejlchina.http.Download.Ctrl;
-import com.ejlchina.http.Download.Failure;
-import com.ejlchina.http.HTTP;
-import com.ejlchina.http.HttpCall;
-import com.ejlchina.http.HttpResult;
-import com.ejlchina.http.HttpResult.Body;
-import com.ejlchina.http.HttpResult.State;
-import com.ejlchina.http.HttpTask;
-import com.ejlchina.http.HttpUtils;
-import com.ejlchina.http.Preprocessor.PreChain;
-import com.ejlchina.http.Process;
-import com.ejlchina.http.internal.HttpClient;
+import com.ejlchina.okhttps.Download;
+import com.ejlchina.okhttps.HTTP;
+import com.ejlchina.okhttps.HttpCall;
+import com.ejlchina.okhttps.HttpResult;
+import com.ejlchina.okhttps.HttpTask;
+import com.ejlchina.okhttps.HttpUtils;
+import com.ejlchina.okhttps.Process;
+import com.ejlchina.okhttps.Download.Ctrl;
+import com.ejlchina.okhttps.Download.Failure;
+import com.ejlchina.okhttps.HttpResult.Body;
+import com.ejlchina.okhttps.HttpResult.State;
+import com.ejlchina.okhttps.Preprocessor.PreChain;
+import com.ejlchina.okhttps.internal.HttpClient;
 
 import okhttp3.ConnectionPool;
 import okhttp3.Interceptor.Chain;

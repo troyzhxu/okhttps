@@ -1,6 +1,6 @@
-package com.ejlchina.http.internal;
+package com.ejlchina.okhttps.internal;
 
-import com.ejlchina.http.Process;
+import com.ejlchina.okhttps.Process;
 
 public class RealProcess implements Process {
 

@@ -1,4 +1,4 @@
-package com.ejlchina.http;
+package com.ejlchina.okhttps;
 
 import java.io.File;
 import java.io.InputStream;
@@ -7,8 +7,8 @@ import java.util.List;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ejlchina.http.internal.RealHttpResult;
-import com.ejlchina.http.internal.TaskExecutor;
+import com.ejlchina.okhttps.internal.RealHttpResult;
+import com.ejlchina.okhttps.internal.TaskExecutor;
 
 import okhttp3.Headers;
 import okhttp3.MediaType;
