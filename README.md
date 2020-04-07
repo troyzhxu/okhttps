@@ -213,6 +213,20 @@ System.out.println(body.toJsonArray());
 System.out.println(body.toList(Order.class));
 ```
 
+　　示例，获取下载文件的大小：
+
+```java
+long size = http.sync("http://api.demo.com/download/test.zip")
+            .get().getBody()
+            .close()             // 只是想获得文件大小，不消费报文体，所以直接关闭
+            .getContentLength(); // 获得待下载文件的大小
+
+// 由于未消费报文体，所以本次请求不会消耗下载报文体的时间和网络流量）
+
+System.out.println("size = " + size);
+```
+
+
 #### 3.3 HttpCall
 
 　　`HttpCall`对象是异步请求方法（`get`、`post`、`put`、`delete`）的返回值，与`java`的`Future`接口很像，它有如下方法：
