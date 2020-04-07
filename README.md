@@ -170,7 +170,7 @@ http.async("/users/{id}")             // http://api.demo.com/users/1
 * `getHeaders()`       得到HTTP响应头
 * `getHeaders(String name)` 得到HTTP响应头
 * `getHeader(String name)`  得到HTTP响应头
-* `getBody()`          得到响应报文体`Body`实例，它定义了如下方法（对同一个`Body`实例，以下的`toXXX()`类方法只能使用一个且仅能调用一次）：
+* `getBody()`          得到响应报文体`Body`实例，它定义了如下方法（对同一个`Body`实例，以下的`toXXX()`类方法只能使用一个且仅能调用一次，除非先使用 cache 方法）：
     * `toBytes()`                     返回字节数组
     * `toByteStream()`                返回字节输入流
     * `toCharStream()`                返回字符输入流
