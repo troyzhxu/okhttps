@@ -16,6 +16,7 @@
 
 ### 前世：[HttpUtils, V2.3.0 之后重命名为 OkHttps](https://gitee.com/ejlchina-zhxu/httputils)
 ### 当前文档版本[1.0.0]
+### API文档：[https://apidoc.gitee.com/ejlchina-zhxu/okhttps](https://apidoc.gitee.com/ejlchina-zhxu/okhttps)
 
 ## 目录
 
