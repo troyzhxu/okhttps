@@ -99,7 +99,11 @@ public class HttpClient implements HTTP {
 	public OkHttpClient getOkClient() {
 		return client;
 	}
-	
+
+	public int totalTimeoutMillis() {
+		return client.connectTimeoutMillis() + client.writeTimeoutMillis() + client.readTimeoutMillis();
+	}
+
 	public int getTagCallCount() {
 		return tagCalls.size();
 	}

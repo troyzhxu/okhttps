@@ -169,7 +169,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 			}
 			if (call == null) {
 				try {
-					wait();
+					wait(httpClient.totalTimeoutMillis());
 				} catch (InterruptedException e) {
 					throw new HttpException(e.getMessage(), e);
 				}
@@ -214,7 +214,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 		public synchronized HttpResult getResult() {
 			if (result == null) {
 				try {
-					wait();
+					wait(httpClient.totalTimeoutMillis());
 				} catch (InterruptedException e) {
 					throw new HttpException(e.getMessage(), e);
 				}
