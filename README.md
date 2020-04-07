@@ -126,7 +126,7 @@ http.async("/users/1")                //  http://api.demo.com/users/1
 
 ```java
 HttpResult res1 = http.sync("/users").get();     // 同步 GET
-HttpResult res2 = http.sync("/users")post();     // 同步 POST
+HttpResult res2 = http.sync("/users").post();    // 同步 POST
 HttpResult res3 = http.sync("/users/1").put();   // 同步 PUT
 HttpResult res4 = http.sync("/users/1").delete();// 同步 DELETE
 HttpCall call1 = http.async("/users").get();     // 异步 GET
@@ -202,21 +202,15 @@ List<Order> orders = http.sync("/orders")
         .get().getBody().toList(Order.class);
 ```
 
-　　示例，下载文件到指定目录：
+　　示例，使用 cache 方法：
 
 ```java
-String path = "D:/reports/2020-03-01.xlsx";    // 文件保存目录
+Body body = http.sync("/orders").get().getBody().cache();
 
-// 同步下载
-http.sync("/reports/2020-03-01.xlsx")
-        .get().getBody().toFile(path);
-
-// 异步下载
-http.async("/reports/2020-03-01.xlsx")
-        .setOnResponse((HttpResult result) -> {
-            result.getBody().toFile(path);
-        })
-        .get();
+// 使用 cache 后，可以多次使用 toXXX() 方法
+System.out.println(body.toString());
+System.out.println(body.toJsonArray());
+System.out.println(body.toList(Order.class));
 ```
 
 #### 3.3 HttpCall
