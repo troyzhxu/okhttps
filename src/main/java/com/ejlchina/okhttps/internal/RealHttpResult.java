@@ -51,11 +51,6 @@ public class RealHttpResult implements HttpResult {
     }
     
     @Override
-    public HttpTask<?> getTask() {
-        return httpTask;
-    }
-    
-    @Override
     public State getState() {
         return state;
     }

@@ -44,12 +44,6 @@ public interface HttpResult {
 		throw new IllegalArgumentException("response 不能为空");
 	}
 
-	/**
-	 * 获取所属的 Http请求任务
-	 * @return HttpTask
-	 */
-	HttpTask<?> getTask();
-
 	
 	public enum State {
 		
