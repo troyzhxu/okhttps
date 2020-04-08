@@ -69,7 +69,7 @@
 ```
 ### Gradle
 
-`compile 'com.ejlchina:okhttps:1.0.0'`
+`implementation 'com.ejlchina:okhttps:1.0.0'`
 
 ## 使用说明
 
