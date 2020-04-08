@@ -96,6 +96,10 @@ public class TaskExecutor {
 		}
 	}
 
+	/**
+	 * 关闭线程池
+	 * @since OkHttps V1.0.2
+	 */
 	public void shutdown() {
 		if (ioExecutor != null && ioExecutor instanceof ExecutorService) {
 			((ExecutorService) ioExecutor).shutdown();
