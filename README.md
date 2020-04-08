@@ -10,10 +10,9 @@
 
  * 链式调用，一点到底
  * BaseURL、URL占位符、JSON自动封装与解析
- * 同步拦截器、异步预处理器、回调执行器
+ * 同步拦截器、异步预处理器、回调执行器、全局监听、回调阻断
  * 文件上传下载（过程控制、进度监听）
  * 单方法回调，充分利用 Lambda 表达式
- * 全局监听、回调阻断
  * TCP连接池、Http2
 
 ### 前世：[HttpUtils, V2.3.0 之后重命名为 OkHttps](https://gitee.com/ejlchina-zhxu/httputils)
