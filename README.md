@@ -394,9 +394,8 @@ HTTP http = HTTP.builder()
         })
         .build();
 ```
-　　和`Interceptor`一样，`Preprocessor`也可以添加多个。
+　　和`Interceptor`一样，`Preprocessor`也可以添加多个。他们之前的区别如下:
 
-> 预处理器（Preprocessor）与拦截器（Interceptor）的区别：
 > * 拦截器只能处理同步操作，预处理器支持处理异步操作
 > * 拦截器都是并行处理请求，预处理器支持串行处理（详见6.5章节）
 > * 拦截器处理时机在请求前和响应后，预处理器只在请求前，并且预处理器先于拦截器执行
