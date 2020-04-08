@@ -221,7 +221,7 @@ System.out.println(body.toList(Order.class));
 　　示例，获取下载文件的大小：
 
 ```java
-long size = http.sync("http://api.demo.com/download/test.zip")
+long size = http.sync("/download/test.zip")
             .get().getBody()
             .close()             // 只是想获得文件大小，不消费报文体，所以直接关闭
             .getContentLength(); // 获得待下载文件的大小
