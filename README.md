@@ -140,7 +140,7 @@ HttpCall call4 = http.async("/users/1").delete();// 异步 DELETE
 
 #### 3.1 回调函数
 
-　　只有异步请求才可以设置回调函数：
+　　OkHttps 的回调函数全部使用单方法模式，这样可以充分利用 Java8 或 Kotlin 中的 Lambda 表达式，使你的代码更加简洁优雅：
 
 ```java
 http.async("/users/{id}")             // http://api.demo.com/users/1
@@ -156,6 +156,9 @@ http.async("/users/{id}")             // http://api.demo.com/users/1
         })
         .get();
 ```
+
+>* 只有异步请求才可以设置这三种（响应|异常|完成）回调函数
+>* 同步请求直接返回结果，无需使用回调
 
 #### 3.2 HttpResult
 
