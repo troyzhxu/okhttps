@@ -506,7 +506,7 @@ http.sync("/download/test.zip")
         .start();                        // 启动下载
 
 http.sync("/download/test.zip").get().getBody()                  
-        .toFolder("D:/download/")        // 下载到指定的目录，文件名将根据下载信息自动生成
+        .toFolder("D:/download")        // 下载到指定的目录，文件名将根据下载信息自动生成
         .start();
 ```
 　　或使用异步连接方式：
@@ -514,7 +514,7 @@ http.sync("/download/test.zip").get().getBody()
 ```java
 http.async("/download/test.zip")
         .setOnResponse((HttpResult result) -> {
-            result.getBody().toFile("D:/download/test.zip").start();
+            result.getBody().toFolder("D:/download").start();
         })
         .get();
 ```
