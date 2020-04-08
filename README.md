@@ -369,7 +369,7 @@ HTTP http = HTTP.builder()
             // 必须同步返回，拦截器内无法执行异步操作
             return chain.proceed(request);
         });
-        // 其它配置: SSL、缓存、代理、事件监听...
+        // 其它配置: CookieJar、SSL、缓存、代理、事件监听...
     })
     .build();
 ```
