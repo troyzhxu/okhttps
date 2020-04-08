@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 
 import com.ejlchina.okhttps.DownListener;
 import com.ejlchina.okhttps.Download;
@@ -92,6 +93,15 @@ public class TaskExecutor {
 			}, onIoThread);
 		} else if (onComplete != null) {
 			execute(() -> { onComplete.on(state); }, onIoThread);
+		}
+	}
+
+	public void shutdown() {
+		if (ioExecutor != null && ioExecutor instanceof ExecutorService) {
+			((ExecutorService) ioExecutor).shutdown();
+		}
+		if (mainExecutor != null && mainExecutor instanceof ExecutorService) {
+			((ExecutorService) mainExecutor).shutdown();
 		}
 	}
 
