@@ -504,6 +504,10 @@ http.sync("/download/test.zip")
         .getBody()                       // 得到报文体
         .toFile("D:/download/test.zip")  // 下载到指定的路径
         .start();                        // 启动下载
+
+http.sync("/download/test.zip").get().getBody()                  
+        .toFolder("D:/download/")        // 下载到指定的目录，文件名将根据下载信息自动生成
+        .start();
 ```
 　　或使用异步连接方式：
 
