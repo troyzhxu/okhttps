@@ -502,7 +502,7 @@ List<User> users = HttpUtils.sync("/users")
 http.sync("/download/test.zip")
         .get()                           // 使用 GET 方法（其它方法也可以，看服务器支持）
         .getBody()                       // 得到报文体
-        .toFile("D:/download/test.zip")  // 指定下载的目录，文件名将根据下载信息自动生成
+        .toFile("D:/download/test.zip")  // 下载到指定的路径
         .start();                        // 启动下载
 ```
 　　或使用异步连接方式：
