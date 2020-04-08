@@ -15,7 +15,7 @@
  * TCP连接池、Http2
 
 ### 前世：[HttpUtils, V2.3.0 之后重命名为 OkHttps](https://gitee.com/ejlchina-zhxu/httputils)
-### 当前文档版本[1.0.0]
+### 当前文档版本[1.0.1]
 ### API文档：[https://apidoc.gitee.com/ejlchina-zhxu/okhttps](https://apidoc.gitee.com/ejlchina-zhxu/okhttps)
 
 ## 目录
@@ -64,12 +64,12 @@
 <dependency>
      <groupId>com.ejlchina</groupId>
      <artifactId>okhttps</artifactId>
-     <version>1.0.0</version>
+     <version>1.0.1</version>
 </dependency>
 ```
 ### Gradle
 
-`implementation 'com.ejlchina:okhttps:1.0.0'`
+`implementation 'com.ejlchina:okhttps:1.0.1'`
 
 ## 使用说明
 
