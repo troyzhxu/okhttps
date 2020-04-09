@@ -568,16 +568,6 @@ public abstract class HttpTask<C extends HttpTask<?>> {
         }
     }
 
-    
-    protected String toString(Response response) throws IOException {
-		String body = null;
-		ResponseBody rbody = response.body();
-		if (rbody != null) {
-			body = rbody.string();
-		}
-		return body;
-	}
-
 	protected State toState(IOException e) {
 		if (e instanceof SocketTimeoutException) {
 		    return State.TIMEOUT;
