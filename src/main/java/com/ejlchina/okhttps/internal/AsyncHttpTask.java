@@ -113,7 +113,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 			}
     	});
     	if (tag != null) {
-    		httpClient.addTagCall(tag, call, this);
+    		httpClient.addTagTask(tag, call, this);
     	}
     	return call;
     }
@@ -136,7 +136,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 				notify();
 			}
 			if (tag != null && call == null) {
-	    		httpClient.removeTagCall(AsyncHttpTask.this);
+	    		httpClient.removeTagTask(AsyncHttpTask.this);
 	    	}
 			return res;
 		}
@@ -228,7 +228,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 				notify();
 			}
 			if (tag != null) {
-	    		httpClient.removeTagCall(AsyncHttpTask.this);
+	    		httpClient.removeTagTask(AsyncHttpTask.this);
 	    	}
 		}
 

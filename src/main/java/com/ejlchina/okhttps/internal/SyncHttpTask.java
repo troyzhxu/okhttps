@@ -2,6 +2,7 @@ package com.ejlchina.okhttps.internal;
 
 import java.io.IOException;
 
+import com.ejlchina.okhttps.Cancelable;
 import com.ejlchina.okhttps.HttpResult;
 import com.ejlchina.okhttps.HttpTask;
 import com.ejlchina.okhttps.HttpResult.State;
@@ -53,13 +54,45 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
     public HttpResult delete() {
         return request("DELETE");
     }
-    
+
+    static class SyncCall implements Cancelable {
+
+		final Call call;
+		boolean done = false;
+
+		public SyncCall(Call call) {
+			this.call = call;
+		}
+
+		@Override
+		public boolean cancel() {
+			if (done) {
+				return false;
+			}
+			call.cancel();
+			return true;
+		}
+
+		public void setDone(boolean done) {
+			this.done = done;
+		}
+
+	}
+
     private HttpResult request(String method) {
     	RealHttpResult result = new RealHttpResult(this, httpClient.getExecutor());
     	httpClient.preprocess(this, () -> {
         	Call call = prepareCall(method);
+			SyncCall syncCall = null;
+			if (tag != null) {
+				syncCall = new SyncCall(call);
+				httpClient.addTagTask(tag, syncCall, this);
+			}
             try {
                 Response response = call.execute();
+                if (syncCall != null) {
+					syncCall.setDone(true);
+				}
                 synchronized (SyncHttpTask.this) {
                 	result.response(response);
                 	SyncHttpTask.this.notify();

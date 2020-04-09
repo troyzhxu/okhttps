@@ -396,7 +396,7 @@ public class HttpTest {
 				.setTag("A")
 				.get();
 
-		System.out.println(((HttpClient) http).getTagCallCount());
+		System.out.println(((HttpClient) http).getTagTaskCount());
 		
 		http.async("/user/show/2")
 				.setOnResponse((HttpResult result) -> {
@@ -405,7 +405,7 @@ public class HttpTest {
 				.setTag("A.B")
 				.get();
 		
-		System.out.println(((HttpClient) http).getTagCallCount());
+		System.out.println(((HttpClient) http).getTagTaskCount());
 		
 		http.async("/user/show/3")
 				.setOnResponse((HttpResult result) -> {
@@ -414,7 +414,7 @@ public class HttpTest {
 				.setTag("B.C")
 				.get();
 		
-		System.out.println(((HttpClient) http).getTagCallCount());
+		System.out.println(((HttpClient) http).getTagTaskCount());
 		
 		http.async("/user/show/4")
 				.setOnResponse((HttpResult result) -> {
@@ -423,24 +423,24 @@ public class HttpTest {
 				.setTag("C")
 				.get();
 		
-		System.out.println(((HttpClient) http).getTagCallCount());
+		System.out.println(((HttpClient) http).getTagTaskCount());
 		
 		
 		System.out.println("标签取消：" + http.cancel("B"));
 		
-		System.out.println(((HttpClient) http).getTagCallCount());
+		System.out.println(((HttpClient) http).getTagTaskCount());
 		
 		sleep(5000);
 
-		System.out.println(((HttpClient) http).getTagCallCount());
+		System.out.println(((HttpClient) http).getTagTaskCount());
 		
 		sleep(5000);
 		
-		System.out.println(((HttpClient) http).getTagCallCount());
+		System.out.println(((HttpClient) http).getTagTaskCount());
 		
 		sleep(5000);
 		
-		System.out.println(((HttpClient) http).getTagCallCount());
+		System.out.println(((HttpClient) http).getTagTaskCount());
 		
 //		System.out.println("isDone = " + call.isDone());
 //		System.out.println("isCanceled = " + call.isCanceled());

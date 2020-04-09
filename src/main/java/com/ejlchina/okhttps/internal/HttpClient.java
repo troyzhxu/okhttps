@@ -11,14 +11,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.Executor;
 
-import com.ejlchina.okhttps.Configurator;
-import com.ejlchina.okhttps.DownListener;
-import com.ejlchina.okhttps.HTTP;
-import com.ejlchina.okhttps.HttpCall;
-import com.ejlchina.okhttps.HttpResult;
-import com.ejlchina.okhttps.HttpTask;
-import com.ejlchina.okhttps.Preprocessor;
-import com.ejlchina.okhttps.TaskListener;
+import com.ejlchina.okhttps.*;
 import com.ejlchina.okhttps.HttpResult.State;
 
 import okhttp3.Call;
@@ -30,9 +23,9 @@ import okhttp3.WebSocketListener;
 
 public class HttpClient implements HTTP {
 
-
+	// OkHttpClient
 	final OkHttpClient client;
-	
+	// 根URL
 	final String baseUrl;
 	// 媒体类型
 	final Map<String, String> mediaTypes;
@@ -40,8 +33,8 @@ public class HttpClient implements HTTP {
 	final TaskExecutor executor;
 	// 预处理器
 	final Preprocessor[] preprocessors;
-
-	final List<TagCall> tagCalls;
+	// 持有标签的任务
+	final List<TagTask> tagTasks;
 	
 	
 	private HttpClient(Builder builder) {
@@ -52,8 +45,8 @@ public class HttpClient implements HTTP {
 				builder.mainExecutor, builder.downloadListener, 
 				builder.responseListener, builder.exceptionListener, 
 				builder.completeListener);
-		this.preprocessors = builder.preprocessors.toArray(new Preprocessor[builder.preprocessors.size()]);
-		this.tagCalls = Collections.synchronizedList(new LinkedList<>());
+		this.preprocessors = builder.preprocessors.toArray(new Preprocessor[0]);
+		this.tagTasks = Collections.synchronizedList(new LinkedList<>());
 	}
 	
 	@Override
@@ -72,12 +65,12 @@ public class HttpClient implements HTTP {
 			return 0;
 		}
 		int count = 0;
-		Iterator<TagCall> it = tagCalls.iterator();
+		Iterator<TagTask> it = tagTasks.iterator();
 		while (it.hasNext()) {
-			TagCall tagCall = it.next();
+			TagTask tagCall = it.next();
 			// 只要任务的标签包含指定的Tag就会被取消
 			if (tagCall.tag.contains(tag)) {
-				if (tagCall.call.cancel()) {
+				if (tagCall.canceler.cancel()) {
 					count++;
 				}
 				it.remove();
@@ -109,18 +102,18 @@ public class HttpClient implements HTTP {
 		return client.connectTimeoutMillis() + client.writeTimeoutMillis() + client.readTimeoutMillis();
 	}
 
-	public int getTagCallCount() {
-		return tagCalls.size();
+	public int getTagTaskCount() {
+		return tagTasks.size();
 	}
 	
-	public void addTagCall(String tag, HttpCall call, HttpTask<?> task) {
-		tagCalls.add(new TagCall(tag, call, task));
+	public void addTagTask(String tag, Cancelable canceler, HttpTask<?> task) {
+		tagTasks.add(new TagTask(tag, canceler, task));
 	}
 	
-	public void removeTagCall(HttpTask<?> task) {
-		Iterator<TagCall> it = tagCalls.iterator();
+	public void removeTagTask(HttpTask<?> task) {
+		Iterator<TagTask> it = tagTasks.iterator();
 		while (it.hasNext()) {
-			TagCall tagCall = it.next();
+			TagTask tagCall = it.next();
 			if (tagCall.task == task) {
 				it.remove();
 				break;
@@ -128,15 +121,15 @@ public class HttpClient implements HTTP {
 		}
 	}
 	
-	class TagCall {
-		
+	static class TagTask {
+
 		String tag;
-		HttpCall call;
+		Cancelable canceler;
 		HttpTask<?> task;
-		
-		public TagCall(String tag, HttpCall call, HttpTask<?> task) {
+
+		public TagTask(String tag, Cancelable canceler, HttpTask<?> task) {
 			this.tag = tag;
-			this.call = call;
+			this.canceler = canceler;
 			this.task = task;
 		}
 		

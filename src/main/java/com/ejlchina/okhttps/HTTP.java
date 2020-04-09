@@ -33,12 +33,14 @@ public interface HTTP {
     
     /**
      * 根据标签取消HTTP任务，只要任务的标签包含指定的Tag就会被取消
+	 * 从 v1.0.2 开始支持取消同步请求
      * @param tag 标签
      * @return 被取消的任务数量
      */
     int cancel(String tag);
 
 	/**
+	 * @since 1.0.2
 	 * 取消所有HTTP任务，包括同步和异步
 	 */
 	void cancelAll();

@@ -1,6 +1,6 @@
 package com.ejlchina.okhttps;
 
-public interface HttpCall {
+public interface HttpCall extends Cancelable {
 
 	/**
 	 * 取消 Http 请求
