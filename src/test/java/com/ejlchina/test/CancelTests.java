@@ -13,6 +13,16 @@ import java.io.IOException;
 public class CancelTests extends BaseTest {
 
 
+    public void testCancelAll() {
+        HTTP http = HTTP.builder()
+                .baseUrl("http://localhost:8080")
+                .build();
+
+
+
+
+    }
+
     @Test
     public void testCancel() {
 
