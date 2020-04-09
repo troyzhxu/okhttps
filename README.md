@@ -721,7 +721,50 @@ call.cancel();  // 取消上传
 
 #### 10.1 同步请求的异常
 
-文档完善中...
+　　默认情况下，当请求执行异常时，会直接向外抛出，我们可以用 `try catch` 来捕获，例如：
+
+```java
+try {
+    HttpResult result = http.sync("/users/1").get();
+} catch (HttpException e) {
+    Throwable cause = e.getCause(); // 得到异常原因
+    if (cause instanceof ConnectException) {
+        // 当没网络时，会抛出连接异常
+    }
+    if (cause instanceof SocketTimeoutException) {
+        // 当接口长时间未响应，会抛出超时异常
+    }
+    if (cause instanceof UnknownHostException) {
+        // 当把域名或IP写错，会抛出 UnknownHost 异常
+    }
+    // ...
+}
+``` 
+　　这种传统的异常处理方式，当然可以解决问题，但是 OkHttps 提供了更优雅的方案：
+
+```
+HttpResult result = http.sync("/users/1")
+        .nothrow()      // 告诉 OkHttps 发生异常时不要直接向外抛出
+        .get();
+State state = result.getState();    // 得到请求执行状态
+if (state == State.RESPONSED) {
+    // 请求已正常响应
+}
+if (state == State.CANCELED) {
+    // 请求已被取消
+}
+if (state == State.NETWORK_ERROR) {
+    // 网络错误，说明用户没网了
+}
+if (state == State.TIMEOUT) {
+    // 请求超时
+}
+if (state == State.EXCEPTION) {
+    // 其它请求异常
+}
+// 还可以获得具体的异常信息
+Exception err = result.getError();
+``` 
 
 #### 10.2 异步请求的异常
 
