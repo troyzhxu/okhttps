@@ -358,7 +358,7 @@ HTTP http = HTTP.builder()
         })
         .build();
 ```
-　　该配置**影响所有回调**。
+　　该配置默认 **影响所有回调**。
 
 #### 6.3 配置 OkHttpClient
 
