@@ -12,7 +12,10 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
-public class ExceptionTests {
+/**
+ * 测试异常处理
+ */
+public class ExceptionTests extends BaseTest {
 
     HTTP http = HTTP.builder()
             .config((OkHttpClient.Builder builder) -> {
@@ -78,25 +81,16 @@ public class ExceptionTests {
         http.async("/users/1")
                 .setOnResponse((HttpResult result) -> {
                     // 当发生异常时就不会走这里
-                    System.out.println(result);
+                    println(result);
                 })
                 .setOnException((IOException e) -> {
                     // 这里处理请求异常
-                    System.out.println(e);
+                    println(e);
                 })
                 .get();
 
         sleep(10000);
     }
 
-
-
-    void sleep(int millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 
 }

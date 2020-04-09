@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class SimpleTests {
+public class SimpleTests extends BaseTest {
 
 
     HTTP http = HTTP.builder()
@@ -77,33 +77,7 @@ public class SimpleTests {
         System.out.println("size = " + (size / 1024) + " KB");
     }
 
-    void sleep(int millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 
 }
 
 
-class User {
-
-    private int id;
-    private String name;
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return "User [id=" + id + ", name=" + name + "]";
-    }
-
-}
