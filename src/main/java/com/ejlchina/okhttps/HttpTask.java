@@ -1,5 +1,14 @@
 package com.ejlchina.okhttps;
 
+import com.alibaba.fastjson.JSON;
+import com.ejlchina.okhttps.HttpResult.State;
+import com.ejlchina.okhttps.internal.HttpClient;
+import com.ejlchina.okhttps.internal.HttpException;
+import com.ejlchina.okhttps.internal.ProcessRequestBody;
+import okhttp3.*;
+import okhttp3.internal.Util;
+import okio.Buffer;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,23 +17,6 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.alibaba.fastjson.JSON;
-import com.ejlchina.okhttps.HttpResult.State;
-import com.ejlchina.okhttps.internal.HttpClient;
-import com.ejlchina.okhttps.internal.HttpException;
-import com.ejlchina.okhttps.internal.ProcessRequestBody;
-
-import okhttp3.Call;
-import okhttp3.FormBody;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
-import okhttp3.internal.Util;
-import okio.Buffer;
 
 
 /**
@@ -555,8 +547,7 @@ public abstract class HttpTask<C extends HttpTask<?>> {
 			throw new HttpException("无法获取请求体长度", e);
 		}
 	}
-   
-    
+
     private void buildHeaders(Request.Builder builder) {
         if (headers != null) {
             for (String name : headers.keySet()) {
@@ -579,7 +570,6 @@ public abstract class HttpTask<C extends HttpTask<?>> {
 		return State.EXCEPTION;
 	}
 
-    
     private RequestBody buildRequestBody() {
         if (jsonParams != null) {
             requestJson = JSON.toJSONString(jsonParams);
@@ -617,8 +607,6 @@ public abstract class HttpTask<C extends HttpTask<?>> {
             return builder.build();
         }
     }
-
-
 
     private String buildUrlPath() {
     	String url = urlPath;
