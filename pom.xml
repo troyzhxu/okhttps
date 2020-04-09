@@ -3,7 +3,7 @@
 	
 	<groupId>com.ejlchina</groupId>
 	<artifactId>okhttps</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<name>OkHttps</name>
  
 	<properties>
@@ -32,7 +32,7 @@
 		<connection>scm:git://gitee.com/ejlchina-zhxu/okhttps.git</connection>
 		<developerConnection>scm:http://gitee.com/ejlchina-zhxu/okhttps</developerConnection>
 		<url>https://gitee.com/ejlchina-zhxu/okhttps</url>
-		<tag>v1.0.1</tag>
+		<tag>v1.0.2</tag>
 	</scm>
 	
 	<dependencies>
