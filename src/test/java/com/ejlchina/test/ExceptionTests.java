@@ -3,16 +3,24 @@ package com.ejlchina.test;
 import com.ejlchina.okhttps.HTTP;
 import com.ejlchina.okhttps.HttpResult;
 import com.ejlchina.okhttps.internal.HttpException;
+import okhttp3.OkHttpClient;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 
 public class ExceptionTests {
 
     HTTP http = HTTP.builder()
-            .baseUrl("http://localhost:8080")
+            .config((OkHttpClient.Builder builder) -> {
+                builder.connectTimeout(2, TimeUnit.SECONDS);
+                builder.writeTimeout(2, TimeUnit.SECONDS);
+                builder.readTimeout(2, TimeUnit.SECONDS);
+            })
+            .baseUrl("http://localhost:8081")
             .build();
 
     @Test
@@ -67,6 +75,28 @@ public class ExceptionTests {
     @Test
     public void testASync() {
 
+        http.async("/users/1")
+                .setOnResponse((HttpResult result) -> {
+                    // 当发生异常时就不会走这里
+                    System.out.println(result);
+                })
+                .setOnException((IOException e) -> {
+                    // 这里处理请求异常
+                    System.out.println(e);
+                })
+                .get();
+
+        sleep(10000);
+    }
+
+
+
+    void sleep(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }

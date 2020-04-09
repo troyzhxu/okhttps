@@ -717,7 +717,7 @@ call.cancel();  // 取消上传
 
 ### 10 异常处理
 
-　　相比其它的 HTTP 开发包，OkHttps 提供了更多的异常处理方法，以满足不同的异常处理需求。
+　　相比其它的 HTTP 开发包，OkHttps 额外提供了一个特别的异常处理方发（`nothrow()`），以满足不同的异常处理需求。
 
 #### 10.1 同步请求的异常
 
@@ -764,7 +764,53 @@ Exception error = result.getError();
 
 #### 10.2 异步请求的异常
 
-文档完善中...
+　　异步请求的使用最多的异常处理方式是设置一个异常回调：
+
+```java
+http.async("/users/1")
+        .setOnResponse((HttpResult result) -> {
+            // 当发生异常时就不会走这里
+        })
+        .setOnException((IOException e) -> {
+            // 这里处理请求异常
+        })
+        .get();
+```
+　　如果不设置`OnException`回调，发生异常时会在 **IO线程池** 中向上抛出，外层无法捕获：
+
+```java
+try {
+    http.async("/users/1")
+            .setOnResponse((HttpResult result) -> {
+                // 当发生异常时就不会走这里
+            })
+            .get();
+} catch (HttpException e) {
+    // 这种方式是捕获不到异常的！！！！
+}
+```
+　　但即使不设置`OnException`回调，发生异常时，依然会走`OnComplete`回调：
+
+```java
+http.async("/users/1")
+        .setOnResponse((HttpResult result) -> {
+            // 当发生异常时就不会走这里
+        })
+        .setOnComplete((State state) -> {
+            // 发生异常，会先执行这里，但执行完后依然会在IO线程中向上抛出
+        })
+        .get();
+```
+　　如果就是想 **不处理异常，也不向上抛出**，可以做到吗？可以！使用`nothrow()`方法：
+
+```java
+http.async("/users/1")
+        .nothrow()  // 告诉 OkHttps 发生异常时不向外抛出
+        .setOnResponse((HttpResult result) -> {
+            // 当发生异常时就不会走这里
+        })
+        .get();
+```
 
 ### 11 回调线程自由切换（for Android）
 
