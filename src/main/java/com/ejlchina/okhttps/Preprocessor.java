@@ -19,7 +19,7 @@ public interface Preprocessor {
 		/**
 		 * @return 当前的请求任务
 		 */
-		@SuppressWarnings("")
+		@SuppressWarnings("all")
 		HttpTask<?> getTask();
 
 		/**
