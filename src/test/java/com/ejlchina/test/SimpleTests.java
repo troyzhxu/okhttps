@@ -77,7 +77,6 @@ public class SimpleTests {
         System.out.println("size = " + (size / 1024) + " KB");
     }
 
-
     void sleep(int millis) {
         try {
             Thread.sleep(millis);

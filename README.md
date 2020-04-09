@@ -746,24 +746,21 @@ try {
 HttpResult result = http.sync("/users/1")
         .nothrow()      // 告诉 OkHttps 发生异常时不要直接向外抛出
         .get();
-State state = result.getState();    // 得到请求执行状态
-if (state == State.RESPONSED) {
-    // 请求已正常响应
-}
-if (state == State.CANCELED) {
-    // 请求已被取消
-}
-if (state == State.NETWORK_ERROR) {
-    // 网络错误，说明用户没网了
-}
-if (state == State.TIMEOUT) {
-    // 请求超时
-}
-if (state == State.EXCEPTION) {
-    // 其它请求异常
+// 判断执行状态
+switch (result.getState()) {
+    case RESPONSED:     // 请求已正常响应
+        break;
+    case CANCELED:      // 请求已被取消
+        break;
+    case NETWORK_ERROR: // 网络错误，说明用户没网了
+        break;
+    case TIMEOUT:       // 请求超时
+        break;
+    case EXCEPTION:     // 其它异常
+        break;
 }
 // 还可以获得具体的异常信息
-Exception err = result.getError();
+Exception error = result.getError();
 ``` 
 
 #### 10.2 异步请求的异常
