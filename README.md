@@ -777,7 +777,18 @@ http.async("/users/1")
         })
         .get();
 ```
-　　如果不设置`OnException`回调，发生异常时会在 **IO 线程** 中向上抛出，外层无法捕获：
+　　当然，还有一个全局异常监听（`ExceptionListener`）：
+
+```java
+HTTP http = HTTP.builder()
+        .exceptionListener((HttpTask<?> task, IOException error) -> {
+            // 所有请求发生异常都会走这里
+
+            return true; // 返回 true 表示继续执行 task 的 OnException 回调，false 表示不再执行
+        })
+        .build();
+```
+　　如果不设置`OnException`回调，也没有`ExceptionListener`，发生异常时会在 **IO 线程** 中向上抛出，外层无法捕获：
 
 ```java
 try {
@@ -790,7 +801,7 @@ try {
     // 这种方式是捕获不到异常的！！！！！！
 }
 ```
-　　即使不设置`OnException`回调，发生异常时，依然会走`OnComplete`回调：
+　　即使没有`OnException`回调，发生异常时，依然会走`OnComplete`回调，如果设置了的话：
 
 ```java
 http.async("/users/1")
