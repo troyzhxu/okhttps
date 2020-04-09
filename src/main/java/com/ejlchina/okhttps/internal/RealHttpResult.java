@@ -1,5 +1,6 @@
 package com.ejlchina.okhttps.internal;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class RealHttpResult implements HttpResult {
 
     private State state;
     private Response response;
-    private Exception error;
+    private IOException error;
     private TaskExecutor taskExecutor;
     private HttpTask<?> httpTask;
     private Body body;
@@ -34,13 +35,13 @@ public class RealHttpResult implements HttpResult {
         this.taskExecutor = taskExecutor;
     }
     
-    public RealHttpResult(HttpTask<?> httpTask, State state, Exception error) {
+    public RealHttpResult(HttpTask<?> httpTask, State state, IOException error) {
         this.httpTask = httpTask;
         exception(state, error);
     }
     
     
-    public void exception(State state, Exception error) {
+    public void exception(State state, IOException error) {
         this.state = state;
         this.error = error;
     }
@@ -104,7 +105,7 @@ public class RealHttpResult implements HttpResult {
     }
     
     @Override
-    public Exception getError() {
+    public IOException getError() {
         return error;
     }
 

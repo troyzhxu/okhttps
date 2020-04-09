@@ -1,6 +1,7 @@
 package com.ejlchina.okhttps;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.List;
@@ -264,7 +265,7 @@ public interface HttpResult {
 	/**
 	 * @return 执行中发生的异常
 	 */
-	Exception getError();
+	IOException getError();
 
 	/**
 	 * 关闭报文
