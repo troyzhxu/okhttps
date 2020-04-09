@@ -260,7 +260,7 @@ System.out.println(call.isCanceled());     // true
 
 ### 4 构建HTTP任务
 
-　　`HTTP`对象的`sync`与`async`方法返回一个`HttpTask`对象，该对象提供了可链式调用的`addXXX`与`setXXX`系列方法用于构建任务本身。
+　　`HTTP`对象的`sync`与`async`方法返回一个`HttpTask`对象，该对象提供了可链式调用的`addXXX`与`setXXX`等系列方法用于构建任务本身。
 
 * `addHeader(String name, String value)`    添加请求头
 * `addHeader(Map<String, String> headers)`  添加请求头
@@ -384,7 +384,7 @@ HTTP http = HTTP.builder()
 
 #### 6.4 并行预处理器
 
-　　预处理器（`Preprocessor`）可以让我们在请求发出之前对请求本身做一些改变，但与`OkHttp`的拦截器（`Interceptor`）不同：预处理器可以让我们**异步**处理这些问题。
+　　预处理器（`Preprocessor`）可以让我们在请求发出之前对请求本身做一些改变，但与`OkHttp`的拦截器（`Interceptor`）不同：预处理器可以让我们 **异步** 处理这些问题。
 
 　　例如，当我们想为请求任务自动添加`Token`头信息，而`Token`只能通过异步方法`requestToken`获取时，这时使用`Interceptor`就很难处理了，但可以使用预处理器轻松解决：
 
@@ -592,7 +592,7 @@ http.async("/download/test.zip")
 
 #### 8.3 实现断点续传
 
-　　OkHttps 对断点续传并没有再做更高层次的封装，因为这是app该去做的事情，它在设计上使各种网络问题的处理变简单的同时力求纯粹。下面的例子可以看到，OkHttps 通过一个失败回调拿到**断点**，便将复杂的问题变得简单：
+　　OkHttps 对断点续传并没有再做更高层次的封装，因为这是app该去做的事情，它在设计上使各种网络问题的处理变简单的同时力求纯粹。下面的例子可以看到，OkHttps 通过一个失败回调拿到 **断点**，便将复杂的问题变得简单：
 
 ```java
 http.sync("/download/test.zip")
@@ -718,7 +718,7 @@ call.cancel();  // 取消上传
 
 ### 10 异常处理
 
-　　使用 OkHttps 时，**异常处理不是必须的**，但相比其它的 HTTP 开发包，它还是额外提供了一个特别的处理方发（`nothrow()`），以满足不同的异常处理需求。
+　　使用 OkHttps 时，**异常处理不是必须的**，但相比其它的 HTTP 开发包，它还是额外提供了一个特别的处理方法（`nothrow()`），以满足不同的异常处理需求。
 
 #### 10.1 同步请求的异常
 
@@ -777,7 +777,7 @@ http.async("/users/1")
         })
         .get();
 ```
-　　如果不设置`OnException`回调，发生异常时会在 **IO线程池** 中向上抛出，外层无法捕获：
+　　如果不设置`OnException`回调，发生异常时会在 **IO 线程** 中向上抛出，外层无法捕获：
 
 ```java
 try {
@@ -787,7 +787,7 @@ try {
             })
             .get();
 } catch (HttpException e) {
-    // 这种方式是捕获不到异常的！！！！
+    // 这种方式是捕获不到异常的！！！！！！
 }
 ```
 　　即使不设置`OnException`回调，发生异常时，依然会走`OnComplete`回调：
@@ -798,12 +798,12 @@ http.async("/users/1")
             // 当发生异常时就不会走这里
         })
         .setOnComplete((State state) -> {
-            // 发生异常，会先执行这里，可以更加 state 判断发生了什么
+            // 发生异常，会先执行这里，可以根据 state 判断发生了什么
             // 但执行完后依然会在IO线程中向上抛出
         })
         .get();
 ```
-　　如果就是想 **不处理异常，也不向上抛出**，可以做到吗？可以！使用`nothrow()`方法：
+　　如果就是想 **不处理异常，也不向上抛出**，可以做到吗？可以！还是使用`nothrow()`方法：
 
 ```java
 http.async("/users/1")
