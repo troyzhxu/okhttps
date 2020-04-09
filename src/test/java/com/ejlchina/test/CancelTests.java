@@ -2,6 +2,7 @@ package com.ejlchina.test;
 
 import com.ejlchina.okhttps.HTTP;
 import com.ejlchina.okhttps.HttpResult;
+import com.ejlchina.okhttps.HttpResult.State;
 import com.ejlchina.okhttps.internal.HttpClient;
 import org.junit.Test;
 
@@ -13,14 +14,39 @@ import java.io.IOException;
 public class CancelTests extends BaseTest {
 
 
-    public void testCancelAll() {
+	@Test
+    public void testCancelByTag() {
         HTTP http = HTTP.builder()
-                .baseUrl("http://localhost:8080")
+                .baseUrl("http://tst-api-mini.cdyun.vip")
                 .build();
 
-
-
-
+        new Thread(() -> {
+        	sleep(50);
+//        	http.cancelAll();
+//        	int count = http.cancel("A");
+//        	println("count = " + count);
+        }).start();
+        
+        http.async("/ejlchina/comm/provinces")
+        	.setTag("A")
+        	.setOnResponse((HttpResult result) -> {
+        		println("异步：result = " + result);
+        	})
+        	.setOnComplete((State state) -> {
+        		println("异步：state = " + state);
+        	})
+        	.get();
+        
+        try {
+	        HttpResult result = http.sync("/ejlchina/comm/provinces")
+	        		.setTag("A")
+	        		.get();
+	        
+	        println("同步：result = " + result);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
+        sleep(5000);
     }
 
     @Test
