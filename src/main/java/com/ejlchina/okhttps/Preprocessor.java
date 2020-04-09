@@ -19,8 +19,9 @@ public interface Preprocessor {
 		/**
 		 * @return 当前的请求任务
 		 */
+		@SuppressWarnings("")
 		HttpTask<?> getTask();
-		
+
 		/**
 		 * @return HTTP
 		 */
