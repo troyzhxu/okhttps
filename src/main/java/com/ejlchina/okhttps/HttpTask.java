@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -559,12 +560,15 @@ public abstract class HttpTask<C extends HttpTask<?>> {
         }
     }
 
-	protected State toState(IOException e) {
+	protected State toState(IOException e, boolean sync) {
 		if (e instanceof SocketTimeoutException) {
 		    return State.TIMEOUT;
 		} else if (e instanceof UnknownHostException || e instanceof ConnectException) {
 			return State.NETWORK_ERROR;
-		} else if ("Canceled".equals(e.getMessage())) {
+		}
+		String msg = e.getMessage();
+		if (msg != null && ("Canceled".equals(msg) || e instanceof SocketException
+                && msg.startsWith("Socket operation on nonsocket"))) {
 			return State.CANCELED;
 		}
 		return State.EXCEPTION;

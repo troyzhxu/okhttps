@@ -98,7 +98,7 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
                 	SyncHttpTask.this.notify();
                 }
             } catch (IOException e) {
-            	State state = toState(e);
+            	State state = toState(e, true);
             	synchronized (SyncHttpTask.this) {
 					result.exception(state, e);
 					SyncHttpTask.this.notify();
@@ -114,7 +114,7 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
     			}
         	}
     	}
-    	Exception e = result.getError();
+		IOException e = result.getError();
     	if (e != null && result.getState() != State.CANCELED 
     			&& !nothrow) {
     		throw new HttpException("请求执行异常", e);

@@ -239,7 +239,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException error) {
-            	State state = toState(error);
+            	State state = toState(error, false);
             	if (state == State.CANCELED) {
             		httpCall.setResult(new RealHttpResult(AsyncHttpTask.this, state));
             	} else {
