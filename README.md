@@ -15,6 +15,9 @@
  * 单方法回调，充分利用 Lambda 表达式
  * TCP连接池、Http2
 
+> 1. OkHttps 非常轻量，自身代码在 2000 行左右
+> 2. OkHttps 有较高的编码质量，sonarqube 结果为 3A，[查看报告](https://gitee.com/ejlchina-zhxu/okhttps/quality_analyses?platform=sonar_qube)
+
 ### 前世：[HttpUtils, V2.3.0 之后重命名为 OkHttps](https://gitee.com/ejlchina-zhxu/httputils)
 ### 当前文档版本[1.0.1]
 ### API文档：[https://apidoc.gitee.com/ejlchina-zhxu/okhttps](https://apidoc.gitee.com/ejlchina-zhxu/okhttps)
@@ -58,8 +61,8 @@
     - [10.2 异步请求的异常](#102-异步请求的异常)
   + [11 回调线程自由切换（for Android）](#11-回调线程自由切换for-android)
   + [12 实现生命周期绑定（for Android）](#12-实现生命周期绑定for-android)
-+ [参考文档](#参考文档)
 + [联系方式](#联系方式)
++ [参与贡献](#参与贡献)
 
 ## 安装教程
 
@@ -905,8 +908,6 @@ http.sync("/download/test.zip")
 
 文档完善中，敬请期待...
 
-
-## 参考文档
 
 
 ## 联系方式
