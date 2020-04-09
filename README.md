@@ -743,9 +743,8 @@ try {
 　　这种传统的异常处理方式，当然可以解决问题，但是 OkHttps 提供了更优雅的方案：
 
 ```java
-HttpResult result = http.sync("/users/1")
-        .nothrow()      // 告诉 OkHttps 发生异常时不要直接向外抛出
-        .get();
+// 使用 nothrow 方法告诉 OkHttps 发生异常时不要直接向外抛出
+HttpResult result = http.sync("/users/1").nothrow().get();
 // 判断执行状态
 switch (result.getState()) {
     case RESPONSED:     // 请求已正常响应
