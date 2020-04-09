@@ -10,6 +10,9 @@
 		<java-version>1.8</java-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</sonatypeOssDistMgmtSnapshotsUrl>
+		<sonar.exclusions>
+			src/main/java/com/ejlchina/okhttps/Preprocessor
+		</sonar.exclusions>
 	</properties>
   
   	<licenses>
