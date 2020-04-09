@@ -30,18 +30,18 @@ import okhttp3.WebSocketListener;
 
 public class HttpClient implements HTTP {
 
-	
-	private OkHttpClient client;
-	
-	private String baseUrl;
-	// 媒体类型
-	private Map<String, String> mediaTypes;
-	// 执行器
-	private TaskExecutor executor;
-	// 预处理器
-	private Preprocessor[] preprocessors;
 
-	private List<TagCall> tagCalls;
+	final OkHttpClient client;
+	
+	final String baseUrl;
+	// 媒体类型
+	final Map<String, String> mediaTypes;
+	// 执行器
+	final TaskExecutor executor;
+	// 预处理器
+	final Preprocessor[] preprocessors;
+
+	final List<TagCall> tagCalls;
 	
 	
 	private HttpClient(Builder builder) {
@@ -85,7 +85,12 @@ public class HttpClient implements HTTP {
 		}
 		return count;
 	}
-	
+
+	@Override
+	public void cancelAll() {
+		client.dispatcher().cancelAll();
+	}
+
 	@Override
 	public Call request(Request request) {
     	return client.newCall(request);

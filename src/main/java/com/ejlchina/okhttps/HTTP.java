@@ -37,7 +37,12 @@ public interface HTTP {
      * @return 被取消的任务数量
      */
     int cancel(String tag);
-    
+
+	/**
+	 * 取消所有HTTP任务，包括同步和异步
+	 */
+	void cancelAll();
+
     /**
      * OkHttp 原生请求 （该请求不经过 预处理器）
      * @param request 请求
