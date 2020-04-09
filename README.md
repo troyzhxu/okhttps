@@ -87,11 +87,12 @@
 ```java
 HTTP http = HTTP.builder().build();
 ```
-　　以上代码构建了一个最简单的`HTTP`实例，它拥有以下三个方法：
+　　以上代码构建了一个最简单的`HTTP`实例，它拥有以下方法：
 
 * `async(String url)` 开始一个异步HTTP任务
 * `sync(String url)` 开始一个同步HTTP任务
 * `cancel(String tag)` 根据标签批量取消HTTP任务
+* `cancelAll()` 取消所有任务（since v1.0.2）
 
 　　为了使用方便，在构建的时候，我们更愿意指定一个`BaseUrl`（请参见[5.1 设置 BaseUrl](#51-设置-baseurl)）:
 
@@ -323,7 +324,7 @@ http.async("/users")    //（5）
 int count = http.cancel("B");              //（2）（3）（4）被取消（取消标签包含"B"的任务）
 System.out.println(count);                 // 输出 3
 ```
-　　同样的，只有异步HTTP任务才可以被取消。标签除了可以用来取消任务，在预处理器中它也可以发挥作用，请参见[并行预处理器](#54-并行预处理器)与[串行预处理器](#55-串行预处理器)。
+　　标签除了可以用来取消任务，在预处理器中它也可以发挥作用，请参见[并行预处理器](#54-并行预处理器)与[串行预处理器](#55-串行预处理器)。
 
 ### 6 配置 HTTP
 
