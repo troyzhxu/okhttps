@@ -567,7 +567,8 @@ public abstract class HttpTask<C extends HttpTask<?>> {
 			return State.NETWORK_ERROR;
 		}
 		String msg = e.getMessage();
-		if (msg != null && ("Canceled".equals(msg) || e instanceof SocketException
+		if (msg != null && ("Canceled".equals(msg) 
+				|| sync && e instanceof SocketException
                 && msg.startsWith("Socket operation on nonsocket"))) {
 			return State.CANCELED;
 		}
