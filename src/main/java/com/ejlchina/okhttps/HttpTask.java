@@ -18,6 +18,7 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -33,7 +34,6 @@ public abstract class HttpTask<C extends HttpTask<?>> {
     protected boolean nothrow;
     protected String tag;
     protected boolean nextOnIO = false;
-    
     private String urlPath;
     private Map<String, String> headers;
     private Map<String, String> pathParams;
@@ -246,19 +246,10 @@ public abstract class HttpTask<C extends HttpTask<?>> {
      * @return HttpTask 实例
      **/
     public C addPathParam(Map<String, ?> params) {
-        if (params != null) {
-            if (pathParams == null) {
-                pathParams = new HashMap<>();
-            }
-            params.forEach((String name, Object value) -> {
-            	if (name != null && value != null) {
-            		pathParams.put(name, value.toString());
-            	}
-            });
-        }
+        addParams(params,this.pathParams);
         return (C) this;
     }
-    
+
     /**
      * URL参数：拼接在URL后的参数
      * @param name 参数名
@@ -281,16 +272,7 @@ public abstract class HttpTask<C extends HttpTask<?>> {
      * @return HttpTask 实例
      **/
     public C addUrlParam(Map<String, ?> params) {
-        if (params != null) {
-            if (urlParams == null) {
-                urlParams = new HashMap<>();
-            }
-            params.forEach((String name, Object value) -> {
-            	if (name != null && value != null) {
-            		urlParams.put(name, value.toString());
-            	}
-            });
-        }
+        addParams(params,this.urlParams);
         return (C) this;
     }
 
@@ -316,19 +298,26 @@ public abstract class HttpTask<C extends HttpTask<?>> {
      * @return HttpTask 实例
      **/
     public C addBodyParam(Map<String, ?> params) {
-    	if (params != null) {
-            if (bodyParams == null) {
-            	bodyParams = new HashMap<>();
-            }
-            params.forEach((String name, Object value) -> {
-            	if (name != null && value != null) {
-            		bodyParams.put(name, value.toString());
-            	}
-            });
-        }
+    	addParams(params,this.bodyParams);
         return (C) this;
     }
-
+    private void addParams(Map<String, ?> params,Map<String, String> addParam){
+        if (params != null) {
+            if (addParam == null) {
+                addParam = new HashMap<>();
+            }
+//            params.forEach((String name, Object value) -> {
+//                if (name != null && value != null) {
+//                    addParam.put(name, value.toString());
+//                }
+//            });
+            for (Map.Entry<String, ?> stringEntry : params.entrySet()) {
+                if (stringEntry.getKey() != null && stringEntry.getValue() != null) {
+                    addParam.put(stringEntry.getKey(), stringEntry.getValue().toString());
+                }
+            }
+        }
+    }
     /**
      * Json参数：请求体为Json，支持多层结构
      * @param name JSON键名
@@ -504,6 +493,10 @@ public abstract class HttpTask<C extends HttpTask<?>> {
     }
     
     protected Call prepareCall(String method) {
+//        OkHttpClient client = new OkHttpClient.Builder()
+//                .connectTimeout(connectTimeout,timeUnit) // 设置连接超时时间
+//                .readTimeout(readTimeout,timeUnit) // 设置读取超时时间
+//                .build();
     	assertNotConflict("GET".equals(method));
         Request.Builder builder = new Request.Builder()
         		.url(buildUrlPath());
@@ -526,7 +519,7 @@ public abstract class HttpTask<C extends HttpTask<?>> {
 		}
 		switch (method) {
         case "GET":
-        	builder.get();
+        	builder.get().build();
         	break;
         case "POST":
         	builder.post(reqBody);

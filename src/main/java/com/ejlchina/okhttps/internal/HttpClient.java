@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 
 import com.ejlchina.okhttps.*;
 import com.ejlchina.okhttps.HttpResult.State;
@@ -58,7 +59,17 @@ public class HttpClient implements HTTP {
     public SyncHttpTask sync(String url) {
         return new SyncHttpTask(this, urlPath(url));
     }
-   
+
+	@Override
+	public AsyncHttpTask async() {
+		return new AsyncHttpTask(this, urlPath());
+	}
+
+	@Override
+	public SyncHttpTask sync() {
+		return new SyncHttpTask(this, urlPath());
+	}
+
 	@Override
 	public int cancel(String tag) {
 		if (tag == null) {
@@ -86,6 +97,7 @@ public class HttpClient implements HTTP {
 
 	@Override
 	public Call request(Request request) {
+
     	return client.newCall(request);
     }
     
@@ -269,6 +281,13 @@ public class HttpClient implements HTTP {
 		}
 		throw new HttpException("在设置 BaseUrl 之前，您必须使用全路径URL发起请求，当前URL为：" + urlPath);
 	}
+
+	private String urlPath() {
+		if (baseUrl != null) {
+			return baseUrl;
+		}
+		throw new HttpException("在设置 BaseUrl 之前，您必须使用全路径URL发起请求，当前URL为：" + baseUrl);
+	}
     
 	
 	public static class Builder {
@@ -430,7 +449,22 @@ public class HttpClient implements HTTP {
 			this.downloadListener = listener;
 			return this;
 		}
-		
+
+		/**
+		 * 设置超时时间
+		 * @param connectTimeout 连接时间
+		 * @param readTimeout 读取时间
+		 * @param timeUnit
+		 * @return
+		 */
+		public Builder builderTimeOut(long connectTimeout, long readTimeout, TimeUnit timeUnit) {
+			this.client= new OkHttpClient.Builder()
+					.connectTimeout(connectTimeout,timeUnit) // 设置连接超时时间
+					.readTimeout(readTimeout,timeUnit) // 设置读取超时时间
+					.build();
+			return this;
+		}
+
 		public HTTP build() {
 			if (configurator != null || client == null) {
 				OkHttpClient.Builder builder = new OkHttpClient.Builder();
