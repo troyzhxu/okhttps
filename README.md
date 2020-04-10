@@ -462,7 +462,7 @@ HTTP http = HTTP.builder()
 　　全局回调监听与拦截器的异同:
 > * 拦截器可以添加多个，全局回调监听分三种，每种最多添加一个
 > * 拦截器处的理时机在请求前和响应后，全局回调监听只在响应后，并且晚于拦截器
-> * 全局回调监听可以阻断（return false）某个请求的具体回调，而拦截器不能
+> * 全局回调监听可以 **阻断**（return false）某个请求的具体回调，而拦截器不能
 
 #### 6.7 全局下载监听
 
@@ -750,7 +750,7 @@ try {
 　　这种传统的异常处理方式，当然可以解决问题，但是 OkHttps 有更佳的方案：
 
 ```java
-// 使用 nothrow 方法告诉 OkHttps 发生异常时不要直接向外抛出
+// 方法  nothrow() 让异常不直接抛出
 HttpResult result = http.sync("/users/1").nothrow().get();
 // 判断执行状态
 switch (result.getState()) {
@@ -766,7 +766,7 @@ switch (result.getState()) {
         break;
 }
 // 还可以获得具体的异常信息
-Exception error = result.getError();
+IOException error = result.getError();
 ``` 
 
 #### 10.2 异步请求的异常
