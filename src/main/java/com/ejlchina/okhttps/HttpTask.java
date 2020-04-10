@@ -474,7 +474,7 @@ public abstract class HttpTask<C extends HttpTask<?>> {
         return (C) this;
     }
 
-    class FilePara {
+    static class FilePara {
 
         String type;
         String fileName;
@@ -624,27 +624,31 @@ public abstract class HttpTask<C extends HttpTask<?>> {
             throw new HttpException("url 里有 pathParameter 没有设置，你必须先调用 addPathParam 为其设置！");
         }
         if (urlParams != null) {
-            if (url.contains("?")) {
-                if (!url.endsWith("?")) {
-                    url = url.trim();
-                    if (url.lastIndexOf("=") < url.lastIndexOf("?") + 2) {
-                        throw new HttpException("url 格式错误，'？' 后没有发现 '='");
-                    }
-                    if (!url.endsWith("&")) {
-                        url += "&";
-                    }
-                }
-            } else {
-                url += "?";
-            }
-            for (String name : urlParams.keySet()) {
-                url += name + "=" + urlParams.get(name) + "&";
-            }
-            url = url.substring(0, url.length() - 1);
+            url = buildUrl(url.trim());
         }
         return url;
     }
 
+    private String buildUrl(String url) {
+        StringBuilder sb = new StringBuilder(url);
+        if (url.contains("?")) {
+            if (!url.endsWith("?")) {
+                if (url.lastIndexOf("=") < url.lastIndexOf("?") + 2) {
+                    throw new HttpException("url 格式错误，'？' 后没有发现 '='");
+                }
+                if (!url.endsWith("&")) {
+                    sb.append('&');
+                }
+            }
+        } else {
+            sb.append('?');
+        }
+        for (String name : urlParams.keySet()) {
+            sb.append(name).append('=').append(urlParams.get(name)).append('&');
+        }
+        sb.delete(sb.length() - 1, sb.length());
+        return sb.toString();
+    }
 
     protected void assertNotConflict(boolean isGetRequest) {
         if (isGetRequest) {
