@@ -44,273 +44,297 @@ public abstract class HttpTask<C extends HttpTask<?>> {
     private String requestJson;
     private OnCallback<Process> onProcess;
     private boolean pOnIO;
-	private long stepBytes = 0;
-	private double stepRate = -1;
-	
-	private Object object;
-	
-    
+    private long stepBytes = 0;
+    private double stepRate = -1;
+
+    private Object object;
+
+
     public HttpTask(HttpClient httpClient, String url) {
-    	this.httpClient = httpClient;
-    	this.urlPath = url;
+        this.httpClient = httpClient;
+        this.urlPath = url;
     }
 
     /**
      * 获取请求任务的URL地址
+     *
      * @return URL地址
      */
     public String getUrl() {
-    	return urlPath;
+        return urlPath;
     }
-    
+
     /**
      * 获取请求任务的标签
+     *
      * @return 标签
      */
     public String getTag() {
-		return tag;
-	}
-    
+        return tag;
+    }
+
     /**
      * 标签匹配
      * 判断任务标签与指定的标签是否匹配（包含指定的标签）
+     *
      * @param tag 标签
      * @return 是否匹配
      */
     public boolean isTagged(String tag) {
-    	if (this.tag != null && tag != null) {
-    		return this.tag.contains(tag);
-    	}
-    	return false;
+        if (this.tag != null && tag != null) {
+            return this.tag.contains(tag);
+        }
+        return false;
     }
-    
+
     /**
      * 获取请求任务的头信息
+     *
      * @return 头信息
      */
     public Map<String, String> getHeaders() {
-		return headers;
-	}
-    
+        return headers;
+    }
+
     /**
      * 获得被绑定的对象
+     *
      * @return Object
      */
     public Object getBound() {
-    	return object;
+        return object;
     }
 
-	/**
+    /**
      * 设置在发生异常时不向上抛出，设置后：
      * 异步请求可以在异常回调内捕获异常，同步请求在返回结果中找到该异常
+     *
      * @return HttpTask 实例
      */
     public C nothrow() {
-    	this.nothrow = true;
-		return (C) this;
+        this.nothrow = true;
+        return (C) this;
     }
-    
+
     /**
      * 为请求任务添加标签
+     *
      * @param tag 标签
      * @return HttpTask 实例
      */
     public C setTag(String tag) {
-    	this.tag = tag;
-    	return (C) this;
+        this.tag = tag;
+        return (C) this;
     }
 
     /**
      * 下一个回调在IO线程执行
+     *
      * @return HttpTask 实例
      */
     public C nextOnIO() {
-    	nextOnIO = true;
-    	return (C) this;
+        nextOnIO = true;
+        return (C) this;
     }
-    
+
     /**
      * 绑定一个对象
+     *
      * @return HttpTask 实例
      */
     public C bind(Object object) {
-    	this.object = object;
-    	return (C) this;
-    }
-    
-	/**
-     * 添加请求头
-     * @param name 请求头名
-     * @param value 请求头值
-     * @return HttpTask 实例
-     */
-	public C addHeader(String name, String value) {
-    	if (name != null && value != null) {
-    		if (headers == null) {
-                headers = new HashMap<>();
-            }
-            headers.put(name, value);
-    	}
+        this.object = object;
         return (C) this;
     }
 
     /**
      * 添加请求头
+     *
+     * @param name  请求头名
+     * @param value 请求头值
+     * @return HttpTask 实例
+     */
+    public C addHeader(String name, String value) {
+        if (name != null && value != null) {
+            if (headers == null) {
+                headers = new HashMap<>();
+            }
+            headers.put(name, value);
+        }
+        return (C) this;
+    }
+
+    /**
+     * 添加请求头
+     *
      * @param headers 请求头集合
      * @return HttpTask 实例
      */
     public C addHeader(Map<String, String> headers) {
-    	if (headers != null) {
-    		if (this.headers == null) {
-            	this.headers = new HashMap<>();
+        if (headers != null) {
+            if (this.headers == null) {
+                this.headers = new HashMap<>();
             }
             this.headers.putAll(headers);
-    	}
+        }
         return (C) this;
     }
-    
+
     /**
      * 设置Range头信息
      * 表示接收报文体时跳过的字节数，用于断点续传
+     *
      * @param rangeStart 表示从 rangeStart 个字节处开始接收，通常是已经下载的字节数，即上次的断点）
      * @return HttpTask 实例
      */
     public C setRange(long rangeStart) {
-    	return addHeader("Range", "bytes=" + rangeStart + "-");
+        return addHeader("Range", "bytes=" + rangeStart + "-");
     }
-    
+
     /**
      * 设置Range头信息
      * 设置接收报文体时接收的范围，用于分块下载
+     *
      * @param rangeStart 表示从 rangeStart 个字节处开始接收
-     * @param rangeEnd 表示接收到 rangeEnd 个字节处
+     * @param rangeEnd   表示接收到 rangeEnd 个字节处
      * @return HttpTask 实例
      */
     public C setRange(long rangeStart, long rangeEnd) {
-    	return addHeader("Range", "bytes=" + rangeStart + "-" + rangeEnd);
+        return addHeader("Range", "bytes=" + rangeStart + "-" + rangeEnd);
     }
-    
-	/**
-	 * 设置报文体发送进度回调
-	 * @param onProcess 进度回调函数
-	 * @return HttpTask 实例
-	 */
-	public C setOnProcess(OnCallback<Process> onProcess) {
-		this.onProcess = onProcess;
-		pOnIO = nextOnIO;
-		nextOnIO = false;
-		return (C) this;
-	}
-	
-	/**
-	 * 设置进度回调的步进字节，默认 8K（8192）
-	 * 表示每接收 stepBytes 个字节，执行一次进度回调
-	 * @param stepBytes 步进字节
-	 * @return HttpTask 实例 
-	 */
-	public C setStepBytes(long stepBytes) {
-		this.stepBytes = stepBytes;
-		return (C) this;
-	}
-	
-	/**
-	 * 设置进度回调的步进比例
-	 * 表示每接收 stepRate 比例，执行一次进度回调
-	 * @param stepRate 步进比例
-	 * @return HttpTask 实例
-	 */
-	public C setStepRate(double stepRate) {
-		this.stepRate = stepRate;
-		return (C) this;
-	}
-    
+
+    /**
+     * 设置报文体发送进度回调
+     *
+     * @param onProcess 进度回调函数
+     * @return HttpTask 实例
+     */
+    public C setOnProcess(OnCallback<Process> onProcess) {
+        this.onProcess = onProcess;
+        pOnIO = nextOnIO;
+        nextOnIO = false;
+        return (C) this;
+    }
+
+    /**
+     * 设置进度回调的步进字节，默认 8K（8192）
+     * 表示每接收 stepBytes 个字节，执行一次进度回调
+     *
+     * @param stepBytes 步进字节
+     * @return HttpTask 实例
+     */
+    public C setStepBytes(long stepBytes) {
+        this.stepBytes = stepBytes;
+        return (C) this;
+    }
+
+    /**
+     * 设置进度回调的步进比例
+     * 表示每接收 stepRate 比例，执行一次进度回调
+     *
+     * @param stepRate 步进比例
+     * @return HttpTask 实例
+     */
+    public C setStepRate(double stepRate) {
+        this.stepRate = stepRate;
+        return (C) this;
+    }
+
     /**
      * 路径参数：替换URL里的{name}
-     * @param name 参数名
+     *
+     * @param name  参数名
      * @param value 参数值
      * @return HttpTask 实例
      **/
     public C addPathParam(String name, Object value) {
-    	if (name != null && value != null) {
-	        if (pathParams == null) {
-	            pathParams = new HashMap<>();
-	        }
-	        pathParams.put(name, value.toString());
-    	}
+        if (name != null && value != null) {
+            if (pathParams == null) {
+                pathParams = new HashMap<>();
+            }
+            pathParams.put(name, value.toString());
+        }
         return (C) this;
     }
 
     /**
      * 路径参数：替换URL里的{name}
+     *
      * @param params 参数集合
      * @return HttpTask 实例
      **/
     public C addPathParam(Map<String, ?> params) {
-        addParams(params,this.pathParams);
+        addParams(params, this.pathParams);
         return (C) this;
     }
 
     /**
      * URL参数：拼接在URL后的参数
-     * @param name 参数名
+     *
+     * @param name  参数名
      * @param value 参数值
      * @return HttpTask 实例
      **/
     public C addUrlParam(String name, Object value) {
-    	if (name != null && value != null) {
-	        if (urlParams == null) {
-	            urlParams = new HashMap<>();
-	        }
-	        urlParams.put(name, value.toString());
-    	}
+        if (name != null && value != null) {
+            if (urlParams == null) {
+                urlParams = new HashMap<>();
+            }
+            urlParams.put(name, value.toString());
+        }
         return (C) this;
     }
 
     /**
      * URL参数：拼接在URL后的参数
+     *
      * @param params 参数集合
      * @return HttpTask 实例
      **/
     public C addUrlParam(Map<String, ?> params) {
-        addParams(params,this.urlParams);
+        addParams(params, this.urlParams);
         return (C) this;
     }
 
     /**
      * Body参数：放在Body里的参数
-     * @param name 参数名
+     *
+     * @param name  参数名
      * @param value 参数值
      * @return HttpTask 实例
      **/
     public C addBodyParam(String name, Object value) {
-    	if (name != null && value != null) {
-	        if (bodyParams == null) {
-	            bodyParams = new HashMap<>();
-	        }
-	        bodyParams.put(name, value.toString());
-    	}
+        if (name != null && value != null) {
+            if (bodyParams == null) {
+                bodyParams = new HashMap<>();
+            }
+            bodyParams.put(name, value.toString());
+        }
         return (C) this;
     }
 
     /**
      * Body参数：放在Body里的参数
+     *
      * @param params 参数集合
      * @return HttpTask 实例
      **/
     public C addBodyParam(Map<String, ?> params) {
-    	addParams(params,this.bodyParams);
+        addParams(params, this.bodyParams);
         return (C) this;
     }
-    private void addParams(Map<String, ?> params,Map<String, String> addParam){
+
+    /**
+     * 批量添加参数
+     *
+     * @param params
+     * @param addParam
+     */
+    private void addParams(Map<String, ?> params, Map<String, String> addParam) {
         if (params != null) {
             if (addParam == null) {
                 addParam = new HashMap<>();
             }
-//            params.forEach((String name, Object value) -> {
-//                if (name != null && value != null) {
-//                    addParam.put(name, value.toString());
-//                }
-//            });
             for (Map.Entry<String, ?> stringEntry : params.entrySet()) {
                 if (stringEntry.getKey() != null && stringEntry.getValue() != null) {
                     addParam.put(stringEntry.getKey(), stringEntry.getValue().toString());
@@ -318,32 +342,35 @@ public abstract class HttpTask<C extends HttpTask<?>> {
             }
         }
     }
+
     /**
      * Json参数：请求体为Json，支持多层结构
-     * @param name JSON键名
+     *
+     * @param name  JSON键名
      * @param value JSON键值
      * @return HttpTask 实例
      */
     public C addJsonParam(String name, Object value) {
-    	if (name != null && value != null) {
-	        if (jsonParams == null) {
-	        	jsonParams = new HashMap<>();
-	        }
-	        jsonParams.put(name, value);
-    	}
+        if (name != null && value != null) {
+            if (jsonParams == null) {
+                jsonParams = new HashMap<>();
+            }
+            jsonParams.put(name, value);
+        }
         return (C) this;
     }
 
     /**
      * Json参数：请求体为Json，只支持单层Json
      * 若请求json为多层结构，请使用setRequestJson方法
+     *
      * @param params JSON键值集合
      * @return HttpTask 实例
      */
     public C addJsonParam(Map<String, Object> params) {
-    	if (params != null) {
+        if (params != null) {
             if (jsonParams == null) {
-            	jsonParams = new HashMap<>();
+                jsonParams = new HashMap<>();
             }
             jsonParams.putAll(params);
         }
@@ -352,6 +379,7 @@ public abstract class HttpTask<C extends HttpTask<?>> {
 
     /**
      * 设置 json 请求体
+     *
      * @param json JSON字符串 或 Java对象（将依据 对象的get方法序列化为 json 字符串）
      * @return HttpTask 实例
      **/
@@ -361,26 +389,28 @@ public abstract class HttpTask<C extends HttpTask<?>> {
 
     /**
      * 请求体为json
-     * @param json JSON字符串 或 Java对象，将跟换 bean的get方法序列化程 json 字符串
+     *
+     * @param json       JSON字符串 或 Java对象，将跟换 bean的get方法序列化程 json 字符串
      * @param dateFormat 序列化json时对日期类型字段的处理格式
      * @return HttpTask 实例
      **/
     public C setRequestJson(Object json, String dateFormat) {
         if (json != null) {
-        	if (json instanceof String) {
-        		requestJson = json.toString();
-        	} else if (dateFormat != null) {
-        		requestJson = JSON.toJSONStringWithDateFormat(json, dateFormat);
-        	} else {
-        		requestJson = JSON.toJSONString(json);
-        	}
+            if (json instanceof String) {
+                requestJson = json.toString();
+            } else if (dateFormat != null) {
+                requestJson = JSON.toJSONStringWithDateFormat(json, dateFormat);
+            } else {
+                requestJson = JSON.toJSONString(json);
+            }
         }
         return (C) this;
     }
-    
+
     /**
      * 添加文件参数
-     * @param name 参数名
+     *
+     * @param name     参数名
      * @param filePath 文件路径
      * @return HttpTask 实例
      */
@@ -390,6 +420,7 @@ public abstract class HttpTask<C extends HttpTask<?>> {
 
     /**
      * 添加文件参数
+     *
      * @param name 参数名
      * @param file 文件
      * @return HttpTask 实例
@@ -408,57 +439,61 @@ public abstract class HttpTask<C extends HttpTask<?>> {
 
     /**
      * 添加文件参数
-     * @param name 参数名
-     * @param type 文件类型: 如 png、jpg、jpeg 等
+     *
+     * @param name        参数名
+     * @param type        文件类型: 如 png、jpg、jpeg 等
      * @param inputStream 文件输入流
      * @return HttpTask 实例
      */
     public C addFileParam(String name, String type, InputStream inputStream) {
-    	return addFileParam(name, type, null, inputStream);
+        return addFileParam(name, type, null, inputStream);
     }
-    
+
     /**
      * 添加文件参数
-     * @param name 参数名
-     * @param type 文件类型: 如 png、jpg、jpeg 等
+     *
+     * @param name     参数名
+     * @param type     文件类型: 如 png、jpg、jpeg 等
      * @param fileName 文件名
-     * @param input 文件输入流
+     * @param input    文件输入流
      * @return HttpTask 实例
      */
     public C addFileParam(String name, String type, String fileName, InputStream input) {
         if (name != null && input != null) {
             byte[] content = null;
-			try {
-				Buffer buffer = new Buffer();
-				content = buffer.readFrom(input).readByteArray();
-				buffer.close();
-			} catch (IOException e) {
-				throw new HttpException("读取文件输入流出错：", e);
-			} finally {
-				Util.closeQuietly(input);
-			}
+            try {
+                Buffer buffer = new Buffer();
+                content = buffer.readFrom(input).readByteArray();
+                buffer.close();
+            } catch (IOException e) {
+                throw new HttpException("读取文件输入流出错：", e);
+            } finally {
+                Util.closeQuietly(input);
+            }
             addFileParam(name, type, fileName, content);
         }
         return (C) this;
     }
-    
+
     /**
      * 添加文件参数
-     * @param name 参数名
-     * @param type 文件类型: 如 png、jpg、jpeg 等
+     *
+     * @param name    参数名
+     * @param type    文件类型: 如 png、jpg、jpeg 等
      * @param content 文件内容
      * @return HttpTask 实例
      */
     public C addFileParam(String name, String type, byte[] content) {
-    	return addFileParam(name, type, null, content);
+        return addFileParam(name, type, null, content);
     }
-    
+
     /**
      * 添加文件参数
-     * @param name 参数名
-     * @param type 文件类型: 如 png、jpg、jpeg 等
+     *
+     * @param name     参数名
+     * @param type     文件类型: 如 png、jpg、jpeg 等
      * @param fileName 文件名
-     * @param content 文件内容
+     * @param content  文件内容
      * @return HttpTask 实例
      */
     public C addFileParam(String name, String type, String fileName, byte[] content) {
@@ -472,75 +507,75 @@ public abstract class HttpTask<C extends HttpTask<?>> {
     }
 
     class FilePara {
-    	
-    	String type;
-    	String fileName;
-    	byte[] content;
-    	File file;
 
-    	FilePara(String type, String fileName, byte[] content) {
-			this.type = type;
-			this.fileName = fileName;
-			this.content = content;
-		}
+        String type;
+        String fileName;
+        byte[] content;
+        File file;
 
-		FilePara(String type, String fileName, File file) {
-			this.type = type;
-			this.fileName = fileName;
-			this.file = file;
-		}
+        FilePara(String type, String fileName, byte[] content) {
+            this.type = type;
+            this.fileName = fileName;
+            this.content = content;
+        }
+
+        FilePara(String type, String fileName, File file) {
+            this.type = type;
+            this.fileName = fileName;
+            this.file = file;
+        }
 
     }
-    
+
     protected Call prepareCall(String method) {
 //        OkHttpClient client = new OkHttpClient.Builder()
 //                .connectTimeout(connectTimeout,timeUnit) // 设置连接超时时间
 //                .readTimeout(readTimeout,timeUnit) // 设置读取超时时间
 //                .build();
-    	assertNotConflict("GET".equals(method));
+        assertNotConflict("GET".equals(method));
         Request.Builder builder = new Request.Builder()
-        		.url(buildUrlPath());
+                .url(buildUrlPath());
         buildHeaders(builder);
-		RequestBody reqBody = null;
-		if (!"GET".equals(method)) {
-			reqBody = buildRequestBody();
-			if (onProcess != null) {
-				long contentLength = contentLength(reqBody);
-				if (stepRate > 0 && stepRate <= 1) {
-					stepBytes = (long) (contentLength * stepRate);
-				}
-				if (stepBytes <= 0) {
-					stepBytes = Process.DEFAULT_STEP_BYTES;
-				}
-				reqBody = new ProcessRequestBody(reqBody, onProcess, 
-						httpClient.getExecutor().getExecutor(pOnIO), 
-						contentLength, stepBytes);
-			}
-		}
-		switch (method) {
-        case "GET":
-        	builder.get().build();
-        	break;
-        case "POST":
-        	builder.post(reqBody);
-        	break;
-        case "PUT":
-        	builder.put(reqBody);
-        	break;
-        case "DELETE":
-        	builder.delete(reqBody);
-        	break;
+        RequestBody reqBody = null;
+        if (!"GET".equals(method)) {
+            reqBody = buildRequestBody();
+            if (onProcess != null) {
+                long contentLength = contentLength(reqBody);
+                if (stepRate > 0 && stepRate <= 1) {
+                    stepBytes = (long) (contentLength * stepRate);
+                }
+                if (stepBytes <= 0) {
+                    stepBytes = Process.DEFAULT_STEP_BYTES;
+                }
+                reqBody = new ProcessRequestBody(reqBody, onProcess,
+                        httpClient.getExecutor().getExecutor(pOnIO),
+                        contentLength, stepBytes);
+            }
         }
-		return httpClient.request(builder.build());
-	}
+        switch (method) {
+            case "GET":
+                builder.get().build();
+                break;
+            case "POST":
+                builder.post(reqBody);
+                break;
+            case "PUT":
+                builder.put(reqBody);
+                break;
+            case "DELETE":
+                builder.delete(reqBody);
+                break;
+        }
+        return httpClient.request(builder.build());
+    }
 
-	private long contentLength(RequestBody reqBody) {
-		try {
-			return reqBody.contentLength();
-		} catch (IOException e) {
-			throw new HttpException("无法获取请求体长度", e);
-		}
-	}
+    private long contentLength(RequestBody reqBody) {
+        try {
+            return reqBody.contentLength();
+        } catch (IOException e) {
+            throw new HttpException("无法获取请求体长度", e);
+        }
+    }
 
     private void buildHeaders(Request.Builder builder) {
         if (headers != null) {
@@ -553,19 +588,19 @@ public abstract class HttpTask<C extends HttpTask<?>> {
         }
     }
 
-	protected State toState(IOException e, boolean sync) {
-		if (e instanceof SocketTimeoutException) {
-		    return State.TIMEOUT;
-		} else if (e instanceof UnknownHostException || e instanceof ConnectException) {
-			return State.NETWORK_ERROR;
-		}
-		String msg = e.getMessage();
-		if (msg != null && ("Canceled".equals(msg) || e instanceof SocketException
+    protected State toState(IOException e, boolean sync) {
+        if (e instanceof SocketTimeoutException) {
+            return State.TIMEOUT;
+        } else if (e instanceof UnknownHostException || e instanceof ConnectException) {
+            return State.NETWORK_ERROR;
+        }
+        String msg = e.getMessage();
+        if (msg != null && ("Canceled".equals(msg) || e instanceof SocketException
                 && msg.startsWith("Socket operation on nonsocket"))) {
-			return State.CANCELED;
-		}
-		return State.EXCEPTION;
-	}
+            return State.CANCELED;
+        }
+        return State.EXCEPTION;
+    }
 
     private RequestBody buildRequestBody() {
         if (jsonParams != null) {
@@ -584,11 +619,11 @@ public abstract class HttpTask<C extends HttpTask<?>> {
                 MediaType type = httpClient.getMediaType(file.type);
                 RequestBody bodyPart;
                 if (file.file != null) {
-                	bodyPart = RequestBody.create(type, file.file);
+                    bodyPart = RequestBody.create(type, file.file);
                 } else {
-                	bodyPart = RequestBody.create(type, file.content);
+                    bodyPart = RequestBody.create(type, file.content);
                 }
-				builder.addFormDataPart(name, file.fileName, bodyPart);
+                builder.addFormDataPart(name, file.fileName, bodyPart);
             }
             return builder.build();
         } else if (requestJson != null) {
@@ -596,17 +631,17 @@ public abstract class HttpTask<C extends HttpTask<?>> {
         } else {
             FormBody.Builder builder = new FormBody.Builder();
             if (bodyParams != null) {
-	            for (String name : bodyParams.keySet()) {
-	                String value = bodyParams.get(name);
-	                builder.add(name, value);
-	            }
+                for (String name : bodyParams.keySet()) {
+                    String value = bodyParams.get(name);
+                    builder.add(name, value);
+                }
             }
             return builder.build();
         }
     }
 
     private String buildUrlPath() {
-    	String url = urlPath;
+        String url = urlPath;
         if (url == null || url.trim().isEmpty()) {
             throw new HttpException("url 不能为空！");
         }
