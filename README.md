@@ -18,7 +18,7 @@
 > OkHttps 非常轻量，自身代码仅 2000 行左右，且有较高的编码质量，sonarqube 分析结果为 3A，[查看报告](https://gitee.com/ejlchina-zhxu/okhttps/quality_analyses?platform=sonar_qube)
 
 ### 前世：[HttpUtils, V2.3.0 之后重命名为 OkHttps](https://gitee.com/ejlchina-zhxu/httputils)
-### 当前文档版本[1.0.1]
+### 当前文档版本[1.0.2]
 ### API文档：[https://apidoc.gitee.com/ejlchina-zhxu/okhttps](https://apidoc.gitee.com/ejlchina-zhxu/okhttps)
 
 ## 目录
@@ -71,12 +71,12 @@
 <dependency>
      <groupId>com.ejlchina</groupId>
      <artifactId>okhttps</artifactId>
-     <version>1.0.1</version>
+     <version>1.0.2</version>
 </dependency>
 ```
 ### Gradle
 
-`implementation 'com.ejlchina:okhttps:1.0.1'`
+`implementation 'com.ejlchina:okhttps:1.0.2'`
 
 ## 使用说明
 
@@ -91,8 +91,10 @@ HTTP http = HTTP.builder().build();
 
 * `async(String url)` 开始一个异步HTTP任务
 * `sync(String url)` 开始一个同步HTTP任务
+* `async()` 开始一个异步HTTP任务，使用该方法必须在构建时设置 BaseUrl
+* `sync()` 开始一个同步HTTP任务，使用该方法必须在构建时设置 BaseUrl
 * `cancel(String tag)` 根据标签批量取消HTTP任务
-* `cancelAll()` 取消所有任务（since v1.0.2）
+* `cancelAll()` 取消所有任务
 
 　　为了使用方便，在构建的时候，我们更愿意指定一个`BaseUrl`（请参见[5.1 设置 BaseUrl](#51-设置-baseurl)）:
 
