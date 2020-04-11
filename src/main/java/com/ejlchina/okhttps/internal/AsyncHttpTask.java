@@ -105,14 +105,14 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
     
     private HttpCall request(String method) {
     	PreHttpCall call = new PreHttpCall();
-		if (tag != null) {
-			httpClient.addTagTask(tag, call, this);
-		}
+		registeTagTask(call);
     	httpClient.preprocess(this, () -> {
     		synchronized (call) {
-    			if (!call.isCanceled()) {
-    				call.setCall(executeCall(prepareCall(method)));
-        		}
+    			if (call.isCanceled()) {
+					removeTagTask();
+        		} else {
+					call.setCall(executeCall(prepareCall(method)));
+				}
 			}
     	});
     	return call;
@@ -125,20 +125,10 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
     	private HttpCall call;
     	
 		@Override
-		public boolean cancel() {
-			boolean res = true;
-			synchronized (this) {
-				if (call != null) {
-					res = call.cancel();
-				} else {
-					canceled = true;
-				}
-				notify();
-			}
-			if (tag != null && call == null) {
-	    		httpClient.removeTagTask(AsyncHttpTask.this);
-	    	}
-			return res;
+		public synchronized boolean cancel() {
+			canceled = call == null || call.cancel();
+			notify();
+			return canceled;
 		}
 
 		@Override
@@ -151,9 +141,6 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 
 		@Override
 		public boolean isCanceled() {
-			if (call != null) {
-				return call.isCanceled();
-			}
 			return canceled;
 		}
 
@@ -227,9 +214,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 				this.result = result;
 				notify();
 			}
-			if (tag != null) {
-	    		httpClient.removeTagTask(AsyncHttpTask.this);
-	    	}
+			removeTagTask();
 		}
 
     }
