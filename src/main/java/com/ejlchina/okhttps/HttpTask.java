@@ -497,6 +497,18 @@ public abstract class HttpTask<C extends HttpTask<?>> {
 
     }
 
+    protected void registeTagTask(Cancelable canceler) {
+        if (tag != null) {
+            httpClient.addTagTask(tag, canceler, this);
+        }
+    }
+
+    protected void removeTagTask() {
+        if (tag != null) {
+            httpClient.removeTagTask(this);
+        }
+    }
+
     protected Call prepareCall(String method) {
         assertNotConflict("GET".equals(method));
         Request.Builder builder = new Request.Builder()
