@@ -1,6 +1,7 @@
 package com.ejlchina.okhttps.internal;
 
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 
 import com.ejlchina.okhttps.Cancelable;
 import com.ejlchina.okhttps.HttpResult;
@@ -57,19 +58,23 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
 
     static class SyncCall implements Cancelable {
 
-		final Call call;
+		private Call call;
 		boolean done = false;
+		boolean canceled = false;
 
-		public SyncCall(Call call) {
+		public void setCall(Call call) {
 			this.call = call;
 		}
 
 		@Override
-		public boolean cancel() {
+		public synchronized boolean cancel() {
 			if (done) {
 				return false;
 			}
-			call.cancel();
+			if (call != null) {
+				call.cancel();
+			}
+			canceled = true;
 			return true;
 		}
 
@@ -81,39 +86,39 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
 
     private HttpResult request(String method) {
     	RealHttpResult result = new RealHttpResult(this, httpClient.getExecutor());
+		SyncCall syncCall = new SyncCall();
+		if (tag != null) {
+			httpClient.addTagTask(tag, syncCall, this);
+		}
+		CountDownLatch latch = new CountDownLatch(1);
     	httpClient.preprocess(this, () -> {
-        	Call call = prepareCall(method);
-			SyncCall syncCall = null;
-			if (tag != null) {
-				syncCall = new SyncCall(call);
-				httpClient.addTagTask(tag, syncCall, this);
+			synchronized (syncCall) {
+				if (syncCall.canceled) {
+					result.exception(State.CANCELED, null);
+					latch.countDown();
+					return;
+				}
+				syncCall.setCall(prepareCall(method));
 			}
             try {
-                Response response = call.execute();
-                if (syncCall != null) {
-					syncCall.setDone(true);
-				}
-                synchronized (SyncHttpTask.this) {
-                	result.response(response);
-                	SyncHttpTask.this.notify();
-                }
+				result.response(syncCall.call.execute());
+				syncCall.setDone(true);
             } catch (IOException e) {
-            	State state = toState(e, true);
-            	synchronized (SyncHttpTask.this) {
-					result.exception(state, e);
-					SyncHttpTask.this.notify();
-                }
-            }
+				result.exception(toState(e, true), e);
+            } finally {
+				latch.countDown();
+			}
     	});
-    	synchronized (this) {
-    		if (result.getState() == null) {
-        		try {
-        			SyncHttpTask.this.wait();
-    			} catch (InterruptedException e) {
-    				throw new HttpException("等待异常", e);
-    			}
-        	}
-    	}
+		if (result.getState() == null) {
+			try {
+				latch.await();
+			} catch (InterruptedException e) {
+				throw new HttpException("等待异常", e);
+			}
+		}
+		if (tag != null) {
+			httpClient.removeTagTask(this);
+		}
 		IOException e = result.getError();
     	if (e != null && result.getState() != State.CANCELED 
     			&& !nothrow) {
