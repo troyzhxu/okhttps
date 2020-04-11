@@ -60,6 +60,7 @@
     - [10.2 异步请求的异常](#102-异步请求的异常)
   + [11 回调线程自由切换（for Android）](#11-回调线程自由切换for-android)
   + [12 实现生命周期绑定（for Android）](#12-实现生命周期绑定for-android)
++ [后期计划（v1.1.0）](#后期计划v110)
 + [联系方式](#联系方式)
 + [参与贡献](#参与贡献)
 
@@ -916,7 +917,11 @@ http.sync("/download/test.zip")
 
 文档完善中，敬请期待...
 
+## 后期计划（v1.1.0）
 
+* 简化 WebSocket 编程：可直接发送 JavaBean 对象消息
+* 简化 WebSocket 编程：可直接接收 JavaBean 对象消息
+* 简化 WebSocket 编程：可使用 Lambda 表达式进行 WebSocket 编程
 
 ## 联系方式
 
