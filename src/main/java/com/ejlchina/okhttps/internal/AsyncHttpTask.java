@@ -243,13 +243,13 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
             	if (state == State.CANCELED) {
             		httpCall.setResult(new RealHttpResult(AsyncHttpTask.this, state));
             	} else {
+					httpCall.setResult(new RealHttpResult(AsyncHttpTask.this, state, error));
             		TaskExecutor executor = httpClient.getExecutor();
             		executor.executeOnComplete(AsyncHttpTask.this, onComplete, state, cOnIO);
             		if (!executor.executeOnException(AsyncHttpTask.this, onException, error, eOnIO)
             				&& !nothrow) {
             			throw new HttpException(error.getMessage(), error);
             		}
-            		httpCall.setResult(new RealHttpResult(AsyncHttpTask.this, state, error));
             	}
             }
 
@@ -257,9 +257,9 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
             public void onResponse(Call call, Response response) throws IOException {
             	TaskExecutor executor = httpClient.getExecutor();
             	HttpResult result = new RealHttpResult(AsyncHttpTask.this, response, executor);
+				httpCall.setResult(result);
         		executor.executeOnComplete(AsyncHttpTask.this, onComplete, State.RESPONSED, cOnIO);
         		executor.executeOnResponse(AsyncHttpTask.this, onResponse, result, rOnIO);
-            	httpCall.setResult(result);
             }
 			
         });
