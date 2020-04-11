@@ -9,7 +9,6 @@ import com.ejlchina.okhttps.HttpTask;
 import com.ejlchina.okhttps.HttpResult.State;
 
 import okhttp3.Call;
-import okhttp3.Response;
 
 
 /**
@@ -87,9 +86,8 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
     private HttpResult request(String method) {
     	RealHttpResult result = new RealHttpResult(this, httpClient.getExecutor());
 		SyncCall syncCall = new SyncCall();
-		if (tag != null) {
-			httpClient.addTagTask(tag, syncCall, this);
-		}
+		// 注册标签任务
+		registeTagTask(syncCall);
 		CountDownLatch latch = new CountDownLatch(1);
     	httpClient.preprocess(this, () -> {
 			synchronized (syncCall) {
@@ -110,19 +108,14 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
 			}
     	});
 		if (result.getState() == null) {
-			try {
-				latch.await();
-			} catch (InterruptedException e) {
-				throw new HttpException("等待异常", e);
-			}
+			timeoutAwait(latch);
 		}
-		if (tag != null) {
-			httpClient.removeTagTask(this);
-		}
+		// 移除标签任务
+		removeTagTask();
 		IOException e = result.getError();
     	if (e != null && result.getState() != State.CANCELED 
     			&& !nothrow) {
-    		throw new HttpException("请求执行异常", e);
+    		throw new HttpException("执行异常", e);
     	}
         return result;
     }

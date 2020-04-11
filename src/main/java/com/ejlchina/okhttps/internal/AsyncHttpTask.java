@@ -1,6 +1,7 @@
 package com.ejlchina.okhttps.internal;
 
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 
 import com.ejlchina.okhttps.HttpCall;
 import com.ejlchina.okhttps.HttpResult;
@@ -108,7 +109,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 		registeTagTask(call);
     	httpClient.preprocess(this, () -> {
     		synchronized (call) {
-    			if (call.isCanceled()) {
+    			if (call.canceled) {
 					removeTagTask();
         		} else {
 					call.setCall(executeCall(prepareCall(method)));
@@ -123,11 +124,12 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 
     	private boolean canceled = false;
     	private HttpCall call;
-    	
+    	final CountDownLatch latch = new CountDownLatch(1);
+
 		@Override
 		public synchronized boolean cancel() {
 			canceled = call == null || call.cancel();
-			notify();
+			latch.countDown();
 			return canceled;
 		}
 
@@ -146,33 +148,25 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 
 		public void setCall(HttpCall call) {
 			this.call = call;
-			notify();
+			latch.countDown();
 		}
 
 		@Override
-		public synchronized HttpResult getResult() {
-			if (canceled) {
+		public HttpResult getResult() {
+			timeoutAwait(latch);
+			if (canceled || call == null) {
 				return new RealHttpResult(AsyncHttpTask.this, State.CANCELED);
 			}
-			if (call == null) {
-				try {
-					wait(httpClient.totalTimeoutMillis() * 10);
-				} catch (InterruptedException e) {
-					throw new HttpException(e.getMessage(), e);
-				}
-			}
-			if (call != null) {
-				return call.getResult();
-			}
-			return new RealHttpResult(AsyncHttpTask.this, State.CANCELED);
+			return call.getResult();
 		}
 
     }
-    
+
     class OkHttpCall implements HttpCall {
 
     	private Call call;
     	private HttpResult result;
+		final CountDownLatch latch = new CountDownLatch(1);
     	
 		public OkHttpCall(Call call) {
 			this.call = call;
@@ -198,22 +192,16 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 		}
 
 		@Override
-		public synchronized HttpResult getResult() {
+		public HttpResult getResult() {
 			if (result == null) {
-				try {
-					wait(httpClient.totalTimeoutMillis() * 10);
-				} catch (InterruptedException e) {
-					throw new HttpException(e.getMessage(), e);
-				}
+				timeoutAwait(latch);
 			}
 			return result;
 		}
 
 		public void setResult(HttpResult result) {
-			synchronized (this) {
-				this.result = result;
-				notify();
-			}
+			this.result = result;
+			latch.countDown();
 			removeTagTask();
 		}
 

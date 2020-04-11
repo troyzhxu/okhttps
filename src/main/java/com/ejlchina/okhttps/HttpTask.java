@@ -18,6 +18,8 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -31,10 +33,10 @@ public abstract class HttpTask<C extends HttpTask<?>> {
 
     protected HttpClient httpClient;
     protected boolean nothrow;
-    protected String tag;
     protected boolean nextOnIO = false;
     
     private String urlPath;
+    private String tag;
     private Map<String, String> headers;
     private Map<String, String> pathParams;
     private Map<String, String> urlParams;
@@ -697,6 +699,15 @@ public abstract class HttpTask<C extends HttpTask<?>> {
             if (files != null) {
                 throw new HttpException("方法 addFileParam 与 addJsonParam 不能同时调用！");
             }
+        }
+    }
+
+    protected void timeoutAwait(CountDownLatch latch) {
+        try {
+            latch.await(httpClient.totalTimeoutMillis() * 10,
+                    TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            throw new HttpException("超时", e);
         }
     }
 
