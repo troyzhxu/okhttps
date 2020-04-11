@@ -3,16 +3,10 @@ package com.ejlchina.okhttps;
 public interface HttpCall extends Cancelable {
 
 	/**
-	 * 取消 Http 请求
-	 * @return 是否取消成功
-	 */
-	boolean cancel();
-
-	/**
-	 * @return 请求是否被取消
+	 * @return 是否被取消
 	 */
 	boolean isCanceled();
-	
+
 	/**
 	 * @return 请求是否执行完成，包含取消和失败
 	 */

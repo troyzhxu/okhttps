@@ -113,9 +113,10 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
 		// 移除标签任务
 		removeTagTask();
 		IOException e = result.getError();
-    	if (e != null && result.getState() != State.CANCELED 
+		State state = result.getState();
+    	if (e != null && state != State.CANCELED
     			&& !nothrow) {
-    		throw new HttpException("执行异常", e);
+    		throw new HttpException(state, "执行异常", e);
     	}
         return result;
     }

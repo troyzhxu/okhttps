@@ -3,10 +3,7 @@ package com.ejlchina.okhttps.internal;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
-import com.ejlchina.okhttps.HttpCall;
-import com.ejlchina.okhttps.HttpResult;
-import com.ejlchina.okhttps.HttpTask;
-import com.ejlchina.okhttps.OnCallback;
+import com.ejlchina.okhttps.*;
 import com.ejlchina.okhttps.HttpResult.State;
 
 import okhttp3.Call;
@@ -164,16 +161,16 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 
     class OkHttpCall implements HttpCall {
 
-    	private Call call;
-    	private HttpResult result;
+		final Call call;
 		final CountDownLatch latch = new CountDownLatch(1);
+		private HttpResult result;
     	
 		public OkHttpCall(Call call) {
 			this.call = call;
 		}
 
 		@Override
-		public boolean cancel() {
+		public synchronized boolean cancel() {
 			if (result == null) {
 				call.cancel();
 				return true;
@@ -202,7 +199,6 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 		public void setResult(HttpResult result) {
 			this.result = result;
 			latch.countDown();
-			removeTagTask();
 		}
 
     }
@@ -212,31 +208,43 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException error) {
-            	State state = toState(error, false);
-            	if (state == State.CANCELED) {
-            		httpCall.setResult(new RealHttpResult(AsyncHttpTask.this, state));
-            	} else {
-					httpCall.setResult(new RealHttpResult(AsyncHttpTask.this, state, error));
-            		TaskExecutor executor = httpClient.getExecutor();
-            		executor.executeOnComplete(AsyncHttpTask.this, onComplete, state, cOnIO);
-            		if (!executor.executeOnException(AsyncHttpTask.this, onException, error, eOnIO)
-            				&& !nothrow) {
-            			throw new HttpException(error.getMessage(), error);
-            		}
-            	}
+				State state = toState(error, false);
+				HttpResult result = new RealHttpResult(AsyncHttpTask.this, state, error);
+				doCallback(httpCall, result, () -> {
+					TaskExecutor executor = httpClient.getExecutor();
+					executor.executeOnComplete(AsyncHttpTask.this, onComplete, state, cOnIO);
+					if (!executor.executeOnException(AsyncHttpTask.this, onException, error, eOnIO)
+							&& !nothrow) {
+						throw new HttpException(state, error.getMessage(), error);
+					}
+				});
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
             	TaskExecutor executor = httpClient.getExecutor();
-            	HttpResult result = new RealHttpResult(AsyncHttpTask.this, response, executor);
-				httpCall.setResult(result);
-        		executor.executeOnComplete(AsyncHttpTask.this, onComplete, State.RESPONSED, cOnIO);
-        		executor.executeOnResponse(AsyncHttpTask.this, onResponse, result, rOnIO);
+				HttpResult result = new RealHttpResult(AsyncHttpTask.this, response, executor);
+				doCallback(httpCall, result, () -> {
+					executor.executeOnComplete(AsyncHttpTask.this, onComplete, State.RESPONSED, cOnIO);
+					executor.executeOnResponse(AsyncHttpTask.this, onResponse, result, rOnIO);
+				});
             }
-			
+
         });
 		return httpCall;
     }
+
+    private void doCallback(OkHttpCall httpCall, HttpResult result, Runnable runnable) {
+		//noinspection SynchronizationOnLocalVariableOrMethodParameter
+		synchronized (httpCall) {
+			removeTagTask();
+			if (httpCall.isCanceled() || result.getState() == State.CANCELED) {
+				httpCall.setResult(new RealHttpResult(AsyncHttpTask.this, State.CANCELED));
+				return;
+			}
+			httpCall.setResult(result);
+			runnable.run();
+		}
+	}
 
 }
