@@ -72,6 +72,8 @@ public class HttpClient implements HTTP {
                     count++;
                 }
                 it.remove();
+            } else if (tagCall.isExpired()) {
+                it.remove();
             }
         }
         return count;
@@ -116,19 +118,29 @@ public class HttpClient implements HTTP {
                 it.remove();
                 break;
             }
+            if (tagCall.isExpired()) {
+                it.remove();
+            }
         }
     }
 
-    static class TagTask {
+    class TagTask {
 
         String tag;
         Cancelable canceler;
         HttpTask<?> task;
+        long createAt;
 
-        public TagTask(String tag, Cancelable canceler, HttpTask<?> task) {
+        TagTask(String tag, Cancelable canceler, HttpTask<?> task) {
             this.tag = tag;
             this.canceler = canceler;
             this.task = task;
+            this.createAt = System.nanoTime();
+        }
+
+        boolean isExpired() {
+            // 生存时间大于10倍的总超时限值
+            return System.nanoTime() - createAt > 10_000_000 * totalTimeoutMillis();
         }
 
     }
