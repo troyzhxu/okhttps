@@ -234,8 +234,8 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 		return httpCall;
     }
 
+	@SuppressWarnings("all")
     private void onCallback(OkHttpCall httpCall, HttpResult result, Runnable runnable) {
-		//noinspection SynchronizationOnLocalVariableOrMethodParameter
 		synchronized (httpCall) {
 			removeTagTask();
 			if (httpCall.isCanceled() || result.getState() == State.CANCELED) {
