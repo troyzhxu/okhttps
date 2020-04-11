@@ -116,11 +116,9 @@ public abstract class HttpTask<C extends HttpTask<?>> {
      * @return HttpTask 实例
      */
     public C setTag(String tag) {
-        if (this.tag != null) {
-            // 标签可动态修改会带来许多不可控的问题
-            throw new IllegalStateException("the tag[" + this.tag + "] of task[" + urlPath + "] already exists, canot modify again!");
+        if (tag != null) {
+            this.tag = tag;
         }
-        this.tag = tag;
         return (C) this;
     }
 
