@@ -105,6 +105,9 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
     
     private HttpCall request(String method) {
     	PreHttpCall call = new PreHttpCall();
+		if (tag != null) {
+			httpClient.addTagTask(tag, call, this);
+		}
     	httpClient.preprocess(this, () -> {
     		synchronized (call) {
     			if (!call.isCanceled()) {
@@ -112,9 +115,6 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
         		}
 			}
     	});
-    	if (tag != null) {
-    		httpClient.addTagTask(tag, call, this);
-    	}
     	return call;
     }
     

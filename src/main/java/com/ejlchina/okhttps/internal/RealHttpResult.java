@@ -39,8 +39,7 @@ public class RealHttpResult implements HttpResult {
         this.httpTask = httpTask;
         exception(state, error);
     }
-    
-    
+
     public void exception(State state, IOException error) {
         this.state = state;
         this.error = error;
