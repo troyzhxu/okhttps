@@ -57,13 +57,9 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
 
     static class SyncCall implements Cancelable {
 
-		private Call call;
+		Call call;
 		boolean done = false;
 		boolean canceled = false;
-
-		public void setCall(Call call) {
-			this.call = call;
-		}
 
 		@Override
 		public synchronized boolean cancel() {
@@ -75,10 +71,6 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
 			}
 			canceled = true;
 			return true;
-		}
-
-		public void setDone(boolean done) {
-			this.done = done;
 		}
 
 	}
@@ -96,11 +88,11 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
 					latch.countDown();
 					return;
 				}
-				syncCall.setCall(prepareCall(method));
+				syncCall.call = prepareCall(method);
 			}
             try {
 				result.response(syncCall.call.execute());
-				syncCall.setDone(true);
+				syncCall.done = true;
             } catch (IOException e) {
 				result.exception(toState(e, true), e);
             } finally {

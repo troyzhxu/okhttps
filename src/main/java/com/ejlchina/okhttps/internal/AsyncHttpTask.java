@@ -119,9 +119,9 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
     
     class PreHttpCall implements HttpCall {
 
-    	private boolean canceled = false;
-    	private HttpCall call;
-    	final CountDownLatch latch = new CountDownLatch(1);
+		HttpCall call;
+		boolean canceled = false;
+    	CountDownLatch latch = new CountDownLatch(1);
 
 		@Override
 		public synchronized boolean cancel() {
@@ -143,7 +143,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 			return canceled;
 		}
 
-		public void setCall(HttpCall call) {
+		void setCall(HttpCall call) {
 			this.call = call;
 			latch.countDown();
 		}
@@ -161,11 +161,11 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 
     class OkHttpCall implements HttpCall {
 
-		final Call call;
-		final CountDownLatch latch = new CountDownLatch(1);
-		private HttpResult result;
-    	
-		public OkHttpCall(Call call) {
+		Call call;
+		HttpResult result;
+		CountDownLatch latch = new CountDownLatch(1);
+
+		OkHttpCall(Call call) {
 			this.call = call;
 		}
 
@@ -196,7 +196,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 			return result;
 		}
 
-		public void setResult(HttpResult result) {
+		void setResult(HttpResult result) {
 			this.result = result;
 			latch.countDown();
 		}
@@ -210,7 +210,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
             public void onFailure(Call call, IOException error) {
 				State state = toState(error, false);
 				HttpResult result = new RealHttpResult(AsyncHttpTask.this, state, error);
-				doCallback(httpCall, result, () -> {
+				onCallback(httpCall, result, () -> {
 					TaskExecutor executor = httpClient.getExecutor();
 					executor.executeOnComplete(AsyncHttpTask.this, onComplete, state, cOnIO);
 					if (!executor.executeOnException(AsyncHttpTask.this, onException, error, eOnIO)
@@ -224,7 +224,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
             public void onResponse(Call call, Response response) throws IOException {
             	TaskExecutor executor = httpClient.getExecutor();
 				HttpResult result = new RealHttpResult(AsyncHttpTask.this, response, executor);
-				doCallback(httpCall, result, () -> {
+				onCallback(httpCall, result, () -> {
 					executor.executeOnComplete(AsyncHttpTask.this, onComplete, State.RESPONSED, cOnIO);
 					executor.executeOnResponse(AsyncHttpTask.this, onResponse, result, rOnIO);
 				});
@@ -234,7 +234,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 		return httpCall;
     }
 
-    private void doCallback(OkHttpCall httpCall, HttpResult result, Runnable runnable) {
+    private void onCallback(OkHttpCall httpCall, HttpResult result, Runnable runnable) {
 		//noinspection SynchronizationOnLocalVariableOrMethodParameter
 		synchronized (httpCall) {
 			removeTagTask();
