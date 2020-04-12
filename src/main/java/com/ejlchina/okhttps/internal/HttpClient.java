@@ -160,9 +160,9 @@ public class HttpClient implements HTTP {
 
     public void preprocess(HttpTask<? extends HttpTask<?>> httpTask, Runnable request) {
         if (preprocessors.length > 0) {
-            RealPreChain process = new RealPreChain(preprocessors,
+            RealPreChain chain = new RealPreChain(preprocessors,
                     httpTask, request);
-            preprocessors[0].doProcess(process);
+            preprocessors[0].doProcess(chain);
         } else {
             request.run();
         }
@@ -187,32 +187,32 @@ public class HttpClient implements HTTP {
         }
 
         @Override
-        public void doProcess(PreChain process) {
+        public void doProcess(PreChain chain) {
             boolean should = true;
             synchronized (this) {
                 if (running) {
-                    pendings.add(process);
+                    pendings.add(chain);
                     should = false;
                 } else {
                     running = true;
                 }
             }
             if (should) {
-                preprocessor.doProcess(process);
+                preprocessor.doProcess(chain);
             }
         }
 
         public void afterProcess() {
-            PreChain process = null;
+            PreChain chain = null;
             synchronized (this) {
                 if (pendings.size() > 0) {
-                    process = pendings.poll();
+                    chain = pendings.poll();
                 } else {
                     running = false;
                 }
             }
-            if (process != null) {
-                preprocessor.doProcess(process);
+            if (chain != null) {
+                preprocessor.doProcess(chain);
             }
         }
 
