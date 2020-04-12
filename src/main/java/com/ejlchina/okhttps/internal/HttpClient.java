@@ -82,6 +82,7 @@ public class HttpClient implements HTTP {
     @Override
     public void cancelAll() {
         client.dispatcher().cancelAll();
+        tagTasks.clear();
     }
 
     @Override
