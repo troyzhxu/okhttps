@@ -34,7 +34,7 @@ public class HttpClient implements HTTP {
                 builder.responseListener, builder.exceptionListener,
                 builder.completeListener);
         this.preprocessors = builder.preprocessors.toArray(new Preprocessor[0]);
-        this.tagTasks = Collections.synchronizedList(new LinkedList<>());
+        this.tagTasks = new LinkedList<>();
     }
 
     @Override
@@ -58,7 +58,7 @@ public class HttpClient implements HTTP {
     }
 
     @Override
-    public int cancel(String tag) {
+    public synchronized int cancel(String tag) {
         if (tag == null) {
             return 0;
         }
@@ -80,8 +80,9 @@ public class HttpClient implements HTTP {
     }
 
     @Override
-    public void cancelAll() {
+    public synchronized void cancelAll() {
         client.dispatcher().cancelAll();
+        tagTasks.clear();
     }
 
     @Override
@@ -106,11 +107,11 @@ public class HttpClient implements HTTP {
         return tagTasks.size();
     }
 
-    public void addTagTask(String tag, Cancelable canceler, HttpTask<?> task) {
+    public synchronized void addTagTask(String tag, Cancelable canceler, HttpTask<?> task) {
         tagTasks.add(new TagTask(tag, canceler, task));
     }
 
-    public void removeTagTask(HttpTask<?> task) {
+    public synchronized void removeTagTask(HttpTask<?> task) {
         Iterator<TagTask> it = tagTasks.iterator();
         while (it.hasNext()) {
             TagTask tagCall = it.next();
@@ -159,9 +160,9 @@ public class HttpClient implements HTTP {
 
     public void preprocess(HttpTask<? extends HttpTask<?>> httpTask, Runnable request) {
         if (preprocessors.length > 0) {
-            RealPreChain process = new RealPreChain(preprocessors,
+            RealPreChain chain = new RealPreChain(preprocessors,
                     httpTask, request);
-            preprocessors[0].doProcess(process);
+            preprocessors[0].doProcess(chain);
         } else {
             request.run();
         }
@@ -186,32 +187,32 @@ public class HttpClient implements HTTP {
         }
 
         @Override
-        public void doProcess(PreChain process) {
+        public void doProcess(PreChain chain) {
             boolean should = true;
             synchronized (this) {
                 if (running) {
-                    pendings.add(process);
+                    pendings.add(chain);
                     should = false;
                 } else {
                     running = true;
                 }
             }
             if (should) {
-                preprocessor.doProcess(process);
+                preprocessor.doProcess(chain);
             }
         }
 
         public void afterProcess() {
-            PreChain process = null;
+            PreChain chain = null;
             synchronized (this) {
                 if (pendings.size() > 0) {
-                    process = pendings.poll();
+                    chain = pendings.poll();
                 } else {
                     running = false;
                 }
             }
-            if (process != null) {
-                preprocessor.doProcess(process);
+            if (chain != null) {
+                preprocessor.doProcess(chain);
             }
         }
 
