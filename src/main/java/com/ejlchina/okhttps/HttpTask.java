@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  * Created by 周旭（Troy.Zhou） on 2020/3/11.
  */
 @SuppressWarnings("unchecked")
-public abstract class HttpTask<C extends HttpTask<?>> {
+public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
 
     private static final MediaType TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
     private static String PATH_PARAM_REGEX = "[A-Za-z0-9_\\-/]*\\{[A-Za-z0-9_\\-]+\\}[A-Za-z0-9_\\-/]*";
@@ -486,6 +486,14 @@ public abstract class HttpTask<C extends HttpTask<?>> {
             files.put(name, new FilePara(type, fileName, content));
         }
         return (C) this;
+    }
+
+    @Override
+    public boolean cancel() {
+        if (canceler != null) {
+            return canceler.cancel();
+        }
+        return false;
     }
 
     static class FilePara {
