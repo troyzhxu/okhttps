@@ -135,7 +135,7 @@ public class HttpClient implements HTTP {
     	}
     }
 
-    class TagTask {
+    public class TagTask {
 
         String tag;
         Cancelable canceler;
@@ -153,6 +153,10 @@ public class HttpClient implements HTTP {
             // 生存时间大于10倍的总超时限值
             return System.nanoTime() - createAt > 10_000_000 * totalTimeoutMillis();
         }
+
+		public void setTag(String tag) {
+			this.tag = tag;
+		}
 
     }
 

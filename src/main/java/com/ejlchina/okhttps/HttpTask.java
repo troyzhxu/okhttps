@@ -3,6 +3,7 @@ package com.ejlchina.okhttps;
 import com.alibaba.fastjson.JSON;
 import com.ejlchina.okhttps.HttpResult.State;
 import com.ejlchina.okhttps.internal.HttpClient;
+import com.ejlchina.okhttps.internal.HttpClient.TagTask;
 import com.ejlchina.okhttps.internal.HttpException;
 import com.ejlchina.okhttps.internal.ProcessRequestBody;
 import okhttp3.*;
@@ -50,6 +51,9 @@ public abstract class HttpTask<C extends HttpTask<?>> {
     private double stepRate = -1;
 
     private Object object;
+    
+    private TagTask tagTask;
+    private Cancelable canceler;
 
 
     public HttpTask(HttpClient httpClient, String url) {
@@ -114,28 +118,18 @@ public abstract class HttpTask<C extends HttpTask<?>> {
 
     /**
      * 为请求任务添加标签
+     * v1.0.4 之后，若 set 多次，标签将连接在一起
      * @param tag 标签
      * @return HttpTask 实例
      */
     public C setTag(String tag) {
         if (tag != null) {
-            this.tag = tag;
-        }
-        return (C) this;
-    }
-
-    /**
-     * 为请求任务追加标签
-     * @param tag 标签
-     * @return HttpTask 实例
-     */
-    public C appendTag(String tag) {
-        if (tag != null) {
-            if (this.tag != null) {
-                this.tag = this.tag + "." + tag;
-            } else {
-                this.tag = tag;
-            }
+        	if (this.tag != null) {
+        		this.tag = this.tag + "." + tag;
+        	} else {
+        		this.tag = tag;
+        	}
+        	updateTagTask();
         }
         return (C) this;
     }
@@ -363,7 +357,7 @@ public abstract class HttpTask<C extends HttpTask<?>> {
      * @param params JSON键值集合
      * @return HttpTask 实例
      */
-    public C addJsonParam(Map<String, Object> params) {
+    public C addJsonParam(Map<String, ?> params) {
         if (params != null) {
             if (jsonParams == null) {
                 jsonParams = new HashMap<>();
@@ -514,13 +508,23 @@ public abstract class HttpTask<C extends HttpTask<?>> {
         }
 
     }
-
+    
     protected void registeTagTask(Cancelable canceler) {
         if (tag != null) {
-            httpClient.addTagTask(tag, canceler, this);
+        	tagTask = httpClient.addTagTask(tag, canceler, this);
         }
+        this.canceler = canceler;
     }
 
+    private void updateTagTask() {
+        if (tagTask != null) {
+        	tagTask.setTag(tag);
+        } else 
+        if (canceler != null) {
+        	registeTagTask(canceler);
+        }
+    }
+    
     protected void removeTagTask() {
         if (tag != null) {
             httpClient.removeTagTask(this);
@@ -719,6 +723,7 @@ public abstract class HttpTask<C extends HttpTask<?>> {
     }
 
     protected void timeoutAwait(CountDownLatch latch) {
+    	// TODO: 超时不会异常！
         try {
             latch.await(httpClient.totalTimeoutMillis() * 10,
                     TimeUnit.MILLISECONDS);
