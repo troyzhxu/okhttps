@@ -926,10 +926,7 @@ http.sync("/download/test.zip")
 ## 联系方式
 
 * 邮箱：zhou.xu@ejlchina.com
-* 微信：
-<center>
-<img src="https://images.gitee.com/uploads/images/2020/0414/001906_3fdfc255_1393412.jpeg" width="500px">
-</center>
+* 微信：<img src="https://images.gitee.com/uploads/images/2020/0414/001906_3fdfc255_1393412.jpeg" width="500px">
 
 ## 参与贡献
 
