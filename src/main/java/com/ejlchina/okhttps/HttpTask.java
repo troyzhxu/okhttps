@@ -125,6 +125,22 @@ public abstract class HttpTask<C extends HttpTask<?>> {
     }
 
     /**
+     * 为请求任务追加标签
+     * @param tag 标签
+     * @return HttpTask 实例
+     */
+    public C appendTag(String tag) {
+        if (tag != null) {
+            if (this.tag != null) {
+                this.tag = this.tag + "." + tag;
+            } else {
+                this.tag = tag;
+            }
+        }
+        return (C) this;
+    }
+    
+    /**
      * 下一个回调在IO线程执行
      * @return HttpTask 实例
      */
@@ -576,7 +592,7 @@ public abstract class HttpTask<C extends HttpTask<?>> {
         }
         String msg = e.getMessage();
         if (msg != null && ("Canceled".equals(msg)
-				|| sync && e instanceof SocketException
+                || sync && e instanceof SocketException
                 && msg.startsWith("Socket operation on nonsocket"))) {
             return State.CANCELED;
         }
