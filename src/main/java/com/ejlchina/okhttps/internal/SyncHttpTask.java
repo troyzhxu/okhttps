@@ -55,7 +55,7 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
         return request("DELETE");
     }
 
-    static class SyncCall implements Cancelable {
+    static class SyncHttpCall implements Cancelable {
 
 		Call call;
 		boolean done = false;
@@ -77,33 +77,38 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
 
     private HttpResult request(String method) {
     	RealHttpResult result = new RealHttpResult(this, httpClient.getExecutor());
-		SyncCall syncCall = new SyncCall();
+		SyncHttpCall httpCall = new SyncHttpCall();
 		// 注册标签任务
-		registeTagTask(syncCall);
+		registeTagTask(httpCall);
 		CountDownLatch latch = new CountDownLatch(1);
     	httpClient.preprocess(this, () -> {
-			synchronized (syncCall) {
-				if (syncCall.canceled) {
+			synchronized (httpCall) {
+				if (httpCall.canceled) {
 					result.exception(State.CANCELED, null);
 					latch.countDown();
 					return;
 				}
-				syncCall.call = prepareCall(method);
+				httpCall.call = prepareCall(method);
 			}
             try {
-				result.response(syncCall.call.execute());
-				syncCall.done = true;
+				result.response(httpCall.call.execute());
+				httpCall.done = true;
             } catch (IOException e) {
 				result.exception(toState(e, true), e);
             } finally {
 				latch.countDown();
 			}
     	});
+    	boolean timeout = false;
 		if (result.getState() == null) {
-			timeoutAwait(latch);
+			timeout = !timeoutAwait(latch);
 		}
 		// 移除标签任务
 		removeTagTask();
+		if (timeout) {
+			httpCall.cancel();
+			return timeoutResult();
+		}
 		IOException e = result.getError();
 		State state = result.getState();
     	if (e != null && state != State.CANCELED

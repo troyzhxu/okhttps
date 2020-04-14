@@ -1,15 +1,5 @@
 package com.ejlchina.okhttps;
 
-import com.alibaba.fastjson.JSON;
-import com.ejlchina.okhttps.HttpResult.State;
-import com.ejlchina.okhttps.internal.HttpClient;
-import com.ejlchina.okhttps.internal.HttpClient.TagTask;
-import com.ejlchina.okhttps.internal.HttpException;
-import com.ejlchina.okhttps.internal.ProcessRequestBody;
-import okhttp3.*;
-import okhttp3.internal.Util;
-import okio.Buffer;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +11,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import com.alibaba.fastjson.JSON;
+import com.ejlchina.okhttps.HttpResult.State;
+import com.ejlchina.okhttps.internal.HttpClient;
+import com.ejlchina.okhttps.internal.HttpClient.TagTask;
+import com.ejlchina.okhttps.internal.HttpException;
+import com.ejlchina.okhttps.internal.ProcessRequestBody;
+import com.ejlchina.okhttps.internal.RealHttpResult;
+
+import okhttp3.Call;
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.internal.Util;
+import okio.Buffer;
 
 
 /**
@@ -730,14 +737,24 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         }
     }
 
-    protected void timeoutAwait(CountDownLatch latch) {
-    	// TODO: 超时不会异常！
+    /**
+     * @param latch CountDownLatch
+     * @return 是否未超时：false 表示已超时
+     */
+    protected boolean timeoutAwait(CountDownLatch latch) {
         try {
-            latch.await(httpClient.totalTimeoutMillis() * 10,
+            return latch.await(httpClient.totalTimeoutMillis() * 10,
                     TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             throw new HttpException("超时", e);
         }
     }
+
+	protected HttpResult timeoutResult() {
+		if (nothrow) {
+			return new RealHttpResult(this, State.TIMEOUT);
+		}
+		throw new HttpException(State.TIMEOUT, "执行超时");
+	}
 
 }
