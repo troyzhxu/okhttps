@@ -152,6 +152,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
 
     /**
      * 绑定一个对象
+     * @param object 对象
      * @return HttpTask 实例
      */
     public C bind(Object object) {

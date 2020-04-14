@@ -114,7 +114,7 @@ public class HttpUtils {
      * Websocket（该请求不经过 预处理器）
      * @param request 请求
      * @param listener 监听器
-     * @return
+     * @return WebSocket
      */
     public static WebSocket webSocket(Request request, WebSocketListener listener) {
     	return getHttp().webSocket(request, listener);
