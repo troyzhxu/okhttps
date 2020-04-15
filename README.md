@@ -948,9 +948,9 @@ http.sync("/download/test.zip")
 　　现在我们需要手写一个工具类，这个工具类具有生命周期绑定的功能，假设我们把它取名叫`OkHttps`，在 androidx 的开发环境里，它的使用效果如下：
 
 ```java
-// 在  Activity 或 Fragment 内发起请求
+// 在  Activity 或 Fragment 内发起请，getLifecycle()是Activity 或 Fragment 自带的方法
 OkHttps.async("http://www.baidu.com")
-        .bind(getLifecycle())   // 绑定Activity 或 Fragment 的生命周期，getLifecycle()是Activity 或 Fragment 自带的方法
+        .bind(getLifecycle())   // 绑定Activity 或 Fragment 的生命周期
         .setOnResponse((HttpResult result) -> {
             Log.i("FirstFragment", "收到请求：" + result.toString());
         })
