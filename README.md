@@ -840,7 +840,7 @@ http.async("/users/1")
 ```
 ### 11 取消请求的4种方式
 
-　　在 OkHttps 里取消请求共有 4 种方式：
+　　在 OkHttps 里取消请求共有 **4 种** 方式：
 
 * 使用`HttpCall#cancel()`取消单个请求（适用于异步请求，[详见 3.3 章节](#33-httpcall)）
 * 使用`HttpTask#cancel()`取消单个请求（适用于所有请求）（since v1.0.4）
