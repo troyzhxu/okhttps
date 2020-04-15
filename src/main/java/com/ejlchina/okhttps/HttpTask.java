@@ -1,14 +1,5 @@
 package com.ejlchina.okhttps;
 
-import com.alibaba.fastjson.JSON;
-import com.ejlchina.okhttps.HttpResult.State;
-import com.ejlchina.okhttps.internal.HttpClient;
-import com.ejlchina.okhttps.internal.HttpException;
-import com.ejlchina.okhttps.internal.ProcessRequestBody;
-import okhttp3.*;
-import okhttp3.internal.Util;
-import okio.Buffer;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,12 +12,29 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import com.alibaba.fastjson.JSON;
+import com.ejlchina.okhttps.HttpResult.State;
+import com.ejlchina.okhttps.internal.HttpClient;
+import com.ejlchina.okhttps.internal.HttpClient.TagTask;
+import com.ejlchina.okhttps.internal.HttpException;
+import com.ejlchina.okhttps.internal.ProcessRequestBody;
+import com.ejlchina.okhttps.internal.RealHttpResult;
+
+import okhttp3.Call;
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.internal.Util;
+import okio.Buffer;
+
 
 /**
  * Created by 周旭（Troy.Zhou） on 2020/3/11.
  */
 @SuppressWarnings("unchecked")
-public abstract class HttpTask<C extends HttpTask<?>> {
+public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
 
     private static final MediaType TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
     private static String PATH_PARAM_REGEX = "[A-Za-z0-9_\\-/]*\\{[A-Za-z0-9_\\-]+\\}[A-Za-z0-9_\\-/]*";
@@ -50,6 +58,9 @@ public abstract class HttpTask<C extends HttpTask<?>> {
     private double stepRate = -1;
 
     private Object object;
+    
+    private TagTask tagTask;
+    private Cancelable canceler;
 
 
     public HttpTask(HttpClient httpClient, String url) {
@@ -114,16 +125,22 @@ public abstract class HttpTask<C extends HttpTask<?>> {
 
     /**
      * 为请求任务添加标签
+     * v1.0.4 之后，若 set 多次，标签将连接在一起
      * @param tag 标签
      * @return HttpTask 实例
      */
     public C setTag(String tag) {
         if (tag != null) {
-            this.tag = tag;
+        	if (this.tag != null) {
+        		this.tag = this.tag + "." + tag;
+        	} else {
+        		this.tag = tag;
+        	}
+        	updateTagTask();
         }
         return (C) this;
     }
-
+    
     /**
      * 下一个回调在IO线程执行
      * @return HttpTask 实例
@@ -135,6 +152,7 @@ public abstract class HttpTask<C extends HttpTask<?>> {
 
     /**
      * 绑定一个对象
+     * @param object 对象
      * @return HttpTask 实例
      */
     public C bind(Object object) {
@@ -347,7 +365,7 @@ public abstract class HttpTask<C extends HttpTask<?>> {
      * @param params JSON键值集合
      * @return HttpTask 实例
      */
-    public C addJsonParam(Map<String, Object> params) {
+    public C addJsonParam(Map<String, ?> params) {
         if (params != null) {
             if (jsonParams == null) {
                 jsonParams = new HashMap<>();
@@ -478,6 +496,14 @@ public abstract class HttpTask<C extends HttpTask<?>> {
         return (C) this;
     }
 
+    @Override
+    public boolean cancel() {
+        if (canceler != null) {
+            return canceler.cancel();
+        }
+        return false;
+    }
+
     static class FilePara {
 
         String type;
@@ -498,13 +524,23 @@ public abstract class HttpTask<C extends HttpTask<?>> {
         }
 
     }
-
+    
     protected void registeTagTask(Cancelable canceler) {
         if (tag != null) {
-            httpClient.addTagTask(tag, canceler, this);
+        	tagTask = httpClient.addTagTask(tag, canceler, this);
         }
+        this.canceler = canceler;
     }
 
+    private void updateTagTask() {
+        if (tagTask != null) {
+        	tagTask.setTag(tag);
+        } else 
+        if (canceler != null) {
+        	registeTagTask(canceler);
+        }
+    }
+    
     protected void removeTagTask() {
         if (tag != null) {
             httpClient.removeTagTask(this);
@@ -576,7 +612,7 @@ public abstract class HttpTask<C extends HttpTask<?>> {
         }
         String msg = e.getMessage();
         if (msg != null && ("Canceled".equals(msg)
-				|| sync && e instanceof SocketException
+                || sync && e instanceof SocketException
                 && msg.startsWith("Socket operation on nonsocket"))) {
             return State.CANCELED;
         }
@@ -702,13 +738,24 @@ public abstract class HttpTask<C extends HttpTask<?>> {
         }
     }
 
-    protected void timeoutAwait(CountDownLatch latch) {
+    /**
+     * @param latch CountDownLatch
+     * @return 是否未超时：false 表示已超时
+     */
+    protected boolean timeoutAwait(CountDownLatch latch) {
         try {
-            latch.await(httpClient.totalTimeoutMillis() * 10,
+            return latch.await(httpClient.totalTimeoutMillis() * 10,
                     TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             throw new HttpException("超时", e);
         }
     }
+
+	protected HttpResult timeoutResult() {
+		if (nothrow) {
+			return new RealHttpResult(this, State.TIMEOUT);
+		}
+		throw new HttpException(State.TIMEOUT, "执行超时");
+	}
 
 }

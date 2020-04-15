@@ -69,7 +69,7 @@ public interface HTTP {
      *
      * @param request  请求
      * @param listener 监听器
-     * @return
+     * @return Websocket
      */
     WebSocket webSocket(Request request, WebSocketListener listener);
 

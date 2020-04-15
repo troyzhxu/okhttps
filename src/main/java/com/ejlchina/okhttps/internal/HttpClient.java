@@ -58,31 +58,35 @@ public class HttpClient implements HTTP {
     }
 
     @Override
-    public synchronized int cancel(String tag) {
+    public int cancel(String tag) {
         if (tag == null) {
             return 0;
         }
         int count = 0;
-        Iterator<TagTask> it = tagTasks.iterator();
-        while (it.hasNext()) {
-            TagTask tagCall = it.next();
-            // 只要任务的标签包含指定的Tag就会被取消
-            if (tagCall.tag.contains(tag)) {
-                if (tagCall.canceler.cancel()) {
-                    count++;
+        synchronized (tagTasks) {
+        	Iterator<TagTask> it = tagTasks.iterator();
+            while (it.hasNext()) {
+                TagTask tagCall = it.next();
+                // 只要任务的标签包含指定的Tag就会被取消
+                if (tagCall.tag.contains(tag)) {
+                    if (tagCall.canceler.cancel()) {
+                        count++;
+                    }
+                    it.remove();
+                } else if (tagCall.isExpired()) {
+                    it.remove();
                 }
-                it.remove();
-            } else if (tagCall.isExpired()) {
-                it.remove();
             }
         }
         return count;
     }
 
     @Override
-    public synchronized void cancelAll() {
+    public void cancelAll() {
         client.dispatcher().cancelAll();
-        tagTasks.clear();
+        synchronized (tagTasks) {
+        	tagTasks.clear();
+        }
     }
 
     @Override
@@ -107,25 +111,31 @@ public class HttpClient implements HTTP {
         return tagTasks.size();
     }
 
-    public synchronized void addTagTask(String tag, Cancelable canceler, HttpTask<?> task) {
-        tagTasks.add(new TagTask(tag, canceler, task));
-    }
-
-    public synchronized void removeTagTask(HttpTask<?> task) {
-        Iterator<TagTask> it = tagTasks.iterator();
-        while (it.hasNext()) {
-            TagTask tagCall = it.next();
-            if (tagCall.task == task) {
-                it.remove();
-                break;
-            }
-            if (tagCall.isExpired()) {
-                it.remove();
-            }
+    public TagTask addTagTask(String tag, Cancelable canceler, HttpTask<?> task) {
+        TagTask tagTask = new TagTask(tag, canceler, task);
+        synchronized (tagTasks) {
+        	tagTasks.add(tagTask);
         }
+		return tagTask;
     }
 
-    class TagTask {
+    public void removeTagTask(HttpTask<?> task) {
+    	synchronized (tagTasks) {
+    		Iterator<TagTask> it = tagTasks.iterator();
+            while (it.hasNext()) {
+                TagTask tagCall = it.next();
+                if (tagCall.task == task) {
+                    it.remove();
+                    break;
+                }
+                if (tagCall.isExpired()) {
+                    it.remove();
+                }
+            }
+    	}
+    }
+
+    public class TagTask {
 
         String tag;
         Cancelable canceler;
@@ -143,6 +153,10 @@ public class HttpClient implements HTTP {
             // 生存时间大于10倍的总超时限值
             return System.nanoTime() - createAt > 10_000_000 * totalTimeoutMillis();
         }
+
+		public void setTag(String tag) {
+			this.tag = tag;
+		}
 
     }
 

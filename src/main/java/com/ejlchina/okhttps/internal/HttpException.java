@@ -27,6 +27,11 @@ public class HttpException extends RuntimeException {
         this.state = state;
     }
 
+    public HttpException(HttpResult.State state, String detailMessage) {
+        super(detailMessage);
+        this.state = state;
+    }
+    
     public HttpResult.State getState() {
         return state;
     }

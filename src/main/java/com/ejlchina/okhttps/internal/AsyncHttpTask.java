@@ -150,7 +150,10 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 
 		@Override
 		public HttpResult getResult() {
-			timeoutAwait(latch);
+			if (!timeoutAwait(latch)) {
+				cancel();
+				return timeoutResult();
+			}
 			if (canceled || call == null) {
 				return new RealHttpResult(AsyncHttpTask.this, State.CANCELED);
 			}
@@ -191,7 +194,10 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 		@Override
 		public HttpResult getResult() {
 			if (result == null) {
-				timeoutAwait(latch);
+				if (!timeoutAwait(latch)) {
+					cancel();
+					return timeoutResult();
+				}
 			}
 			return result;
 		}
@@ -202,6 +208,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 		}
 
     }
+
 	
     private HttpCall executeCall(Call call) {
         OkHttpCall httpCall = new OkHttpCall(call);
