@@ -840,7 +840,7 @@ http.async("/users/1")
 ```
 ### 11 取消请求的4种方式
 
-　　在 OkHttps 里取消请求共有 **4 种** 方式：
+　　在 OkHttps 里取消请求共有 **4 种** 方式可选：
 
 * 使用`HttpCall#cancel()`取消单个请求（适用于异步请求，[详见 3.3 章节](#33-httpcall)）
 * 使用`HttpTask#cancel()`取消单个请求（适用于所有请求）（since v1.0.4）
@@ -940,6 +940,11 @@ http.sync("/download/test.zip")
         .start();
 ```
 ### 13 实现生命周期绑定（for Android）
+
+　　由于 OkHttps 并不依赖于 Android，所以它并没有直接提供关于生命周期绑定的实现，但它的一些扩展机制让我们很容易就可以实现这个功能。
+
+
+
 
 文档完善中，敬请期待...
 
