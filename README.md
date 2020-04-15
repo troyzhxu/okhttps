@@ -1007,6 +1007,8 @@ public class LCObserver implements LifecycleObserver {
 
 #### 第三步：配置全局回调监听
 
+　　以上两步其实已经实现了生命周期绑定的功能，但是在请求完成之后，我们需要移除生命周期监视器（LCObserver）对象：
+
 ```java
 HTTP http = HTTP.builder()
         ... // 省略其它配置项
@@ -1023,9 +1025,12 @@ HTTP http = HTTP.builder()
         .build();
 ```
 
+####　以上三步便在Android中实现了生命周期与HTTP请求绑定的功能
 
+　　非常简单，懒得敲代码的同学还可以 [点这里 OkHttps.java](https://gitee.com/ejlchina-zhxu/okhttps-android-demo/blob/master/app/src/main/java/com/flower/myapplication/http/OkHttps.java) 直接下载封装好的源码，其中不仅编写了生命周期绑定的配置，还有在UI线程执行回调的配置。
 
-文档完善中，敬请期待...
+　　有需要的同学，可以直接下载下来使用，还可以再其上再次扩展，比如实现自动添加 TOKEN 的功能，具体可以参考[6.5 串行预处理器（TOKEN问题最佳解决方案）](#65-串行预处理器token问题最佳解决方案)。
+
 
 ## 后期计划（v1.1.0）
 
