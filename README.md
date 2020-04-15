@@ -957,6 +957,7 @@ http.async("http://www.baidu.com")
         .get();
 ```
 　　上述代码中的`getLifecycle()`是`androidx`中`Activity`或`Fragment`自带的方法，而`bind()`是`HttpTask`的现有方法。在配置好`HTTP`实例后，上述代码发起的请求便可以感知`Activity`或`Fragment`的生命周期。
+
 　　那`HTTP`实例到底该如何配置呢？
 
 
