@@ -240,7 +240,7 @@ long size = http.sync("/download/test.zip")
             .close()             // 只是想获得文件大小，不消费报文体，所以直接关闭
             .getContentLength(); // 获得待下载文件的大小
 
-// 由于未消费报文体，所以本次请求不会消耗下载报文体的时间和网络流量）
+// 由于未消费报文体，所以本次请求不会消耗下载报文体的时间和网络流量
 
 System.out.println("size = " + size);
 ```
