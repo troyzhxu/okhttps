@@ -58,8 +58,9 @@
   + [10 异常处理](#10-异常处理)
     - [10.1 同步请求的异常](#101-同步请求的异常)
     - [10.2 异步请求的异常](#102-异步请求的异常)
-  + [11 回调线程自由切换（for Android）](#11-回调线程自由切换for-android)
-  + [12 实现生命周期绑定（for Android）](#12-实现生命周期绑定for-android)
+  + [11 请求的取消](#11-请求的取消)
+  + [12 回调线程自由切换（for Android）](#12-回调线程自由切换for-android)
+  + [13 实现生命周期绑定（for Android）](#13-实现生命周期绑定for-android)
 + [后期计划（v1.1.0）](#后期计划v110)
 + [联系方式](#联系方式)
 + [参与贡献](#参与贡献)
@@ -72,12 +73,12 @@
 <dependency>
      <groupId>com.ejlchina</groupId>
      <artifactId>okhttps</artifactId>
-     <version>1.0.3</version>
+     <version>1.0.4</version>
 </dependency>
 ```
 ### Gradle
 
-`implementation 'com.ejlchina:okhttps:1.0.3'`
+`implementation 'com.ejlchina:okhttps:1.0.4'`
 
 ## 使用说明
 
@@ -837,8 +838,9 @@ http.async("/users/1")
         })
         .get();
 ```
+### 11 请求的取消
 
-### 11 回调线程自由切换（for Android）
+### 12 回调线程自由切换（for Android）
 
 　　在 Android 开发中，经常会把某些代码放到特点的线程去执行，比如网络请求响应后的页面更新在主线程（UI线程）执行，而保存文件则在IO线程操作。OkHttps 为这类问题提供了良好的方案。
 
@@ -913,7 +915,7 @@ http.sync("/download/test.zip")
         })
         .start();
 ```
-### 12 实现生命周期绑定（for Android）
+### 13 实现生命周期绑定（for Android）
 
 文档完善中，敬请期待...
 
