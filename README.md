@@ -960,6 +960,69 @@ http.async("http://www.baidu.com")
 
 　　那`HTTP`实例到底该如何配置呢？
 
+#### 第一步：配置预处理器
+
+```java
+HTTP http = HTTP.builder()
+        ... // 省略其它配置项
+        .addPreprocessor((Preprocessor.PreChain chain) -> {
+            HttpTask<?> task = chain.getTask();
+            Object bound = task.getBound();
+            // 判断 task 是否绑定了 Lifecycle 对象
+            if (bound instanceof Lifecycle) {
+                // 重新绑定一个 生命周期监视器（LCObserver），它的定义见下一步
+                task.bind(new LCObserver(task, (Lifecycle) bound));
+            }
+            chain.proceed();
+        })
+        ... // 省略其它配置项
+        .build();
+```
+
+#### 第二步：定义生命周期监视器
+
+```java
+public class LCObserver implements LifecycleObserver {
+
+    HttpTask<?> task;
+    Lifecycle lifecycle;
+
+    LCObserver(HttpTask<?> task, Lifecycle lifecycle) {
+        this.task = task;
+        this.lifecycle = lifecycle;
+        lifecycle.addObserver(this);
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    public void onStop() {
+        task.cancel();  // 在 ON_STOP 事件中，取消对应的 HTTP 任务
+    }
+
+    void unbind() {
+        lifecycle.removeObserver(this);
+    }
+
+}
+```
+
+#### 第三步：配置全局回调监听
+
+```java
+HTTP http = HTTP.builder()
+        ... // 省略其它配置项
+        .completeListener((HttpTask<?> task, HttpResult.State state) -> {
+            Object bound = task.getBound();
+            // 判断 task 是否绑定了生命周期监视器（LCObserver）对象
+            if (bound instanceof LCObserver) {
+                // 解绑监视器
+                ((LCObserver) bound).unbind();
+            }
+            return true;
+        })
+        ... // 省略其它配置项
+        .build();
+```
+
 
 
 文档完善中，敬请期待...
