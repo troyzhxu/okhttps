@@ -842,10 +842,34 @@ http.async("/users/1")
 
 　　在 OkHttps 里取消某个请求有多种方式：
 
-* 使用`HttpCall#cancel()`取消单个请求（适用于异步请求）
+* 使用`HttpCall#cancel()`取消单个请求（适用于异步请求，[详见 3.3 章节](#33-httpcall)）
 * 使用`HttpTask#cancel()`取消单个请求（适用于所有请求）（since v1.0.4）
-* 使用`HTTP#cancel(String tag)`批量取消请求（适用于所有请求）
+
+```java
+HttpTask<?> task = http.async("/users")
+        .setOnResponse((HttpResult result) -> {
+            // 响应回调
+        });
+
+task.get(); // 发起 GET 请求
+
+// 取消请求，并返回是否取消成功
+boolean canceled = task.cancel();   
+```
+
+* 使用`HTTP#cancel(String tag)`批量取消请求（适用于所有请求，[详见第 5 章节](#5-使用标签)）
 * 使用`HTTP#cancelAll()`取消所有请求（适用于所有请求）（since v1.0.2）
+
+```java
+http.async("/users")
+        .setOnResponse((HttpResult result) -> {
+
+        })
+        .get();
+
+// 取消所有请求
+http.cancelAll();   
+```
 
 ### 12 回调线程自由切换（for Android）
 
