@@ -941,9 +941,21 @@ http.sync("/download/test.zip")
 ```
 ### 13 实现生命周期绑定（for Android）
 
-　　由于 OkHttps 并不依赖于 Android，所以它并没有直接提供关于生命周期绑定的实现，但它的一些扩展机制让我们很容易就可以实现这个功能。在开始之前，我们首先要理解何为生命周期绑定：
+　　由于 OkHttps 并不依赖于 Android，所以它并没有提供关于生命周期绑定的直接实现，但它的一些扩展机制让我们很容易就可以实现这个需求。在开始之前，我们首先要理解何为生命周期绑定：
 
 > 所谓的生命周期绑定：即是让 HTTP 任务感知其所属的 Activity 或 Fragment 的生命周期，当  Activity 或 Fragment 将被销毁时，框架应自动的把由它们发起的但尚未完成的 HTTP 任务全部取消，以免导致程序出错！
+
+　　现在我们需要手写一个工具类，这个工具类具有生命周期绑定的功能，假设我们把它取名叫`OkHttps`，在 androidx 的开发环境里，它的使用效果如下：
+
+```java
+// 在  Activity 或 Fragment 内发起请求
+OkHttps.async("http://www.baidu.com")
+        .bind(getLifecycle())   // 绑定Activity 或 Fragment 的生命周期，getLifecycle()是Activity 或 Fragment 自带的方法
+        .setOnResponse((HttpResult result) -> {
+            Log.i("FirstFragment", "收到请求：" + result.toString());
+        })
+        .get();
+```
 
 
 
