@@ -945,11 +945,11 @@ http.sync("/download/test.zip")
 
 > 所谓的生命周期绑定：即是让 HTTP 任务感知其所属的 Activity 或 Fragment 的生命周期，当  Activity 或 Fragment 将被销毁时，框架应自动的把由它们发起的但尚未完成的 HTTP 任务全部取消，以免导致程序出错！
 
-　　现在我们需要手写一个工具类，这个工具类具有生命周期绑定的功能，假设我们把它取名叫`OkHttps`，在 androidx 的开发环境里，它的使用效果如下：
+　　现在我们需要对`HTTP`实例进行配置，配置后的`HTTP`实例具有生命周期绑定的功能，在 androidx 的开发环境里，它的使用效果如下：
 
 ```java
 // 在  Activity 或 Fragment 内发起请，getLifecycle()是Activity 或 Fragment 自带的方法
-OkHttps.async("http://www.baidu.com")
+http.async("http://www.baidu.com")
         .bind(getLifecycle())   // 绑定Activity 或 Fragment 的生命周期
         .setOnResponse((HttpResult result) -> {
             Log.i("FirstFragment", "收到请求：" + result.toString());
