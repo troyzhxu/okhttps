@@ -857,18 +857,11 @@ task.get(); // 发起 GET 请求
 boolean canceled = task.cancel();   
 ```
 
-* 使用`HTTP#cancel(String tag)`批量取消请求（适用于所有请求，[详见第 5 章节](#5-使用标签)）
+* 使用`HTTP#cancel(String tag)`按标签批量取消请求（适用于所有请求，[详见第 5 章节](#5-使用标签)）
 * 使用`HTTP#cancelAll()`取消所有请求（适用于所有请求）（since v1.0.2）
 
 ```java
-http.async("/users")
-        .setOnResponse((HttpResult result) -> {
-
-        })
-        .get();
-
-// 取消所有请求
-http.cancelAll();   
+http.cancelAll();   // 取消所有请求
 ```
 
 ### 12 回调线程自由切换（for Android）
