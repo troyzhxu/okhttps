@@ -945,17 +945,19 @@ http.sync("/download/test.zip")
 
 > 所谓的生命周期绑定：即是让 HTTP 任务感知其所属的 Activity 或 Fragment 的生命周期，当  Activity 或 Fragment 将被销毁时，框架应自动的把由它们发起的但尚未完成的 HTTP 任务全部取消，以免导致程序出错！
 
-　　现在我们需要对`HTTP`实例进行配置，配置后的`HTTP`实例具有生命周期绑定的功能，在 androidx 的开发环境里，它的使用效果如下：
+　　现在我们需要对`HTTP`实例进行配置，配置后的`HTTP`实例具有生命周期绑定的功能，在`androidx`的开发环境里，它的使用效果如下：
 
 ```java
-// 在  Activity 或 Fragment 内发起请，getLifecycle()是Activity 或 Fragment 自带的方法
+// 在 Activity 或 Fragment 内发起请，getLifecycle() 是 Activity 或 Fragment 自带的方法
 http.async("http://www.baidu.com")
-        .bind(getLifecycle())   // 绑定Activity 或 Fragment 的生命周期
+        .bind(getLifecycle())   // 绑定生命周期
         .setOnResponse((HttpResult result) -> {
             Log.i("FirstFragment", "收到请求：" + result.toString());
         })
         .get();
 ```
+　　上述代码中的`getLifecycle()`是`androidx`中`Activity`或`Fragment`自带的方法，而`bind()`是`HttpTask`的现有方法。在配置好`HTTP`实例后，上述代码发起的请求便可以感知`Activity`或`Fragment`的生命周期。
+　　那`HTTP`实例到底该如何配置呢？
 
 
 
