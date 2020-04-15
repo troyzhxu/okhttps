@@ -840,6 +840,13 @@ http.async("/users/1")
 ```
 ### 11 请求的取消
 
+　　在 OkHttps 里取消某个请求有多种方式：
+
+* 使用`HttpCall#cancel()`取消请求（适用于异步请求）
+* 使用`HttpTask#cancel()`取消请求（适用于所有请求）（since v1.0.4）
+* 使用`HTTP.cancel(String tag)`批量取消请求（适用于所有请求）
+* 使用`HTTP.cancelAll()`取消所有请求（适用于所有请求）（since v1.0.2）
+
 ### 12 回调线程自由切换（for Android）
 
 　　在 Android 开发中，经常会把某些代码放到特点的线程去执行，比如网络请求响应后的页面更新在主线程（UI线程）执行，而保存文件则在IO线程操作。OkHttps 为这类问题提供了良好的方案。
