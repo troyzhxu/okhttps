@@ -310,19 +310,25 @@ System.out.println(call.isCanceled());     // true
 
 ```java
 http.async("/users")    //（1）
-        .setTag("A").get();
+        .setTag("A")
+        .get();
         
 http.async("/users")    //（2）
-        .setTag("A.B").get();
+        .setTag("A.B")
+        .get();
         
 http.async("/users")    //（3）
-        .setTag("B").get();
+        .setTag("B")
+        .get();
         
 http.async("/users")    //（4）
-        .setTag("B.C").get();
+        .setTag("B")
+        .setTag("C")    // since v1.0.4, 标签将以追加模式添加
+        .get();
         
 http.async("/users")    //（5）
-        .setTag("C").get();
+        .setTag("C")
+        .get();
 ```
 　　当使用标签后，就可以按标签批量的对HTTP任务进行取消：
 
