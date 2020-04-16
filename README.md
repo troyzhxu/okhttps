@@ -1032,7 +1032,7 @@ HTTP http = HTTP.builder()
         .build();
 ```
 
-####　以上三步便在Android中实现了生命周期与HTTP请求绑定的功能
+**以上三步便在Android中实现了生命周期与HTTP请求绑定的功能**
 
 　　非常简单，懒得敲代码的同学还可以 [点这里 OkHttps.java](https://gitee.com/ejlchina-zhxu/okhttps-android-demo/blob/master/app/src/main/java/com/flower/myapplication/http/OkHttps.java) 直接下载封装好的源码，其中不仅编写了生命周期绑定的配置，还有在UI线程执行回调的配置。
 
