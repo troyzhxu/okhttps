@@ -1036,7 +1036,7 @@ HTTP http = HTTP.builder()
 
 　　非常简单，懒得敲代码的同学还可以 [点这里 OkHttps.java](https://gitee.com/ejlchina-zhxu/okhttps-android-demo/blob/master/app/src/main/java/com/flower/myapplication/http/OkHttps.java) 直接下载封装好的源码，其中不仅编写了生命周期绑定的配置，还有在UI线程执行回调的配置。
 
-　　有需要的同学，可以直接下载下来使用，还可以基于它再次扩展，比如实现自动添加 TOKEN 的功能，具体可以参考[6.5 串行预处理器（TOKEN问题最佳解决方案）](#65-串行预处理器token问题最佳解决方案)。
+　　有需要的同学，可以直接下载下来使用，还可以基于它再次扩展，比如实现自动添加 TOKEN 的功能，具体可以参考[6.5 串行预处理器（TOKEN问题最佳解决方案）](#65-串行预处理器token问题最佳解决方案)，再比如扩展实现生命周期与下载事件绑定的功能，都非常简单。
 
 
 ## 后期计划（v1.1.0）
