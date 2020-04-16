@@ -1004,7 +1004,8 @@ public class LCObserver implements LifecycleObserver {
         task.cancel();  // 在 ON_STOP 事件中，取消对应的 HTTP 任务
     }
 
-    void unbind() {
+    public void unbind() {
+        // 在请求完成之后移除监视器
         lifecycle.removeObserver(this);
     }
 
