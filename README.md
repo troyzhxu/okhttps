@@ -954,7 +954,7 @@ http.sync("/download/test.zip")
 　　现在我们需要对`HTTP`实例进行配置，配置后的`HTTP`实例具有生命周期绑定的功能，在`androidx`的开发环境里，它的使用效果如下：
 
 ```java
-// 在 Activity 或 Fragment 内发起请，getLifecycle() 是 Activity 或 Fragment 自带的方法
+// 在 Activity 或 Fragment 内发起请求
 http.async("http://www.baidu.com")
         .bind(getLifecycle())   // 绑定生命周期
         .setOnResponse((HttpResult result) -> {
