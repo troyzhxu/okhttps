@@ -69,7 +69,7 @@
 
 ### Maven
 
-```
+```xml
 <dependency>
      <groupId>com.ejlchina</groupId>
      <artifactId>okhttps</artifactId>
@@ -79,6 +79,18 @@
 ### Gradle
 
 `implementation 'com.ejlchina:okhttps:1.0.4'`
+
+安卓中使用需要把 JDK 版本调成 1.8，在 app 模块的 build.gradle 中加入以下配置即可：
+
+```groovy
+android {
+    // 省略其它配置..
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+}
+```
 
 ## 使用说明
 
@@ -1047,7 +1059,7 @@ HTTP http = HTTP.builder()
 
 ## 联系方式
 
-* 微信：<img src="https://images.gitee.com/uploads/images/2020/0416/101418_eb179903_1393412.png" width="700px">
+* 微信：<img src="https://images.gitee.com/uploads/images/2020/0416/121927_208c5230_1393412.png" width="700px">
 * 邮箱：zhou.xu@ejlchina.com
 
 ## 参与贡献
