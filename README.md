@@ -311,8 +311,7 @@ System.out.println(call.isCanceled());     // true
 
 * `setTag(String tag)` 为HTTP任务添加标签
 * `setRange(long rangeStart)` 设置Range头信息，用于断点续传
-* `setRange(long rangeStart, long rangeEnd)` 设置Range头信息，用于分块下载
-* `setRange(long rangeStart, long rangeEnd)` 设置Range头信息，用于分块下载
+* `setRange(long rangeStart, long rangeEnd)` 设置Range头信息，可用于分块下载
 
 * `bind(Object object)` 绑定一个对象，可用于实现Android里的生命周期绑定
 
@@ -430,7 +429,7 @@ HTTP http = HTTP.builder()
         })
         .build();
 ```
-　　和`Interceptor`一样，`Preprocessor`也可以添加多个。他们之前的区别如下:
+　　和`Interceptor`一样，`Preprocessor`也可以添加多个。他们之间的区别如下:
 
 > * 拦截器只能处理同步操作，预处理器支持处理异步操作
 > * 拦截器都是并行处理请求，预处理器支持串行处理（详见6.5章节）
