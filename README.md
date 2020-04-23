@@ -17,7 +17,7 @@
 
 > OkHttps 非常轻量，自身代码仅 2000 行左右，且有较高的编码质量，sonarqube 分析结果为 3A，[查看报告](https://gitee.com/ejlchina-zhxu/okhttps/quality_analyses?platform=sonar_qube)
 
-### 前世：[HttpUtils, V2.3.0 之后重命名为 OkHttps](https://gitee.com/ejlchina-zhxu/httputils)
+### 前身：[HttpUtils, V2.3.0 之后重命名为 OkHttps](https://gitee.com/ejlchina-zhxu/httputils)
 ### 当前文档版本[1.0.4]
 ### API文档：[https://apidoc.gitee.com/ejlchina-zhxu/okhttps](https://apidoc.gitee.com/ejlchina-zhxu/okhttps)
 
