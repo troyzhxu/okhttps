@@ -15,7 +15,10 @@
  * 单方法回调，充分利用 Lambda 表达式
  * TCP连接池、Http2
 
-> OkHttps 非常轻量，自身代码仅 2000 行左右，且有较高的编码质量，sonarqube 分析结果为 3A，[查看报告](https://gitee.com/ejlchina-zhxu/okhttps/quality_analyses?platform=sonar_qube)
+> 1. OkHttps 非常轻量（59Kb），是 Retrofit（124Kb）的一半，并且更加的开箱即用，API 也更加自然和语义化。
+> 2. OkHttps 是一个纯粹的 Java 网络开发包，并不依赖 Android，这一点和 Retrofit 不同
+> 3. OkHttps 用起来很优美，可以像 RxJava 那样链式用，却比 RxJava 更简单。
+
 
 ### 前身：[HttpUtils, V2.3.0 之后重命名为 OkHttps](https://gitee.com/ejlchina-zhxu/httputils)
 ### 当前文档版本[1.0.4]
