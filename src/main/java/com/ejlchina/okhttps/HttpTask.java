@@ -526,7 +526,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
     
     protected void registeTagTask(Cancelable canceler) {
-        if (tag != null) {
+        if (tag != null && tagTask == null) {
         	tagTask = httpClient.addTagTask(tag, canceler, this);
         }
         this.canceler = canceler;
