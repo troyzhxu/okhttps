@@ -3,7 +3,7 @@
 	
 	<groupId>com.ejlchina</groupId>
 	<artifactId>okhttps</artifactId>
-	<version>1.0.4</version>
+	<version>1.0.5</version>
 	<name>OkHttps</name>
  
 	<properties>
@@ -35,7 +35,7 @@
 		<connection>scm:git://gitee.com/ejlchina-zhxu/okhttps.git</connection>
 		<developerConnection>scm:http://gitee.com/ejlchina-zhxu/okhttps</developerConnection>
 		<url>https://gitee.com/ejlchina-zhxu/okhttps</url>
-		<tag>v1.0.4</tag>
+		<tag>v1.0.5</tag>
 	</scm>
 	
 	<dependencies>
@@ -168,7 +168,7 @@
 	</build>
   
 	<url>https://gitee.com/ejlchina-zhxu/okhttps</url>
-	<description>Http工具包，封装 OkHttp，链式用法、支持异步同步、响应JSON自动解析，回调线程切换、配置灵活、支持URL占位符、支持BaseUrl、外部依赖少、适用 JavaWeb 和 Android，教程全面、简单易用</description>
+	<description>比 Retrofit 更好用的网络框架！ OkHttp3 轻量封装 ，开箱即用、Java领域前后端处理 Http问题的新选择。</description>
 	<organization>
 		<name>江苏一键联信息科技有限公司</name>
 		<url>http://www.ejlchina.com/</url>
