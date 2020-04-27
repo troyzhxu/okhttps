@@ -1,9 +1,10 @@
 ---
 home: true
+<!-- heroImage: /favicon.png -->
 heroText: OkHttps
-tagline: 安卓和Java领域开箱即用的 HTTP 客户端
+tagline: JAVA 中超级好用的 HTTP 客户端
 actionText: 快速上手 →
-actionLink: /zh/guide/
+actionLink: /guide/
 features:
 - title: 轻量纯粹优雅
   details: OkHttps 非常轻量，体积仅是 Retrofit 的一半不到，并且不依赖于特定平台，API 语义简洁舒适。
@@ -19,7 +20,7 @@ footer: Apache Licensed | Copyright © 2020-present Troy Zhou
 ```java
 // 构建 HTTP
 HTTP http = HTTP.builder()
-        .baseUrl("http://api.demo.com")
+        .baseUrl("https://api.demo.com")
         .build();
 
 // 同步请求
