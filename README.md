@@ -21,7 +21,7 @@
 
 
 ### 前身：[HttpUtils, V2.3.0 之后重命名为 OkHttps](https://gitee.com/ejlchina-zhxu/httputils)
-### 当前文档版本[1.0.4]
+### 当前文档版本[1.0.5]
 ### API文档：[https://apidoc.gitee.com/ejlchina-zhxu/okhttps](https://apidoc.gitee.com/ejlchina-zhxu/okhttps)
 
 ## 目录
@@ -76,12 +76,12 @@
 <dependency>
      <groupId>com.ejlchina</groupId>
      <artifactId>okhttps</artifactId>
-     <version>1.0.4</version>
+     <version>1.0.5</version>
 </dependency>
 ```
 ### Gradle
 
-`implementation 'com.ejlchina:okhttps:1.0.4'`
+`implementation 'com.ejlchina:okhttps:1.0.5'`
 
 安卓中使用需要把 JDK 版本调成 1.8，在 app 模块的 build.gradle 中加入以下配置即可：
 
