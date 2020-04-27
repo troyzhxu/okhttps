@@ -8,6 +8,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -131,12 +132,12 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      */
     public C setTag(String tag) {
         if (tag != null) {
-        	if (this.tag != null) {
-        		this.tag = this.tag + "." + tag;
-        	} else {
-        		this.tag = tag;
-        	}
-        	updateTagTask();
+            if (this.tag != null) {
+                this.tag = this.tag + "." + tag;
+            } else {
+                this.tag = tag;
+            }
+            updateTagTask();
         }
         return (C) this;
     }
@@ -335,11 +336,14 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
 
     private void doAddParams(Map<String, String> taskParams, Map<String, ?> params) {
         if (params != null) {
-            params.forEach((String name, Object value) -> {
+            Iterator<String> it = params.keySet().iterator();
+            while (it.hasNext()) {
+                String name = it.next();
+                Object value = params.get(name);
                 if (name != null && value != null) {
                     taskParams.put(name, value.toString());
                 }
-            });
+            }
         }
     }
 
@@ -527,17 +531,17 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     
     protected void registeTagTask(Cancelable canceler) {
         if (tag != null && tagTask == null) {
-        	tagTask = httpClient.addTagTask(tag, canceler, this);
+            tagTask = httpClient.addTagTask(tag, canceler, this);
         }
         this.canceler = canceler;
     }
 
     private void updateTagTask() {
         if (tagTask != null) {
-        	tagTask.setTag(tag);
+            tagTask.setTag(tag);
         } else 
         if (canceler != null) {
-        	registeTagTask(canceler);
+            registeTagTask(canceler);
         }
     }
     
@@ -751,11 +755,11 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         }
     }
 
-	protected HttpResult timeoutResult() {
-		if (nothrow) {
-			return new RealHttpResult(this, State.TIMEOUT);
-		}
-		throw new HttpException(State.TIMEOUT, "执行超时");
-	}
+    protected HttpResult timeoutResult() {
+        if (nothrow) {
+            return new RealHttpResult(this, State.TIMEOUT);
+        }
+        throw new HttpException(State.TIMEOUT, "执行超时");
+    }
 
 }
