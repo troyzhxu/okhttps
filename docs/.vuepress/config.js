@@ -13,9 +13,15 @@ module.exports = {
     ],
     sidebar: [
       ['/guide/', '起步'],
-      ['/guide/getting-start', '一探究竟'],
+      ['/guide/foundation', '基础'],
+      ['/guide/configuration', '配置'],
+      ['/guide/features', '特色'],
+      ['/guide/updown', '上传下载'],
       ['/guide/android', '安卓'],
     ],
     sidebarDepth: 2
+  },
+  markdown: {
+    lineNumbers: true
   }
 }

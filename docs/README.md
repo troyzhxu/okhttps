@@ -13,7 +13,7 @@ features:
 - title: 更多实用特性
   details: URL 占位符、Lambda 回调、JSON自动封装解析、OkHttp 的特性：拦截器、连接池、CookieJar 等。
 
-footer: Apache Licensed | Copyright © 2020-present Troy Zhou
+footer: Apache Licensed | Copyright © 2020-present ejlchina
 ---
 
 
@@ -38,4 +38,4 @@ http.async("/users/jack")               //  http://api.demo.com/users/jack
         .get();                         // GET请求
 ```
 
-**<center>就这么简单，你已学会 OkHttps 90% 的用法！</center>**
+**<center>就这么简单，你已学会了 <font size=6>90</font>% 的用法！</center>**
