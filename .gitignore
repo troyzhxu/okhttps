@@ -3,7 +3,8 @@
 /.settings/
 /.classpath
 /.project
-/.idea/**
-*.iml
+/.idea/
 /package-lock.json
 /node_modules/
+/docs/.vuepress/dist/
+*.iml

@@ -1,3 +1,7 @@
+---
+description: OkHttps 使用 HttpUtils 类 WebSocket 异常处理 nothrow 异常回调 多种方式 取消请求 标签 批量取消 cancelAll
+---
+
 # 特色
 
 ## 使用 HttpUtils 类

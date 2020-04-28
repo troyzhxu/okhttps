@@ -1,6 +1,6 @@
 module.exports = {
   title: 'OkHttps',
-  description: 'OkHttps 官网',
+  description: 'OkHttps 官网 比 Retrofit 更好用的网络框架！ OkHttp3 轻量封装 ，开箱即用、Java领域前后端处理 Http问题的新选择。',
   head: [
     ['link', { rel: 'icon', href: '/logo.png' }]
   ],
@@ -27,13 +27,17 @@ module.exports = {
     docsBranch: 'dev',
     docsDir: 'docs',
     editLinks: true,
-    editLinkText: '在 GitHub 上编辑此页'
+    editLinkText: '在 GitHub 上编辑此页',
+    author: 'Troy Zhou'
   },
   // 若全局使用 vuepress，back-to-top 就会失效
   plugins: [
     '@vuepress/back-to-top', 'code-switcher',
     ['smartlook', {id: "309988eea09b54d04d69edf5864d0414949892f4"}],
-    ['seo', { /* options */ }]
+    ['seo', { 
+      description: $page => $page.frontmatter.description,
+      tags: $page => $page.frontmatter.tags
+    }]
   ],
   markdown: {
     lineNumbers: true
