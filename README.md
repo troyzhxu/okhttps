@@ -11,7 +11,7 @@
 
 ## Documentation
 
-Check out our docs at http://okhttps.ejlchina.com/.
+官网 http://okhttps.ejlchina.com/
 
 ## 介绍
 
