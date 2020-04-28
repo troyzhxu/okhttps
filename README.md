@@ -9,6 +9,10 @@
     <a href="https://github.com/ejlchina"><img src="https://img.shields.io/badge/%E4%BD%9C%E8%80%85-ejlchina-orange.svg" alt="Troy.Zhou"></a>
 </p>
 
+## Documentation
+
+Check out our docs at http://okhttps.ejlchina.com/.
+
 ## 介绍
 
 　　OkHttps 是近期开源的对 OkHttp3 轻量封装的框架，它独创的异步预处理器，特色的标签，灵活的上传下载进度监听与过程控制功能，在轻松解决很多原本另人头疼问题的同时，设计上也力求纯粹与优雅。
