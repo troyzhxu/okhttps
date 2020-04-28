@@ -32,12 +32,8 @@ module.exports = {
   },
   // 若全局使用 vuepress，back-to-top 就会失效
   plugins: [
-    '@vuepress/back-to-top', 'code-switcher',
+    '@vuepress/back-to-top', 'code-switcher', 'baidu-autopush', 'seo',
     ['smartlook', {id: "309988eea09b54d04d69edf5864d0414949892f4"}],
-    ['seo', { 
-      description: $page => $page.frontmatter.description,
-      tags: $page => $page.frontmatter.tags
-    }]
   ],
   markdown: {
     lineNumbers: true
