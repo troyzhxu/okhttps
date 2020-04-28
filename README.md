@@ -1,6 +1,6 @@
 <p align="center">
   <a href="http://okhttps.ejlchina.com/" target="_blank">
-    <img width="180" src="http://okhttps.ejlchina.com/logo.png" alt="logo">
+    <img width="128" src="http://okhttps.ejlchina.com/logo.png" alt="logo">
   </a>
 </p>
 <p align="center">
