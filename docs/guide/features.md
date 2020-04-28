@@ -1,3 +1,5 @@
+# 特色
+
 ## 使用 HttpUtils 类
 
 　　类`HttpUtils`本是 [前身 HttpUtils](https://gitee.com/ejlchina-zhxu/httputils) 的 1.x 版本里的最重要的核心类，由于在后来的版本里抽象出了`HTTP`接口，使得它的重要性已不如往昔。但合理的使用它，仍然可以带来不少便利，特别是在没有IOC容器的环境里，比如在Android开发和一些工具项目的开发中。

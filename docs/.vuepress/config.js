@@ -9,8 +9,7 @@ module.exports = {
     nav: [
       { text: '教程', link: '/guide/' },
       { text: '历史版本', link: 'https://gitee.com/ejlchina-zhxu/okhttps/releases' },
-      { text: 'Gitee', link: 'https://gitee.com/ejlchina-zhxu/okhttps' },
-      { text: 'GitHub', link: 'https://github.com/ejlchina/okhttps' }
+      { text: '码云', link: 'https://gitee.com/ejlchina-zhxu/okhttps' }
     ],
     sidebar: [
       ['/guide/', '起步'],
@@ -23,11 +22,19 @@ module.exports = {
     sidebarDepth: 2,
     smoothScroll: true,
     lastUpdated: '上次更新',
-    repo: 'https://gitee.com/ejlchina-zhxu/okhttps',
-    repoLabel: '查看源码',
+    repo: 'ejlchina/okhttps',
+    repoLabel: 'Github',
     docsBranch: 'dev',
+    docsDir: 'docs',
     editLinks: true,
+    editLinkText: '在 GitHub 上编辑此页'
   },
+  // 若全局使用 vuepress，back-to-top 就会失效
+  plugins: [
+    '@vuepress/back-to-top', 'code-switcher',
+    ['smartlook', {id: "309988eea09b54d04d69edf5864d0414949892f4"}],
+    ['seo', { /* options */ }]
+  ],
   markdown: {
     lineNumbers: true
   }

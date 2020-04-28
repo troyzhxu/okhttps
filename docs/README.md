@@ -16,6 +16,8 @@ features:
 footer: Apache Licensed | Copyright © 2020-present ejlchina
 ---
 
+<!-- <CodeSwitcher :languages="{java:'Java',kotlin:'Kotlin'}" name="java">
+<template v-slot:java> -->
 
 ```java
 // 构建 HTTP
@@ -37,5 +39,32 @@ http.async("/users/jack")               //  http://api.demo.com/users/jack
         })
         .get();                         // GET请求
 ```
+
+<!-- </template>
+<template v-slot:kotlin>
+
+```java
+// 构建 HTTP
+HTTP http = HTTP.builder()
+        .baseUrl("https://api.demo.com")
+        .build();
+
+// 同步请求
+List<User> users = http.sync("/users")  // http://api.demo.com/users
+        .get()                          // GET请求
+        .getBody()                      // 获取响应报文体
+        .toList(User.class);            // 得到目标数据
+
+// 异步请求
+http.async("/users/jack")               //  http://api.demo.com/users/jack
+        .setOnResponse((HttpResult result) -> {
+            // 得到目标数据
+            User jack = result.getBody().toBean(User.class);
+        })
+        .get();                         // GET请求
+```
+
+</template>
+</CodeSwitcher> -->
 
 **<center>就这么简单，你已学会了 <font size=6>90</font>% 的用法！</center>**
