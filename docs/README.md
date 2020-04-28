@@ -1,8 +1,8 @@
 ---
 home: true
-<!-- heroImage: /favicon.png -->
+heroImage: /logo.png
 heroText: OkHttps
-tagline: JAVA 中超级好用的 HTTP 客户端
+tagline: 基于 OkHttp 的 Java HTTP 客户端
 actionText: 快速上手 →
 actionLink: /guide/
 features:
@@ -37,3 +37,5 @@ http.async("/users/jack")               //  http://api.demo.com/users/jack
         })
         .get();                         // GET请求
 ```
+
+**<center>就这么简单，你已学会 OkHttps 90% 的用法！</center>**

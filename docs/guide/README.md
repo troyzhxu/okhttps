@@ -43,18 +43,18 @@ android {
 
 ## 使用
 
-### 构建 HTTP
+### 构建实例
 
 ```java
 HTTP http = HTTP.builder().build();
 ```
 　　以上代码构建了一个最简单的`HTTP`实例，它拥有以下方法：
 
-* `async(String url)`  开始一个异步请求 （内部通过一个`HTTP`单例实现）
-* `sync(String url)`   开始一个同步请求 （内部通过一个`HTTP`单例实现）
-* `cancel(String tag)` 按标签取消请求（内部通过一个`HTTP`单例实现）
-* `cancelAll()`        取消所有HTTP任务，包括同步和异步（内部通过一个`HTTP`单例实现）
-* `request(Request request)`  OkHttp 原生请求 （该请求不经过 预处理器）
+* `async(String url)`  开始一个异步请求 
+* `sync(String url)`   开始一个同步请求 
+* `cancel(String tag)` 按标签取消请求
+* `cancelAll()`        取消所有HTTP任务，包括同步和异步
+* `request(Request request)`  OkHttp 原生请求 
 * `webSocket(Request request, WebSocketListener listener)` WebSocket通讯
 
 　　为了使用方便，在构建的时候，我们更愿意指定一个`BaseUrl`（请参见[5.1 设置 BaseUrl](#51-设置-baseurl)）:
@@ -66,7 +66,7 @@ HTTP http = HTTP.builder()
 ```
 　　为了简化文档，下文中出现的`http`均是在构建时设置了`BaseUrl`的`HTTP`实例。
 
-#### 同步请求
+### 同步请求
 
 　　使用方法`sync(String url)`开始一个同步请求：
 
@@ -78,7 +78,7 @@ List<User> users = http.sync("/users") // http://api.demo.com/users
 ```
 　　方法`sync`返回一个同步`HttpTask`，可链式使用。
 
-#### 异步请求
+### 异步请求
 
 　　使用方法`async(String url)`开始一个异步请求：
 
@@ -91,3 +91,21 @@ http.async("/users/1")                //  http://api.demo.com/users/1
         .get();                       // GET请求
 ```
 　　方法`async`返回一个异步`HttpTask`，可链式使用。
+
+
+### 请求方法
+
+　　同步与异步的`HttpTask`都拥有`get`、`post`、`put`与`delete`方法。不同的是：同步`HttpTask`的这些方法返回一个`HttpResult`，而异步`HttpTask`的这些方法返回一个`HttpCall`。
+
+```java
+HttpResult res1 = http.sync("/users").get();     // 同步 GET
+HttpResult res2 = http.sync("/users").post();    // 同步 POST
+HttpResult res3 = http.sync("/users/1").put();   // 同步 PUT
+HttpResult res4 = http.sync("/users/1").delete();// 同步 DELETE
+HttpCall call1 = http.async("/users").get();     // 异步 GET
+HttpCall call2 = http.async("/users").post();    // 异步 POST
+HttpCall call3 = http.async("/users/1").put();   // 异步 PUT
+HttpCall call4 = http.async("/users/1").delete();// 异步 DELETE
+```
+
+**至此，你已轻松学会了 OkHttps 95% 的常规用法！但别急，后面还有更精彩的。**

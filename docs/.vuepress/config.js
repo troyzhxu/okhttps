@@ -2,10 +2,10 @@ module.exports = {
   title: 'OkHttps',
   description: 'OkHttps 官网',
   head: [
-    // ['link', { rel: 'icon', href: '/favicon.png' }]
+    ['link', { rel: 'icon', href: '/logo.png' }]
   ],
   themeConfig: {
-    // logo: '/favicon.png',
+    logo: '/logo.png',
     nav: [
       { text: '教程', link: '/guide/' },
       { text: 'Gitee', link: 'https://gitee.com/ejlchina-zhxu/okhttps' },
@@ -13,7 +13,9 @@ module.exports = {
     ],
     sidebar: [
       ['/guide/', '起步'],
-      '/guide/getting-start'
-    ]
+      ['/guide/getting-start', '一探究竟'],
+      ['/guide/android', '安卓'],
+    ],
+    sidebarDepth: 2
   }
 }

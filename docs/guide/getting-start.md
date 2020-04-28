@@ -1,20 +1,7 @@
-### 2 请求方法（GET|POST|PUT|DELETE）
 
-　　同步与异步的`HttpTask`都拥有`get`、`post`、`put`与`delete`方法。不同的是：同步`HttpTask`的这些方法返回一个`HttpResult`，而异步`HttpTask`的这些方法返回一个`HttpCall`。
+## 解析请求结果
 
-```java
-HttpResult res1 = http.sync("/users").get();     // 同步 GET
-HttpResult res2 = http.sync("/users").post();    // 同步 POST
-HttpResult res3 = http.sync("/users/1").put();   // 同步 PUT
-HttpResult res4 = http.sync("/users/1").delete();// 同步 DELETE
-HttpCall call1 = http.async("/users").get();     // 异步 GET
-HttpCall call2 = http.async("/users").post();    // 异步 POST
-HttpCall call3 = http.async("/users/1").put();   // 异步 PUT
-HttpCall call4 = http.async("/users/1").delete();// 异步 DELETE
-```
-### 3 解析请求结果
-
-#### 3.1 回调函数
+### 回调函数
 
 　　OkHttps 的回调函数全部使用单方法模式，这样可以充分利用 Java8 或 Kotlin 中的 Lambda 表达式，使你的代码更加简洁优雅：
 
@@ -37,7 +24,7 @@ http.async("/users/{id}")             // http://api.demo.com/users/1
 >* 只有异步请求才可以设置这三种（响应|异常|完成）回调
 >* 同步请求直接返回结果，无需使用回调
 
-#### 3.2 HttpResult
+### HttpResult
 
 　　`HttpResult`是HTTP请求执行完后的结果，它是同步请求方法（ `get`、`post`、`put`、`delete`）的返回值，也是异步请求响应回调（`OnResponse`）的参数，它定义了如下方法：
 
@@ -109,7 +96,7 @@ System.out.println("size = " + size);
 ```
 
 
-#### 3.3 HttpCall
+### HttpCall
 
 　　`HttpCall`对象是异步请求方法（`get`、`post`、`put`、`delete`）的返回值，与`java`的`Future`接口很像，它有如下方法：
 
@@ -131,7 +118,7 @@ System.out.println(success);               // true
 System.out.println(call.isCanceled());     // true
 ```
 
-### 4 构建HTTP任务
+## 构建HTTP任务
 
 　　`HTTP`对象的`sync`与`async`方法返回一个`HttpTask`对象，该对象提供了可链式调用的`addXXX`与`setXXX`等系列方法用于构建任务本身。
 
@@ -166,7 +153,7 @@ System.out.println(call.isCanceled());     // true
 
 * `bind(Object object)` 绑定一个对象，可用于实现Android里的生命周期绑定
 
-### 5 使用标签
+## 使用标签
 
 　　有时候我们想对HTTP任务加以分类，这时候可以使用标签功能：
 
@@ -200,9 +187,9 @@ System.out.println(count);                 // 输出 3
 ```
 　　标签除了可以用来取消任务，在预处理器中它也可以发挥作用，请参见[并行预处理器](#54-并行预处理器)与[串行预处理器](#55-串行预处理器)。
 
-### 6 配置 HTTP
+## 配置 HTTP
 
-#### 6.1 设置 BaseUrl
+### 设置 BaseUrl
 
 ```java
 HTTP http = HTTP.builder()
@@ -225,7 +212,7 @@ http.sync("/auth/signin")                  // http://api.demo.com/auth/signin
 http.sync("https://www.baidu.com").get()
 ```
 
-#### 6.2 回调执行器
+### 回调执行器
 
 　　OkHttps 默认所有回调都在 **IO线程** 执行，如何想改变执行回调的线程时，可以配置回调执行器。例如在Android里，让所有的回调函数都在UI线程执行，则可以在构建`HTTP`时配置如下：
 
@@ -238,7 +225,7 @@ HTTP http = HTTP.builder()
 ```
 　　该配置默认 **影响所有回调**。
 
-#### 6.3 配置 OkHttpClient
+### 配置 OkHttpClient
 
 　　与其他封装 OkHttp3 的框架不同，OkHttps 并不会遮蔽 OkHttp3 本身就很好用的功能，如下：
 
@@ -260,7 +247,7 @@ HTTP http = HTTP.builder()
     .build();
 ```
 
-#### 6.4 并行预处理器
+### 并行预处理器
 
 　　预处理器（`Preprocessor`）可以让我们在请求发出之前对请求本身做一些改变，但与`OkHttp`的拦截器（`Interceptor`）不同：预处理器可以让我们 **异步** 处理这些问题。
 
@@ -286,7 +273,7 @@ HTTP http = HTTP.builder()
 > * 拦截器都是并行处理请求，预处理器支持串行处理（详见6.5章节）
 > * 拦截器处理时机在请求前和响应后，预处理器只在请求前，并且先于拦截器执行。关于响应后，OkHttps还提供了全局回调监听（详见6.6章节）
 
-#### 6.5 串行预处理器（TOKEN问题最佳解决方案）
+### 串行预处理器（TOKEN问题最佳解决方案）
 
 　　普通预处理器都是可并行处理的，然而有时我们希望某个预处理器同时只处理一个任务。比如 当`Token`过期时我们需要去刷新获取新`Token`，而刷新`Token`这个操作只能有一个任务去执行，因为如果`n`个任务同时执行的话，那么必有`n-1`个任务刚刷新得到的`Token`可能就立马失效了，而这是我们所不希望的。
 
@@ -309,7 +296,7 @@ HTTP http = HTTP.builder()
 ```
 　　串行预处理器实现了让HTTP任务排队串行处理的功能，但值得一提的是：它并没有因此而阻塞任何线程！
 
-#### 6.6 全局回调监听
+### 全局回调监听
 
 ```java
 HTTP http = HTTP.builder()
@@ -336,7 +323,7 @@ HTTP http = HTTP.builder()
 > * 拦截器处的理时机在请求前和响应后，全局回调监听只在响应后，并且晚于拦截器
 > * 全局回调监听可以 **阻断**（return false）某个请求的具体回调，而拦截器不能
 
-#### 6.7 全局下载监听
+### 全局下载监听
 
 ```java
 HTTP http = HTTP.builder()
@@ -348,7 +335,7 @@ HTTP http = HTTP.builder()
         .build();
 ```
 
-### 7 使用 HttpUtils 类
+## 使用 HttpUtils 类
 
 　　类`HttpUtils`本是 [前身 HttpUtils](https://gitee.com/ejlchina-zhxu/httputils) 的 1.x 版本里的最重要的核心类，由于在后来的版本里抽象出了`HTTP`接口，使得它的重要性已不如往昔。但合理的使用它，仍然可以带来不少便利，特别是在没有IOC容器的环境里，比如在Android开发和一些工具项目的开发中。
 
@@ -380,229 +367,12 @@ List<User> users = HttpUtils.sync("/users")
         .get().getBody().toList(User.class);
 ```
 
-### 8 文件下载
 
-　　OkHttps 并没有把文件的下载排除在常规的请求之外，同一套API，它优雅的设计使得下载与常规请求融合的毫无违和感，一个最简单的示例：
-
-```java
-http.sync("/download/test.zip")
-        .get()                           // 使用 GET 方法（其它方法也可以，看服务器支持）
-        .getBody()                       // 得到报文体
-        .toFile("D:/download/test.zip")  // 下载到指定的路径
-        .start();                        // 启动下载
-
-http.sync("/download/test.zip").get().getBody()                  
-        .toFolder("D:/download")         // 下载到指定的目录，文件名将根据下载信息自动生成
-        .start();
-```
-　　或使用异步连接方式：
-
-```java
-http.async("/download/test.zip")
-        .setOnResponse((HttpResult result) -> {
-            result.getBody().toFolder("D:/download").start();
-        })
-        .get();
-```
-　　这里要说明一下：`sync`与`async`的区别在于连接服务器并得到响应这个过程的同步与异步（这个过程的耗时在大文件下载中占比极小），而`start`方法启动的下载过程则都是异步的。
-
-#### 8.1 下载进度监听
-
-　　就直接上代码啦，诸君一看便懂：
-
-```java
-http.sync("/download/test.zip")
-        .get()
-        .getBody()
-        .setStepBytes(1024)   // 设置每接收 1024 个字节执行一次进度回调（不设置默认为 8192）  
- //     .setStepRate(0.01)    // 设置每接收 1% 执行一次进度回调（不设置以 StepBytes 为准）  
-        .setOnProcess((Process process) -> {           // 下载进度回调
-            long doneBytes = process.getDoneBytes();   // 已下载字节数
-            long totalBytes = process.getTotalBytes(); // 总共的字节数
-            double rate = process.getRate();           // 已下载的比例
-            boolean isDone = process.isDone();         // 是否下载完成
-        })
-        .toFolder("D:/download/")        // 指定下载的目录，文件名将根据下载信息自动生成
- //     .toFile("D:/download/test.zip")  // 指定下载的路径，若文件已存在则覆盖
-        .setOnSuccess((File file) -> {   // 下载成功回调
-            
-        })
-        .start();
-```
-　　值得一提的是：由于 OkHttps 并没有把下载做的很特别，这里设置的进度回调不只对下载文件起用作，即使对响应JSON的常规请求，只要设置了进度回调，它也会告诉你报文接收的进度（提前是服务器响应的报文有`Content-Length`头），例如：
-
-```java
-List<User> users = http.sync("/users")
-        .get()
-        .getBody()
-        .setStepBytes(2)
-        .setOnProcess((Process process) -> {
-            System.out.println(process.getRate());
-        })
-        .toList(User.class);
-```
-
-#### 8.2 下载过程控制
-
-　　过于简单：还是直接上代码：
-
-```java
-Ctrl ctrl = http.sync("/download/test.zip")
-        .get()
-        .getBody()
-        .setOnProcess((Process process) -> {
-            System.out.println(process.getRate());
-        })
-        .toFolder("D:/download/")
-        .start();   // 该方法返回一个下载过程控制器
- 
-ctrl.status();      // 下载状态
-ctrl.pause();       // 暂停下载
-ctrl.resume();      // 恢复下载
-ctrl.cancel();      // 取消下载（同时会删除文件，不可恢复）
-```
-　　无论是同步还是异步发起的下载请求，都可以做以上的控制：
-
-```java
-http.async("/download/test.zip")
-        .setOnResponse((HttpResult result) -> {
-            // 拿到下载控制器
-            Ctrl ctrl = result.getBody().toFolder("D:/download/").start();
-        })
-        .get();
-```
-
-#### 8.3 实现断点续传
-
-　　OkHttps 对断点续传并没有再做更高层次的封装，因为这是app该去做的事情，它在设计上使各种网络问题的处理变简单的同时力求纯粹。下面的例子可以看到，OkHttps 通过一个失败回调拿到 **断点**，便将复杂的问题变得简单：
-
-```java
-http.sync("/download/test.zip")
-        .get()
-        .getBody()
-        .toFolder("D:/download/")
-        .setOnFailure((Failure failure) -> {         // 下载失败回调，以便接收诸如网络错误等失败信息
-            IOException e = failure.getException();  // 具体的异常信息
-            long doneBytes = failure.getDoneBytes(); // 已下载的字节数（断点），需要保存，用于断点续传
-            File file = failure.getFile();           // 下载生成的文件，需要保存 ，用于断点续传（只保存路径也可以）
-        })
-        .start();
-```
-　　下面代码实现续传：
-
-```java
-long doneBytes = ...    // 拿到保存的断点
-File file =  ...        // 待续传的文件
-
-http.sync("/download/test.zip")
-        .setRange(doneBytes)                         // 设置断点（已下载的字节数）
-        .get()
-        .getBody()
-        .toFile(file)                                // 下载到同一个文件里
-        .setAppended()                               // 开启文件追加模式
-        .setOnSuccess((File file) -> {
-
-        })
-        .setOnFailure((Failure failure) -> {
-        
-        })
-        .start();
-```
-
-#### 8.4 实现分块下载
-
-　　当文件很大时，有时候我们会考虑分块下载，与断点续传的思路是一样的，示例代码：
-
-```java
-static String url = "http://api.demo.com/download/test.zip"
-
-public static void main(String[] args) {
-    long totalSize = HttpUtils.sync(url).get().getBody()
-            .close()             // 因为这次请求只是为了获得文件大小，不消费报文体，所以直接关闭
-            .getContentLength(); // 获得待下载文件的大小（由于未消费报文体，所以该请求不会消耗下载报文体的时间和网络流量）
-    download(totalSize, 0);      // 从第 0 块开始下载
-    sleep(50000);                // 等待下载完成（不然本例的主线程就结束啦）
-}
-
-static void download(long totalSize, int index) {
-    long size = 3 * 1024 * 1024;                 // 每块下载 3M  
-    long start = index * size;
-    long end = Math.min(start + size, totalSize);
-    HttpUtils.sync(url)
-            .setRange(start, end)                // 设置本次下载的范围
-            .get().getBody()
-            .toFile("D:/download/test.zip")      // 下载到同一个文件里
-            .setAppended()                       // 开启文件追加模式
-            .setOnSuccess((File file) -> {
-                if (end < totalSize) {           // 若未下载完，则继续下载下一块
-                    download(totalSize, index + 1); 
-                } else {
-                    System.out.println("下载完成");
-                }
-            })
-            .start();
-}
-```
-
-### 9 文件上传
-
-　　一个简单文件上传的示例：
-
-```java
-http.sync("/upload")
-        .addFileParam("test", "D:/download/test.zip")
-        .post()     // 上传发法一般使用 POST 或 PUT，看服务器支持
-```
-　　异步上传也是完全一样：
-
-```java
-http.async("/upload")
-        .addFileParam("test", "D:/download/test.zip")
-        .post()
-```
-
-#### 9.1 上传进度监听
-
-　　OkHttps 的上传进度监听，监听的是所有请求报文体的发送进度，示例代码：
-
-```java
-http.sync("/upload")
-        .addBodyParam("name", "Jack")
-        .addBodyParam("age", 20)
-        .addFileParam("avatar", "D:/image/avatar.jpg")
-        .setStepBytes(1024)   // 设置每发送 1024 个字节执行一次进度回调（不设置默认为 8192）  
- //     .setStepRate(0.01)    // 设置每发送 1% 执行一次进度回调（不设置以 StepBytes 为准）  
-        .setOnProcess((Process process) -> {           // 上传进度回调
-            long doneBytes = process.getDoneBytes();   // 已发送字节数
-            long totalBytes = process.getTotalBytes(); // 总共的字节数
-            double rate = process.getRate();           // 已发送的比例
-            boolean isDone = process.isDone();         // 是否发送完成
-        })
-        .post()
-```
-　　咦！怎么感觉和下载的进度回调的一样？没错！OkHttps 还是使用同一套API处理上传和下载的进度回调，区别只在于上传是在`get/post`方法之前使用这些API，下载是在`getBody`方法之后使用。很好理解：`get/post`之前是准备发送请求时段，有上传的含义，而`getBody`之后，已是报文响应的时段，当然是下载。
-
-#### 9.2 上传过程控制
-
-　　上传文件的过程控制就很简单，和常规请求一样，只有异步发起的上传可以取消：
-
-```java
-HttpCall call = http.async("/upload")
-        .addFileParam("test", "D:/download/test.zip")
-        .setOnProcess((Process process) -> {
-            System.out.println(process.getRate());
-        })
-        .post()
-
-call.cancel();  // 取消上传
-```
-　　上传就没有暂停和继续这个功能啦，应该没人有这个需求吧?
-
-### 10 异常处理
+## 异常处理
 
 　　使用 OkHttps 时，**异常处理不是必须的**，但相比其它的 HTTP 开发包，它还提供一个特别的处理方法：`nothrow()`，以满足不同的异常处理需求。
 
-#### 10.1 同步请求的异常
+### 同步请求的异常
 
 　　默认情况下，当同步请求执行异常时，会直接向外抛出，我们可以用 `try catch` 来捕获，例如：
 
@@ -645,7 +415,7 @@ switch (result.getState()) {
 IOException error = result.getError();
 ``` 
 
-#### 10.2 异步请求的异常
+### 异步请求的异常
 
 　　异步请求最常用的异常处理方式就是设置一个异常回调：
 
@@ -706,7 +476,7 @@ http.async("/users/1")
         })
         .get();
 ```
-### 11 取消请求的4种方式
+## 取消请求的4种方式
 
 　　在 OkHttps 里取消请求共有 **4 种** 方式可选：
 
@@ -731,190 +501,3 @@ boolean canceled = task.cancel();
 ```java
 http.cancelAll();   // 取消所有请求
 ```
-
-### 12 回调线程自由切换（for Android）
-
-　　在 Android 开发中，经常会把某些代码放到特点的线程去执行，比如网络请求响应后的页面更新在主线程（UI线程）执行，而保存文件则在IO线程操作。OkHttps 为这类问题提供了良好的方案。
-
-　　在 **默认** 情况下，**所有回调** 函数都会 **在 IO 线程** 执行。为什么会设计如此呢？这是因为 OkHttps 只是纯粹的 Java 领域 Http工具包，本身对 Android 不会有任何依赖，因此也不知 Android 的 UI 线程为何物。这么设计也让它在 Android 之外有更多的可能性。
-
-　　但是在 Android 里使用  OkHttps 的话，UI线程的问题能否优雅的解决呢？当然可以！简单粗暴的方法就是配置一个 回调执行器：
-
- ```java
-HTTP http = HTTP.builder()
-        .callbackExecutor((Runnable run) -> {
-            // 实际编码中可以吧 Handler 提出来，不需要每次执行回调都重新创建
-            new Handler(Looper.getMainLooper()).post(run); // 在主线程执行
-        })
-        .build();
-```
-　　上述代码便实现了让 **所有** 的 **回调函数** 都在 **主线程（UI线程）** 执行的目的，如：
-
-```java
-http.async("/users")
-        .addBodyParam("name", "Jack")
-        .setOnProcess((Process process) -> {
-            // 在主线程执行
-        })
-        .setOnResponse((HttpResult result) -> {
-            // 在主线程执行
-        })
-        .setOnException((Exception e) -> {
-            // 在主线程执行
-        })
-        .setOnComplete((State state) -> {
-            // 在主线程执行
-        })
-        .post();
-```
-　　但是，如果同时还想让某些回调放在IO线程，实现 **自由切换**，怎么办呢？OkHttps 给出了非常灵活的方法，如下：
-
-```java
-http.async("/users")
-        .addBodyParam("name", "Jack")
-        .setOnProcess((Process process) -> {
-            // 在主线程执行
-        })
-        .nextOnIO()          // 指定下一个回调在 IO 线程执行
-        .setOnResponse((HttpResult result) -> {
-            // 在 IO 线程执行
-        })
-        .setOnException((Exception e) -> {
-            // 在主线程执行（没有指明 nextOnIO 则在回调执行器里执行）
-        })
-        .nextOnIO()          // 指定下一个回调在 IO 线程执行
-        .setOnComplete((State state) -> {
-            // 在 IO 线程执行
-        })
-        .post();
-```
-　　无论是哪一个回调，都可以使用`nextOnIO()`方法自由切换。同样，对于文件下载也是一样：
-
-```java
-http.sync("/download/test.zip")
-        .get()
-        .getBody()
-        .setOnProcess((Process process) -> {
-            // 在主线程执行
-        })
-        .toFolder("D:/download/")
-        .nextOnIO()          // 指定下一个回调在 IO 线程执行
-        .setOnSuccess((File file) -> {
-            // 在 IO 线程执行
-        })
-        .setOnFailure((Failure failure) -> {
-            // 在主线程执行
-        })
-        .start();
-```
-### 13 实现生命周期绑定（for Android）
-
-　　由于 OkHttps 并不依赖于 Android，所以它并没有提供关于生命周期绑定的直接实现，但它的一些扩展机制让我们很容易就可以实现这个需求。在开始之前，我们首先要理解何为生命周期绑定：
-
-> 所谓的生命周期绑定：即是让 HTTP 任务感知其所属的 Activity 或 Fragment 的生命周期，当  Activity 或 Fragment 将被销毁时，框架应自动的把由它们发起的但尚未完成的 HTTP 任务全部取消，以免导致程序出错！
-
-　　现在我们需要对`HTTP`实例进行配置，配置后的`HTTP`实例具有生命周期绑定的功能，在`Activity`或`Fragment`里，它的使用效果如下：
-
-```java
-// 在 Activity 或 Fragment 内发起请求
-http.async("http://www.baidu.com")
-        .bind(getLifecycle())   // 绑定生命周期
-        .setOnResponse((HttpResult result) -> {
-            Log.i("FirstFragment", "收到请求：" + result.toString());
-        })
-        .get();
-```
-　　上述代码中的`getLifecycle()`是`Activity`或`Fragment`自带的方法，而`bind()`是`HttpTask`的现有方法。在配置好`HTTP`实例后，上述代码发起的请求便可以感知`Activity`或`Fragment`的生命周期。
-
-　　那`HTTP`实例到底该如何配置呢？
-
-#### 第一步：配置预处理器
-
-```java
-HTTP http = HTTP.builder()
-        ... // 省略其它配置项
-        .addPreprocessor((Preprocessor.PreChain chain) -> {
-            HttpTask<?> task = chain.getTask();
-            Object bound = task.getBound();
-            // 判断 task 是否绑定了 Lifecycle 对象
-            if (bound instanceof Lifecycle) {
-                // 重新绑定一个 生命周期监视器（LCObserver）对象，它的定义见下一步
-                task.bind(new LCObserver(task, (Lifecycle) bound));
-            }
-            chain.proceed();
-        })
-        ... // 省略其它配置项
-        .build();
-```
-
-#### 第二步：定义生命周期监视器
-
-```java
-public class LCObserver implements LifecycleObserver {
-
-    HttpTask<?> task;
-    Lifecycle lifecycle;
-
-    LCObserver(HttpTask<?> task, Lifecycle lifecycle) {
-        this.task = task;
-        this.lifecycle = lifecycle;
-        lifecycle.addObserver(this);
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    public void onStop() {
-        task.cancel();  // 在 ON_STOP 事件中，取消对应的 HTTP 任务
-    }
-
-    public void unbind() {
-        // 在请求完成之后移除监视器
-        lifecycle.removeObserver(this);
-    }
-
-}
-```
-
-#### 第三步：配置全局回调监听
-
-　　以上两步其实已经实现了生命周期绑定的功能，但是在请求完成之后，我们需要在`lifecycle`中移除`LCObserver`对象：
-
-```java
-HTTP http = HTTP.builder()
-        ... // 省略其它配置项
-        .completeListener((HttpTask<?> task, HttpResult.State state) -> {
-            Object bound = task.getBound();
-            // 判断 task 是否绑定了生命周期监视器（LCObserver）对象
-            if (bound instanceof LCObserver) {
-                // 解绑监视器
-                ((LCObserver) bound).unbind();
-            }
-            return true;
-        })
-        ... // 省略其它配置项
-        .build();
-```
-
-**以上三步便在Android中实现了生命周期与HTTP请求绑定的功能**
-
-　　非常简单，懒得敲代码的同学还可以 [点这里 OkHttps.java](https://gitee.com/ejlchina-zhxu/okhttps-android-demo/blob/master/app/src/main/java/com/flower/myapplication/http/OkHttps.java) 直接下载封装好的源码，其中不仅编写了生命周期绑定的配置，还有在UI线程执行回调的配置。
-
-　　有需要的同学，可以直接下载下来使用，还可以基于它再次扩展，比如实现自动添加 TOKEN 的功能，具体可以参考[6.5 串行预处理器（TOKEN问题最佳解决方案）](#65-串行预处理器token问题最佳解决方案)，再比如扩展实现生命周期与下载事件绑定的功能，都非常简单。
-
-
-## 后期计划（v1.1.0）
-
-* 简化 WebSocket 编程：可直接发送 JavaBean 对象消息
-* 简化 WebSocket 编程：可直接接收 JavaBean 对象消息
-* 简化 WebSocket 编程：可使用 Lambda 表达式进行 WebSocket 编程
-
-## 联系方式
-
-* 微信：<img src="https://images.gitee.com/uploads/images/2020/0423/170356_3c038dd6_1393412.png" width="700px">
-* 邮箱：zhou.xu@ejlchina.com
-
-## 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
