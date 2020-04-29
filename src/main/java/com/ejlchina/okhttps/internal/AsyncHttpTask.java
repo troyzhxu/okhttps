@@ -101,7 +101,15 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
         return request("DELETE");
     }
     
-    private HttpCall request(String method) {
+    /**
+     * 发起 HTTP 请求
+     * @param method 请求方法
+     * @return HttpCall
+     */
+    public HttpCall request(String method) {
+    	if (method == null || method.isEmpty()) {
+    		throw new IllegalArgumentException("HTTP 请求方法 method 不可为空！");
+    	}
     	PreHttpCall call = new PreHttpCall();
 		registeTagTask(call);
     	httpClient.preprocess(this, () -> {

@@ -55,27 +55,15 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
         return request("DELETE");
     }
 
-    static class SyncHttpCall implements Cancelable {
-
-		Call call;
-		boolean done = false;
-		boolean canceled = false;
-
-		@Override
-		public synchronized boolean cancel() {
-			if (done) {
-				return false;
-			}
-			if (call != null) {
-				call.cancel();
-			}
-			canceled = true;
-			return true;
-		}
-
-	}
-
-    private HttpResult request(String method) {
+    /**
+     * 发起 HTTP 请求
+     * @param method
+     * @return 请求结果  
+     */
+    public HttpResult request(String method) {
+    	if (method == null || method.isEmpty()) {
+    		throw new IllegalArgumentException("HTTP 请求方法 method 不可为空！");
+    	}
     	RealHttpResult result = new RealHttpResult(this, httpClient.getExecutor());
 		SyncHttpCall httpCall = new SyncHttpCall();
 		// 注册标签任务
@@ -117,5 +105,26 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
     	}
         return result;
     }
+    
+
+    static class SyncHttpCall implements Cancelable {
+
+		Call call;
+		boolean done = false;
+		boolean canceled = false;
+
+		@Override
+		public synchronized boolean cancel() {
+			if (done) {
+				return false;
+			}
+			if (call != null) {
+				call.cancel();
+			}
+			canceled = true;
+			return true;
+		}
+
+	}
 
 }

@@ -585,6 +585,8 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             case "DELETE":
                 builder.delete(reqBody);
                 break;
+            default:
+            	builder.method(method, reqBody);
         }
         return httpClient.request(builder.build());
     }
