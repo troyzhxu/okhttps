@@ -175,7 +175,7 @@ static void download(long totalSize, int index) {
 ```java
 http.sync("/upload")
         .addFileParam("test", "D:/download/test.zip")
-        .post()     // 上传发法一般使用 POST 或 PUT，看服务器支持
+        .post();     // 上传发法一般使用 POST 或 PUT，看服务器支持
 ```
 　　异步上传也是完全一样：
 
