@@ -3,6 +3,7 @@ package com.ejlchina.okhttps.internal;
 import com.ejlchina.okhttps.*;
 import com.ejlchina.okhttps.HttpResult.State;
 import okhttp3.*;
+import okhttp3.WebSocket;
 
 import java.io.IOException;
 import java.util.*;
@@ -57,6 +58,11 @@ public class HttpClient implements HTTP {
         return new SyncHttpTask(this, urlPath(url));
     }
 
+	@Override
+	public WebSocketTask webSocket(String url) {
+		return new WebSocketTask(this, urlPath(url));
+	}
+    
     @Override
     public int cancel(String tag) {
         if (tag == null) {

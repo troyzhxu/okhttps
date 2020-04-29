@@ -553,7 +553,12 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
 
     protected Call prepareCall(String method) {
         assertNotConflict("GET".equals(method));
-        Request.Builder builder = new Request.Builder()
+        Request request = prepareRequest(method);
+		return httpClient.request(request);
+    }
+
+    protected Request prepareRequest(String method) {
+		Request.Builder builder = new Request.Builder()
                 .url(buildUrlPath());
         buildHeaders(builder);
         RequestBody reqBody = null;
@@ -588,8 +593,8 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             default:
             	builder.method(method, reqBody);
         }
-        return httpClient.request(builder.build());
-    }
+		return builder.build();
+	}
 
     private long contentLength(RequestBody reqBody) {
         try {
