@@ -182,7 +182,7 @@ http.sync("/upload")
 ```java
 http.async("/upload")
         .addFileParam("test", "D:/download/test.zip")
-        .post()
+        .post();
 ```
 
 ### 上传进度监听
@@ -202,7 +202,7 @@ http.sync("/upload")
             double rate = process.getRate();           // 已发送的比例
             boolean isDone = process.isDone();         // 是否发送完成
         })
-        .post()
+        .post();
 ```
 　　咦！怎么感觉和下载的进度回调的一样？没错！OkHttps 还是使用同一套API处理上传和下载的进度回调，区别只在于上传是在`get/post`方法之前使用这些API，下载是在`getBody`方法之后使用。很好理解：`get/post`之前是准备发送请求时段，有上传的含义，而`getBody`之后，已是报文响应的时段，当然是下载。
 
@@ -216,7 +216,7 @@ HttpCall call = http.async("/upload")
         .setOnProcess((Process process) -> {
             System.out.println(process.getRate());
         })
-        .post()
+        .post();
 
 call.cancel();  // 取消上传
 ```

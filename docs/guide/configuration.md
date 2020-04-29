@@ -19,12 +19,12 @@ http.sync("/users").get()                  // http://api.demo.com/users
 http.sync("/auth/signin")                  // http://api.demo.com/auth/signin
         .addBodyParam("username", "Jackson")
         .addBodyParam("password", "xxxxxx")
-        .post()                            // POST请求
+        .post();                           // POST请求
 ```
 　　在配置了`BaseUrl`之后，如有特殊请求任务，仍然可以使用全路径的方式，一点都不妨碍：
 
 ```java
-http.sync("https://www.baidu.com").get()
+http.sync("https://www.baidu.com").get();
 ```
 
 ## 回调执行器

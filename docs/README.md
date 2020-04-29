@@ -2,8 +2,8 @@
 home: true
 heroImage: /logo.png
 heroText: OkHttps
-tagline: 基于 OkHttp 的 Java HTTP 客户端
-actionText: 快速上手 →
+tagline: 基于 OkHttp 增强版 HTTP 客户端
+actionText: 极速上手 →
 actionLink: /guide/
 features:
 - title: 轻量纯粹优雅
@@ -67,4 +67,5 @@ http.async("/users/jack")               //  http://api.demo.com/users/jack
 </template>
 </CodeSwitcher> -->
 
-**<center>就这么简单，你已学会了 <font size=6>90</font>% 的用法！</center>**
+**<center>竟然不到 <font size=5>15</font> 秒，你已学会 <font size=6>90</font>% 的精髓！</center>**
+<center>[**了解更多**](/guide/)</center>
