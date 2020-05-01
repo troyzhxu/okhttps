@@ -9,6 +9,7 @@ module.exports = {
     nav: [
       { text: '教程', link: '/guide/' },
       { text: '历史版本', link: 'https://gitee.com/ejlchina-zhxu/okhttps/releases' },
+      { text: 'Grails 中文', link: 'http://grails.ejlchina.com' },
       { text: '码云', link: 'https://gitee.com/ejlchina-zhxu/okhttps' }
     ],
     sidebar: [
