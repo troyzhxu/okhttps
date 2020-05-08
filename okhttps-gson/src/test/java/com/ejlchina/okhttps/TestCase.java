@@ -1,4 +1,4 @@
-package com.ejlchina.okhttps.gson;
+package com.ejlchina.okhttps;
 
 import java.util.ArrayList;
 import java.util.Collections;
