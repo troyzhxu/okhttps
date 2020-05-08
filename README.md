@@ -432,6 +432,7 @@ HTTP http = HTTP.builder()
         .addPreprocessor((PreChain chain) -> {
             HttpTask<?> task = chain.getTask();// 获得当前的HTTP任务
             if (!task.isTagged("Auth")) {      // 根据标签判断该任务是否需要Token
+                chain.proceed();
                 return;
             }
             requestToken((String token) -> {   // 异步获取 Token
@@ -458,6 +459,7 @@ HTTP http = HTTP.builder()
         .addSerialPreprocessor((PreChain chain) -> {
             HttpTask<?> task = chain.getTask();
             if (!task.isTagged("Auth")) {
+                chain.proceed();
                 return;
             }
             // 检查过期，若需要则刷新Token
