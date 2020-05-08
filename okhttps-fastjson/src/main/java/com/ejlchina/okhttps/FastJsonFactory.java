@@ -8,12 +8,18 @@ public class FastJsonFactory implements JsonFactory {
 
 	@Override
 	public JsonObj newJsonObj(String json) {
-		return new FastJsonObj(JSON.parseObject(json));
+		if (json != null) {
+			return new FastJsonObj(JSON.parseObject(json));
+		}
+		return null;
 	}
 
 	@Override
 	public JsonArr newJsonArr(String json) {
-		return new FastJsonArr(JSON.parseArray(json));
+		if (json != null) {
+			return new FastJsonArr(JSON.parseArray(json));
+		}
+		return null;
 	}
 
 	@Override
@@ -28,12 +34,18 @@ public class FastJsonFactory implements JsonFactory {
 
 	@Override
 	public <T> T jsonToBean(Class<T> type, String json) {
-		return JSON.parseObject(json, type);
+		if (json != null) {
+			return JSON.parseObject(json, type);
+		}
+		return null;
 	}
 
 	@Override
 	public <T> List<T> jsonToList(Class<T> type, String json) {
-		return JSON.parseArray(json, type);
+		if (json != null) {
+			return JSON.parseArray(json, type);
+		}
+		return null;
 	}
 
 }

@@ -1,5 +1,7 @@
 package com.ejlchina.okhttps;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Set;
 
 /**
@@ -96,6 +98,18 @@ public interface JsonObj {
 	 * @return String 值
 	 */
 	String getString(String key);
+	
+	/**
+	 * @param key 键名
+	 * @return BigDecimal 值
+	 */
+	BigDecimal getBigDecimal(String key);
+	
+	/**
+	 * @param key 键名
+	 * @return BigInteger 值
+	 */
+	BigInteger getBigInteger(String key);
 	
 	/**
 	 * @param key 键名

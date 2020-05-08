@@ -1,5 +1,8 @@
 package com.ejlchina.okhttps;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 public interface JsonArr {
 
 	/**
@@ -90,4 +93,16 @@ public interface JsonArr {
 	 */
 	String getString(int index);
 	
+	/**
+	 * @param key 键名
+	 * @return BigDecimal 值
+	 */
+	BigDecimal getBigDecimal(int index);
+	
+	/**
+	 * @param key 键名
+	 * @return BigInteger 值
+	 */
+	BigInteger getBigInteger(int index);
+
 }

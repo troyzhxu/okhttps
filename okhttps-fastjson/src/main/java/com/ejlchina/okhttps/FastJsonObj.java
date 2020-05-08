@@ -1,5 +1,7 @@
 package com.ejlchina.okhttps;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Set;
 
 import com.alibaba.fastjson.JSONArray;
@@ -7,9 +9,7 @@ import com.alibaba.fastjson.JSONObject;
 
 public class FastJsonObj implements JsonObj {
 
-	
 	private JSONObject json;
-	
 	
 	public FastJsonObj(JSONObject json) {
 		this.json = json;
@@ -98,6 +98,16 @@ public class FastJsonObj implements JsonObj {
 		return json.getString(key);
 	}
 
+	@Override
+	public BigDecimal getBigDecimal(String key) {
+		return json.getBigDecimal(key);
+	}
+
+	@Override
+	public BigInteger getBigInteger(String key) {
+		return json.getBigInteger(key);
+	}
+	
 	@Override
 	public boolean has(String key) {
 		return json.containsKey(key);
