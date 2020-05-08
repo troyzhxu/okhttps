@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.alibaba.fastjson.JSON;
 
-public class FastjsonFactory implements JsonFactory {
+public class FastJsonFactory implements JsonFactory {
 
 	@Override
 	public JsonObj newJsonObj(String json) {
