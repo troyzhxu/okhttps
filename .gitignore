@@ -1,8 +1,8 @@
 /target/
 /bin/
-/.settings/
-/.classpath
-/.project
+/*/.settings/
+/*/.classpath
+/*/.project
 /.idea/
 /package-lock.json
 /node_modules/

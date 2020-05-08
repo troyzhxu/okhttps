@@ -71,7 +71,7 @@ public class ExceptionTests extends BaseTest {
         }
         // 还可以获得具体的异常信息
         Exception error = result.getError();
-
+        System.out.println(error);
 
     }
 
