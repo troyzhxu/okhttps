@@ -8,17 +8,20 @@
     <parent>
         <groupId>com.ejlchina</groupId>
         <artifactId>okhttps-parent</artifactId>
-        <version>2.0.0</version>
+        <version>${okhttps.version}</version>
     </parent>
 
     <dependencies>
-    
+        <dependency>
+            <groupId>com.ejlchina</groupId>
+            <artifactId>okhttps</artifactId>
+            <version>${okhttps.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>${fastjson.version}</version>
         </dependency>
-    
     </dependencies>
 
 
