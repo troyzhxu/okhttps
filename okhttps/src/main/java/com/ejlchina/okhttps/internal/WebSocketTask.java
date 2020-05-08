@@ -1,6 +1,5 @@
 package com.ejlchina.okhttps.internal;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +19,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 	
 	private Listener<HttpResult> onOnen;
-	private Listener<IOException> onException;
+	private Listener<Throwable> onException;
 	
 
 	public WebSocketTask(HttpClient httpClient, String url) {
@@ -41,7 +40,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 					socket.setWebSocket(httpClient.webSocket(request, listener));
 				}
 			}
-    	});
+    	}, noPreprocess, noSerialPreprocess);
 		return socket;
 	}
 	
@@ -85,7 +84,9 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		@Override
 		public void onFailure(okhttp3.WebSocket webSocket, Throwable t, Response response) {
 			if (onException != null) {
-//				onException.on(this.webSocket,  t);
+				onException.on(this.webSocket,  t);
+			} else if (!nothrow) {
+				throw new HttpException("WebSockt 异常", t);
 			}
 		}
 		

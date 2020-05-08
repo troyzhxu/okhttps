@@ -63,7 +63,10 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     private TagTask tagTask;
     private Cancelable canceler;
 
-
+    protected boolean noPreprocess = false;
+    protected boolean noSerialPreprocess = false;
+    
+    
     public HttpTask(HttpClient httpClient, String url) {
         this.httpClient = httpClient;
         this.urlPath = url;
@@ -125,6 +128,24 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     /**
+     * 指定该请求不经过任何预处理器
+     * @return HttpTask 实例
+     */
+    public C noPreprocess() {
+		this.noPreprocess = true;
+		return (C) this;
+	}
+
+    /**
+     * 指定该请求不经过并行预处理器
+     * @return HttpTask 实例
+     */
+	public C noSerialPreprocess() {
+		this.noSerialPreprocess = true;
+		return (C) this;
+	}
+	
+    /**
      * 为请求任务添加标签
      * v1.0.4 之后，若 set 多次，标签将连接在一起
      * @param tag 标签
@@ -161,7 +182,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         return (C) this;
     }
 
-    /**
+	/**
      * 添加请求头
      * @param name 请求头名
      * @param value 请求头值

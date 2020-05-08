@@ -86,7 +86,7 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
             } finally {
 				latch.countDown();
 			}
-    	});
+    	}, noPreprocess, noSerialPreprocess);
     	boolean timeout = false;
 		if (result.getState() == null) {
 			timeout = !timeoutAwait(latch);

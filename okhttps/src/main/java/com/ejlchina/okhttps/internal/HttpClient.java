@@ -178,14 +178,27 @@ public class HttpClient implements HTTP {
         return executor;
     }
 
-    public void preprocess(HttpTask<? extends HttpTask<?>> httpTask, Runnable request) {
-        if (preprocessors.length > 0) {
-            RealPreChain chain = new RealPreChain(preprocessors,
-                    httpTask, request);
-            preprocessors[0].doProcess(chain);
-        } else {
-            request.run();
-        }
+    public void preprocess(HttpTask<? extends HttpTask<?>> httpTask, Runnable request, 
+    		boolean noPreprocess, boolean noSerialPreprocess) {
+    	if (preprocessors.length == 0 || noPreprocess) {
+    		request.run();
+    		return;
+    	}
+    	int index = 0;
+    	if (noSerialPreprocess) {
+    		while (index < preprocessors.length 
+    				&& preprocessors[index] instanceof SerialPreprocessor) {
+    			index++;
+    		}
+    	}
+    	if (index < preprocessors.length) {
+    		RealPreChain chain = new RealPreChain(preprocessors,
+                    httpTask, request, index + 1, 
+                    noSerialPreprocess);
+            preprocessors[index].doProcess(chain);
+    	} else {
+    		request.run();
+    	}
     }
 
     /**
@@ -249,13 +262,15 @@ public class HttpClient implements HTTP {
 
         private Runnable request;
 
-        public RealPreChain(Preprocessor[] preprocessors,
-                            HttpTask<?> httpTask,
-                            Runnable request) {
-            this.index = 1;
+        private boolean noSerialPreprocess;
+        
+        public RealPreChain(Preprocessor[] preprocessors, HttpTask<?> httpTask, Runnable request, 
+        		int index, boolean noSerialPreprocess) {
+            this.index = index;		// index 大于等于 1
             this.preprocessors = preprocessors;
             this.httpTask = httpTask;
             this.request = request;
+            this.noSerialPreprocess = noSerialPreprocess;
         }
 
         @Override
@@ -270,12 +285,17 @@ public class HttpClient implements HTTP {
 
         @Override
         public void proceed() {
-            if (index > 0) {
-                Preprocessor last = preprocessors[index - 1];
+        	if (noSerialPreprocess) {
+        		while (index < preprocessors.length 
+        				&& preprocessors[index] instanceof SerialPreprocessor) {
+        			index++;
+        		}
+        	} else {
+        		Preprocessor last = preprocessors[index - 1];
                 if (last instanceof SerialPreprocessor) {
                     ((SerialPreprocessor) last).afterProcess();
                 }
-            }
+        	}
             if (index < preprocessors.length) {
                 preprocessors[index++].doProcess(this);
             } else {
