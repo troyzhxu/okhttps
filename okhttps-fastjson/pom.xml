@@ -11,6 +11,17 @@
         <version>2.0.0</version>
     </parent>
 
+    <dependencies>
+    
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
+        </dependency>
+    
+    </dependencies>
+
+
 	<build>
 		<finalName>okhttps-fastjson</finalName>
 	</build>

@@ -6,8 +6,6 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.List;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.ejlchina.okhttps.internal.RealHttpResult;
 import com.ejlchina.okhttps.internal.TaskExecutor;
 
@@ -153,13 +151,13 @@ public interface HttpResult {
 		 * 同一个 Body 对象的 toXXX 类方法只可使用一个并且只能调用一次
 		 * @return 报文体转Json对象
 		 */
-		JSONObject toJsonObject();
+		JsonObj toJsonObj();
 
 		/**
 		 * 同一个 Body 对象的 toXXX 类方法只可使用一个并且只能调用一次
 		 * @return 报文体转Json数组
 		 */
-		JSONArray toJsonArray();
+		JsonArr toJsonArr();
 
 		/**
 		 * 同一个 Body 对象的 toXXX 类方法只可使用一个并且只能调用一次

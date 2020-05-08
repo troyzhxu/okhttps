@@ -1,16 +1,7 @@
 package com.ejlchina.test;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.Test;
-
-import com.alibaba.fastjson.JSON;
 import com.ejlchina.okhttps.HTTP;
 
-import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 
 public class SimpleTests extends BaseTest {
@@ -26,38 +17,38 @@ public class SimpleTests extends BaseTest {
      * 同步请求示例
      * 同步请求直接得到结果，无需设置回调
      */
-    @Test
-    public void testSyncToBean() {
-    	User u1 = new User(1, "Jack");
-    	server.enqueue(new MockResponse().setBody(JSON.toJSONString(u1)));
-    	
-        User user = http.sync("/users")  // http://localhost:8080/users
-                .get()                              // GET请求
-                .getBody()                          // 获取响应报文体
-                .toBean(User.class);                // 得到目标数据
-        
-        assertEquals(u1, user);
-    }
+//    @Test
+//    public void testSyncToBean() {
+//    	User u1 = new User(1, "Jack");
+//    	server.enqueue(new MockResponse().setBody(JSON.toJSONString(u1)));
+//    	
+//        User user = http.sync("/users")  // http://localhost:8080/users
+//                .get()                              // GET请求
+//                .getBody()                          // 获取响应报文体
+//                .toBean(User.class);                // 得到目标数据
+//        
+//        assertEquals(u1, user);
+//    }
     
     /**
      * 同步请求示例
      * 同步请求直接得到结果，无需设置回调
      */
-    @Test
-    public void testSyncToList() {
-    	User u1 = new User(1, "Jack");
-    	User u2 = new User(2, "Tom");
-    	List<User> list = Arrays.asList(u1, u2);
-    	server.enqueue(new MockResponse().setBody(JSON.toJSONString(list)));
-    	
-        List<User> users = http.sync("/users")  // http://localhost:8080/users
-                .get()                              // GET请求
-                .getBody()                          // 获取响应报文体
-                .toList(User.class);                // 得到目标数据
-        
-        assertEquals(u1, users.get(0));
-        assertEquals(u2, users.get(1));
-    }
+//    @Test
+//    public void testSyncToList() {
+//    	User u1 = new User(1, "Jack");
+//    	User u2 = new User(2, "Tom");
+//    	List<User> list = Arrays.asList(u1, u2);
+//    	server.enqueue(new MockResponse().setBody(JSON.toJSONString(list)));
+//    	
+//        List<User> users = http.sync("/users")  // http://localhost:8080/users
+//                .get()                              // GET请求
+//                .getBody()                          // 获取响应报文体
+//                .toList(User.class);                // 得到目标数据
+//        
+//        assertEquals(u1, users.get(0));
+//        assertEquals(u2, users.get(1));
+//    }
 //
 //    /**
 //     * 异步请求示例

@@ -35,6 +35,14 @@ public interface WebSocket extends Cancelable {
 	public boolean send(Object bean);
 
 	/**
+	 * 以JSON文本格式发送对象消息
+	 * @param bean 待发送的对象
+	 * @param dateFormat 日期类型字段的处理格式
+	 * @return 如果连接已断开 返回 false
+	 */
+	public boolean send(Object bean, String dateFormat);
+	
+	/**
 	 * 发送字节流
 	 * @param data 待发送的数据
 	 * @return 如果连接已断开 返回 false

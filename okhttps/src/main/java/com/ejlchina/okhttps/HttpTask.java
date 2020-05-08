@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import com.alibaba.fastjson.JSON;
 import com.ejlchina.okhttps.HttpResult.State;
 import com.ejlchina.okhttps.internal.HttpClient;
 import com.ejlchina.okhttps.internal.HttpClient.TagTask;
@@ -420,9 +419,13 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             if (json instanceof String) {
                 requestJson = json.toString();
             } else if (dateFormat != null) {
-                requestJson = JSON.toJSONStringWithDateFormat(json, dateFormat);
+                requestJson = httpClient.getExecutor()
+                		.getJsonFactoryNotNull()
+                		.toJsonStr(json, dateFormat);
             } else {
-                requestJson = JSON.toJSONString(json);
+                requestJson = httpClient.getExecutor()
+                		.getJsonFactoryNotNull()
+                		.toJsonStr(json);
             }
         }
         return (C) this;
@@ -653,7 +656,8 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
 
     private RequestBody buildRequestBody() {
         if (jsonParams != null) {
-            requestJson = JSON.toJSONString(jsonParams);
+            requestJson = httpClient.getExecutor().getJsonFactoryNotNull()
+            		.toJsonStr(jsonParams);
         }
         if (files != null) {
             MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);

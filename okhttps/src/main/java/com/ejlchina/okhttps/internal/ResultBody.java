@@ -14,14 +14,13 @@ import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.List;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.ejlchina.okhttps.Download;
+import com.ejlchina.okhttps.HttpResult.Body;
 import com.ejlchina.okhttps.HttpTask;
+import com.ejlchina.okhttps.JsonArr;
+import com.ejlchina.okhttps.JsonObj;
 import com.ejlchina.okhttps.OnCallback;
 import com.ejlchina.okhttps.Process;
-import com.ejlchina.okhttps.HttpResult.Body;
 
 import okhttp3.MediaType;
 import okhttp3.Response;
@@ -149,23 +148,35 @@ public class ResultBody implements Body {
 	}
 
 	@Override
-	public JSONObject toJsonObject() {
-		return JSON.parseObject(toString());
+	public JsonObj toJsonObj() {
+		if (taskExecutor == null) {
+			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
+		}
+		return taskExecutor.getJsonFactoryNotNull().newJsonObj(toString());
 	}
 
 	@Override
-	public JSONArray toJsonArray() {
-		return JSON.parseArray(toString());
+	public JsonArr toJsonArr() {
+		if (taskExecutor == null) {
+			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
+		}
+		return taskExecutor.getJsonFactoryNotNull().newJsonArr(toString());
 	}
 
 	@Override
 	public <T> T toBean(Class<T> type) {
-		return JSON.parseObject(toString(), type);
+		if (taskExecutor == null) {
+			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
+		}
+		return taskExecutor.getJsonFactoryNotNull().jsonToBean(type, toString());
 	}
 	
 	@Override
 	public <T> List<T> toList(Class<T> type) {
-		return JSON.parseArray(toString(), type);
+		if (taskExecutor == null) {
+			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
+		}
+		return taskExecutor.getJsonFactoryNotNull().jsonToList(type, toString());
 	}
 	
 	@Override

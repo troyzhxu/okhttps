@@ -3,7 +3,6 @@ package com.ejlchina.okhttps.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.alibaba.fastjson.JSON;
 import com.ejlchina.okhttps.HttpResult;
 import com.ejlchina.okhttps.HttpTask;
 import com.ejlchina.okhttps.WebSocket;
@@ -28,7 +27,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 	
 	public WebSocket listen() {
-		WebSocketImpl socket = new WebSocketImpl();
+		WebSocketImpl socket = new WebSocketImpl(httpClient.executor);
 		registeTagTask(socket);
 		httpClient.preprocess(this, () -> {
 			synchronized (socket) {
@@ -101,6 +100,12 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		
 		List<Object> queues = new ArrayList<>();
 		
+		TaskExecutor taskExecutor;
+		
+		public WebSocketImpl(TaskExecutor taskExecutor) {
+			this.taskExecutor = taskExecutor;
+		}
+
 		@Override
 		public synchronized boolean cancel() {
 			if (webSocket != null) {
@@ -147,13 +152,14 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 		@Override
 		public boolean send(Object bean) {
-			if (webSocket != null) {
-				return send(webSocket, bean);
-			}
-			queueMsgToSend(bean);
-			return true;
+			return send(taskExecutor.getJsonFactoryNotNull().toJsonStr(bean));
 		}
 
+		@Override
+		public boolean send(Object bean, String dateFormat) {
+			return send(taskExecutor.getJsonFactoryNotNull().toJsonStr(bean, dateFormat));
+		}
+		
 		@Override
 		public boolean send(byte[] data) {
 			if (webSocket != null) {
@@ -162,6 +168,8 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			queueMsgToSend(data);
 			return true;
 		}
+		
+
 		
 		void queueMsgToSend(Object msg) {
 			if (msg == null) {
@@ -201,7 +209,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			if (msg instanceof byte[]) {
 				return webSocket.send(ByteString.of((byte[]) msg));
 			}
-			return webSocket.send(JSON.toJSONString(msg));
+			return webSocket.send(taskExecutor.getJsonFactoryNotNull().toJsonStr(msg));
 		}
 		
 	}

@@ -33,7 +33,7 @@ public class HttpClient implements HTTP {
         this.executor = new TaskExecutor(client.dispatcher().executorService(),
                 builder.mainExecutor, builder.downloadListener,
                 builder.responseListener, builder.exceptionListener,
-                builder.completeListener);
+                builder.completeListener, builder.jsonFactory);
         this.preprocessors = builder.preprocessors.toArray(new Preprocessor[0]);
         this.tagTasks = new LinkedList<>();
     }
@@ -349,6 +349,8 @@ public class HttpClient implements HTTP {
 
         private TaskListener<State> completeListener;
 
+        private JsonFactory jsonFactory;
+        
         public Builder() {
             mediaTypes = new HashMap<>();
             mediaTypes.put("*", "application/octet-stream");
@@ -374,6 +376,11 @@ public class HttpClient implements HTTP {
             this.mediaTypes = hc.mediaTypes;
             this.preprocessors = new ArrayList<>();
             Collections.addAll(this.preprocessors, hc.preprocessors);
+            this.downloadListener = hc.executor.downloadListener;
+            this.responseListener = hc.executor.responseListener;
+            this.exceptionListener = hc.executor.exceptionListener;
+            this.completeListener = hc.executor.completeListener;
+            this.jsonFactory = hc.executor.jsonFactory;
         }
 
         /**
@@ -498,6 +505,17 @@ public class HttpClient implements HTTP {
             return this;
         }
 
+        /**
+         * 设置 JSON 工厂
+         * @param jsonFactory JSON 工厂
+         * @return Builder
+         */
+        public Builder jsonFactory(JsonFactory jsonFactory) {
+        	this.jsonFactory = jsonFactory;
+            return this;
+        }
+        
+        
         public HTTP build() {
             if (configurator != null || client == null) {
                 OkHttpClient.Builder builder = new OkHttpClient.Builder();
