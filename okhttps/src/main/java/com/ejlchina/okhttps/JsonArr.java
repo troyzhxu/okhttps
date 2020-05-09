@@ -41,6 +41,12 @@ public interface JsonArr {
 	
 	/**
 	 * @param index 元素下标
+	 * @return long 值
+	 */
+	long getLong(int index);
+	
+	/**
+	 * @param index 元素下标
 	 * @return float 值
 	 */
 	float getFloat(int index);

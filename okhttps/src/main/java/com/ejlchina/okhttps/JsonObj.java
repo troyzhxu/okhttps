@@ -47,6 +47,12 @@ public interface JsonObj {
 	
 	/**
 	 * @param key 键名
+	 * @return long 值
+	 */
+	long getLong(String key);
+	
+	/**
+	 * @param key 键名
 	 * @return float 值
 	 */
 	float getFloat(String key);
