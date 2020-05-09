@@ -45,11 +45,7 @@ public class FastJsonService implements JsonService {
 
 	@Override
 	public <T> T jsonToBean(Class<T> type, InputStream in) {
-		try {
-			return JSON.parseObject(in, type);
-		} catch (IOException e) {
-			throw new HttpException("读取文本异常", e);
-		}
+		return JSON.parseObject(toString(in), type);
 	}
 
 	@Override
