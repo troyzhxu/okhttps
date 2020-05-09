@@ -33,7 +33,7 @@ public class HttpClient implements HTTP {
         this.executor = new TaskExecutor(client.dispatcher().executorService(),
                 builder.mainExecutor, builder.downloadListener,
                 builder.responseListener, builder.exceptionListener,
-                builder.completeListener, builder.jsonFactory);
+                builder.completeListener, builder.jsonService);
         this.preprocessors = builder.preprocessors.toArray(new Preprocessor[0]);
         this.tagTasks = new LinkedList<>();
     }
@@ -174,6 +174,7 @@ public class HttpClient implements HTTP {
         return MediaType.parse("application/octet-stream");
     }
 
+    @Override
     public TaskExecutor getExecutor() {
         return executor;
     }
@@ -305,6 +306,7 @@ public class HttpClient implements HTTP {
 
     }
 
+    @Override
     public Builder newBuilder() {
         return new Builder(this);
     }
@@ -349,7 +351,7 @@ public class HttpClient implements HTTP {
 
         private TaskListener<State> completeListener;
 
-        private JsonFactory jsonFactory;
+        private JsonService jsonService;
         
         public Builder() {
             mediaTypes = new HashMap<>();
@@ -380,7 +382,7 @@ public class HttpClient implements HTTP {
             this.responseListener = hc.executor.responseListener;
             this.exceptionListener = hc.executor.exceptionListener;
             this.completeListener = hc.executor.completeListener;
-            this.jsonFactory = hc.executor.jsonFactory;
+            this.jsonService = hc.executor.jsonService;
         }
 
         /**
@@ -506,12 +508,12 @@ public class HttpClient implements HTTP {
         }
 
         /**
-         * 设置 JSON 工厂
-         * @param jsonFactory JSON 工厂
+         * 设置 JSON 服务
+         * @param jsonService JSON 服务
          * @return Builder
          */
-        public Builder jsonFactory(JsonFactory jsonFactory) {
-        	this.jsonFactory = jsonFactory;
+        public Builder jsonService(JsonService jsonService) {
+        	this.jsonService = jsonService;
             return this;
         }
         

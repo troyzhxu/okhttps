@@ -152,7 +152,7 @@ public class ResultBody implements Body {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
 		}
-		return taskExecutor.getJsonFactoryNotNull().newJsonObj(toByteStream());
+		return taskExecutor.jsonServiceNotNull().newJsonObj(toByteStream());
 	}
 
 	@Override
@@ -160,7 +160,7 @@ public class ResultBody implements Body {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
 		}
-		return taskExecutor.getJsonFactoryNotNull().newJsonArr(toByteStream());
+		return taskExecutor.jsonServiceNotNull().newJsonArr(toByteStream());
 	}
 
 	@Override
@@ -168,7 +168,7 @@ public class ResultBody implements Body {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
 		}
-		return taskExecutor.getJsonFactoryNotNull().jsonToBean(type, toByteStream());
+		return taskExecutor.jsonServiceNotNull().jsonToBean(type, toByteStream());
 	}
 	
 	@Override
@@ -176,7 +176,7 @@ public class ResultBody implements Body {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
 		}
-		return taskExecutor.getJsonFactoryNotNull().jsonToList(type, toByteStream());
+		return taskExecutor.jsonServiceNotNull().jsonToList(type, toByteStream());
 	}
 	
 	@Override

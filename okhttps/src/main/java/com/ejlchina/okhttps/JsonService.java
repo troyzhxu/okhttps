@@ -4,9 +4,8 @@ import java.io.InputStream;
 import java.util.List;
 
 
-public interface JsonFactory {
+public interface JsonService {
 
-	
 	/**
 	 * 解析 JsonObj
 	 * @param in 输入流

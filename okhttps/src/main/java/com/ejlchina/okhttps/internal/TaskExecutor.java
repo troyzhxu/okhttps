@@ -10,7 +10,7 @@ import com.ejlchina.okhttps.DownListener;
 import com.ejlchina.okhttps.Download;
 import com.ejlchina.okhttps.HttpResult;
 import com.ejlchina.okhttps.HttpTask;
-import com.ejlchina.okhttps.JsonFactory;
+import com.ejlchina.okhttps.JsonService;
 import com.ejlchina.okhttps.OnCallback;
 import com.ejlchina.okhttps.TaskListener;
 import com.ejlchina.okhttps.HttpResult.State;
@@ -23,18 +23,18 @@ public class TaskExecutor {
     TaskListener<HttpResult> responseListener;
     TaskListener<IOException> exceptionListener;
     TaskListener<State> completeListener;
-    JsonFactory jsonFactory;
+    JsonService jsonService;
     
     public TaskExecutor(Executor ioExecutor, Executor mainExecutor, DownListener downloadListener, 
             TaskListener<HttpResult> responseListener, TaskListener<IOException> exceptionListener, 
-            TaskListener<State> completeListener, JsonFactory jsonFactory) {
+            TaskListener<State> completeListener, JsonService jsonService) {
         this.ioExecutor = ioExecutor;
         this.mainExecutor = mainExecutor;
         this.downloadListener = downloadListener;
         this.responseListener = responseListener;
         this.exceptionListener = exceptionListener;
         this.completeListener = completeListener;
-        this.jsonFactory = jsonFactory;
+        this.jsonService = jsonService;
     }
 
     public Executor getExecutor(boolean onIoThread) {
@@ -99,11 +99,11 @@ public class TaskExecutor {
         }
     }
 
-    public JsonFactory getJsonFactoryNotNull() {
-    	if (jsonFactory != null) {
-    		return jsonFactory;
+    public JsonService jsonServiceNotNull() {
+    	if (jsonService != null) {
+    		return jsonService;
     	}
-    	throw new IllegalStateException("没有设置 JsonFactory，不可做 Json 操作！");
+    	throw new IllegalStateException("没有设置 JsonService，不可做 Json 操作！");
     }
     
     /**
