@@ -65,6 +65,15 @@ public class JacksonObj implements JsonObj {
 	}
 
 	@Override
+	public long getLong(String key) {
+		JsonNode subJson = json.get(key);
+		if (subJson != null && subJson.isNumber()) {
+			return subJson.longValue();
+		}
+		return 0;
+	}
+	
+	@Override
 	public float getFloat(String key) {
 		JsonNode subJson = json.get(key);
 		if (subJson != null && subJson.isNumber()) {

@@ -62,6 +62,15 @@ public class JacksonArr implements JsonArr {
 	}
 
 	@Override
+	public long getLong(int index) {
+		JsonNode subJson = json.get(index);
+		if (subJson != null && subJson.isNumber()) {
+			return subJson.longValue();
+		}
+		return 0;
+	}
+	
+	@Override
 	public float getFloat(int index) {
 		JsonNode subJson = json.get(index);
 		if (subJson != null && subJson.isNumber()) {
