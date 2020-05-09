@@ -54,6 +54,11 @@ public class FastJsonObj implements JsonObj {
 	}
 
 	@Override
+	public long getLong(String key) {
+		return json.getLongValue(key);
+	}
+	
+	@Override
 	public float getFloat(String key) {
 		return json.getFloatValue(key);
 	}

@@ -53,6 +53,11 @@ public class FastJsonArr implements JsonArr {
 	}
 
 	@Override
+	public long getLong(int index) {
+		return json.getLongValue(index);
+	}
+	
+	@Override
 	public float getFloat(int index) {
 		return json.getFloatValue(index);
 	}
