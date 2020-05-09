@@ -93,4 +93,9 @@ public class FastJsonObj implements JsonObj {
 		return json.keySet();
 	}
 
+	@Override
+	public String toString() {
+		return json.toJSONString();
+	}
+
 }

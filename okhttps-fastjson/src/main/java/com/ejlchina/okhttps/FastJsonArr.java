@@ -82,4 +82,9 @@ public class FastJsonArr implements JsonArr {
 		return json.getBigInteger(index);
 	}
 
+	@Override
+	public String toString() {
+		return json.toJSONString();
+	}
+
 }

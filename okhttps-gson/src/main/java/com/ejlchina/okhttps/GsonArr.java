@@ -114,4 +114,9 @@ public class GsonArr implements JsonArr {
 		return null;
 	}
 
+	@Override
+	public String toString() {
+		return json.toString();
+	}
+
 }

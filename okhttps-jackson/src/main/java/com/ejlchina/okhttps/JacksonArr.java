@@ -115,4 +115,9 @@ public class JacksonArr implements JsonArr {
 		return null;
 	}
 
+	@Override
+	public String toString() {
+		return json.toString();
+	}
+
 }

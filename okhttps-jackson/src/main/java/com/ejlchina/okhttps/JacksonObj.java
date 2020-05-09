@@ -133,4 +133,9 @@ public class JacksonObj implements JsonObj {
 		return set;
 	}
 
+	@Override
+	public String toString() {
+		return json.toString();
+	}
+
 }
