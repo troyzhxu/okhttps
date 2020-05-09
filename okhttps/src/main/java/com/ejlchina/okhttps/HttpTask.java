@@ -62,8 +62,8 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     private TagTask tagTask;
     private Cancelable canceler;
 
-    protected boolean noPreprocess = false;
-    protected boolean noSerialPreprocess = false;
+    protected boolean skipPreproc = false;
+    protected boolean skipSerialPreproc = false;
     
     
     public HttpTask(HttpClient httpClient, String url) {
@@ -127,20 +127,20 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     /**
-     * 指定该请求不经过任何预处理器
+     * 指定该请求跳过任何预处理器（包括串行和并行）
      * @return HttpTask 实例
      */
-    public C noPreprocess() {
-		this.noPreprocess = true;
+    public C skipPreproc() {
+		this.skipPreproc = true;
 		return (C) this;
 	}
 
     /**
-     * 指定该请求不经过并行预处理器
+     * 指定该请求跳过任何串行预处理器
      * @return HttpTask 实例
      */
-	public C noSerialPreprocess() {
-		this.noSerialPreprocess = true;
+	public C skipSerialPreproc() {
+		this.skipSerialPreproc = true;
 		return (C) this;
 	}
 	

@@ -39,7 +39,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 					socket.setWebSocket(httpClient.webSocket(request, listener));
 				}
 			}
-    	}, noPreprocess, noSerialPreprocess);
+    	}, skipPreproc, skipSerialPreproc);
 		return socket;
 	}
 	
@@ -169,7 +169,6 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			return true;
 		}
 		
-
 		
 		void queueMsgToSend(Object msg) {
 			if (msg == null) {

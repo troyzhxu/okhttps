@@ -120,7 +120,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 					call.setCall(executeCall(prepareCall(method)));
 				}
 			}
-    	}, noPreprocess, noSerialPreprocess);
+    	}, skipPreproc, skipSerialPreproc);
     	return call;
     }
     

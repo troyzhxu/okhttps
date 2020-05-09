@@ -184,13 +184,13 @@ public class HttpClient implements HTTP {
     }
 
     public void preprocess(HttpTask<? extends HttpTask<?>> httpTask, Runnable request, 
-    		boolean noPreprocess, boolean noSerialPreprocess) {
-    	if (preprocessors.length == 0 || noPreprocess) {
+    		boolean skipPreproc, boolean skipSerialPreproc) {
+    	if (preprocessors.length == 0 || skipPreproc) {
     		request.run();
     		return;
     	}
     	int index = 0;
-    	if (noSerialPreprocess) {
+    	if (skipSerialPreproc) {
     		while (index < preprocessors.length 
     				&& preprocessors[index] instanceof SerialPreprocessor) {
     			index++;
@@ -199,7 +199,7 @@ public class HttpClient implements HTTP {
     	if (index < preprocessors.length) {
     		RealPreChain chain = new RealPreChain(preprocessors,
                     httpTask, request, index + 1, 
-                    noSerialPreprocess);
+                    skipSerialPreproc);
             preprocessors[index].doProcess(chain);
     	} else {
     		request.run();
