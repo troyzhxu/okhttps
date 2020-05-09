@@ -6,7 +6,9 @@ import java.util.List;
 import com.ejlchina.okhttps.HttpResult;
 import com.ejlchina.okhttps.HttpTask;
 import com.ejlchina.okhttps.WebSocket;
+import com.ejlchina.okhttps.WebSocket.Close;
 import com.ejlchina.okhttps.WebSocket.Listener;
+import com.ejlchina.okhttps.WebSocket.Message;
 
 import okhttp3.Request;
 import okhttp3.Response;
@@ -17,8 +19,11 @@ import okio.ByteString;
 public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 	
-	private Listener<HttpResult> onOnen;
+	private Listener<HttpResult> onOpen;
 	private Listener<Throwable> onException;
+	private Listener<Message> onMessage;
+	private Listener<Close> onClosing;
+	private Listener<Close> onClosed;
 	
 
 	public WebSocketTask(HttpClient httpClient, String url) {
@@ -54,30 +59,40 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 		@Override
 		public void onOpen(okhttp3.WebSocket webSocket, Response response) {
-			if (onOnen != null) {
+			if (onOpen != null) {
 				HttpResult result = new RealHttpResult(WebSocketTask.this, response, httpClient.executor);
-				onOnen.on(this.webSocket, result);
+				onOpen.on(this.webSocket, result);
+			}
+		}
+
+		// 接收文本数据 仅当  websocket 消息中的 opcode == 1  时
+		@Override
+		public void onMessage(okhttp3.WebSocket webSocket, String text) {
+			if (onMessage != null) {
+				onMessage.on(this.webSocket, new MessageBody(text, httpClient.executor));
+			}
+		}
+
+		// 接收二进制数据 仅当  websocket 消息中的 opcode == 2  时
+		@Override
+		public void onMessage(okhttp3.WebSocket webSocket, ByteString bytes) {
+			if (onMessage != null) {
+				onMessage.on(this.webSocket, new MessageBody(bytes, httpClient.executor));
 			}
 		}
 
 		@Override
-		public void onMessage(okhttp3.WebSocket webSocket, String text) {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
-		public void onMessage(okhttp3.WebSocket webSocket, ByteString bytes) {
-			// TODO Auto-generated method stub
-		}
-
-		@Override
 		public void onClosing(okhttp3.WebSocket webSocket, int code, String reason) {
-			// TODO Auto-generated method stub
+			if (onClosing != null) {
+				onClosing.on(this.webSocket, new Close(code, reason));
+			}
 		}
 
 		@Override
 		public void onClosed(okhttp3.WebSocket webSocket, int code, String reason) {
-			// TODO Auto-generated method stub
+			if (onClosed != null) {
+				onClosed.on(this.webSocket, new Close(code, reason));
+			}
 		}
 
 		@Override
@@ -129,7 +144,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			if (webSocket != null) {
 				return webSocket.queueSize();
 			}
-			return 0;
+			return queues.size();
 		}
 
 		@Override
@@ -211,6 +226,46 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			return webSocket.send(taskExecutor.jsonServiceNotNull().toJsonStr(msg));
 		}
 		
+	}
+
+	/**
+	 * 连接打开监听
+	 * @param onOpen 监听器
+	 */
+	public void setOnOpen(Listener<HttpResult> onOpen) {
+		this.onOpen = onOpen;
+	}
+
+	/**
+	 * 连接异常监听
+	 * @param onException 监听器
+	 */
+	public void setOnException(Listener<Throwable> onException) {
+		this.onException = onException;
+	}
+
+	/**
+	 * 消息监听
+	 * @param onTextMessage 监听器
+	 */
+	public void setOnTextMessage(Listener<Message> onMessage) {
+		this.onMessage = onMessage;
+	}
+
+	/**
+	 * 正在关闭监听
+	 * @param onClosing 监听器
+	 */
+	public void setOnClosing(Listener<Close> onClosing) {
+		this.onClosing = onClosing;
+	}
+
+	/**
+	 * 已关闭监听
+	 * @param onClosed 监听器
+	 */
+	public void setOnClosed(Listener<Close> onClosed) {
+		this.onClosed = onClosed;
 	}
 
 }

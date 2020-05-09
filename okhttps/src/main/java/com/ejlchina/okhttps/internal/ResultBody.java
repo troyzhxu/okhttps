@@ -12,13 +12,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
-import java.util.List;
 
 import com.ejlchina.okhttps.Download;
 import com.ejlchina.okhttps.HttpResult.Body;
 import com.ejlchina.okhttps.HttpTask;
-import com.ejlchina.okhttps.JsonArr;
-import com.ejlchina.okhttps.JsonObj;
 import com.ejlchina.okhttps.OnCallback;
 import com.ejlchina.okhttps.Process;
 
@@ -26,10 +23,9 @@ import okhttp3.MediaType;
 import okhttp3.Response;
 import okio.Buffer;
 
-public class ResultBody implements Body {
+public class ResultBody extends AbstractBody implements Body {
 	
 	private Response response;
-	private TaskExecutor taskExecutor;
 	private boolean onIO = false;
 	private OnCallback<Process> onProcess;
 	private long stepBytes = 0;
@@ -40,9 +36,9 @@ public class ResultBody implements Body {
 	private byte[] data;
 
 	ResultBody(HttpTask<?> httpTask, Response response, TaskExecutor taskExecutor) {
+		super(taskExecutor);
 		this.httpTask = httpTask;
 		this.response = response;
-		this.taskExecutor = taskExecutor;
 	}
 
 	@Override
@@ -147,38 +143,6 @@ public class ResultBody implements Body {
 		}
 	}
 
-	@Override
-	public JsonObj toJsonObj() {
-		if (taskExecutor == null) {
-			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
-		}
-		return taskExecutor.jsonServiceNotNull().toJsonObj(toByteStream());
-	}
-
-	@Override
-	public JsonArr toJsonArr() {
-		if (taskExecutor == null) {
-			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
-		}
-		return taskExecutor.jsonServiceNotNull().toJsonArr(toByteStream());
-	}
-
-	@Override
-	public <T> T toBean(Class<T> type) {
-		if (taskExecutor == null) {
-			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
-		}
-		return taskExecutor.jsonServiceNotNull().jsonToBean(type, toByteStream());
-	}
-	
-	@Override
-	public <T> List<T> toList(Class<T> type) {
-		if (taskExecutor == null) {
-			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
-		}
-		return taskExecutor.jsonServiceNotNull().jsonToList(type, toByteStream());
-	}
-	
 	@Override
 	public Download toFile(String filePath) {
 		return toFile(new File(filePath));
