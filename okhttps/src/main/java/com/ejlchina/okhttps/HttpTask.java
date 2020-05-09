@@ -780,7 +780,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      */
     protected boolean timeoutAwait(CountDownLatch latch) {
         try {
-            return latch.await(httpClient.totalTimeoutMillis() * 10,
+            return latch.await(httpClient.preprocTimeoutMillis(),
                     TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             throw new HttpException("超时", e);

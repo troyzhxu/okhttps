@@ -24,7 +24,8 @@ public class HttpClient implements HTTP {
     final Preprocessor[] preprocessors;
     // 持有标签的任务
     final List<TagTask> tagTasks;
-
+    // 最大预处理时间倍数（相对于普通请求的超时时间）
+    final int preprocTimeoutTimes;
 
     private HttpClient(Builder builder) {
         this.client = builder.client;
@@ -35,6 +36,7 @@ public class HttpClient implements HTTP {
                 builder.responseListener, builder.exceptionListener,
                 builder.completeListener, builder.jsonService);
         this.preprocessors = builder.preprocessors.toArray(new Preprocessor[0]);
+        this.preprocTimeoutTimes = builder.preprocTimeoutTimes;
         this.tagTasks = new LinkedList<>();
     }
 
@@ -109,8 +111,10 @@ public class HttpClient implements HTTP {
         return client;
     }
 
-    public int totalTimeoutMillis() {
-        return client.connectTimeoutMillis() + client.writeTimeoutMillis() + client.readTimeoutMillis();
+    public int preprocTimeoutMillis() {
+        return preprocTimeoutTimes * (client.connectTimeoutMillis() 
+        		+ client.writeTimeoutMillis() 
+        		+ client.readTimeoutMillis());
     }
 
     public int getTagTaskCount() {
@@ -157,7 +161,7 @@ public class HttpClient implements HTTP {
 
         boolean isExpired() {
             // 生存时间大于10倍的总超时限值
-            return System.nanoTime() - createAt > 10_000_000 * totalTimeoutMillis();
+            return System.nanoTime() - createAt > 1_000_000 * preprocTimeoutMillis();
         }
 
 		public void setTag(String tag) {
@@ -353,6 +357,8 @@ public class HttpClient implements HTTP {
 
         private JsonService jsonService;
         
+        private int preprocTimeoutTimes = 10;
+        
         public Builder() {
             mediaTypes = new HashMap<>();
             mediaTypes.put("*", "application/octet-stream");
@@ -383,6 +389,7 @@ public class HttpClient implements HTTP {
             this.exceptionListener = hc.executor.exceptionListener;
             this.completeListener = hc.executor.completeListener;
             this.jsonService = hc.executor.jsonService;
+            this.preprocTimeoutTimes = hc.preprocTimeoutTimes;
         }
 
         /**
@@ -461,6 +468,19 @@ public class HttpClient implements HTTP {
         public Builder addSerialPreprocessor(Preprocessor preprocessor) {
             preprocessors.add(new SerialPreprocessor(preprocessor));
             return this;
+        }
+        
+        /**
+         * 最大预处理时间（倍数，相当普通请求的超时时间）
+         * 
+         * @param times 普通超时时间的倍数，默认为 10
+         * @return
+         */
+        public Builder preprocTimeoutTimes(int times) {
+        	if (times > 0) {
+        		this.preprocTimeoutTimes = times;
+        	}
+        	return this;
         }
 
         /**
