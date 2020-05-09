@@ -13,7 +13,6 @@
 		<module>okhttps-fastjson</module>
 		<module>okhttps-gson</module>
 		<module>okhttps-jackson</module>
-		<module>okhttps-kotlin</module>
 	</modules>
 
 	<properties>
