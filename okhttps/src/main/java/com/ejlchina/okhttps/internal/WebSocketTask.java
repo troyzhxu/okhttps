@@ -30,7 +30,10 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		super(httpClient, url);
 	}
 
-	
+	/**
+	 * 启动 WebSocket 监听
+	 * @return WebSocket
+	 */
 	public WebSocket listen() {
 		WebSocketImpl socket = new WebSocketImpl(httpClient.executor);
 		registeTagTask(socket);
