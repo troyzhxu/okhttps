@@ -57,7 +57,7 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
 
     /**
      * 发起 HTTP 请求
-     * @param method
+     * @param method 请求方法
      * @return 请求结果  
      */
     public HttpResult request(String method) {

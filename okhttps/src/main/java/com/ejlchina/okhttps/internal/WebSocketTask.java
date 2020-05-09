@@ -234,41 +234,51 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	/**
 	 * 连接打开监听
 	 * @param onOpen 监听器
+	 * @return WebSocketTask
 	 */
-	public void setOnOpen(Listener<HttpResult> onOpen) {
+	public WebSocketTask setOnOpen(Listener<HttpResult> onOpen) {
 		this.onOpen = onOpen;
+		return this;
 	}
 
 	/**
 	 * 连接异常监听
 	 * @param onException 监听器
+	 * @return WebSocketTask
 	 */
-	public void setOnException(Listener<Throwable> onException) {
+	public WebSocketTask setOnException(Listener<Throwable> onException) {
 		this.onException = onException;
+		return this;
 	}
 
 	/**
 	 * 消息监听
-	 * @param onTextMessage 监听器
+	 * @param onMessage 监听器
+	 * @return WebSocketTask
 	 */
-	public void setOnTextMessage(Listener<Message> onMessage) {
+	public WebSocketTask setOnTextMessage(Listener<Message> onMessage) {
 		this.onMessage = onMessage;
+		return this;
 	}
 
 	/**
 	 * 正在关闭监听
 	 * @param onClosing 监听器
+	 * @return WebSocketTask
 	 */
-	public void setOnClosing(Listener<Close> onClosing) {
+	public WebSocketTask setOnClosing(Listener<Close> onClosing) {
 		this.onClosing = onClosing;
+		return this;
 	}
 
 	/**
 	 * 已关闭监听
 	 * @param onClosed 监听器
+	 * @return WebSocketTask
 	 */
-	public void setOnClosed(Listener<Close> onClosed) {
+	public WebSocketTask setOnClosed(Listener<Close> onClosed) {
 		this.onClosed = onClosed;
+		return this;
 	}
 
 }

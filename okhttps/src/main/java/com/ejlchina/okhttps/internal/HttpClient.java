@@ -470,7 +470,7 @@ public class HttpClient implements HTTP {
          * 最大预处理时间（倍数，相当普通请求的超时时间）
          * 
          * @param times 普通超时时间的倍数，默认为 10
-         * @return
+         * @return Builder
          */
         public Builder preprocTimeoutTimes(int times) {
         	if (times > 0) {

@@ -118,11 +118,15 @@ public interface WebSocket extends Cancelable {
 
 	/**
 	 * 同 {@link okhttp3.WebSocket#send(String)}
+	 * @param text 文本数据
+	 * @return 是否可以发送
 	 */
 	boolean send(String text);
 
 	/**
 	 * 同 {@link okhttp3.WebSocket#send(ByteString)}
+	 * @param bytes 二进制数据
+	 * @return 是否可以发送
 	 */
 	boolean send(ByteString bytes);
 

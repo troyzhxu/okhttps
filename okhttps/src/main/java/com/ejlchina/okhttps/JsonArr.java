@@ -64,13 +64,13 @@ public interface JsonArr {
 	String getString(int index);
 	
 	/**
-	 * @param key 键名
+	 * @param index 元素下标
 	 * @return BigDecimal 值
 	 */
 	BigDecimal getBigDecimal(int index);
 	
 	/**
-	 * @param key 键名
+	 * @param index 元素下标
 	 * @return BigInteger 值
 	 */
 	BigInteger getBigInteger(int index);
