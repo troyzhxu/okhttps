@@ -24,12 +24,12 @@ public class GsonService implements JsonService {
 	}
 
 	@Override
-	public JsonObj newJsonObj(InputStream in) {
+	public JsonObj toJsonObj(InputStream in) {
 		return new GsonObj(gson.fromJson(new InputStreamReader(in), JsonObject.class));
 	}
 
 	@Override
-	public JsonArr newJsonArr(InputStream in) {
+	public JsonArr toJsonArr(InputStream in) {
 		return new GsonArr(gson.fromJson(new InputStreamReader(in), JsonArray.class));
 	}
 

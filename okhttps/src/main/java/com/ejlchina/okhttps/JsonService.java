@@ -8,17 +8,17 @@ public interface JsonService {
 
 	/**
 	 * 解析 JsonObj
-	 * @param in 输入流
+	 * @param in JSON 输入流
 	 * @return JsonObj
 	 */
-	JsonObj newJsonObj(InputStream in);
+	JsonObj toJsonObj(InputStream in);
 	
 	/**
 	 * 解析 JsonArr
-	 * @param in 输入流
+	 * @param in JSON 输入流
 	 * @return JsonArr
 	 */
-	JsonArr newJsonArr(InputStream in);
+	JsonArr toJsonArr(InputStream in);
 	
 	/**
 	 * 将 Java 对象序列化为 Json 字符串
@@ -39,7 +39,7 @@ public interface JsonService {
 	 * 解析 Java Bean
 	 * @param <T> 目标泛型
 	 * @param type 目标类型
-	 * @param in 输入流
+	 * @param in JSON 输入流
 	 * @return Java Bean
 	 */
 	<T> T jsonToBean(Class<T> type, InputStream in);
@@ -48,7 +48,7 @@ public interface JsonService {
 	 * 解析为 Java List
 	 * @param <T> 目标泛型
 	 * @param type 目标类型
-	 * @param in 输入流
+	 * @param in JSON 输入流
 	 * @return Java List
 	 */
 	<T> List<T> jsonToList(Class<T> type, InputStream in);

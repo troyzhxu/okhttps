@@ -152,7 +152,7 @@ public class ResultBody implements Body {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
 		}
-		return taskExecutor.jsonServiceNotNull().newJsonObj(toByteStream());
+		return taskExecutor.jsonServiceNotNull().toJsonObj(toByteStream());
 	}
 
 	@Override
@@ -160,7 +160,7 @@ public class ResultBody implements Body {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
 		}
-		return taskExecutor.jsonServiceNotNull().newJsonArr(toByteStream());
+		return taskExecutor.jsonServiceNotNull().toJsonArr(toByteStream());
 	}
 
 	@Override

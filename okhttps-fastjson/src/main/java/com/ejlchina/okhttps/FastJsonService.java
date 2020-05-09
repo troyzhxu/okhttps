@@ -24,12 +24,12 @@ public class FastJsonService implements JsonService {
 	}
 
 	@Override
-	public JsonObj newJsonObj(InputStream in) {
+	public JsonObj toJsonObj(InputStream in) {
 		return new FastJsonObj(JSON.parseObject(toString(in)));
 	}
 
 	@Override
-	public JsonArr newJsonArr(InputStream in) {
+	public JsonArr toJsonArr(InputStream in) {
 		return new FastJsonArr(JSON.parseArray(toString(in)));
 	}
 

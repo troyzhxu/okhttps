@@ -28,7 +28,7 @@ public class JacksonService implements JsonService {
 	}
 
 	@Override
-	public JsonObj newJsonObj(InputStream in) {
+	public JsonObj toJsonObj(InputStream in) {
 		try {
 			JsonNode json = objectMapper.readTree(in);
 			if (json.isObject()) {
@@ -44,7 +44,7 @@ public class JacksonService implements JsonService {
 	}
 
 	@Override
-	public JsonArr newJsonArr(InputStream in) {
+	public JsonArr toJsonArr(InputStream in) {
 		try {
 			JsonNode json = objectMapper.readTree(in);
 			if (json.isArray()) {
