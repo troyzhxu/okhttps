@@ -35,63 +35,27 @@ public interface JsonObj {
 	
 	/**
 	 * @param key 键名
-	 * @return Boolean 值
-	 */
-	Boolean getBool(String key);
-	
-	/**
-	 * @param key 键名
 	 * @return boolean 值
 	 */
-	boolean getBoolVal(String key);
-	
-	/**
-	 * @param key 键名
-	 * @return Integer 值
-	 */
-	Integer getInt(String key);
+	boolean getBool(String key);
 
 	/**
 	 * @param key 键名
 	 * @return int 值
 	 */
-	int getIntVal(String key);
-	
-	/**
-	 * @param key 键名
-	 * @return Short 值
-	 */
-	Short getShort(String key);
-	
-	/**
-	 * @param key 键名
-	 * @return short 值
-	 */
-	short getShortVal(String key);
-	
-	/**
-	 * @param key 键名
-	 * @return Float 值
-	 */
-	Float getFloat(String key);
+	int getInt(String key);
 	
 	/**
 	 * @param key 键名
 	 * @return float 值
 	 */
-	float getFloatVal(String key);
-	
-	/**
-	 * @param key 键名
-	 * @return Double 值
-	 */
-	Double getDouble(String key);
+	float getFloat(String key);
 	
 	/**
 	 * @param key 键名
 	 * @return double 值
 	 */
-	double getDoubleVal(String key);
+	double getDouble(String key);
 	
 	/**
 	 * @param key 键名

@@ -43,16 +43,7 @@ public class GsonArr implements JsonArr {
 	}
 
 	@Override
-	public Boolean getBool(int index) {
-		JsonElement val = json.get(index);
-		if (val != null) {
-			return val.getAsBoolean();
-		}
-		return null;
-	}
-
-	@Override
-	public boolean getBoolVal(int index) {
+	public boolean getBool(int index) {
 		JsonElement val = json.get(index);
 		if (val != null) {
 			return val.getAsBoolean();
@@ -61,16 +52,7 @@ public class GsonArr implements JsonArr {
 	}
 
 	@Override
-	public Integer getInt(int index) {
-		JsonElement val = json.get(index);
-		if (val != null) {
-			return val.getAsInt();
-		}
-		return null;
-	}
-
-	@Override
-	public int getIntVal(int index) {
+	public int getInt(int index) {
 		JsonElement val = json.get(index);
 		if (val != null) {
 			return val.getAsInt();
@@ -79,34 +61,7 @@ public class GsonArr implements JsonArr {
 	}
 
 	@Override
-	public Short getShort(int index) {
-		JsonElement val = json.get(index);
-		if (val != null) {
-			return val.getAsShort();
-		}
-		return null;
-	}
-
-	@Override
-	public short getShortVal(int index) {
-		JsonElement val = json.get(index);
-		if (val != null) {
-			return val.getAsShort();
-		}
-		return 0;
-	}
-
-	@Override
-	public Float getFloat(int index) {
-		JsonElement val = json.get(index);
-		if (val != null) {
-			return val.getAsFloat();
-		}
-		return null;
-	}
-
-	@Override
-	public float getFloatVal(int index) {
+	public float getFloat(int index) {
 		JsonElement val = json.get(index);
 		if (val != null) {
 			return val.getAsFloat();
@@ -115,16 +70,7 @@ public class GsonArr implements JsonArr {
 	}
 
 	@Override
-	public Double getDouble(int index) {
-		JsonElement val = json.get(index);
-		if (val != null) {
-			return val.getAsDouble();
-		}
-		return null;
-	}
-
-	@Override
-	public double getDoubleVal(int index) {
+	public double getDouble(int index) {
 		JsonElement val = json.get(index);
 		if (val != null) {
 			return val.getAsDouble();

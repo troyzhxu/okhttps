@@ -1,13 +1,18 @@
 package com.ejlchina.okhttps;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.ejlchina.okhttps.internal.HttpException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.CollectionType;
 
 public class JacksonFactory implements JsonFactory {
@@ -23,15 +28,35 @@ public class JacksonFactory implements JsonFactory {
 	}
 
 	@Override
-	public JsonObj newJsonObj(String json) {
-		// TODO Auto-generated method stub
-		return null;
+	public JsonObj newJsonObj(InputStream in) {
+		try {
+			JsonNode json = objectMapper.readTree(in);
+			if (json.isObject()) {
+				return new JacksonObj((ObjectNode) json);
+			}
+			if (json.isNull() || json.isMissingNode()) {
+				return null;
+			}
+			throw new HttpException("不是 一个 json 对象：" + json);
+		} catch (IOException e) {
+			throw new HttpException("Jackson 解析异常", e);
+		}
 	}
 
 	@Override
-	public JsonArr newJsonArr(String json) {
-		// TODO Auto-generated method stub
-		return null;
+	public JsonArr newJsonArr(InputStream in) {
+		try {
+			JsonNode json = objectMapper.readTree(in);
+			if (json.isArray()) {
+				return new JacksonArr((ArrayNode) json);
+			}
+			if (json.isNull() || json.isMissingNode()) {
+				return null;
+			}
+			throw new HttpException("不是 一个 json 数组：" + json);
+		} catch (IOException e) {
+			throw new HttpException("Jackson 解析异常", e);
+		}
 	}
 
 	@Override
@@ -56,28 +81,30 @@ public class JacksonFactory implements JsonFactory {
 	}
 
 	@Override
-	public <T> T jsonToBean(Class<T> type, String json) {
-		if (json != null) {
-			try {
-				return objectMapper.readValue(json, type);
-			} catch (JsonProcessingException e) {
-				throw new HttpException("Jackson 解析异常：" + json, e);
-			}
+	public <T> T jsonToBean(Class<T> type, InputStream in) {
+		try {
+			return objectMapper.readValue(in, type);
+		} catch (IOException e) {
+			throw new HttpException("Jackson 解析异常", e);
 		}
-		return null;
 	}
 
 	@Override
-	public <T> List<T> jsonToList(Class<T> type, String json) {
-		if (json != null) {
-			CollectionType javaType = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, type);
-			try {
-				return objectMapper.readValue(json, javaType);
-			} catch (JsonProcessingException e) {
-				throw new HttpException("Jackson 解析异常：" + json, e);
-			}
+	public <T> List<T> jsonToList(Class<T> type, InputStream in) {
+		CollectionType javaType = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, type);
+		try {
+			return objectMapper.readValue(in, javaType);
+		} catch (IOException e) {
+			throw new HttpException("Jackson 解析异常", e);
 		}
-		return null;
+	}
+
+	public ObjectMapper getObjectMapper() {
+		return objectMapper;
+	}
+
+	public void setObjectMapper(ObjectMapper objectMapper) {
+		this.objectMapper = objectMapper;
 	}
 
 }

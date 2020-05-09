@@ -1,5 +1,7 @@
 package com.ejlchina.okhttps;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -11,7 +13,7 @@ import com.google.gson.reflect.TypeToken;
 
 public class GsonFactory implements JsonFactory {
 
-	private final Gson gson;
+	private Gson gson;
 	
 	public GsonFactory() {
 		this(new Gson());
@@ -22,19 +24,13 @@ public class GsonFactory implements JsonFactory {
 	}
 
 	@Override
-	public JsonObj newJsonObj(String json) {
-		if (json != null) {
-			return new GsonObj(gson.fromJson(json, JsonObject.class));
-		}
-		return null;
+	public JsonObj newJsonObj(InputStream in) {
+		return new GsonObj(gson.fromJson(new InputStreamReader(in), JsonObject.class));
 	}
 
 	@Override
-	public JsonArr newJsonArr(String json) {
-		if (json != null) {
-			return new GsonArr(gson.fromJson(json, JsonArray.class));
-		}
-		return null;
+	public JsonArr newJsonArr(InputStream in) {
+		return new GsonArr(gson.fromJson(new InputStreamReader(in), JsonArray.class));
 	}
 
 	@Override
@@ -48,22 +44,24 @@ public class GsonFactory implements JsonFactory {
 	}
 
 	@Override
-	public <T> T jsonToBean(Class<T> type, String json) {
-		if (json != null) {
-			return gson.fromJson(json, type);
-		}
-		return null;
+	public <T> T jsonToBean(Class<T> type, InputStream in) {
+		return gson.fromJson(new InputStreamReader(in), type);
 	}
 
 	@Override
-	public <T> List<T> jsonToList(Class<T> type, String json) {
-		if (json != null) {
-			T[] beans = gson.fromJson(json, TypeToken.getArray(type).getType());
-			List<T> list = new ArrayList<>();
-			Collections.addAll(list, beans);
-			return list;
-		}
-		return null;
+	public <T> List<T> jsonToList(Class<T> type, InputStream in) {
+		T[] beans = gson.fromJson(new InputStreamReader(in), TypeToken.getArray(type).getType());
+		List<T> list = new ArrayList<>();
+		Collections.addAll(list, beans);
+		return list;
+	}
+
+	public Gson getGson() {
+		return gson;
+	}
+
+	public void setGson(Gson gson) {
+		this.gson = gson;
 	}
 	
 }

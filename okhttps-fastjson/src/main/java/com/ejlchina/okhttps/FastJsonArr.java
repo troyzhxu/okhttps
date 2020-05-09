@@ -43,52 +43,22 @@ public class FastJsonArr implements JsonArr {
 	}
 
 	@Override
-	public Boolean getBool(int index) {
-		return json.getBoolean(index);
-	}
-
-	@Override
-	public boolean getBoolVal(int index) {
+	public boolean getBool(int index) {
 		return json.getBooleanValue(index);
 	}
 
 	@Override
-	public Integer getInt(int index) {
-		return json.getInteger(index);
-	}
-
-	@Override
-	public int getIntVal(int index) {
+	public int getInt(int index) {
 		return json.getIntValue(index);
 	}
 
 	@Override
-	public Short getShort(int index) {
-		return json.getShort(index);
-	}
-
-	@Override
-	public short getShortVal(int index) {
-		return json.getShortValue(index);
-	}
-
-	@Override
-	public Float getFloat(int index) {
-		return json.getFloat(index);
-	}
-
-	@Override
-	public float getFloatVal(int index) {
+	public float getFloat(int index) {
 		return json.getFloatValue(index);
 	}
 
 	@Override
-	public Double getDouble(int index) {
-		return json.getDouble(index);
-	}
-
-	@Override
-	public double getDoubleVal(int index) {
+	public double getDouble(int index) {
 		return json.getDoubleValue(index);
 	}
 
@@ -99,7 +69,6 @@ public class FastJsonArr implements JsonArr {
 
 	@Override
 	public BigDecimal getBigDecimal(int index) {
-		// TODO Auto-generated method stub
 		return json.getBigDecimal(index);
 	}
 

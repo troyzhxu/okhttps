@@ -2,122 +2,126 @@ package com.ejlchina.okhttps;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JacksonObj implements JsonObj {
 
+	private ObjectNode json;
+	
+	public JacksonObj(ObjectNode json) {
+		this.json = json;
+	}
+
 	@Override
 	public int size() {
-		// TODO Auto-generated method stub
-		return 0;
+		return json.size();
 	}
 
 	@Override
 	public boolean isEmpty() {
-		// TODO Auto-generated method stub
-		return false;
+		return json.isEmpty();
 	}
 
 	@Override
 	public JsonObj getJsonOjb(String key) {
-		// TODO Auto-generated method stub
+		JsonNode subJson = json.get(key);
+		if (subJson != null && subJson.isObject()) {
+			return new JacksonObj((ObjectNode) subJson);
+		}
 		return null;
 	}
 
 	@Override
 	public JsonArr getJsonArr(String key) {
-		// TODO Auto-generated method stub
+		JsonNode subJson = json.get(key);
+		if (subJson != null && subJson.isArray()) {
+			return new JacksonArr((ArrayNode) subJson);
+		}
 		return null;
 	}
 
 	@Override
-	public Boolean getBool(String key) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean getBoolVal(String key) {
-		// TODO Auto-generated method stub
+	public boolean getBool(String key) {
+		JsonNode subJson = json.get(key);
+		if (subJson != null && subJson.asBoolean()) {
+			return subJson.asBoolean();
+		}
 		return false;
 	}
 
 	@Override
-	public Integer getInt(String key) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getIntVal(String key) {
-		// TODO Auto-generated method stub
+	public int getInt(String key) {
+		JsonNode subJson = json.get(key);
+		if (subJson != null && subJson.isNumber()) {
+			return subJson.intValue();
+		}
 		return 0;
 	}
 
 	@Override
-	public Short getShort(String key) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public short getShortVal(String key) {
-		// TODO Auto-generated method stub
+	public float getFloat(String key) {
+		JsonNode subJson = json.get(key);
+		if (subJson != null && subJson.isNumber()) {
+			return subJson.floatValue();
+		}
 		return 0;
 	}
 
 	@Override
-	public Float getFloat(String key) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public float getFloatVal(String key) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public Double getDouble(String key) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public double getDoubleVal(String key) {
-		// TODO Auto-generated method stub
+	public double getDouble(String key) {
+		JsonNode subJson = json.get(key);
+		if (subJson != null && subJson.isNumber()) {
+			return subJson.doubleValue();
+		}
 		return 0;
 	}
 
 	@Override
 	public String getString(String key) {
-		// TODO Auto-generated method stub
+		JsonNode subJson = json.get(key);
+		if (subJson != null) {
+			return subJson.asText();
+		}
 		return null;
 	}
 
 	@Override
 	public BigDecimal getBigDecimal(String key) {
-		// TODO Auto-generated method stub
+		JsonNode subJson = json.get(key);
+		if (subJson != null && subJson.isNumber()) {
+			return subJson.decimalValue();
+		}
 		return null;
 	}
 
 	@Override
 	public BigInteger getBigInteger(String key) {
-		// TODO Auto-generated method stub
+		JsonNode subJson = json.get(key);
+		if (subJson != null && subJson.isNumber()) {
+			return subJson.bigIntegerValue();
+		}
 		return null;
 	}
 
 	@Override
 	public boolean has(String key) {
-		// TODO Auto-generated method stub
-		return false;
+		return json.has(key);
 	}
 
 	@Override
 	public Set<String> keySet() {
-		// TODO Auto-generated method stub
-		return null;
+		Iterator<String> it = json.fieldNames();
+		Set<String> set = new HashSet<>();
+		while (it.hasNext()) {
+			set.add(it.next());
+		}
+		return set;
 	}
 
 }

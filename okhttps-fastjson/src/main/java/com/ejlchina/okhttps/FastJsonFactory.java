@@ -1,25 +1,36 @@
 package com.ejlchina.okhttps;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import com.alibaba.fastjson.JSON;
+import com.ejlchina.okhttps.internal.HttpException;
+
+import okio.Okio;
 
 public class FastJsonFactory implements JsonFactory {
 
-	@Override
-	public JsonObj newJsonObj(String json) {
-		if (json != null) {
-			return new FastJsonObj(JSON.parseObject(json));
-		}
-		return null;
+	private Charset charset;
+	
+	public FastJsonFactory() {
+		this(StandardCharsets.UTF_8);
+	}
+	
+	public FastJsonFactory(Charset charset) {
+		this.charset = charset;
 	}
 
 	@Override
-	public JsonArr newJsonArr(String json) {
-		if (json != null) {
-			return new FastJsonArr(JSON.parseArray(json));
-		}
-		return null;
+	public JsonObj newJsonObj(InputStream in) {
+		return new FastJsonObj(JSON.parseObject(toString(in)));
+	}
+
+	@Override
+	public JsonArr newJsonArr(InputStream in) {
+		return new FastJsonArr(JSON.parseArray(toString(in)));
 	}
 
 	@Override
@@ -33,19 +44,33 @@ public class FastJsonFactory implements JsonFactory {
 	}
 
 	@Override
-	public <T> T jsonToBean(Class<T> type, String json) {
-		if (json != null) {
-			return JSON.parseObject(json, type);
+	public <T> T jsonToBean(Class<T> type, InputStream in) {
+		try {
+			return JSON.parseObject(in, type);
+		} catch (IOException e) {
+			throw new HttpException("读取文本异常", e);
 		}
-		return null;
 	}
 
 	@Override
-	public <T> List<T> jsonToList(Class<T> type, String json) {
-		if (json != null) {
-			return JSON.parseArray(json, type);
+	public <T> List<T> jsonToList(Class<T> type, InputStream in) {
+		return JSON.parseArray(toString(in), type);
+	}
+
+	private String toString(InputStream in) {
+		try {
+			return Okio.buffer(Okio.source(in)).readString(charset);
+		} catch (IOException e) {
+			throw new HttpException("读取文本异常", e);
 		}
-		return null;
+	}
+
+	public Charset getCharset() {
+		return charset;
+	}
+
+	public void setCharset(Charset charset) {
+		this.charset = charset;
 	}
 
 }

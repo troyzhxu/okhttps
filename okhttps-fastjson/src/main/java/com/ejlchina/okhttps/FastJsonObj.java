@@ -44,52 +44,22 @@ public class FastJsonObj implements JsonObj {
 	}
 
 	@Override
-	public Boolean getBool(String key) {
-		return json.getBoolean(key);
-	}
-
-	@Override
-	public boolean getBoolVal(String key) {
+	public boolean getBool(String key) {
 		return json.getBooleanValue(key);
 	}
 
 	@Override
-	public Integer getInt(String key) {
-		return json.getInteger(key);
-	}
-
-	@Override
-	public int getIntVal(String key) {
+	public int getInt(String key) {
 		return json.getIntValue(key);
 	}
 
 	@Override
-	public Short getShort(String key) {
-		return json.getShort(key);
-	}
-
-	@Override
-	public short getShortVal(String key) {
-		return json.getShortValue(key);
-	}
-
-	@Override
-	public Float getFloat(String key) {
-		return json.getFloat(key);
-	}
-
-	@Override
-	public float getFloatVal(String key) {
+	public float getFloat(String key) {
 		return json.getFloatValue(key);
 	}
 
 	@Override
-	public Double getDouble(String key) {
-		return json.getDouble(key);
-	}
-
-	@Override
-	public double getDoubleVal(String key) {
+	public double getDouble(String key) {
 		return json.getDoubleValue(key);
 	}
 
