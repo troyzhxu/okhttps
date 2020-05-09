@@ -19,30 +19,18 @@ import okhttp3.WebSocketListener;
 public interface HTTP {
 
     /**
-     * 异步请求
-     * @param url 请求地址
-     * @return 异步HTTP任务
-     */
-    AsyncHttpTask async(String url);
-
-    /**
-     * 异步请求
-     * @return 异步HTTP任务
-     */
-    AsyncHttpTask async();
-
-    /**
      * 同步请求
      * @param url 请求地址
      * @return 同步HTTP任务
      */
     SyncHttpTask sync(String url);
-
+    
     /**
-     * 同步请求
-     * @return 同步HTTP任务
+     * 异步请求
+     * @param url 请求地址
+     * @return 异步HTTP任务
      */
-    SyncHttpTask sync();
+    AsyncHttpTask async(String url);
 
     /**
      * Websocket 连接
@@ -66,14 +54,14 @@ public interface HTTP {
     void cancelAll();
 
     /**
-     * OkHttp 原生请求 （该请求不经过 预处理器）
+     * OkHttp 的 HTTP 原生请求 （该请求不经过 预处理器）
      * @param request 请求
      * @return Call
      */
     Call request(Request request);
 
     /**
-     * Websocket（该请求不经过 预处理器）
+     * OkHttp 的 Websocket 原生请求（该请求不经过 预处理器）
      *
      * @param request  请求
      * @param listener 监听器

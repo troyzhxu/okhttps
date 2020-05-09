@@ -60,28 +60,12 @@ public class HttpUtils {
     }
 
     /**
-     * 异步请求
-     * @return 异步 HttpTask
-     */
-    public static AsyncHttpTask async() {
-        return getHttp().async();
-    }
-
-    /**
      * 同步请求
      * @param url 请求地址
      * @return 同步 HttpTask
      */
     public static SyncHttpTask sync(String url) {
         return getHttp().sync(url);
-    }
-
-    /**
-     * 同步请求
-     * @return 同步 HttpTask
-     */
-    public static SyncHttpTask sync() {
-        return getHttp().sync();
     }
 
     /**

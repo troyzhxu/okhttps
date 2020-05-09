@@ -41,18 +41,8 @@ public class HttpClient implements HTTP {
     }
 
     @Override
-    public AsyncHttpTask async() {
-        return async(null);
-    }
-
-    @Override
     public AsyncHttpTask async(String url) {
         return new AsyncHttpTask(this, urlPath(url));
-    }
-
-    @Override
-    public SyncHttpTask sync() {
-        return sync(null);
     }
 
     @Override
@@ -62,7 +52,13 @@ public class HttpClient implements HTTP {
 
 	@Override
 	public WebSocketTask webSocket(String url) {
-		return new WebSocketTask(this, urlPath(url));
+		String path = urlPath(url);
+		if (path.startsWith("https://")) {
+			path = path.replace("https://", "wss://");
+		} else if (path.startsWith("http://")) {
+			path = path.replace("http://", "ws://");
+		}
+		return new WebSocketTask(this, path);
 	}
     
     @Override
