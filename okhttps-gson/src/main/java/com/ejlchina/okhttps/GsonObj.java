@@ -62,6 +62,15 @@ public class GsonObj implements JsonObj {
 	}
 
 	@Override
+	public long getLong(String key) {
+		JsonElement val = json.get(key);
+		if (val != null) {
+			return val.getAsLong();
+		}
+		return 0;
+	}
+
+	@Override
 	public float getFloat(String key) {
 		JsonElement val = json.get(key);
 		if (val != null) {

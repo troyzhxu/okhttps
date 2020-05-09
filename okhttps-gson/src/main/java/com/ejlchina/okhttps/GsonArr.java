@@ -61,6 +61,15 @@ public class GsonArr implements JsonArr {
 	}
 
 	@Override
+	public long getLong(int index) {
+		JsonElement val = json.get(index);
+		if (val != null) {
+			return val.getAsLong();
+		}
+		return 0;
+	}
+	
+	@Override
 	public float getFloat(int index) {
 		JsonElement val = json.get(index);
 		if (val != null) {
