@@ -88,6 +88,12 @@ public interface HTTP {
     TaskExecutor getExecutor();
 
     /**
+     * 新的构建器
+     * @return Builder
+     */
+    Builder newBuilder();
+    
+    /**
      * HTTP 构建器
      * @return HTTP 构建器
      */
