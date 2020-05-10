@@ -33,6 +33,7 @@ public class HttpUtils {
      * 配置HttpUtils持有的HTTP实例（不调用此方法前默认使用一个没有没有经过任何配置的HTTP懒实例）
      * @param http HTTP实例
      */
+    @Deprecated
     public static void of(HTTP http) {
         if (http != null) {
             HttpUtils.http = http;
