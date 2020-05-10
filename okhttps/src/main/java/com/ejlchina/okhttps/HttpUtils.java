@@ -46,8 +46,30 @@ public class HttpUtils {
         if (http != null) {
             return http;
         }
-        http = HTTP.builder().build();
+        http = HTTP.builder().jsonService(findJsonService(new String[] {
+                "com.ejlchina.okhttps.GsonService",
+                "com.ejlchina.okhttps.FastJsonService",
+                "com.ejlchina.okhttps.JacksonService"
+        }, 0)).build();
         return http;
+    }
+
+    static JsonService findJsonService(String[] classes, int index) {
+        if (index >= classes.length) {
+            return null;
+        }
+        Class<?> clazz = null;
+        try {
+            clazz = Class.forName(classes[0]);
+        } catch (Exception ignore) {}
+        if (clazz == null || !JsonService.class.isAssignableFrom(clazz)) {
+            return findJsonService(classes, index + 1);
+        }
+        try {
+            return (JsonService) clazz.getDeclaredConstructor().newInstance();
+        } catch (Exception ignore) {
+            return null;
+        }
     }
 
     /**
