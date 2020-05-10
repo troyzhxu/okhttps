@@ -45,6 +45,17 @@ public class MessageBody extends AbstractBody implements Message {
 	}
 
 	@Override
+	public String toString() {
+		if (text != null) {
+			return text;
+		}
+		if (bytes != null) {
+			return bytes.utf8();
+		}
+		return null;
+	}
+
+	@Override
 	public ByteString toByteString() {
 		if (text != null) {
 			return ByteString.encodeUtf8(text);
