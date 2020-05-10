@@ -4,6 +4,7 @@ import com.ejlchina.okhttps.internal.AsyncHttpTask;
 import com.ejlchina.okhttps.internal.SyncHttpTask;
 import com.ejlchina.okhttps.internal.TaskExecutor;
 
+import com.ejlchina.okhttps.internal.WebSocketTask;
 import okhttp3.Call;
 import okhttp3.Request;
 import okhttp3.WebSocket;
@@ -55,7 +56,7 @@ public class HttpUtils {
         return http;
     }
 
-    static JsonService findJsonService(String[] classes, int index) {
+    static private JsonService findJsonService(String[] classes, int index) {
         if (index >= classes.length) {
             return null;
         }
@@ -92,6 +93,15 @@ public class HttpUtils {
     }
 
     /**
+     * Websocket 连接
+     * @param url 连接地址
+     * @return WebSocket 任务
+     */
+    public static WebSocketTask webSocket(String url) {
+        return getHttp().webSocket(url);
+    }
+
+    /**
      * 根据标签取消HTTP任务，只要任务的标签包含指定的Tag就会被取消
      * @param tag 标签
      * @return 被取消的任务数量
@@ -116,7 +126,7 @@ public class HttpUtils {
     public static Call request(Request request) {
     	return getHttp().request(request);
     }
-    
+
     /**
      * Websocket（该请求不经过 预处理器）
      * @param request 请求
