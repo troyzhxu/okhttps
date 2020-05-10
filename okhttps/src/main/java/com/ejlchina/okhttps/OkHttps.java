@@ -1,70 +1,39 @@
 package com.ejlchina.okhttps;
 
-import com.ejlchina.okhttps.internal.AsyncHttpTask;
-import com.ejlchina.okhttps.internal.SyncHttpTask;
-import com.ejlchina.okhttps.internal.TaskExecutor;
-
-import com.ejlchina.okhttps.internal.WebSocketTask;
+import com.ejlchina.okhttps.internal.*;
 import okhttp3.Call;
 import okhttp3.Request;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 
+import java.util.ServiceLoader;
+
 /**
- * Http 工具类（可供第三方库，非主应用使用）
- * 若需要配置，请使用 {@link OkHttps } 类
- *
- * @author Troy.Zhou
+ * OkHttps 工具类
+ * 支持 SPI 方式配置
  */
-public class HttpUtils {
+public class OkHttps {
 
+    public interface Config {
 
-    private static HTTP http;
+        void withConfig(HTTP.Builder builder);
 
-
-    /**
-     * 配置HttpUtils持有的HTTP实例（不调用此方法前默认使用一个没有没有经过任何配置的HTTP懒实例）
-     * @param http HTTP实例
-     */
-    @Deprecated
-    public static void of(HTTP http) {
-        if (http != null) {
-            HttpUtils.http = http;
-        } else {
-        	throw new IllegalArgumentException("Parameter http can not be null!");
-        }
     }
 
+    private static HTTP http;
 
     static synchronized HTTP getHttp() {
         if (http != null) {
             return http;
         }
-        http = HTTP.builder().jsonService(findJsonService(new String[] {
-                "com.ejlchina.okhttps.GsonService",
-                "com.ejlchina.okhttps.FastJsonService",
-                "com.ejlchina.okhttps.JacksonService"
-        }, 0)).build();
+        HTTP.Builder builder = HTTP.builder();
+        for (Config config : ServiceLoader.load(Config.class)) {
+            config.withConfig(builder);
+        }
+        http = builder.build();
         return http;
     }
 
-    static private JsonService findJsonService(String[] classes, int index) {
-        if (index >= classes.length) {
-            return null;
-        }
-        Class<?> clazz = null;
-        try {
-            clazz = Class.forName(classes[0]);
-        } catch (Exception ignore) {}
-        if (clazz == null || !JsonService.class.isAssignableFrom(clazz)) {
-            return findJsonService(classes, index + 1);
-        }
-        try {
-            return (JsonService) clazz.getDeclaredConstructor().newInstance();
-        } catch (Exception ignore) {
-            return null;
-        }
-    }
 
     /**
      * 异步请求
@@ -116,7 +85,7 @@ public class HttpUtils {
      * @return Call
      */
     public static Call request(Request request) {
-    	return getHttp().request(request);
+        return getHttp().request(request);
     }
 
     /**
@@ -126,15 +95,15 @@ public class HttpUtils {
      * @return WebSocket
      */
     public static WebSocket webSocket(Request request, WebSocketListener listener) {
-    	return getHttp().webSocket(request, listener);
+        return getHttp().webSocket(request, listener);
     }
-    
+
     /**
      * 获取任务执行器
      * @return TaskExecutor
      */
     public static TaskExecutor getExecutor() {
-    	return getHttp().getExecutor();
+        return getHttp().getExecutor();
     }
-    
+
 }
