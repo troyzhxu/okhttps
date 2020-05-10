@@ -12,7 +12,9 @@ import java.util.ServiceLoader;
  * OkHttps 工具类
  * 支持 SPI 方式配置
  */
-public class OkHttps {
+public final class OkHttps {
+
+    private OkHttps() {}
 
     public interface Config {
 
