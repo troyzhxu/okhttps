@@ -1,11 +1,11 @@
 package com.ejlchina.okhttps;
 
-public class GsonConfig implements OkHttps.Config {
+public class JacksonAutoConfig implements OkHttps.Config {
 
     @Override
     public void withConfig(HTTP.Builder builder) {
         if (builder.getJsonService() == null) {
-            builder.jsonService(new GsonService());
+            builder.jsonService(new JacksonService());
         }
     }
 
