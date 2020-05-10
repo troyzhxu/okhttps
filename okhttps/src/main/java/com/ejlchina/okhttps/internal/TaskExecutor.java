@@ -119,4 +119,32 @@ public class TaskExecutor {
         }
     }
 
+    public Executor getIoExecutor() {
+        return ioExecutor;
+    }
+
+    public Executor getMainExecutor() {
+        return mainExecutor;
+    }
+
+    public DownListener getDownloadListener() {
+        return downloadListener;
+    }
+
+    public TaskListener<HttpResult> getResponseListener() {
+        return responseListener;
+    }
+
+    public TaskListener<IOException> getExceptionListener() {
+        return exceptionListener;
+    }
+
+    public TaskListener<State> getCompleteListener() {
+        return completeListener;
+    }
+
+    public JsonService getJsonService() {
+        return jsonService;
+    }
+
 }

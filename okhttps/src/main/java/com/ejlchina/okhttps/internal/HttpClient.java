@@ -1,19 +1,18 @@
 package com.ejlchina.okhttps.internal;
 
-import com.ejlchina.okhttps.*;
-import com.ejlchina.okhttps.HttpResult.State;
+import com.ejlchina.okhttps.Cancelable;
+import com.ejlchina.okhttps.HTTP;
+import com.ejlchina.okhttps.HttpTask;
+import com.ejlchina.okhttps.Preprocessor;
 import okhttp3.*;
-import okhttp3.WebSocket;
 
-import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.Executor;
 
 
 public class HttpClient implements HTTP {
 
     // OkHttpClient
-    final OkHttpClient client;
+    final OkHttpClient okClient;
     // 根URL
     final String baseUrl;
     // 媒体类型
@@ -27,16 +26,16 @@ public class HttpClient implements HTTP {
     // 最大预处理时间倍数（相对于普通请求的超时时间）
     final int preprocTimeoutTimes;
 
-    private HttpClient(Builder builder) {
-        this.client = builder.client;
-        this.baseUrl = builder.baseUrl;
-        this.mediaTypes = builder.mediaTypes;
-        this.executor = new TaskExecutor(client.dispatcher().executorService(),
-                builder.mainExecutor, builder.downloadListener,
-                builder.responseListener, builder.exceptionListener,
-                builder.completeListener, builder.jsonService);
-        this.preprocessors = builder.preprocessors.toArray(new Preprocessor[0]);
-        this.preprocTimeoutTimes = builder.preprocTimeoutTimes;
+    public HttpClient(Builder builder) {
+        this.okClient = builder.getOkClient();
+        this.baseUrl = builder.getBaseUrl();
+        this.mediaTypes = builder.getMediaTypes();
+        this.executor = new TaskExecutor(okClient.dispatcher().executorService(),
+                builder.getMainExecutor(), builder.getDownloadListener(),
+                builder.getResponseListener(), builder.getExceptionListener(),
+                builder.getCompleteListener(), builder.getJsonService());
+        this.preprocessors = builder.getPreprocessors().toArray(new Preprocessor[0]);
+        this.preprocTimeoutTimes = builder.getPreprocTimeoutTimes();
         this.tagTasks = new LinkedList<>();
     }
 
@@ -81,7 +80,7 @@ public class HttpClient implements HTTP {
 
     @Override
     public void cancelAll() {
-        client.dispatcher().cancelAll();
+        okClient.dispatcher().cancelAll();
         synchronized (tagTasks) {
         	tagTasks.clear();
         }
@@ -89,22 +88,22 @@ public class HttpClient implements HTTP {
 
     @Override
     public Call request(Request request) {
-        return client.newCall(request);
+        return okClient.newCall(request);
     }
 
     @Override
     public WebSocket webSocket(Request request, WebSocketListener listener) {
-        return client.newWebSocket(request, listener);
+        return okClient.newWebSocket(request, listener);
     }
 
     public OkHttpClient getOkClient() {
-        return client;
+        return okClient;
     }
 
     public int preprocTimeoutMillis() {
-        return preprocTimeoutTimes * (client.connectTimeoutMillis() 
-        		+ client.writeTimeoutMillis() 
-        		+ client.readTimeoutMillis());
+        return preprocTimeoutTimes * (okClient.connectTimeoutMillis()
+        		+ okClient.writeTimeoutMillis()
+        		+ okClient.readTimeoutMillis());
     }
 
     public int getTagTaskCount() {
@@ -200,7 +199,7 @@ public class HttpClient implements HTTP {
      * 串行预处理器
      * @author Troy.Zhou
      */
-    static class SerialPreprocessor implements Preprocessor {
+    public static class SerialPreprocessor implements Preprocessor {
 
         // 预处理器
         private Preprocessor preprocessor;
@@ -209,7 +208,7 @@ public class HttpClient implements HTTP {
         // 是否有任务正在执行
         private boolean running = false;
 
-        SerialPreprocessor(Preprocessor preprocessor) {
+        public SerialPreprocessor(Preprocessor preprocessor) {
             this.preprocessor = preprocessor;
             this.pendings = new LinkedList<>();
         }
@@ -335,222 +334,24 @@ public class HttpClient implements HTTP {
         return fullUrl;
     }
 
-    public static class Builder {
+    public String getBaseUrl() {
+        return baseUrl;
+    }
 
-        private OkHttpClient client;
+    public Map<String, String> getMediaTypes() {
+        return mediaTypes;
+    }
 
-        private String baseUrl;
+    public Preprocessor[] getPreprocessors() {
+        return preprocessors;
+    }
 
-        private Map<String, String> mediaTypes;
+    public List<TagTask> getTagTasks() {
+        return tagTasks;
+    }
 
-        private Configurator configurator;
-
-        private Executor mainExecutor;
-
-        private List<Preprocessor> preprocessors;
-
-        private DownListener downloadListener;
-
-        private TaskListener<HttpResult> responseListener;
-
-        private TaskListener<IOException> exceptionListener;
-
-        private TaskListener<State> completeListener;
-
-        private JsonService jsonService;
-        
-        private int preprocTimeoutTimes = 10;
-        
-        public Builder() {
-            mediaTypes = new HashMap<>();
-            mediaTypes.put("*", "application/octet-stream");
-            mediaTypes.put("png", "image/png");
-            mediaTypes.put("jpg", "image/jpeg");
-            mediaTypes.put("jpeg", "image/jpeg");
-            mediaTypes.put("wav", "audio/wav");
-            mediaTypes.put("mp3", "audio/mp3");
-            mediaTypes.put("mp4", "video/mpeg4");
-            mediaTypes.put("txt", "text/plain");
-            mediaTypes.put("xls", "application/x-xls");
-            mediaTypes.put("xml", "text/xml");
-            mediaTypes.put("apk", "application/vnd.android.package-archive");
-            mediaTypes.put("doc", "application/msword");
-            mediaTypes.put("pdf", "application/pdf");
-            mediaTypes.put("html", "text/html");
-            preprocessors = new ArrayList<>();
-        }
-
-        private Builder(HttpClient hc) {
-            this.client = hc.client;
-            this.baseUrl = hc.baseUrl;
-            this.mediaTypes = hc.mediaTypes;
-            this.preprocessors = new ArrayList<>();
-            Collections.addAll(this.preprocessors, hc.preprocessors);
-            this.downloadListener = hc.executor.downloadListener;
-            this.responseListener = hc.executor.responseListener;
-            this.exceptionListener = hc.executor.exceptionListener;
-            this.completeListener = hc.executor.completeListener;
-            this.jsonService = hc.executor.jsonService;
-            this.preprocTimeoutTimes = hc.preprocTimeoutTimes;
-        }
-
-        /**
-         * 配置 OkHttpClient
-         *
-         * @param configurator 配置器
-         * @return Builder
-         */
-        public Builder config(Configurator configurator) {
-            this.configurator = configurator;
-            return this;
-        }
-
-        /**
-         * 设置 baseUrl
-         *
-         * @param baseUrl 全局URL前缀
-         * @return Builder
-         */
-        public Builder baseUrl(String baseUrl) {
-            this.baseUrl = baseUrl;
-            return this;
-        }
-
-        /**
-         * 配置媒体类型
-         *
-         * @param mediaTypes 媒体类型
-         * @return Builder
-         */
-        public Builder mediaTypes(Map<String, String> mediaTypes) {
-            this.mediaTypes.putAll(mediaTypes);
-            return this;
-        }
-
-        /**
-         * 配置媒体类型
-         *
-         * @param key   媒体类型KEY
-         * @param value 媒体类型VALUE
-         * @return Builder
-         */
-        public Builder mediaTypes(String key, String value) {
-            this.mediaTypes.put(key, value);
-            return this;
-        }
-
-        /**
-         * 设置回调执行器，例如实现切换线程功能，只对异步请求有效
-         *
-         * @param executor 回调执行器
-         * @return Builder
-         */
-        public Builder callbackExecutor(Executor executor) {
-            this.mainExecutor = executor;
-            return this;
-        }
-
-        /**
-         * 添加可并行处理请求任务的预处理器
-         *
-         * @param preprocessor 预处理器
-         * @return Builder
-         */
-        public Builder addPreprocessor(Preprocessor preprocessor) {
-            preprocessors.add(preprocessor);
-            return this;
-        }
-
-        /**
-         * 添加预处理器
-         *
-         * @param preprocessor 预处理器
-         * @return Builder
-         */
-        public Builder addSerialPreprocessor(Preprocessor preprocessor) {
-            preprocessors.add(new SerialPreprocessor(preprocessor));
-            return this;
-        }
-        
-        /**
-         * 最大预处理时间（倍数，相当普通请求的超时时间）
-         * 
-         * @param times 普通超时时间的倍数，默认为 10
-         * @return Builder
-         */
-        public Builder preprocTimeoutTimes(int times) {
-        	if (times > 0) {
-        		this.preprocTimeoutTimes = times;
-        	}
-        	return this;
-        }
-
-        /**
-         * 设置全局响应监听
-         *
-         * @param listener 监听器
-         * @return Builder
-         */
-        public Builder responseListener(TaskListener<HttpResult> listener) {
-            this.responseListener = listener;
-            return this;
-        }
-
-        /**
-         * 设置全局异常监听
-         *
-         * @param listener 监听器
-         * @return Builder
-         */
-        public Builder exceptionListener(TaskListener<IOException> listener) {
-            this.exceptionListener = listener;
-            return this;
-        }
-
-        /**
-         * 设置全局完成监听
-         *
-         * @param listener 监听器
-         * @return Builder
-         */
-        public Builder completeListener(TaskListener<State> listener) {
-            this.completeListener = listener;
-            return this;
-        }
-
-        /**
-         * 设置下载监听器
-         *
-         * @param listener 监听器
-         * @return Builder
-         */
-        public Builder downloadListener(DownListener listener) {
-            this.downloadListener = listener;
-            return this;
-        }
-
-        /**
-         * 设置 JSON 服务
-         * @param jsonService JSON 服务
-         * @return Builder
-         */
-        public Builder jsonService(JsonService jsonService) {
-        	this.jsonService = jsonService;
-            return this;
-        }
-        
-        
-        public HTTP build() {
-            if (configurator != null || client == null) {
-                OkHttpClient.Builder builder = new OkHttpClient.Builder();
-                if (configurator != null) {
-                    configurator.config(builder);
-                }
-                client = builder.build();
-            }
-            return new HttpClient(this);
-        }
-
+    public int getPreprocTimeoutTimes() {
+        return preprocTimeoutTimes;
     }
 
 }
