@@ -2,7 +2,10 @@ package com.ejlchina.test;
 
 import com.ejlchina.okhttps.HTTP;
 
+import com.ejlchina.okhttps.JsonObj;
+import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import org.junit.Test;
 
 public class SimpleTests extends BaseTest {
 
@@ -19,15 +22,14 @@ public class SimpleTests extends BaseTest {
      */
 //    @Test
 //    public void testSyncToBean() {
-//    	User u1 = new User(1, "Jack");
-//    	server.enqueue(new MockResponse().setBody(JSON.toJSONString(u1)));
-//    	
-//        User user = http.sync("/users")  // http://localhost:8080/users
+//    	server.enqueue(new MockResponse().setBody("Hello World!"));
+//
+//        JsonObj hello = http.sync("/users")  // http://localhost:8080/users
 //                .get()                              // GET请求
 //                .getBody()                          // 获取响应报文体
-//                .toBean(User.class);                // 得到目标数据
-//        
-//        assertEquals(u1, user);
+//                .toJsonObj();                // 得到目标数据
+//
+//        System.out.println("hello = " + hello);
 //    }
     
     /**
