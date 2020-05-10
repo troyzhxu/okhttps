@@ -256,7 +256,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * @param onMessage 监听器
 	 * @return WebSocketTask
 	 */
-	public WebSocketTask setOnTextMessage(Listener<Message> onMessage) {
+	public WebSocketTask setOnMessage(Listener<Message> onMessage) {
 		this.onMessage = onMessage;
 		return this;
 	}

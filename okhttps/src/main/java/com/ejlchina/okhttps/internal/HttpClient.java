@@ -42,23 +42,17 @@ public class HttpClient implements HTTP {
 
     @Override
     public AsyncHttpTask async(String url) {
-        return new AsyncHttpTask(this, urlPath(url));
+        return new AsyncHttpTask(this, urlPath(url, false));
     }
 
     @Override
     public SyncHttpTask sync(String url) {
-        return new SyncHttpTask(this, urlPath(url));
+        return new SyncHttpTask(this, urlPath(url, false));
     }
 
 	@Override
 	public WebSocketTask webSocket(String url) {
-		String path = urlPath(url);
-		if (path.startsWith("https://")) {
-			path = path.replace("https://", "wss://");
-		} else if (path.startsWith("http://")) {
-			path = path.replace("http://", "ws://");
-		}
-		return new WebSocketTask(this, path);
+		return new WebSocketTask(this, urlPath(url, true));
 	}
     
     @Override
@@ -311,22 +305,34 @@ public class HttpClient implements HTTP {
         return new Builder(this);
     }
 
-    private String urlPath(String urlPath) {
+    private String urlPath(String urlPath, boolean websocket) {
+        String fullUrl;
         if (urlPath == null) {
             if (baseUrl != null) {
-                return baseUrl;
+                fullUrl = baseUrl;
+            } else {
+                throw new HttpException("在设置 BaseUrl 之前，您必须指定具体路径才能发起请求！");
             }
-            throw new HttpException("在设置 BaseUrl 之前，您必须指定具体路径才能发起请求！");
+        } else {
+            boolean isFullPath = urlPath.startsWith("https://")
+                    || urlPath.startsWith("http://")
+                    || urlPath.startsWith("wss://")
+                    || urlPath.startsWith("ws://");
+            if (isFullPath) {
+                fullUrl = urlPath;
+            } else if (baseUrl != null) {
+                fullUrl = baseUrl + urlPath;
+            } else {
+                throw new HttpException("在设置 BaseUrl 之前，您必须使用全路径URL发起请求，当前URL为：" + urlPath);
+            }
         }
-        boolean isFullPath = urlPath.startsWith("https://")
-                || urlPath.startsWith("http://");
-        if (isFullPath) {
-            return urlPath;
+        if (websocket && fullUrl.startsWith("http")) {
+            return fullUrl.replaceFirst("http", "ws");
         }
-        if (baseUrl != null) {
-            return baseUrl + urlPath;
+        if (!websocket && fullUrl.startsWith("ws")) {
+            return fullUrl.replaceFirst("ws", "http");
         }
-        throw new HttpException("在设置 BaseUrl 之前，您必须使用全路径URL发起请求，当前URL为：" + urlPath);
+        return fullUrl;
     }
 
     public static class Builder {
