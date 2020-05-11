@@ -6,11 +6,11 @@ import java.math.BigInteger;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
-public class GsonArr implements Array {
+public class GsonArray implements Array {
 
 	private JsonArray json;
 	
-	public GsonArr(JsonArray json) {
+	public GsonArray(JsonArray json) {
 		this.json = json;
 	}
 
@@ -28,7 +28,7 @@ public class GsonArr implements Array {
 	public Mapper getMapper(int index) {
 		JsonElement subJson = json.get(index);
 		if (subJson != null) {
-			return new GsonObj(subJson.getAsJsonObject());
+			return new GsonMapper(subJson.getAsJsonObject());
 		}
 		return null;
 	}
@@ -37,7 +37,7 @@ public class GsonArr implements Array {
 	public Array getArray(int index) {
 		JsonElement subJson = json.get(index);
 		if (subJson != null) {
-			return new GsonArr(subJson.getAsJsonArray());
+			return new GsonArray(subJson.getAsJsonArray());
 		}
 		return null;
 	}

@@ -7,11 +7,11 @@ import java.util.Set;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class GsonObj implements Mapper {
+public class GsonMapper implements Mapper {
 
 	private JsonObject json;
 	
-	public GsonObj(JsonObject json) {
+	public GsonMapper(JsonObject json) {
 		this.json = json;
 	}
 
@@ -29,7 +29,7 @@ public class GsonObj implements Mapper {
 	public Mapper getMapper(String key) {
 		JsonElement subJson = json.get(key);
 		if (subJson != null) {
-			return new GsonObj(subJson.getAsJsonObject());
+			return new GsonMapper(subJson.getAsJsonObject());
 		}
 		return null;
 	}
@@ -38,7 +38,7 @@ public class GsonObj implements Mapper {
 	public Array getArray(String key) {
 		JsonElement subJson = json.get(key);
 		if (subJson != null) {
-			return new GsonArr(subJson.getAsJsonArray());
+			return new GsonArray(subJson.getAsJsonArray());
 		}
 		return null;
 	}

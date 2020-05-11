@@ -10,11 +10,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class JacksonObj implements Mapper {
+public class JacksonMapper implements Mapper {
 
 	private ObjectNode json;
 	
-	public JacksonObj(ObjectNode json) {
+	public JacksonMapper(ObjectNode json) {
 		this.json = json;
 	}
 
@@ -32,7 +32,7 @@ public class JacksonObj implements Mapper {
 	public Mapper getMapper(String key) {
 		JsonNode subJson = json.get(key);
 		if (subJson != null && subJson.isObject()) {
-			return new JacksonObj((ObjectNode) subJson);
+			return new JacksonMapper((ObjectNode) subJson);
 		}
 		return null;
 	}
@@ -41,7 +41,7 @@ public class JacksonObj implements Mapper {
 	public Array getArray(String key) {
 		JsonNode subJson = json.get(key);
 		if (subJson != null && subJson.isArray()) {
-			return new JacksonArr((ArrayNode) subJson);
+			return new JacksonArray((ArrayNode) subJson);
 		}
 		return null;
 	}

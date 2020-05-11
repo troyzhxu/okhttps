@@ -32,7 +32,7 @@ public class JacksonService implements JsonService {
 		try {
 			JsonNode json = objectMapper.readTree(in);
 			if (json.isObject()) {
-				return new JacksonObj((ObjectNode) json);
+				return new JacksonMapper((ObjectNode) json);
 			}
 			if (json.isNull() || json.isMissingNode()) {
 				return null;
@@ -48,7 +48,7 @@ public class JacksonService implements JsonService {
 		try {
 			JsonNode json = objectMapper.readTree(in);
 			if (json.isArray()) {
-				return new JacksonArr((ArrayNode) json);
+				return new JacksonArray((ArrayNode) json);
 			}
 			if (json.isNull() || json.isMissingNode()) {
 				return null;
