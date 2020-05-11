@@ -40,7 +40,7 @@ public class HttpUtils {
         if (http != null) {
             return http;
         }
-        http = HTTP.builder().jsonService(findJsonService(new String[] {
+        http = HTTP.builder().msgConvertor(findJsonService(new String[] {
                 "com.ejlchina.okhttps.GsonService",
                 "com.ejlchina.okhttps.FastJsonService",
                 "com.ejlchina.okhttps.JacksonService"
@@ -48,7 +48,7 @@ public class HttpUtils {
         return http;
     }
 
-    static private JsonService findJsonService(String[] classes, int index) {
+    static private MsgConvertor findJsonService(String[] classes, int index) {
         if (index >= classes.length) {
             return null;
         }
@@ -56,11 +56,11 @@ public class HttpUtils {
         try {
             clazz = Class.forName(classes[0]);
         } catch (Exception ignore) {}
-        if (clazz == null || !JsonService.class.isAssignableFrom(clazz)) {
+        if (clazz == null || !MsgConvertor.class.isAssignableFrom(clazz)) {
             return findJsonService(classes, index + 1);
         }
         try {
-            return (JsonService) clazz.getDeclaredConstructor().newInstance();
+            return (MsgConvertor) clazz.getDeclaredConstructor().newInstance();
         } catch (Exception ignore) {
             return null;
         }

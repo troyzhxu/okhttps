@@ -11,15 +11,15 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-public class GsonService implements JsonService {
+public class GsonMsgConvertor implements MsgConvertor {
 
 	private Gson gson;
 	
-	public GsonService() {
+	public GsonMsgConvertor() {
 		this(new Gson());
 	}
 	
-	public GsonService(Gson gson) {
+	public GsonMsgConvertor(Gson gson) {
 		this.gson = gson;
 	}
 

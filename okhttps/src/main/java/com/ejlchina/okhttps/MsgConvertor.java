@@ -3,8 +3,10 @@ package com.ejlchina.okhttps;
 import java.io.InputStream;
 import java.util.List;
 
-
-public interface JsonService {
+/**
+ * 消息转换器接口
+ */
+public interface MsgConvertor {
 
 	/**
 	 * 解析 Mapper
@@ -52,6 +54,5 @@ public interface JsonService {
 	 * @return Java List
 	 */
 	<T> List<T> toList(Class<T> type, InputStream in);
-	
-	
+
 }

@@ -11,15 +11,15 @@ import com.ejlchina.okhttps.internal.HttpException;
 
 import okio.Okio;
 
-public class FastJsonService implements JsonService {
+public class FastjsonMsgConvertor implements MsgConvertor {
 
 	private Charset charset;
 	
-	public FastJsonService() {
+	public FastjsonMsgConvertor() {
 		this(StandardCharsets.UTF_8);
 	}
 	
-	public FastJsonService(Charset charset) {
+	public FastjsonMsgConvertor(Charset charset) {
 		this.charset = charset;
 	}
 

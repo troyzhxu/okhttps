@@ -10,7 +10,7 @@ import com.ejlchina.okhttps.DownListener;
 import com.ejlchina.okhttps.Download;
 import com.ejlchina.okhttps.HttpResult;
 import com.ejlchina.okhttps.HttpTask;
-import com.ejlchina.okhttps.JsonService;
+import com.ejlchina.okhttps.MsgConvertor;
 import com.ejlchina.okhttps.OnCallback;
 import com.ejlchina.okhttps.TaskListener;
 import com.ejlchina.okhttps.HttpResult.State;
@@ -23,18 +23,18 @@ public class TaskExecutor {
     TaskListener<HttpResult> responseListener;
     TaskListener<IOException> exceptionListener;
     TaskListener<State> completeListener;
-    JsonService jsonService;
+    MsgConvertor msgConvertor;
     
     public TaskExecutor(Executor ioExecutor, Executor mainExecutor, DownListener downloadListener, 
             TaskListener<HttpResult> responseListener, TaskListener<IOException> exceptionListener, 
-            TaskListener<State> completeListener, JsonService jsonService) {
+            TaskListener<State> completeListener, MsgConvertor msgConvertor) {
         this.ioExecutor = ioExecutor;
         this.mainExecutor = mainExecutor;
         this.downloadListener = downloadListener;
         this.responseListener = responseListener;
         this.exceptionListener = exceptionListener;
         this.completeListener = completeListener;
-        this.jsonService = jsonService;
+        this.msgConvertor = msgConvertor;
     }
 
     public Executor getExecutor(boolean onIoThread) {
@@ -99,9 +99,9 @@ public class TaskExecutor {
         }
     }
 
-    public JsonService jsonServiceNotNull() {
-    	if (jsonService != null) {
-    		return jsonService;
+    public MsgConvertor jsonServiceNotNull() {
+    	if (msgConvertor != null) {
+    		return msgConvertor;
     	}
     	throw new IllegalStateException("没有设置 JsonService，不可做 Json 操作！");
     }
@@ -143,8 +143,8 @@ public class TaskExecutor {
         return completeListener;
     }
 
-    public JsonService getJsonService() {
-        return jsonService;
+    public MsgConvertor getMsgConvertor() {
+        return msgConvertor;
     }
 
 }

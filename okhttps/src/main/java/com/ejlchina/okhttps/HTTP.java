@@ -110,7 +110,7 @@ public interface HTTP {
 
         private TaskListener<HttpResult.State> completeListener;
 
-        private JsonService jsonService;
+        private MsgConvertor msgConvertor;
 
         private int preprocTimeoutTimes = 10;
 
@@ -144,7 +144,7 @@ public interface HTTP {
             this.responseListener = executor.getResponseListener();
             this.exceptionListener = executor.getExceptionListener();
             this.completeListener = executor.getCompleteListener();
-            this.jsonService = executor.getJsonService();
+            this.msgConvertor = executor.getMsgConvertor();
             this.preprocTimeoutTimes = hc.getPreprocTimeoutTimes();
         }
 
@@ -284,12 +284,12 @@ public interface HTTP {
         }
 
         /**
-         * 设置 JSON 服务
-         * @param jsonService JSON 服务
+         * 设置消息转换器
+         * @param msgConvertor JSON 服务
          * @return Builder
          */
-        public Builder jsonService(JsonService jsonService) {
-            this.jsonService = jsonService;
+        public Builder msgConvertor(MsgConvertor msgConvertor) {
+            this.msgConvertor = msgConvertor;
             return this;
         }
 
@@ -348,8 +348,8 @@ public interface HTTP {
             return completeListener;
         }
 
-        public JsonService getJsonService() {
-            return jsonService;
+        public MsgConvertor getMsgConvertor() {
+            return msgConvertor;
         }
 
         public int getPreprocTimeoutTimes() {

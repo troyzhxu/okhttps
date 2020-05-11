@@ -33,7 +33,7 @@ public class HttpClient implements HTTP {
         this.executor = new TaskExecutor(okClient.dispatcher().executorService(),
                 builder.getMainExecutor(), builder.getDownloadListener(),
                 builder.getResponseListener(), builder.getExceptionListener(),
-                builder.getCompleteListener(), builder.getJsonService());
+                builder.getCompleteListener(), builder.getMsgConvertor());
         this.preprocessors = builder.getPreprocessors().toArray(new Preprocessor[0]);
         this.preprocTimeoutTimes = builder.getPreprocTimeoutTimes();
         this.tagTasks = new LinkedList<>();

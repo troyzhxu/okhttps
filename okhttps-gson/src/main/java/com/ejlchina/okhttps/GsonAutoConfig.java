@@ -4,8 +4,8 @@ public class GsonAutoConfig implements OkHttps.Config {
 
     @Override
     public void withConfig(HTTP.Builder builder) {
-        if (builder.getJsonService() == null) {
-            builder.jsonService(new GsonService());
+        if (builder.getMsgConvertor() == null) {
+            builder.msgConvertor(new GsonMsgConvertor());
         }
     }
 

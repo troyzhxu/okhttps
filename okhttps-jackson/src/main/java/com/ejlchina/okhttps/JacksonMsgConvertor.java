@@ -15,15 +15,15 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.CollectionType;
 
-public class JacksonService implements JsonService {
+public class JacksonMsgConvertor implements MsgConvertor {
 
 	private ObjectMapper objectMapper;
 	
-	public JacksonService() {
+	public JacksonMsgConvertor() {
 		this(new ObjectMapper());
 	}
 	
-	public JacksonService(ObjectMapper objectMapper) {
+	public JacksonMsgConvertor(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
 	}
 
