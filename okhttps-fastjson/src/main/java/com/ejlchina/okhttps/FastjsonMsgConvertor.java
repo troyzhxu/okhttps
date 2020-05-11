@@ -1,61 +1,49 @@
 package com.ejlchina.okhttps;
 
+import com.alibaba.fastjson.JSON;
+import com.ejlchina.okhttps.internal.HttpException;
+import okio.Okio;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-
-import com.alibaba.fastjson.JSON;
-import com.ejlchina.okhttps.internal.HttpException;
-
-import okio.Okio;
 
 public class FastjsonMsgConvertor implements MsgConvertor, ConvertProvider {
 
-	private Charset charset;
-	
-	public FastjsonMsgConvertor() {
-		this(StandardCharsets.UTF_8);
-	}
-	
-	public FastjsonMsgConvertor(Charset charset) {
-		this.charset = charset;
-	}
-
 	@Override
 	public String mediaType() {
-		return "application/json; charset=" + charset.displayName();
+		return "application/json";
 	}
 
 	@Override
-	public Mapper toMapper(InputStream in) {
-		return new FastjsonMapper(JSON.parseObject(toString(in)));
+	public Mapper toMapper(InputStream in, Charset charset) {
+		return new FastjsonMapper(JSON.parseObject(toString(in, charset)));
 	}
 
 	@Override
-	public Array toArray(InputStream in) {
-		return new FastjsonArray(JSON.parseArray(toString(in)));
+	public Array toArray(InputStream in, Charset charset) {
+		return new FastjsonArray(JSON.parseArray(toString(in, charset)));
 	}
 
 	@Override
-	public byte[] serialize(Object bean) {
+	public byte[] serialize(Object bean, Charset charset) {
 		return JSON.toJSONString(bean).getBytes(charset);
 	}
 
 	@Override
-	public byte[] serialize(Object bean, String dateFormat) {
+	public byte[] serialize(Object bean, String dateFormat, Charset charset) {
 		return JSON.toJSONStringWithDateFormat(bean, dateFormat).getBytes(charset);
 	}
 
 	@Override
-	public <T> T toBean(Class<T> type, InputStream in) {
-		return JSON.parseObject(toString(in), type);
+	public <T> T toBean(Class<T> type, InputStream in, Charset charset) {
+		return JSON.parseObject(toString(in, charset), type);
 	}
 
 	@Override
-	public <T> List<T> toList(Class<T> type, InputStream in) {
-		return JSON.parseArray(toString(in), type);
+	public <T> List<T> toList(Class<T> type, InputStream in, Charset charset) {
+		return JSON.parseArray(toString(in, charset), type);
 	}
 
 	@Override
@@ -63,20 +51,12 @@ public class FastjsonMsgConvertor implements MsgConvertor, ConvertProvider {
 		return new FastjsonMsgConvertor();
 	}
 
-	private String toString(InputStream in) {
+	private String toString(InputStream in, Charset charset) {
 		try {
 			return Okio.buffer(Okio.source(in)).readString(charset);
 		} catch (IOException e) {
 			throw new HttpException("读取文本异常", e);
 		}
-	}
-
-	public Charset getCharset() {
-		return charset;
-	}
-
-	public void setCharset(Charset charset) {
-		this.charset = charset;
 	}
 
 }

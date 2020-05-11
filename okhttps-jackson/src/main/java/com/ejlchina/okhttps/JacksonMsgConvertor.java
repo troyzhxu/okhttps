@@ -21,24 +21,21 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 
 	private ObjectMapper objectMapper;
 
-	private Charset charset;
-
 	public JacksonMsgConvertor() {
-		this(new ObjectMapper(), StandardCharsets.UTF_8);
+		this(new ObjectMapper());
 	}
 	
-	public JacksonMsgConvertor(ObjectMapper objectMapper, Charset charset) {
+	public JacksonMsgConvertor(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
-		this.charset = charset;
 	}
 
 	@Override
 	public String mediaType() {
-		return "application/json; charset=" + charset.displayName();
+		return "application/json";
 	}
 
 	@Override
-	public Mapper toMapper(InputStream in) {
+	public Mapper toMapper(InputStream in, Charset charset) {
 		try {
 			JsonNode json = objectMapper.readTree(in);
 			if (json.isObject()) {
@@ -54,7 +51,7 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 	}
 
 	@Override
-	public Array toArray(InputStream in) {
+	public Array toArray(InputStream in, Charset charset) {
 		try {
 			JsonNode json = objectMapper.readTree(in);
 			if (json.isArray()) {
@@ -70,7 +67,7 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 	}
 
 	@Override
-	public byte[] serialize(Object bean) {
+	public byte[] serialize(Object bean, Charset charset) {
 		try {
 			objectMapper.writeValueAsBytes(bean);
 			return objectMapper.writeValueAsString(bean).getBytes(charset);
@@ -80,7 +77,7 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 	}
 
 	@Override
-	public byte[] serialize(Object bean, String dateFormat) {
+	public byte[] serialize(Object bean, String dateFormat, Charset charset) {
 		ObjectMapper mapper = objectMapper.copy();
 		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 		mapper.setDateFormat(new SimpleDateFormat(dateFormat));
@@ -92,7 +89,7 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 	}
 
 	@Override
-	public <T> T toBean(Class<T> type, InputStream in) {
+	public <T> T toBean(Class<T> type, InputStream in, Charset charset) {
 		try {
 			return objectMapper.readValue(in, type);
 		} catch (IOException e) {
@@ -101,7 +98,7 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 	}
 
 	@Override
-	public <T> List<T> toList(Class<T> type, InputStream in) {
+	public <T> List<T> toList(Class<T> type, InputStream in, Charset charset) {
 		CollectionType javaType = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, type);
 		try {
 			return objectMapper.readValue(in, javaType);
@@ -123,11 +120,4 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 		this.objectMapper = objectMapper;
 	}
 
-	public Charset getCharset() {
-		return charset;
-	}
-
-	public void setCharset(Charset charset) {
-		this.charset = charset;
-	}
 }

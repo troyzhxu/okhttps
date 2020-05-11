@@ -16,49 +16,47 @@ import com.google.gson.reflect.TypeToken;
 public class GsonMsgConvertor implements MsgConvertor, ConvertProvider {
 
 	private Gson gson;
-	private Charset charset;
 
 	public GsonMsgConvertor() {
-		this(new Gson(), StandardCharsets.UTF_8);
+		this(new Gson());
 	}
 	
-	public GsonMsgConvertor(Gson gson, Charset charset) {
+	public GsonMsgConvertor(Gson gson) {
 		this.gson = gson;
-		this.charset = charset;
 	}
 
 	@Override
 	public String mediaType() {
-		return "application/json; charset=" + charset.displayName();
+		return "application/json";
 	}
 
 	@Override
-	public Mapper toMapper(InputStream in) {
+	public Mapper toMapper(InputStream in, Charset charset) {
 		return new GsonMapper(gson.fromJson(new InputStreamReader(in), JsonObject.class));
 	}
 
 	@Override
-	public Array toArray(InputStream in) {
+	public Array toArray(InputStream in, Charset charset) {
 		return new GsonArray(gson.fromJson(new InputStreamReader(in), JsonArray.class));
 	}
 
 	@Override
-	public byte[] serialize(Object bean) {
+	public byte[] serialize(Object bean, Charset charset) {
 		return gson.toJson(bean).getBytes(charset);
 	}
 
 	@Override
-	public byte[] serialize(Object bean, String dateFormat) {
+	public byte[] serialize(Object bean, String dateFormat, Charset charset) {
 		return gson.newBuilder().setDateFormat(dateFormat).create().toJson(bean).getBytes(charset);
 	}
 
 	@Override
-	public <T> T toBean(Class<T> type, InputStream in) {
+	public <T> T toBean(Class<T> type, InputStream in, Charset charset) {
 		return gson.fromJson(new InputStreamReader(in), type);
 	}
 
 	@Override
-	public <T> List<T> toList(Class<T> type, InputStream in) {
+	public <T> List<T> toList(Class<T> type, InputStream in, Charset charset) {
 		T[] beans = gson.fromJson(new InputStreamReader(in), TypeToken.getArray(type).getType());
 		List<T> list = new ArrayList<>();
 		Collections.addAll(list, beans);
