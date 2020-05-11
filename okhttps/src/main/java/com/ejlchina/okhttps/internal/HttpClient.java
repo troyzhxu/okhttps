@@ -26,27 +26,22 @@ public class HttpClient implements HTTP {
     final int preprocTimeoutTimes;
     // 编码格式
     final Charset charset;
-    // Mapper的媒体类型
-    final MediaType mapperType;
+    // 默认的请求体类型
+    final String bodyType;
 
     public HttpClient(Builder builder) {
         this.okClient = builder.okClient();
         this.baseUrl = builder.baseUrl();
         this.mediaTypes = builder.getMediaTypes();
-        MsgConvertor convertor = builder.msgConvertor();
         this.executor = new TaskExecutor(okClient.dispatcher().executorService(),
                 builder.mainExecutor(), builder.downloadListener(),
                 builder.responseListener(), builder.exceptionListener(),
-                builder.completeListener(), convertor);
-        this.preprocessors = builder.preprocessors().toArray(new Preprocessor[0]);
+                builder.completeListener(), builder.msgConvertors());
+        this.preprocessors = builder.preprocessors();
         this.preprocTimeoutTimes = builder.preprocTimeoutTimes();
         this.charset = builder.charset();
+        this.bodyType = builder.bodyType();
         this.tagTasks = new LinkedList<>();
-        String mediaType = convertor != null ? convertor.mediaType() : null;
-        if (mediaType == null) {
-            mediaType = "application/json";
-        }
-        this.mapperType = MediaType.parse(mediaType + "; charset=" + charset.name());
     }
 
     @Override
@@ -368,8 +363,9 @@ public class HttpClient implements HTTP {
         return charset;
     }
 
-    public MediaType mapperType() {
-        return mapperType;
+    public String bodyType() {
+        return bodyType;
     }
+
 
 }

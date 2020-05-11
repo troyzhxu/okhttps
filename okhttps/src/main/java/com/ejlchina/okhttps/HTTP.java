@@ -127,11 +127,13 @@ public interface HTTP {
 
         private TaskListener<HttpResult.State> completeListener;
 
-        private MsgConvertor msgConvertor;
+        private List<MsgConvertor> msgConvertors;
 
         private int preprocTimeoutTimes = 10;
 
         private Charset charset = StandardCharsets.UTF_8;
+
+        private String bodyType = "json";
 
         public Builder() {
             mediaTypes = new HashMap<>();
@@ -150,6 +152,7 @@ public interface HTTP {
             mediaTypes.put("pdf", "application/pdf");
             mediaTypes.put("html", "text/html");
             preprocessors = new ArrayList<>();
+            msgConvertors = new ArrayList<>();
         }
 
         public Builder(HttpClient hc) {
@@ -163,9 +166,11 @@ public interface HTTP {
             this.responseListener = executor.getResponseListener();
             this.exceptionListener = executor.getExceptionListener();
             this.completeListener = executor.getCompleteListener();
-            this.msgConvertor = executor.getMsgConvertor();
+            this.msgConvertors = new ArrayList<>();
+            Collections.addAll(this.msgConvertors, executor.getMsgConvertors());
             this.preprocTimeoutTimes = hc.preprocTimeoutTimes();
             this.charset = hc.charset();
+            this.bodyType = hc.bodyType();
         }
 
         /**
@@ -197,7 +202,9 @@ public interface HTTP {
          * @return Builder
          */
         public Builder mediaTypes(Map<String, String> mediaTypes) {
-            this.mediaTypes.putAll(mediaTypes);
+            if (mediaTypes != null) {
+                this.mediaTypes.putAll(mediaTypes);
+            }
             return this;
         }
 
@@ -209,7 +216,9 @@ public interface HTTP {
          * @return Builder
          */
         public Builder mediaTypes(String key, String value) {
-            this.mediaTypes.put(key, value);
+            if (key != null && value != null) {
+                this.mediaTypes.put(key, value);
+            }
             return this;
         }
 
@@ -231,7 +240,9 @@ public interface HTTP {
          * @return Builder
          */
         public Builder addPreprocessor(Preprocessor preprocessor) {
-            preprocessors.add(preprocessor);
+            if (preprocessor != null) {
+                preprocessors.add(preprocessor);
+            }
             return this;
         }
 
@@ -242,7 +253,9 @@ public interface HTTP {
          * @return Builder
          */
         public Builder addSerialPreprocessor(Preprocessor preprocessor) {
-            preprocessors.add(new HttpClient.SerialPreprocessor(preprocessor));
+            if (preprocessor != null) {
+                preprocessors.add(new HttpClient.SerialPreprocessor(preprocessor));
+            }
             return this;
         }
 
@@ -304,22 +317,41 @@ public interface HTTP {
         }
 
         /**
-         * 设置消息转换器
+         * @since 2.0.0
+         * 添加消息转换器
          * @param msgConvertor JSON 服务
          * @return Builder
          */
-        public Builder msgConvertor(MsgConvertor msgConvertor) {
-            this.msgConvertor = msgConvertor;
+        public Builder addMsgConvertor(MsgConvertor msgConvertor) {
+            if (msgConvertor != null) {
+                this.msgConvertors.add(msgConvertor);
+            }
             return this;
         }
 
         /**
+         * @since 2.0.0
          * 设置默认编码格式
          * @param charset 编码
          * @return Builder
          */
         public Builder defaultCharset(Charset charset) {
-            this.charset = charset;
+            if (charset != null) {
+                this.charset = charset;
+            }
+            return this;
+        }
+
+        /**
+         * @since 2.0.0
+         * 设置默认请求体类型
+         * @param bodyType 请求体类型
+         * @return Builder
+         */
+        public Builder defaultBodyType(String bodyType) {
+            if (bodyType != null) {
+                this.bodyType = bodyType;
+            }
             return this;
         }
 
@@ -354,8 +386,8 @@ public interface HTTP {
             return mainExecutor;
         }
 
-        public List<Preprocessor> preprocessors() {
-            return preprocessors;
+        public Preprocessor[] preprocessors() {
+            return preprocessors.toArray(new Preprocessor[0]);
         }
 
         public DownListener downloadListener() {
@@ -374,8 +406,8 @@ public interface HTTP {
             return completeListener;
         }
 
-        public MsgConvertor msgConvertor() {
-            return msgConvertor;
+        public MsgConvertor[] msgConvertors() {
+            return msgConvertors.toArray(new MsgConvertor[0]);
         }
 
         public int preprocTimeoutTimes() {
@@ -384,6 +416,10 @@ public interface HTTP {
 
         public Charset charset() {
             return charset;
+        }
+
+        public String bodyType() {
+            return bodyType;
         }
 
     }

@@ -14,7 +14,6 @@ import com.ejlchina.okhttps.MsgConvertor;
 import com.ejlchina.okhttps.OnCallback;
 import com.ejlchina.okhttps.TaskListener;
 import com.ejlchina.okhttps.HttpResult.State;
-import okhttp3.MediaType;
 
 public class TaskExecutor {
 
@@ -24,18 +23,18 @@ public class TaskExecutor {
     private TaskListener<HttpResult> responseListener;
     private TaskListener<IOException> exceptionListener;
     private TaskListener<State> completeListener;
-    private MsgConvertor msgConvertor;
+    private MsgConvertor[] msgConvertors;
     
     public TaskExecutor(Executor ioExecutor, Executor mainExecutor, DownListener downloadListener, 
             TaskListener<HttpResult> responseListener, TaskListener<IOException> exceptionListener, 
-            TaskListener<State> completeListener, MsgConvertor msgConvertor) {
+            TaskListener<State> completeListener, MsgConvertor[] msgConvertors) {
         this.ioExecutor = ioExecutor;
         this.mainExecutor = mainExecutor;
         this.downloadListener = downloadListener;
         this.responseListener = responseListener;
         this.exceptionListener = exceptionListener;
         this.completeListener = completeListener;
-        this.msgConvertor = msgConvertor;
+        this.msgConvertors = msgConvertors;
     }
 
     public Executor getExecutor(boolean onIoThread) {
@@ -100,11 +99,52 @@ public class TaskExecutor {
         }
     }
 
-    public MsgConvertor convertor() {
-    	if (msgConvertor != null) {
-    		return msgConvertor;
-    	}
-    	throw new IllegalStateException("没有设置 MsgConvertor，不可做转换操作！");
+    public interface ConvertFunc<T> {
+
+        T apply(MsgConvertor convertor);
+
+    }
+
+    public static class Data<T> {
+
+        public T data;
+        public String mediaType;
+
+        public Data(T data, String mediaType) {
+            this.data = data;
+            this.mediaType = mediaType;
+        }
+    }
+
+    public <V> Data<V> doMsgConvert(String type, ConvertFunc<V> callable) {
+        Throwable cause = null;
+        for (int i = msgConvertors.length - 1; i >= 0; i--) {
+            MsgConvertor convertor = msgConvertors[i];
+            String mediaType = convertor.mediaType();
+            if (mediaType == null || !mediaType.contains(type)) {
+                continue;
+            }
+            try {
+                return new Data<>(callable.apply(convertor), mediaType);
+            } catch (Exception e) {
+                if (cause != null) {
+                    initRootCause(e, cause);
+                }
+                cause = e;
+            }
+        }
+        if (cause != null) {
+            throw new HttpException("转换失败", cause);
+        }
+        throw new HttpException("没有匹配[" + type + "]类型的转换器！");
+    }
+
+    private void initRootCause(Throwable throwable, Throwable cause) {
+        Throwable lastCause = throwable.getCause();
+        if (lastCause != null) {
+            initRootCause(lastCause, cause);
+        }
+        throwable.initCause(cause);
     }
 
     /**
@@ -144,8 +184,8 @@ public class TaskExecutor {
         return completeListener;
     }
 
-    public MsgConvertor getMsgConvertor() {
-        return msgConvertor;
+    public MsgConvertor[] getMsgConvertors() {
+        return msgConvertors;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.ejlchina.okhttps;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -19,7 +20,7 @@ public interface MsgConvertor {
 	 * 解析 Mapper
 	 * @param in JSON 输入流
 	 * @param charset 编码格式
-	 * @return JsonObj
+	 * @return Mapper
 	 */
 	Mapper toMapper(InputStream in, Charset charset);
 	
@@ -27,26 +28,26 @@ public interface MsgConvertor {
 	 * 解析 Array
 	 * @param in JSON 输入流
 	 * @param charset 编码格式
-	 * @return JsonArr
+	 * @return Array
 	 */
 	Array toArray(InputStream in, Charset charset);
 	
 	/**
 	 * 将 Java 对象序列化为字节数组
-	 * @param bean Java Bean
+	 * @param object Java 对象
 	 * @param charset 编码格式
 	 * @return 字节数组
 	 */
-	byte[] serialize(Object bean, Charset charset);
+	byte[] serialize(Object object, Charset charset);
 	
 	/**
 	 * 将 Java 对象序列化为字节数组
-	 * @param bean Java Bean
+	 * @param object Java 对象
 	 * @param dateFormat 日期类的处理格式
 	 * @param charset 编码格式
 	 * @return 字节数组
 	 */
-	byte[] serialize(Object bean, String dateFormat, Charset charset);
+	byte[] serialize(Object object, String dateFormat, Charset charset);
 	
 	/**
 	 * 解析 Java Bean
@@ -67,5 +68,66 @@ public interface MsgConvertor {
 	 * @return Java List
 	 */
 	<T> List<T> toList(Class<T> type, InputStream in, Charset charset);
+
+
+	class FormMsgConvertor implements MsgConvertor {
+
+		MsgConvertor convertor;
+
+		public FormMsgConvertor(MsgConvertor convertor) {
+			this.convertor = convertor;
+		}
+
+		@Override
+		public String mediaType() {
+			return "application/x-www-form-urlencoded";
+		}
+
+		@Override
+		public Mapper toMapper(InputStream in, Charset charset) {
+			return convertor.toMapper(in, charset);
+		}
+
+		@Override
+		public Array toArray(InputStream in, Charset charset) {
+			return convertor.toArray(in, charset);
+		}
+
+		@Override
+		public byte[] serialize(Object object, Charset charset) {
+			return serialize(object, null, charset);
+		}
+
+		@Override
+		public byte[] serialize(Object object, String dateFormat, Charset charset) {
+			if (object instanceof byte[]) {
+				return (byte[]) object;
+			}
+			if (object instanceof String) {
+				return object.toString().getBytes(charset);
+			}
+			byte[] data = convertor.serialize(object, dateFormat, charset);
+			Mapper mapper = convertor.toMapper(new ByteArrayInputStream(data), charset);
+			StringBuilder sb = new StringBuilder();
+			for (String key: mapper.keySet()) {
+				sb.append(key).append('=').append(mapper.getString(key)).append('&');
+			}
+			if (sb.length() > 1) {
+				sb.deleteCharAt(sb.length() - 1);
+			}
+			return sb.toString().getBytes(charset);
+		}
+
+		@Override
+		public <T> T toBean(Class<T> type, InputStream in, Charset charset) {
+			return convertor.toBean(type, in, charset);
+		}
+
+		@Override
+		public <T> List<T> toList(Class<T> type, InputStream in, Charset charset) {
+			return convertor.toList(type, in, charset);
+		}
+
+	}
 
 }

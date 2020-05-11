@@ -9,17 +9,13 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import com.ejlchina.okhttps.HttpResult.State;
-import com.ejlchina.okhttps.internal.HttpClient;
+import com.ejlchina.okhttps.internal.*;
 import com.ejlchina.okhttps.internal.HttpClient.TagTask;
-import com.ejlchina.okhttps.internal.HttpException;
-import com.ejlchina.okhttps.internal.ProcessRequestBody;
-import com.ejlchina.okhttps.internal.RealHttpResult;
 
 import okhttp3.*;
 import okhttp3.internal.Util;
@@ -43,9 +39,10 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     private Map<String, String> pathParams;
     private Map<String, String> urlParams;
     private Map<String, String> bodyParams;
-    private Map<String, Object> jsonParams;
     private Map<String, FilePara> files;
-    private byte[] requestJson;
+    private Object requestBody;
+    private String dateFormat;
+    private String bodyType;
     private OnCallback<Process> onProcess;
     private boolean pOnIO;
     private long stepBytes = 0;
@@ -55,14 +52,17 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     
     private TagTask tagTask;
     private Cancelable canceler;
+    private Charset charset;
 
     protected boolean skipPreproc = false;
     protected boolean skipSerialPreproc = false;
-    
-    
+
+
     public HttpTask(HttpClient httpClient, String url) {
-        this.httpClient = httpClient;
         this.urlPath = url;
+        this.httpClient = httpClient;
+        this.charset = httpClient.charset();
+        this.bodyType = httpClient.bodyType();
     }
 
     /**
@@ -137,14 +137,19 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
 		this.skipSerialPreproc = true;
 		return (C) this;
 	}
-	
+
+    @Deprecated
+    public C setTag(String tag) {
+	    return tag(tag);
+    }
+
     /**
+     * @since 2.2.0
      * 为请求任务添加标签
-     * v1.0.4 之后，若 set 多次，标签将连接在一起
      * @param tag 标签
      * @return HttpTask 实例
      */
-    public C setTag(String tag) {
+    public C tag(String tag) {
         if (tag != null) {
             if (this.tag != null) {
                 this.tag = this.tag + "." + tag;
@@ -155,7 +160,33 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         }
         return (C) this;
     }
-    
+
+    /**
+     * @since 2.0.0
+     * 设置该请求的编码格式
+     * @param charset 编码格式
+     * @return HttpTask 实例
+     */
+    public C charset(Charset charset) {
+        if (charset != null) {
+            this.charset = charset;
+        }
+        return (C) this;
+    }
+
+    /**
+     * @since 2.0.0
+     * 设置请求体的类型，如：form、json、xml、protobuf 等，默认为 form
+     * @param type 请求类型
+     * @return HttpTask 实例
+     */
+    public C bodyType(String type) {
+        if (type != null) {
+            this.bodyType = type;
+        }
+        return (C) this;
+    }
+
     /**
      * 下一个回调在IO线程执行
      * @return HttpTask 实例
@@ -261,13 +292,18 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         return (C) this;
     }
 
+    @Deprecated
+    public C addPathParam(String name, Object value) {
+        return addPathPara(name, value);
+    }
+
     /**
      * 路径参数：替换URL里的{name}
      * @param name 参数名
      * @param value 参数值
      * @return HttpTask 实例
      **/
-    public C addPathParam(String name, Object value) {
+    public C addPathPara(String name, Object value) {
         if (name != null && value != null) {
             if (pathParams == null) {
                 pathParams = new HashMap<>();
@@ -277,17 +313,27 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         return (C) this;
     }
 
+    @Deprecated
+    public C addPathParam(Map<String, ?> params) {
+        return addPathPara(params);
+    }
+
     /**
      * 路径参数：替换URL里的{name}
      * @param params 参数集合
      * @return HttpTask 实例
      **/
-    public C addPathParam(Map<String, ?> params) {
+    public C addPathPara(Map<String, ?> params) {
         if (pathParams == null) {
             pathParams = new HashMap<>();
         }
         doAddParams(pathParams, params);
         return (C) this;
+    }
+
+    @Deprecated
+    public C addUrlParam(String name, Object value) {
+        return addUrlPara(name, value);
     }
 
     /**
@@ -296,7 +342,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      * @param value 参数值
      * @return HttpTask 实例
      **/
-    public C addUrlParam(String name, Object value) {
+    public C addUrlPara(String name, Object value) {
         if (name != null && value != null) {
             if (urlParams == null) {
                 urlParams = new HashMap<>();
@@ -306,17 +352,27 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         return (C) this;
     }
 
+    @Deprecated
+    public C addUrlParam(Map<String, ?> params) {
+        return addUrlPara(params);
+    }
+
     /**
      * URL参数：拼接在URL后的参数
      * @param params 参数集合
      * @return HttpTask 实例
      **/
-    public C addUrlParam(Map<String, ?> params) {
+    public C addUrlPara(Map<String, ?> params) {
         if (urlParams == null) {
             urlParams = new HashMap<>();
         }
         doAddParams(urlParams, params);
         return (C) this;
+    }
+
+    @Deprecated
+    public C addBodyParam(String name, Object value) {
+        return addBodyPara(name, value);
     }
 
     /**
@@ -325,7 +381,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      * @param value 参数值
      * @return HttpTask 实例
      **/
-    public C addBodyParam(String name, Object value) {
+    public C addBodyPara(String name, Object value) {
         if (name != null && value != null) {
             if (bodyParams == null) {
                 bodyParams = new HashMap<>();
@@ -335,12 +391,17 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         return (C) this;
     }
 
+    @Deprecated
+    public C addBodyParam(Map<String, ?> params) {
+        return addBodyPara(params);
+    }
+
     /**
      * Body参数：放在Body里的参数
      * @param params 参数集合
      * @return HttpTask 实例
      **/
-    public C addBodyParam(Map<String, ?> params) {
+    public C addBodyPara(Map<String, ?> params) {
         if (bodyParams == null) {
             bodyParams = new HashMap<>();
         }
@@ -350,9 +411,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
 
     private void doAddParams(Map<String, String> taskParams, Map<String, ?> params) {
         if (params != null) {
-            Iterator<String> it = params.keySet().iterator();
-            while (it.hasNext()) {
-                String name = it.next();
+            for (String name : params.keySet()) {
                 Object value = params.get(name);
                 if (name != null && value != null) {
                     taskParams.put(name, value.toString());
@@ -362,67 +421,70 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     /**
+     * 推荐方案：setBodyParam 与 bodyType 方法
      * Json参数：请求体为Json，支持多层结构
      * @param name JSON键名
      * @param value JSON键值
      * @return HttpTask 实例
      */
+    @Deprecated
     public C addJsonParam(String name, Object value) {
-        if (name != null && value != null) {
-            if (jsonParams == null) {
-                jsonParams = new HashMap<>();
-            }
-            jsonParams.put(name, value);
-        }
-        return (C) this;
+        this.bodyType = "json";
+        return addBodyPara(name, value);
     }
 
     /**
+     * 推荐方案：setBodyParam 与 bodyType 方法
      * Json参数：请求体为Json，只支持单层Json
      * 若请求json为多层结构，请使用setRequestJson方法
      * @param params JSON键值集合
      * @return HttpTask 实例
      */
+    @Deprecated
     public C addJsonParam(Map<String, ?> params) {
-        if (params != null) {
-            if (jsonParams == null) {
-                jsonParams = new HashMap<>();
-            }
-            jsonParams.putAll(params);
-        }
-        return (C) this;
+        this.bodyType = "json";
+        return addBodyPara(params);
+    }
+
+    /**
+     * 推荐方案：setBodyPara 与 bodyType 方法
+     * 设置 json 请求体
+     * @param body JSON字符串 或 Java对象（将依据 对象的get方法序列化为 json 字符串）
+     * @return HttpTask 实例
+     **/
+    @Deprecated
+    public C setRequestJson(Object body) {
+        this.bodyType = "json";
+        return setBodyPara(body);
+    }
+
+    /**
+     * 此方法性能较低
+     * 推荐方案：setBodyPara 与 bodyType 方法，日期格式在 Java Bean 上使用注解的方式指定
+     * @param body Json 请求体
+     * @param dateFormat 日期格式
+     * @return HttpTask 实例
+     */
+    @Deprecated
+    public C setRequestJson(Object body, String dateFormat) {
+        this.bodyType = "json";
+        this.dateFormat = dateFormat;
+        return setBodyPara(body);
     }
 
     /**
      * 设置 json 请求体
-     * @param json JSON字符串 或 Java对象（将依据 对象的get方法序列化为 json 字符串）
+     * @param body 请求体，字节数组、字符串 或 Java对象（由 MsgConvertor 来序列化）
      * @return HttpTask 实例
      **/
-    public C setRequestJson(Object json) {
-        return setRequestJson(json, null);
+    public C setBodyPara(Object body) {
+        this.requestBody = body;
+        return (C) this;
     }
 
-    /**
-     * 请求体为json
-     * @param json JSON字符串 或 Java对象，将跟换 bean的get方法序列化程 json 字符串
-     * @param dateFormat 序列化json时对日期类型字段的处理格式
-     * @return HttpTask 实例
-     **/
-    public C setRequestJson(Object json, String dateFormat) {
-        if (json != null) {
-            if (json instanceof byte[]) {
-                requestJson = (byte[]) json;
-            } else if (json instanceof String) {
-                requestJson = json.toString().getBytes(httpClient.charset());
-            } else if (dateFormat != null) {
-                requestJson = httpClient.executor().convertor()
-                		.serialize(json, dateFormat, httpClient.charset());
-            } else {
-                requestJson = httpClient.executor().convertor()
-                		.serialize(json, httpClient.charset());
-            }
-        }
-        return (C) this;
+    @Deprecated
+    public C addFileParam(String name, String filePath) {
+        return addFilePara(name, filePath);
     }
 
     /**
@@ -431,8 +493,13 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      * @param filePath 文件路径
      * @return HttpTask 实例
      */
-    public C addFileParam(String name, String filePath) {
-        return addFileParam(name, new File(filePath));
+    public C addFilePara(String name, String filePath) {
+        return addFilePara(name, new File(filePath));
+    }
+
+    @Deprecated
+    public C addFileParam(String name, File file) {
+        return addFilePara(name, file);
     }
 
     /**
@@ -441,7 +508,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      * @param file 文件
      * @return HttpTask 实例
      */
-    public C addFileParam(String name, File file) {
+    public C addFilePara(String name, File file) {
         if (name != null && file != null && file.exists()) {
             String fileName = file.getName();
             String type = fileName.substring(fileName.lastIndexOf(".") + 1);
@@ -454,17 +521,20 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     /**
+     * 建议直接使用文件上传，使用输入流性能较差
      * 添加文件参数
      * @param name 参数名
      * @param type 文件类型: 如 png、jpg、jpeg 等
      * @param inputStream 文件输入流
      * @return HttpTask 实例
      */
+    @Deprecated
     public C addFileParam(String name, String type, InputStream inputStream) {
         return addFileParam(name, type, null, inputStream);
     }
 
     /**
+     * 建议直接使用文件上传，使用输入流性能较差
      * 添加文件参数
      * @param name 参数名
      * @param type 文件类型: 如 png、jpg、jpeg 等
@@ -472,6 +542,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      * @param input 文件输入流
      * @return HttpTask 实例
      */
+    @Deprecated
     public C addFileParam(String name, String type, String fileName, InputStream input) {
         if (name != null && input != null) {
             byte[] content = null;
@@ -484,9 +555,14 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             } finally {
                 Util.closeQuietly(input);
             }
-            addFileParam(name, type, fileName, content);
+            addFilePara(name, type, fileName, content);
         }
         return (C) this;
+    }
+
+    @Deprecated
+    public C addFileParam(String name, String type, byte[] content) {
+        return addFilePara(name, type, content);
     }
 
     /**
@@ -496,8 +572,13 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      * @param content 文件内容
      * @return HttpTask 实例
      */
-    public C addFileParam(String name, String type, byte[] content) {
-        return addFileParam(name, type, null, content);
+    public C addFilePara(String name, String type, byte[] content) {
+        return addFilePara(name, type, null, content);
+    }
+
+    @Deprecated
+    public C addFileParam(String name, String type, String fileName, byte[] content) {
+        return addFilePara(name, type, fileName, content);
     }
 
     /**
@@ -508,7 +589,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      * @param content 文件内容
      * @return HttpTask 实例
      */
-    public C addFileParam(String name, String type, String fileName, byte[] content) {
+    public C addFilePara(String name, String type, String fileName, byte[] content) {
         if (name != null && content != null) {
             if (files == null) {
                 files = new HashMap<>();
@@ -648,16 +729,38 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         return State.EXCEPTION;
     }
 
-    private RequestBody buildRequestBody() {
-        if (jsonParams != null) {
-            requestJson = httpClient.executor().convertor()
-            		.serialize(jsonParams, httpClient.charset());
+
+    /**
+     * 请求体为json
+     * @param body JSON字符串 或 Java对象，将跟换 bean的get方法序列化程 json 字符串
+     * @return HttpTask 实例
+     **/
+    public C setBodyParaxxx(Object body) {
+        if (bodyType == null) {
+            throw new IllegalArgumentException("type can not be null");
         }
+        if (body != null) {
+            if (body instanceof byte[]) {
+                requestBody = body;
+            } else if (body instanceof String) {
+                requestBody = body.toString().getBytes(charset);
+            } else if (dateFormat != null) {
+                requestBody = httpClient.executor().doMsgConvert(bodyType, (MsgConvertor c) ->
+                        c.serialize(body, dateFormat, charset));
+            } else {
+                requestBody = httpClient.executor().doMsgConvert(bodyType, (MsgConvertor c) ->
+                        c.serialize(body, charset));
+            }
+        }
+        return (C) this;
+    }
+
+    private RequestBody buildRequestBody() {
         if (files != null) {
             MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
             if (bodyParams != null) {
                 for (String name : bodyParams.keySet()) {
-                    byte[] value = bodyParams.get(name).getBytes(httpClient.charset());
+                    byte[] value = bodyParams.get(name).getBytes(charset);
                     RequestBody body = RequestBody.create(null, value);
                     builder.addPart(MultipartBody.Part.createFormData(name, null, body));
                 }
@@ -674,18 +777,34 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
                 builder.addFormDataPart(name, file.fileName, bodyPart);
             }
             return builder.build();
-        } else if (requestJson != null) {
-            return RequestBody.create(httpClient.mapperType(), requestJson);
-        } else {
-            FormBody.Builder builder = new FormBody.Builder(httpClient.charset());
-            if (bodyParams != null) {
-                for (String name : bodyParams.keySet()) {
-                    String value = bodyParams.get(name);
-                    builder.add(name, value);
-                }
+        }
+        if (requestBody != null) {
+            return toRequestBody(requestBody);
+        }
+        if (bodyParams == null) {
+            return new FormBody.Builder(charset).build();
+        }
+        if (bodyType.toLowerCase().contains("form")) {
+            FormBody.Builder builder = new FormBody.Builder(charset);
+            for (String name : bodyParams.keySet()) {
+                String value = bodyParams.get(name);
+                builder.add(name, value);
             }
             return builder.build();
         }
+        return toRequestBody(bodyParams);
+    }
+
+    private RequestBody toRequestBody(Object object) {
+        TaskExecutor.Data<byte[]> data = httpClient.executor()
+                .doMsgConvert(bodyType, (MsgConvertor c)
+                    -> c.serialize(object, dateFormat, charset));
+        byte[] body = data.data;
+        String mediaType = data.mediaType;
+        if (mediaType == null) {
+            mediaType = "application/json";
+        }
+        return RequestBody.create(MediaType.parse(mediaType + "; charset=" + charset.name()), body);
     }
 
     private String buildUrlPath() {
@@ -735,37 +854,26 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
 
     protected void assertNotConflict(boolean isGetRequest) {
         if (isGetRequest) {
-            if (requestJson != null) {
-                throw new HttpException("GET 请求 不能调用 setRequestJson 方法！");
-            }
-            if (jsonParams != null) {
-                throw new HttpException("GET 请求 不能调用 addJsonParam 方法！");
+            if (requestBody != null) {
+                throw new HttpException("GET 请求 不能调用 setBodyPara 方法！");
             }
             if (bodyParams != null) {
-                throw new HttpException("GET 请求 不能调用 addBodyParam 方法！");
+                throw new HttpException("GET 请求 不能调用 addBodyPara 方法！");
             }
             if (files != null) {
-                throw new HttpException("GET 请求 不能调用 addFileParam 方法！");
+                throw new HttpException("GET 请求 不能调用 addFilePara 方法！");
             }
         }
-        if (requestJson != null) {
-            if (jsonParams != null) {
-                throw new HttpException("方法 addJsonParam 与 setRequestJson 不能同时调用！");
-            }
+        if (requestBody != null) {
             if (bodyParams != null) {
-                throw new HttpException("方法 addBodyParam 与 setRequestJson 不能同时调用！");
+                throw new HttpException("方法 addBodyPara 与 setBodyPara 不能同时调用！");
             }
             if (files != null) {
-                throw new HttpException("方法 addFileParam 与 setRequestJson 不能同时调用！");
+                throw new HttpException("方法 addFilePara 与 setBodyPara 不能同时调用！");
             }
         }
-        if (jsonParams != null) {
-            if (bodyParams != null) {
-                throw new HttpException("方法 addBodyParam 与 addJsonParam 不能同时调用！");
-            }
-            if (files != null) {
-                throw new HttpException("方法 addFileParam 与 addJsonParam 不能同时调用！");
-            }
+        if (files != null && "form".equals(bodyType)) {
+            throw new HttpException("方法 addFilePara 只能使用 form 方式请求！");
         }
     }
 
@@ -792,8 +900,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     public Charset charset(Response response) {
         ResponseBody b = response.body();
         MediaType type = b != null ? b.contentType() : null;
-        Charset defaultCharset = httpClient.charset();
-        return type != null ? type.charset(defaultCharset) : defaultCharset;
+        return type != null ? type.charset(charset) : charset;
     }
 
 }
