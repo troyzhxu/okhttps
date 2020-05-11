@@ -69,7 +69,6 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 	@Override
 	public byte[] serialize(Object bean, Charset charset) {
 		try {
-			objectMapper.writeValueAsBytes(bean);
 			return objectMapper.writeValueAsString(bean).getBytes(charset);
 		} catch (JsonProcessingException e) {
 			throw new HttpException("Java Bean [" + bean + "] Jackson 序列化异常", e);
