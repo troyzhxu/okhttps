@@ -1,17 +1,8 @@
 package com.ejlchina.okhttps.internal;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URLDecoder;
-import java.nio.charset.Charset;
 
 import com.ejlchina.okhttps.Download;
 import com.ejlchina.okhttps.HttpResult.Body;
@@ -21,6 +12,7 @@ import com.ejlchina.okhttps.Process;
 
 import okhttp3.MediaType;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import okio.Buffer;
 
 public class ResultBody extends AbstractBody implements Body {
@@ -36,19 +28,29 @@ public class ResultBody extends AbstractBody implements Body {
 	private byte[] data;
 
 	ResultBody(HttpTask<?> httpTask, Response response, TaskExecutor taskExecutor) {
-		super(taskExecutor);
+		super(taskExecutor, httpTask.charset(response));
 		this.httpTask = httpTask;
 		this.response = response;
 	}
 
+
+
 	@Override
 	public MediaType getContentType() {
-		return response.body().contentType();
+		ResponseBody body = response.body();
+		if (body != null) {
+			return body.contentType();
+		}
+		return null;
 	}
 
 	@Override
 	public long getContentLength() {
-		return response.body().contentLength();
+		ResponseBody body = response.body();
+		if (body != null) {
+			return body.contentLength();
+		}
+		return 0;
 	}
 	
 	@Override
@@ -93,7 +95,12 @@ public class ResultBody extends AbstractBody implements Body {
 		if (cached) {
 			input = new ByteArrayInputStream(cacheBytes());
 		} else {
-			input = response.body().byteStream();
+			ResponseBody body = response.body();
+			if (body != null) {
+				input = body.byteStream();
+			} else {
+				input = new ByteArrayInputStream(new byte[]{});
+			}
 		}
 		if (onProcess != null) {
 			long rangeStart = getRangeStart();
@@ -126,21 +133,27 @@ public class ResultBody extends AbstractBody implements Body {
 		if (cached || onProcess != null) {
 			return new InputStreamReader(toByteStream());
 		}
-		return response.body().charStream();
+		ResponseBody body = response.body();
+		if (body != null) {
+			return body.charStream();
+		}
+		return new CharArrayReader(new char[]{});
 	}
-	  
+
 	@Override
 	public String toString() {
 		if (cached || onProcess != null) {
-			MediaType contentType = getContentType();
-			Charset charset = contentType != null ? contentType.charset(UTF_8) : UTF_8;
 			return new String(toBytes(), charset);
 		}
 		try {
-			return response.body().string();
+			ResponseBody body = response.body();
+			if (body != null) {
+				return new String(body.bytes(), charset);
+			}
 		} catch (IOException e) {
 			throw new HttpException("报文体转化字符串出错", e);
 		}
+		return null;
 	}
 
 	@Override
@@ -231,11 +244,15 @@ public class ResultBody extends AbstractBody implements Body {
 				buffer.close();
 			}
 		}
-		try {
-			return response.body().bytes();
-		} catch (IOException e) {
-			throw new HttpException("报文体转化字节数组出错", e);
+		ResponseBody body = response.body();
+		if (body != null) {
+			try {
+				return body.bytes();
+			} catch (IOException e) {
+				throw new HttpException("报文体转化字节数组出错", e);
+			}
 		}
+		return new byte[]{};
 	}
 	
 	private long getRangeStart() {

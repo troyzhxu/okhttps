@@ -1,5 +1,7 @@
 package com.ejlchina.okhttps.internal;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +37,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * @return WebSocket
 	 */
 	public WebSocket listen() {
-		WebSocketImpl socket = new WebSocketImpl(httpClient.executor);
+		WebSocketImpl socket = new WebSocketImpl(httpClient.executor, httpClient.charset);
 		registeTagTask(socket);
 		httpClient.preprocess(this, () -> {
 			synchronized (socket) {
@@ -119,9 +121,12 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		final List<Object> queues = new ArrayList<>();
 		
 		TaskExecutor taskExecutor;
-		
-		public WebSocketImpl(TaskExecutor taskExecutor) {
+
+		Charset charset;
+
+		public WebSocketImpl(TaskExecutor taskExecutor, Charset charset) {
 			this.taskExecutor = taskExecutor;
+			this.charset = charset;
 		}
 
 		@Override
@@ -170,12 +175,12 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 		@Override
 		public boolean send(Object bean) {
-			return send(taskExecutor.convertor().serialize(bean));
+			return send(taskExecutor.convertor().serialize(bean, charset));
 		}
 
 		@Override
 		public boolean send(Object bean, String dateFormat) {
-			return send(taskExecutor.convertor().serialize(bean, dateFormat));
+			return send(taskExecutor.convertor().serialize(bean, dateFormat, charset));
 		}
 		
 		@Override
@@ -224,7 +229,8 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			if (msg instanceof byte[]) {
 				return webSocket.send(ByteString.of((byte[]) msg));
 			}
-			return webSocket.send(taskExecutor.convertor().serialize(msg));
+			byte[] bytes = taskExecutor.convertor().serialize(msg, charset);
+			return webSocket.send(new String(bytes, StandardCharsets.UTF_8));
 		}
 		
 	}

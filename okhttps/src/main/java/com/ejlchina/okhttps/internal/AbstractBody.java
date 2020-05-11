@@ -1,6 +1,7 @@
 package com.ejlchina.okhttps.internal;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import com.ejlchina.okhttps.Array;
@@ -10,10 +11,11 @@ public abstract class AbstractBody {
 
 	
 	protected TaskExecutor taskExecutor;
+	protected Charset charset;
 	
-	
-	public AbstractBody(TaskExecutor taskExecutor) {
+	public AbstractBody(TaskExecutor taskExecutor, Charset charset) {
 		this.taskExecutor = taskExecutor;
+		this.charset = charset;
 	}
 
 	public abstract InputStream toByteStream();
@@ -23,7 +25,7 @@ public abstract class AbstractBody {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Mapper 转换！");
 		}
-		return taskExecutor.convertor().toMapper(toByteStream());
+		return taskExecutor.convertor().toMapper(toByteStream(), charset);
 	}
 
 
@@ -31,7 +33,7 @@ public abstract class AbstractBody {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Array 转换！");
 		}
-		return taskExecutor.convertor().toArray(toByteStream());
+		return taskExecutor.convertor().toArray(toByteStream(), charset);
 	}
 
 
@@ -39,7 +41,7 @@ public abstract class AbstractBody {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Bean 转换！");
 		}
-		return taskExecutor.convertor().toBean(type, toByteStream());
+		return taskExecutor.convertor().toBean(type, toByteStream(), charset);
 	}
 	
 
@@ -47,7 +49,7 @@ public abstract class AbstractBody {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 List 转换！");
 		}
-		return taskExecutor.convertor().toList(type, toByteStream());
+		return taskExecutor.convertor().toList(type, toByteStream(), charset);
 	}
 	
 }

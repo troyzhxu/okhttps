@@ -1,14 +1,13 @@
 package com.ejlchina.okhttps.internal;
 
+import com.ejlchina.okhttps.HttpResult;
+import com.ejlchina.okhttps.HttpTask;
+import okhttp3.Headers;
+import okhttp3.Response;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-
-import com.ejlchina.okhttps.HttpResult;
-import com.ejlchina.okhttps.HttpTask;
-
-import okhttp3.Headers;
-import okhttp3.Response;
 
 
 public class RealHttpResult implements HttpResult {
@@ -111,7 +110,6 @@ public class RealHttpResult implements HttpResult {
     public Response getResponse() {
         return response;
     }
-    
 
     @Override
     public String toString() {

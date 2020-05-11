@@ -7,6 +7,7 @@ import java.net.ConnectException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -20,15 +21,9 @@ import com.ejlchina.okhttps.internal.HttpException;
 import com.ejlchina.okhttps.internal.ProcessRequestBody;
 import com.ejlchina.okhttps.internal.RealHttpResult;
 
-import okhttp3.Call;
-import okhttp3.FormBody;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.Request;
-import okhttp3.RequestBody;
+import okhttp3.*;
 import okhttp3.internal.Util;
 import okio.Buffer;
-
 
 /**
  * Created by 周旭（Troy.Zhou） on 2020/3/11.
@@ -420,13 +415,11 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             } else if (json instanceof String) {
                 requestJson = json.toString().getBytes(httpClient.charset());
             } else if (dateFormat != null) {
-                requestJson = httpClient.executor()
-                		.convertor()
-                		.serialize(json, dateFormat);
+                requestJson = httpClient.executor().convertor()
+                		.serialize(json, dateFormat, httpClient.charset());
             } else {
-                requestJson = httpClient.executor()
-                		.convertor()
-                		.serialize(json);
+                requestJson = httpClient.executor().convertor()
+                		.serialize(json, httpClient.charset());
             }
         }
         return (C) this;
@@ -658,7 +651,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     private RequestBody buildRequestBody() {
         if (jsonParams != null) {
             requestJson = httpClient.executor().convertor()
-            		.serialize(jsonParams);
+            		.serialize(jsonParams, httpClient.charset());
         }
         if (files != null) {
             MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
@@ -794,6 +787,13 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             return new RealHttpResult(this, State.TIMEOUT);
         }
         throw new HttpException(State.TIMEOUT, "执行超时");
+    }
+
+    public Charset charset(Response response) {
+        ResponseBody b = response.body();
+        MediaType type = b != null ? b.contentType() : null;
+        Charset defaultCharset = httpClient.charset();
+        return type != null ? type.charset(defaultCharset) : defaultCharset;
     }
 
 }
