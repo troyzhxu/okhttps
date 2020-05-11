@@ -10,6 +10,8 @@ import okhttp3.Request;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 
+import java.util.ServiceLoader;
+
 /**
  * Http 工具类（可供第三方库，非主应用使用）
  * 若需要配置，请使用 {@link OkHttps } 类
@@ -20,7 +22,6 @@ public class HttpUtils {
 
 
     private static HTTP http;
-
 
     /**
      * 配置HttpUtils持有的HTTP实例（不调用此方法前默认使用一个没有没有经过任何配置的HTTP懒实例）
@@ -40,30 +41,10 @@ public class HttpUtils {
         if (http != null) {
             return http;
         }
-        http = HTTP.builder().msgConvertor(findJsonService(new String[] {
-                "com.ejlchina.okhttps.GsonService",
-                "com.ejlchina.okhttps.FastJsonService",
-                "com.ejlchina.okhttps.JacksonService"
-        }, 0)).build();
+        HTTP.Builder builder = HTTP.builder();
+        ConvertProvider.inject(builder);
+        http = builder.build();
         return http;
-    }
-
-    static private MsgConvertor findJsonService(String[] classes, int index) {
-        if (index >= classes.length) {
-            return null;
-        }
-        Class<?> clazz = null;
-        try {
-            clazz = Class.forName(classes[0]);
-        } catch (Exception ignore) {}
-        if (clazz == null || !MsgConvertor.class.isAssignableFrom(clazz)) {
-            return findJsonService(classes, index + 1);
-        }
-        try {
-            return (MsgConvertor) clazz.getDeclaredConstructor().newInstance();
-        } catch (Exception ignore) {
-            return null;
-        }
     }
 
     /**

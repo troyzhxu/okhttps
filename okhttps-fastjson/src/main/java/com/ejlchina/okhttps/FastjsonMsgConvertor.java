@@ -11,7 +11,7 @@ import com.ejlchina.okhttps.internal.HttpException;
 
 import okio.Okio;
 
-public class FastjsonMsgConvertor implements MsgConvertor {
+public class FastjsonMsgConvertor implements MsgConvertor, ConvertProvider {
 
 	private Charset charset;
 	
@@ -51,6 +51,11 @@ public class FastjsonMsgConvertor implements MsgConvertor {
 	@Override
 	public <T> List<T> toList(Class<T> type, InputStream in) {
 		return JSON.parseArray(toString(in), type);
+	}
+
+	@Override
+	public MsgConvertor getConvertor() {
+		return new FastjsonMsgConvertor();
 	}
 
 	private String toString(InputStream in) {

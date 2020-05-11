@@ -11,7 +11,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-public class GsonMsgConvertor implements MsgConvertor {
+public class GsonMsgConvertor implements MsgConvertor, ConvertProvider {
 
 	private Gson gson;
 	
@@ -56,6 +56,11 @@ public class GsonMsgConvertor implements MsgConvertor {
 		return list;
 	}
 
+	@Override
+	public MsgConvertor getConvertor() {
+		return new GsonMsgConvertor();
+	}
+
 	public Gson getGson() {
 		return gson;
 	}
@@ -63,7 +68,7 @@ public class GsonMsgConvertor implements MsgConvertor {
 	public void setGson(Gson gson) {
 		this.gson = gson;
 	}
-	
+
 }
 
 

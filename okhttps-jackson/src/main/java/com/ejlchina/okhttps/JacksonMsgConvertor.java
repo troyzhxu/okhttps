@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.CollectionType;
 
-public class JacksonMsgConvertor implements MsgConvertor {
+public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 
 	private ObjectMapper objectMapper;
 	
@@ -97,6 +97,11 @@ public class JacksonMsgConvertor implements MsgConvertor {
 		} catch (IOException e) {
 			throw new HttpException("Jackson 解析异常", e);
 		}
+	}
+
+	@Override
+	public MsgConvertor getConvertor() {
+		return new JacksonMsgConvertor();
 	}
 
 	public ObjectMapper getObjectMapper() {

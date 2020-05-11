@@ -88,6 +88,21 @@ public interface HTTP {
     }
 
 
+    /**
+     * Http 配置器
+     *
+     */
+    interface OkConfig {
+
+        /**
+         * 使用 builder 配置 HttpClient
+         * @param builder OkHttpClient 构建器
+         */
+        void config(OkHttpClient.Builder builder);
+
+    }
+
+
     class Builder {
 
         private OkHttpClient okClient;
@@ -96,7 +111,7 @@ public interface HTTP {
 
         private Map<String, String> mediaTypes;
 
-        private Configurator configurator;
+        private OkConfig config;
 
         private Executor mainExecutor;
 
@@ -151,11 +166,11 @@ public interface HTTP {
         /**
          * 配置 OkHttpClient
          *
-         * @param configurator 配置器
+         * @param config 配置器
          * @return Builder
          */
-        public Builder config(Configurator configurator) {
-            this.configurator = configurator;
+        public Builder config(OkConfig config) {
+            this.config = config;
             return this;
         }
 
@@ -298,10 +313,10 @@ public interface HTTP {
          * @return HTTP
          */
         public HTTP build() {
-            if (configurator != null || okClient == null) {
+            if (config != null || okClient == null) {
                 OkHttpClient.Builder builder = new OkHttpClient.Builder();
-                if (configurator != null) {
-                    configurator.config(builder);
+                if (config != null) {
+                    config.config(builder);
                 }
                 okClient = builder.build();
             }
@@ -318,10 +333,6 @@ public interface HTTP {
 
         public Map<String, String> getMediaTypes() {
             return mediaTypes;
-        }
-
-        public Configurator getConfigurator() {
-            return configurator;
         }
 
         public Executor getMainExecutor() {

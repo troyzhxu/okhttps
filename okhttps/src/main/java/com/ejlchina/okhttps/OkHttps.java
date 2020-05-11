@@ -16,11 +16,6 @@ public final class OkHttps {
 
     private OkHttps() {}
 
-    public interface Config {
-
-        void withConfig(HTTP.Builder builder);
-
-    }
 
     private static HTTP http;
 
@@ -29,9 +24,8 @@ public final class OkHttps {
             return http;
         }
         HTTP.Builder builder = HTTP.builder();
-        for (Config config : ServiceLoader.load(Config.class)) {
-            config.withConfig(builder);
-        }
+        ConvertProvider.inject(builder);
+        Config.config(builder);
         http = builder.build();
         return http;
     }
