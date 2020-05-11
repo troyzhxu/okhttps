@@ -9,7 +9,7 @@ import okio.ByteString;
 public interface WebSocket extends Cancelable {
 
 
-	public interface Message {
+	interface Message {
 		
 		/**
 		 * 判断是文本消息还是二进制消息
@@ -45,12 +45,12 @@ public interface WebSocket extends Cancelable {
 		/**
 		 * @return 消息体转Json对象
 		 */
-		Mapper toJsonObj();
+		Mapper toMapper();
 
 		/**
 		 * @return 消息体转Json数组
 		 */
-		Array toJsonArr();
+		Array toArray();
 
 		/**
 		 * @param <T> 目标泛型
@@ -69,7 +69,7 @@ public interface WebSocket extends Cancelable {
 	}
 	
 
-	public static class Close {
+	class Close {
 		
 		private int code;
 		private String reason;
@@ -102,7 +102,7 @@ public interface WebSocket extends Cancelable {
 	}
 	
 
-	public interface Listener<T> {
+	interface Listener<T> {
 		
 		void on(WebSocket ws, T data);
 		
@@ -135,7 +135,7 @@ public interface WebSocket extends Cancelable {
 	 * @param bean 待发送的对象
 	 * @return 如果连接已断开 返回 false
 	 */
-	public boolean send(Object bean);
+	boolean send(Object bean);
 
 	/**
 	 * 以JSON文本格式发送对象消息
@@ -143,14 +143,14 @@ public interface WebSocket extends Cancelable {
 	 * @param dateFormat 日期类型字段的处理格式
 	 * @return 如果连接已断开 返回 false
 	 */
-	public boolean send(Object bean, String dateFormat);
+	boolean send(Object bean, String dateFormat);
 	
 	/**
 	 * 发送字节流
 	 * @param data 待发送的数据
 	 * @return 如果连接已断开 返回 false
 	 */
-	public boolean send(byte[] data);
+	boolean send(byte[] data);
 	
 	/**
 	 * 同 {@link okhttp3.WebSocket#close(int, String)}

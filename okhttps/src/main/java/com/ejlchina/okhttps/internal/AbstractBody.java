@@ -19,7 +19,7 @@ public abstract class AbstractBody {
 	public abstract InputStream toByteStream();
 	
 
-	public Mapper toJsonObj() {
+	public Mapper toMapper() {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
 		}
@@ -27,7 +27,7 @@ public abstract class AbstractBody {
 	}
 
 
-	public Array toJsonArr() {
+	public Array toArray() {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
 		}

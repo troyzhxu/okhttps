@@ -44,7 +44,7 @@ public interface HttpResult {
 	}
 
 	
-	public enum State {
+	enum State {
 		
 		/**
 		 * 执行异常
@@ -76,7 +76,7 @@ public interface HttpResult {
 	/**
 	 * HTTP响应报文体
 	 */
-	public interface Body {
+	interface Body {
 		
 		/**
 		 * @return 媒体类型
@@ -151,13 +151,13 @@ public interface HttpResult {
 		 * 同一个 Body 对象的 toXXX 类方法只可使用一个并且只能调用一次
 		 * @return 报文体转Json对象
 		 */
-		Mapper toJsonObj();
+		Mapper toMapper();
 
 		/**
 		 * 同一个 Body 对象的 toXXX 类方法只可使用一个并且只能调用一次
 		 * @return 报文体转Json数组
 		 */
-		Array toJsonArr();
+		Array toArray();
 
 		/**
 		 * 同一个 Body 对象的 toXXX 类方法只可使用一个并且只能调用一次

@@ -16,12 +16,12 @@ public class CacheTests extends BaseTest {
                 .cache();
 
         println("result = " + body.toString());
-        println("result = " + body.toJsonArr());
+        println("result = " + body.toArray());
 
         body.close();
 
         println("result = " + body.toString());
-        println("result = " + body.toJsonArr());
+        println("result = " + body.toArray());
     }
 
 }
