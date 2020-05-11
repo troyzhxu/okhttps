@@ -234,14 +234,12 @@ public class ResultBody extends AbstractBody implements Body {
 	
 	private byte[] bodyToBytes() {
 		if (onProcess != null) {
-			Buffer buffer = new Buffer();
-			try {
+			try (Buffer buffer = new Buffer()) {
 				return buffer.readFrom(toByteStream()).readByteArray();
 			} catch (IOException e) {
 				throw new HttpException("报文体转化字节数组出错", e);
 			} finally {
 				response.close();
-				buffer.close();
 			}
 		}
 		ResponseBody body = response.body();
