@@ -176,7 +176,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
 
     /**
      * @since 2.0.0
-     * 设置请求体的类型，如：form、json、xml、protobuf 等，默认为 form
+     * 设置请求体的类型，如：form、json、xml、protobuf 等
      * @param type 请求类型
      * @return HttpTask 实例
      */
@@ -421,7 +421,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     /**
-     * 推荐方案：setBodyParam 与 bodyType 方法
+     * 推荐方案：setBodyPara 与 bodyType 方法
      * Json参数：请求体为Json，支持多层结构
      * @param name JSON键名
      * @param value JSON键值
@@ -434,7 +434,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     /**
-     * 推荐方案：setBodyParam 与 bodyType 方法
+     * 推荐方案：setBodyPara 与 bodyType 方法
      * Json参数：请求体为Json，只支持单层Json
      * 若请求json为多层结构，请使用setRequestJson方法
      * @param params JSON键值集合
