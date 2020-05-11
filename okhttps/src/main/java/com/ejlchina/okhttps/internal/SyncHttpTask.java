@@ -24,7 +24,7 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
 	}
 	
     /**
-     * 发起 GET 请求
+     * 发起 GET 请求（Rest：获取资源，幂等）
      * @return 请求结果  
      */
     public HttpResult get() {
@@ -32,7 +32,7 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
     }
 
     /**
-     * 发起 POST 请求
+     * 发起 POST 请求（Rest：创建资源，非幂等）
      * @return 请求结果  
      */
     public HttpResult post() {
@@ -40,15 +40,23 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
     }
 
     /**
-     * 发起 PUT 请求
+     * 发起 PUT 请求（Rest：更新资源，幂等）
      * @return 请求结果  
      */
     public HttpResult put() {
         return request("PUT");
     }
-    
+
+	/**
+	 * 发起 PATCH 请求（Rest：更新资源，部分更新，幂等）
+	 * @return HttpCall
+	 */
+	public HttpResult patch() {
+		return request("PATCH");
+	}
+
     /**
-     * 发起 DELETE 请求
+     * 发起 DELETE 请求（Rest：删除资源，幂等）
      * @return 请求结果  
      */
     public HttpResult delete() {

@@ -70,7 +70,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
     }
     
     /**
-     * 发起 GET 请求
+     * 发起 GET 请求（Rest：读取资源，幂等）
      * @return HttpCall
      */
     public HttpCall get() {
@@ -78,7 +78,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
     }
 
     /**
-     * 发起 POST 请求
+     * 发起 POST 请求（Rest：创建资源，非幂等）
      * @return HttpCall
      */
     public HttpCall post() {
@@ -86,15 +86,23 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
     }
 
     /**
-     * 发起 PUT 请求
+     * 发起 PUT 请求（Rest：更新资源，幂等）
      * @return HttpCall
      */
     public HttpCall put() {
         return request("PUT");
     }
 
+	/**
+	 * 发起 PATCH 请求（Rest：更新资源，部分更新，幂等）
+	 * @return HttpCall
+	 */
+	public HttpCall patch() {
+		return request("PATCH");
+	}
+
     /**
-     * 发起 DELETE 请求
+     * 发起 DELETE 请求（Rest：删除资源，幂等）
      * @return HttpCall
      */
     public HttpCall delete() {
