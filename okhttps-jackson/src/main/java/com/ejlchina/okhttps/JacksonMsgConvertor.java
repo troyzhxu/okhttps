@@ -2,6 +2,8 @@ package com.ejlchina.okhttps;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +20,21 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 
 	private ObjectMapper objectMapper;
-	
+
+	private Charset charset;
+
 	public JacksonMsgConvertor() {
-		this(new ObjectMapper());
+		this(new ObjectMapper(), StandardCharsets.UTF_8);
 	}
 	
-	public JacksonMsgConvertor(ObjectMapper objectMapper) {
+	public JacksonMsgConvertor(ObjectMapper objectMapper, Charset charset) {
 		this.objectMapper = objectMapper;
+		this.charset = charset;
+	}
+
+	@Override
+	public String mediaType() {
+		return "application/json; charset=" + charset.displayName();
 	}
 
 	@Override
@@ -112,4 +122,11 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 		this.objectMapper = objectMapper;
 	}
 
+	public Charset getCharset() {
+		return charset;
+	}
+
+	public void setCharset(Charset charset) {
+		this.charset = charset;
+	}
 }

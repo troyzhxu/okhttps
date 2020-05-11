@@ -36,8 +36,7 @@ import okio.Buffer;
 @SuppressWarnings("unchecked")
 public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
 
-    private static final MediaType TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
-    private static String PATH_PARAM_REGEX = "[A-Za-z0-9_\\-/]*\\{[A-Za-z0-9_\\-]+\\}[A-Za-z0-9_\\-/]*";
+    private static final String PATH_PARAM_REGEX = "[A-Za-z0-9_\\-/]*\\{[A-Za-z0-9_\\-]+\\}[A-Za-z0-9_\\-/]*";
 
     protected HttpClient httpClient;
     protected boolean nothrow;
@@ -680,7 +679,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             }
             return builder.build();
         } else if (requestJson != null) {
-            return RequestBody.create(TYPE_JSON, requestJson);
+            return RequestBody.create(httpClient.getExecutor().getMapperMediaType(), requestJson);
         } else {
             FormBody.Builder builder = new FormBody.Builder();
             if (bodyParams != null) {

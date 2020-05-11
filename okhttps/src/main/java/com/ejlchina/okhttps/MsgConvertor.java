@@ -9,6 +9,12 @@ import java.util.List;
 public interface MsgConvertor {
 
 	/**
+	 * 消息的媒体类型
+	 * @return 媒体类型
+	 */
+	String mediaType();
+
+	/**
 	 * 解析 Mapper
 	 * @param in JSON 输入流
 	 * @return JsonObj

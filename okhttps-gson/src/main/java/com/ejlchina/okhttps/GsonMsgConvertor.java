@@ -2,6 +2,8 @@ package com.ejlchina.okhttps;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,13 +16,20 @@ import com.google.gson.reflect.TypeToken;
 public class GsonMsgConvertor implements MsgConvertor, ConvertProvider {
 
 	private Gson gson;
-	
+	private Charset charset;
+
 	public GsonMsgConvertor() {
-		this(new Gson());
+		this(new Gson(), StandardCharsets.UTF_8);
 	}
 	
-	public GsonMsgConvertor(Gson gson) {
+	public GsonMsgConvertor(Gson gson, Charset charset) {
 		this.gson = gson;
+		this.charset = charset;
+	}
+
+	@Override
+	public String mediaType() {
+		return "application/json; charset=" + charset.displayName();
 	}
 
 	@Override

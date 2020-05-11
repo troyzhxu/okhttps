@@ -24,6 +24,11 @@ public class FastjsonMsgConvertor implements MsgConvertor, ConvertProvider {
 	}
 
 	@Override
+	public String mediaType() {
+		return "application/json; charset=" + charset.displayName();
+	}
+
+	@Override
 	public Mapper toMapper(InputStream in) {
 		return new FastjsonMapper(JSON.parseObject(toString(in)));
 	}

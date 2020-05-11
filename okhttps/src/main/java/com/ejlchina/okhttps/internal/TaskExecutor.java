@@ -14,16 +14,17 @@ import com.ejlchina.okhttps.MsgConvertor;
 import com.ejlchina.okhttps.OnCallback;
 import com.ejlchina.okhttps.TaskListener;
 import com.ejlchina.okhttps.HttpResult.State;
+import okhttp3.MediaType;
 
 public class TaskExecutor {
 
-    Executor ioExecutor;
-    Executor mainExecutor;
-    DownListener downloadListener;
-    TaskListener<HttpResult> responseListener;
-    TaskListener<IOException> exceptionListener;
-    TaskListener<State> completeListener;
-    MsgConvertor msgConvertor;
+    private Executor ioExecutor;
+    private Executor mainExecutor;
+    private DownListener downloadListener;
+    private TaskListener<HttpResult> responseListener;
+    private TaskListener<IOException> exceptionListener;
+    private TaskListener<State> completeListener;
+    private MsgConvertor msgConvertor;
     
     public TaskExecutor(Executor ioExecutor, Executor mainExecutor, DownListener downloadListener, 
             TaskListener<HttpResult> responseListener, TaskListener<IOException> exceptionListener, 
@@ -105,7 +106,22 @@ public class TaskExecutor {
     	}
     	throw new IllegalStateException("没有设置 MsgConvertor，不可做转换操作！");
     }
-    
+
+    private MediaType mapperMediaType;
+
+    public MediaType getMapperMediaType() {
+        if (mapperMediaType == null && msgConvertor != null) {
+            String mediaType = msgConvertor.mediaType();
+            if (mediaType != null) {
+                mapperMediaType = MediaType.parse(mediaType);
+            }
+        }
+        if (mapperMediaType == null) {
+            MediaType.parse("application/json; charset=utf-8");
+        }
+        return mapperMediaType;
+    }
+
     /**
      * 关闭线程池
      * @since OkHttps V1.0.2
