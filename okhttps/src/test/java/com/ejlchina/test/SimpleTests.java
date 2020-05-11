@@ -2,10 +2,7 @@ package com.ejlchina.test;
 
 import com.ejlchina.okhttps.HTTP;
 
-import com.ejlchina.okhttps.JsonObj;
-import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.junit.Test;
 
 public class SimpleTests extends BaseTest {
 

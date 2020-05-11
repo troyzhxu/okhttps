@@ -9,12 +9,12 @@ import java.util.Set;
  * @author 15735
  *
  */
-public interface JsonObj {
+public interface Mapper {
 
 	/**
 	 * @return JSON 的键值对数量
 	 */
-	public int size();
+	int size();
 	
 	/**
 	 * @return 是否为空
@@ -25,13 +25,13 @@ public interface JsonObj {
 	 * @param key 键名
 	 * @return 子 JsonObj
 	 */
-	JsonObj getJsonOjb(String key);
+	Mapper getMapper(String key);
 	
 	/**
 	 * @param key 键名
 	 * @return 子 JsonArr
 	 */
-	JsonArr getJsonArr(String key);
+	Array getArray(String key);
 	
 	/**
 	 * @param key 键名
@@ -90,6 +90,6 @@ public interface JsonObj {
 	/**
 	 * @return JSON 的键集合
 	 */
-	public Set<String> keySet();
+	Set<String> keySet();
 
 }

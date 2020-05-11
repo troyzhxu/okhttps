@@ -7,11 +7,11 @@ import java.util.Set;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-public class FastJsonObj implements JsonObj {
+public class FastjsonMapper implements Mapper {
 
 	private JSONObject json;
 	
-	public FastJsonObj(JSONObject json) {
+	public FastjsonMapper(JSONObject json) {
 		this.json = json;
 	}
 
@@ -26,19 +26,19 @@ public class FastJsonObj implements JsonObj {
 	}
 
 	@Override
-	public JsonObj getJsonOjb(String key) {
+	public Mapper getMapper(String key) {
 		JSONObject subJson = json.getJSONObject(key);
 		if (subJson != null) {
-			return new FastJsonObj(subJson);
+			return new FastjsonMapper(subJson);
 		}
 		return null;
 	}
 
 	@Override
-	public JsonArr getJsonArr(String key) {
+	public Array getArray(String key) {
 		JSONArray subJson = json.getJSONArray(key);
 		if (subJson != null) {
-			return new FastJsonArr(subJson);
+			return new FastjsonArray(subJson);
 		}
 		return null;
 	}

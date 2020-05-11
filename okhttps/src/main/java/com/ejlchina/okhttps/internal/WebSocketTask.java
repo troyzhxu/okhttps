@@ -170,12 +170,12 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 		@Override
 		public boolean send(Object bean) {
-			return send(taskExecutor.jsonServiceNotNull().toJsonStr(bean));
+			return send(taskExecutor.jsonServiceNotNull().serialize(bean));
 		}
 
 		@Override
 		public boolean send(Object bean, String dateFormat) {
-			return send(taskExecutor.jsonServiceNotNull().toJsonStr(bean, dateFormat));
+			return send(taskExecutor.jsonServiceNotNull().serialize(bean, dateFormat));
 		}
 		
 		@Override
@@ -226,7 +226,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			if (msg instanceof byte[]) {
 				return webSocket.send(ByteString.of((byte[]) msg));
 			}
-			return webSocket.send(taskExecutor.jsonServiceNotNull().toJsonStr(msg));
+			return webSocket.send(taskExecutor.jsonServiceNotNull().serialize(msg));
 		}
 		
 	}

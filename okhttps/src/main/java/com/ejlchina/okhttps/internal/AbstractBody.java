@@ -3,8 +3,8 @@ package com.ejlchina.okhttps.internal;
 import java.io.InputStream;
 import java.util.List;
 
-import com.ejlchina.okhttps.JsonArr;
-import com.ejlchina.okhttps.JsonObj;
+import com.ejlchina.okhttps.Array;
+import com.ejlchina.okhttps.Mapper;
 
 public abstract class AbstractBody {
 
@@ -19,19 +19,19 @@ public abstract class AbstractBody {
 	public abstract InputStream toByteStream();
 	
 
-	public JsonObj toJsonObj() {
+	public Mapper toJsonObj() {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
 		}
-		return taskExecutor.jsonServiceNotNull().toJsonObj(toByteStream());
+		return taskExecutor.jsonServiceNotNull().toMapper(toByteStream());
 	}
 
 
-	public JsonArr toJsonArr() {
+	public Array toJsonArr() {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
 		}
-		return taskExecutor.jsonServiceNotNull().toJsonArr(toByteStream());
+		return taskExecutor.jsonServiceNotNull().toArray(toByteStream());
 	}
 
 
@@ -39,7 +39,7 @@ public abstract class AbstractBody {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
 		}
-		return taskExecutor.jsonServiceNotNull().jsonToBean(type, toByteStream());
+		return taskExecutor.jsonServiceNotNull().toBean(type, toByteStream());
 	}
 	
 
@@ -47,7 +47,7 @@ public abstract class AbstractBody {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
 		}
-		return taskExecutor.jsonServiceNotNull().jsonToList(type, toByteStream());
+		return taskExecutor.jsonServiceNotNull().toList(type, toByteStream());
 	}
 	
 }

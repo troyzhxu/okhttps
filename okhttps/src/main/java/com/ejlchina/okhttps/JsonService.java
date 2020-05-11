@@ -7,33 +7,33 @@ import java.util.List;
 public interface JsonService {
 
 	/**
-	 * 解析 JsonObj
+	 * 解析 Mapper
 	 * @param in JSON 输入流
 	 * @return JsonObj
 	 */
-	JsonObj toJsonObj(InputStream in);
+	Mapper toMapper(InputStream in);
 	
 	/**
-	 * 解析 JsonArr
+	 * 解析 Array
 	 * @param in JSON 输入流
 	 * @return JsonArr
 	 */
-	JsonArr toJsonArr(InputStream in);
+	Array toArray(InputStream in);
 	
 	/**
-	 * 将 Java 对象序列化为 Json 字符串
+	 * 将 Java 对象序列化为字符串
 	 * @param bean Java Bean
-	 * @return Json 字符串
+	 * @return 字符串
 	 */
-	String toJsonStr(Object bean);
+	String serialize(Object bean);
 	
 	/**
-	 * 将 Java 对象序列化为 Json 字符串
+	 * 将 Java 对象序列化为字符串
 	 * @param bean Java Bean
 	 * @param dateFormat 日期类的处理格式
-	 * @return Json 字符串
+	 * @return 字符串
 	 */
-	String toJsonStr(Object bean, String dateFormat);
+	String serialize(Object bean, String dateFormat);
 	
 	/**
 	 * 解析 Java Bean
@@ -42,7 +42,7 @@ public interface JsonService {
 	 * @param in JSON 输入流
 	 * @return Java Bean
 	 */
-	<T> T jsonToBean(Class<T> type, InputStream in);
+	<T> T toBean(Class<T> type, InputStream in);
 
 	/**
 	 * 解析为 Java List
@@ -51,7 +51,7 @@ public interface JsonService {
 	 * @param in JSON 输入流
 	 * @return Java List
 	 */
-	<T> List<T> jsonToList(Class<T> type, InputStream in);
+	<T> List<T> toList(Class<T> type, InputStream in);
 	
 	
 }

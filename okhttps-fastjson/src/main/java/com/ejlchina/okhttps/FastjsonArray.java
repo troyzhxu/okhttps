@@ -6,11 +6,11 @@ import java.math.BigInteger;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-public class FastJsonArr implements JsonArr {
+public class FastjsonArray implements Array {
 
 	private JSONArray json;
 	
-	public FastJsonArr(JSONArray json) {
+	public FastjsonArray(JSONArray json) {
 		this.json = json;
 	}
 
@@ -25,19 +25,19 @@ public class FastJsonArr implements JsonArr {
 	}
 
 	@Override
-	public JsonObj getJsonOjb(int index) {
+	public Mapper getMapper(int index) {
 		JSONObject subJson = json.getJSONObject(index);
 		if (subJson != null) {
-			return new FastJsonObj(subJson);
+			return new FastjsonMapper(subJson);
 		}
 		return null;
 	}
 
 	@Override
-	public JsonArr getJsonArr(int index) {
+	public Array getArray(int index) {
 		JSONArray subJson = json.getJSONArray(index);
 		if (subJson != null) {
-			return new FastJsonArr(subJson);
+			return new FastjsonArray(subJson);
 		}
 		return null;
 	}

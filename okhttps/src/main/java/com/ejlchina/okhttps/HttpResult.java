@@ -151,13 +151,13 @@ public interface HttpResult {
 		 * 同一个 Body 对象的 toXXX 类方法只可使用一个并且只能调用一次
 		 * @return 报文体转Json对象
 		 */
-		JsonObj toJsonObj();
+		Mapper toJsonObj();
 
 		/**
 		 * 同一个 Body 对象的 toXXX 类方法只可使用一个并且只能调用一次
 		 * @return 报文体转Json数组
 		 */
-		JsonArr toJsonArr();
+		Array toJsonArr();
 
 		/**
 		 * 同一个 Body 对象的 toXXX 类方法只可使用一个并且只能调用一次

@@ -421,11 +421,11 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             } else if (dateFormat != null) {
                 requestJson = httpClient.getExecutor()
                 		.jsonServiceNotNull()
-                		.toJsonStr(json, dateFormat);
+                		.serialize(json, dateFormat);
             } else {
                 requestJson = httpClient.getExecutor()
                 		.jsonServiceNotNull()
-                		.toJsonStr(json);
+                		.serialize(json);
             }
         }
         return (C) this;
@@ -657,7 +657,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     private RequestBody buildRequestBody() {
         if (jsonParams != null) {
             requestJson = httpClient.getExecutor().jsonServiceNotNull()
-            		.toJsonStr(jsonParams);
+            		.serialize(jsonParams);
         }
         if (files != null) {
             MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);

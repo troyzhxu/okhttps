@@ -24,32 +24,32 @@ public class GsonService implements JsonService {
 	}
 
 	@Override
-	public JsonObj toJsonObj(InputStream in) {
+	public Mapper toMapper(InputStream in) {
 		return new GsonObj(gson.fromJson(new InputStreamReader(in), JsonObject.class));
 	}
 
 	@Override
-	public JsonArr toJsonArr(InputStream in) {
+	public Array toArray(InputStream in) {
 		return new GsonArr(gson.fromJson(new InputStreamReader(in), JsonArray.class));
 	}
 
 	@Override
-	public String toJsonStr(Object bean) {
+	public String serialize(Object bean) {
 		return gson.toJson(bean);
 	}
 
 	@Override
-	public String toJsonStr(Object bean, String dateFormat) {
+	public String serialize(Object bean, String dateFormat) {
 		return gson.newBuilder().setDateFormat(dateFormat).create().toJson(bean);
 	}
 
 	@Override
-	public <T> T jsonToBean(Class<T> type, InputStream in) {
+	public <T> T toBean(Class<T> type, InputStream in) {
 		return gson.fromJson(new InputStreamReader(in), type);
 	}
 
 	@Override
-	public <T> List<T> jsonToList(Class<T> type, InputStream in) {
+	public <T> List<T> toList(Class<T> type, InputStream in) {
 		T[] beans = gson.fromJson(new InputStreamReader(in), TypeToken.getArray(type).getType());
 		List<T> list = new ArrayList<>();
 		Collections.addAll(list, beans);

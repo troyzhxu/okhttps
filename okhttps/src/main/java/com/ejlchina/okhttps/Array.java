@@ -3,7 +3,7 @@ package com.ejlchina.okhttps;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-public interface JsonArr {
+public interface Array {
 
 	/**
 	 * @return JSON 的键值对数量
@@ -19,13 +19,13 @@ public interface JsonArr {
 	 * @param index 元素下标
 	 * @return 子 JsonObj
 	 */
-	JsonObj getJsonOjb(int index);
+	Mapper getMapper(int index);
 	
 	/**
 	 * @param index 元素下标
 	 * @return 子 JsonArr
 	 */
-	JsonArr getJsonArr(int index);
+	Array getArray(int index);
 	
 	/**
 	 * @param index 元素下标

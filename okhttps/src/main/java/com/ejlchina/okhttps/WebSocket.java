@@ -45,12 +45,12 @@ public interface WebSocket extends Cancelable {
 		/**
 		 * @return 消息体转Json对象
 		 */
-		JsonObj toJsonObj();
+		Mapper toJsonObj();
 
 		/**
 		 * @return 消息体转Json数组
 		 */
-		JsonArr toJsonArr();
+		Array toJsonArr();
 
 		/**
 		 * @param <T> 目标泛型

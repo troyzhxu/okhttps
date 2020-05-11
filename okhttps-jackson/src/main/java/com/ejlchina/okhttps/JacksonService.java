@@ -28,7 +28,7 @@ public class JacksonService implements JsonService {
 	}
 
 	@Override
-	public JsonObj toJsonObj(InputStream in) {
+	public Mapper toMapper(InputStream in) {
 		try {
 			JsonNode json = objectMapper.readTree(in);
 			if (json.isObject()) {
@@ -44,7 +44,7 @@ public class JacksonService implements JsonService {
 	}
 
 	@Override
-	public JsonArr toJsonArr(InputStream in) {
+	public Array toArray(InputStream in) {
 		try {
 			JsonNode json = objectMapper.readTree(in);
 			if (json.isArray()) {
@@ -60,7 +60,7 @@ public class JacksonService implements JsonService {
 	}
 
 	@Override
-	public String toJsonStr(Object bean) {
+	public String serialize(Object bean) {
 		try {
 			return objectMapper.writeValueAsString(bean);
 		} catch (JsonProcessingException e) {
@@ -69,7 +69,7 @@ public class JacksonService implements JsonService {
 	}
 
 	@Override
-	public String toJsonStr(Object bean, String dateFormat) {
+	public String serialize(Object bean, String dateFormat) {
 		ObjectMapper mapper = objectMapper.copy();
 		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 		mapper.setDateFormat(new SimpleDateFormat(dateFormat));
@@ -81,7 +81,7 @@ public class JacksonService implements JsonService {
 	}
 
 	@Override
-	public <T> T jsonToBean(Class<T> type, InputStream in) {
+	public <T> T toBean(Class<T> type, InputStream in) {
 		try {
 			return objectMapper.readValue(in, type);
 		} catch (IOException e) {
@@ -90,7 +90,7 @@ public class JacksonService implements JsonService {
 	}
 
 	@Override
-	public <T> List<T> jsonToList(Class<T> type, InputStream in) {
+	public <T> List<T> toList(Class<T> type, InputStream in) {
 		CollectionType javaType = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, type);
 		try {
 			return objectMapper.readValue(in, javaType);

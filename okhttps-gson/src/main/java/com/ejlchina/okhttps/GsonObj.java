@@ -7,7 +7,7 @@ import java.util.Set;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class GsonObj implements JsonObj {
+public class GsonObj implements Mapper {
 
 	private JsonObject json;
 	
@@ -26,7 +26,7 @@ public class GsonObj implements JsonObj {
 	}
 
 	@Override
-	public JsonObj getJsonOjb(String key) {
+	public Mapper getMapper(String key) {
 		JsonElement subJson = json.get(key);
 		if (subJson != null) {
 			return new GsonObj(subJson.getAsJsonObject());
@@ -35,7 +35,7 @@ public class GsonObj implements JsonObj {
 	}
 
 	@Override
-	public JsonArr getJsonArr(String key) {
+	public Array getArray(String key) {
 		JsonElement subJson = json.get(key);
 		if (subJson != null) {
 			return new GsonArr(subJson.getAsJsonArray());

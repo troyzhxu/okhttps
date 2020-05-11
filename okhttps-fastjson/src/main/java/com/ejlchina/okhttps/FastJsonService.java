@@ -24,32 +24,32 @@ public class FastJsonService implements JsonService {
 	}
 
 	@Override
-	public JsonObj toJsonObj(InputStream in) {
-		return new FastJsonObj(JSON.parseObject(toString(in)));
+	public Mapper toMapper(InputStream in) {
+		return new FastjsonMapper(JSON.parseObject(toString(in)));
 	}
 
 	@Override
-	public JsonArr toJsonArr(InputStream in) {
-		return new FastJsonArr(JSON.parseArray(toString(in)));
+	public Array toArray(InputStream in) {
+		return new FastjsonArray(JSON.parseArray(toString(in)));
 	}
 
 	@Override
-	public String toJsonStr(Object bean) {
+	public String serialize(Object bean) {
 		return JSON.toJSONString(bean);
 	}
 
 	@Override
-	public String toJsonStr(Object bean, String dateFormat) {
+	public String serialize(Object bean, String dateFormat) {
 		return JSON.toJSONStringWithDateFormat(bean, dateFormat);
 	}
 
 	@Override
-	public <T> T jsonToBean(Class<T> type, InputStream in) {
+	public <T> T toBean(Class<T> type, InputStream in) {
 		return JSON.parseObject(toString(in), type);
 	}
 
 	@Override
-	public <T> List<T> jsonToList(Class<T> type, InputStream in) {
+	public <T> List<T> toList(Class<T> type, InputStream in) {
 		return JSON.parseArray(toString(in), type);
 	}
 
