@@ -314,11 +314,11 @@ public interface HTTP {
         }
 
         /**
-         * 设置编码格式
+         * 设置默认编码格式
          * @param charset 编码
          * @return Builder
          */
-        public Builder charset(Charset charset) {
+        public Builder defaultCharset(Charset charset) {
             this.charset = charset;
             return this;
         }
