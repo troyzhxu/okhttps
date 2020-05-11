@@ -66,23 +66,27 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 	}
 
 	@Override
-	public byte[] serialize(Object bean, Charset charset) {
-		try {
-			return objectMapper.writeValueAsString(bean).getBytes(charset);
-		} catch (JsonProcessingException e) {
-			throw new HttpException("Java Bean [" + bean + "] Jackson 序列化异常", e);
-		}
+	public byte[] serialize(Object object, Charset charset) {
+		return serialize(object, null, charset);
 	}
 
 	@Override
-	public byte[] serialize(Object bean, String dateFormat, Charset charset) {
-		ObjectMapper mapper = objectMapper.copy();
-		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-		mapper.setDateFormat(new SimpleDateFormat(dateFormat));
+	public byte[] serialize(Object object, String dateFormat, Charset charset) {
+		if (object instanceof byte[]) {
+			return (byte[]) object;
+		}
+		if (object instanceof String) {
+			return object.toString().getBytes(charset);
+		}
+		ObjectMapper mapper = objectMapper;
+		if (dateFormat != null) {
+			mapper = mapper.copy().configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+					.setDateFormat(new SimpleDateFormat(dateFormat));
+		}
 		try {
-			return mapper.writeValueAsString(bean).getBytes(charset);
+			return mapper.writeValueAsString(object).getBytes(charset);
 		} catch (JsonProcessingException e) {
-			throw new HttpException("Java Bean [" + bean + "] Jackson 序列化异常", e);
+			throw new HttpException("Java Bean [" + object + "] Jackson 序列化异常", e);
 		}
 	}
 
