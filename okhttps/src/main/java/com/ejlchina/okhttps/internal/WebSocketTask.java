@@ -116,7 +116,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 		okhttp3.WebSocket webSocket;
 		
-		List<Object> queues = new ArrayList<>();
+		final List<Object> queues = new ArrayList<>();
 		
 		TaskExecutor taskExecutor;
 		
@@ -170,12 +170,12 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 		@Override
 		public boolean send(Object bean) {
-			return send(taskExecutor.jsonServiceNotNull().serialize(bean));
+			return send(taskExecutor.convertor().serialize(bean));
 		}
 
 		@Override
 		public boolean send(Object bean, String dateFormat) {
-			return send(taskExecutor.jsonServiceNotNull().serialize(bean, dateFormat));
+			return send(taskExecutor.convertor().serialize(bean, dateFormat));
 		}
 		
 		@Override
@@ -193,12 +193,10 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 				return;
 			}
 			synchronized (queues) {
-				if (queues != null) {
-					queues.add(msg);
-				} else if (webSocket != null) {
+				if (webSocket != null) {
 					send(webSocket, msg);
 				} else {
-					throw new IllegalStateException();
+					queues.add(msg);
 				}
 			}
 		}
@@ -209,7 +207,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 					send(webSocket, msg);
 				}
 				this.webSocket = webSocket;
-				queues = null;
+				queues.clear();
 			}
 		}
 		
@@ -226,7 +224,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			if (msg instanceof byte[]) {
 				return webSocket.send(ByteString.of((byte[]) msg));
 			}
-			return webSocket.send(taskExecutor.jsonServiceNotNull().serialize(msg));
+			return webSocket.send(taskExecutor.convertor().serialize(msg));
 		}
 		
 	}

@@ -99,11 +99,11 @@ public class TaskExecutor {
         }
     }
 
-    public MsgConvertor jsonServiceNotNull() {
+    public MsgConvertor convertor() {
     	if (msgConvertor != null) {
     		return msgConvertor;
     	}
-    	throw new IllegalStateException("没有设置 JsonService，不可做 Json 操作！");
+    	throw new IllegalStateException("没有设置 MsgConvertor，不可做转换操作！");
     }
     
     /**

@@ -21,33 +21,33 @@ public abstract class AbstractBody {
 
 	public Mapper toMapper() {
 		if (taskExecutor == null) {
-			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
+			throw new IllegalStateException("没有 taskExecutor，不可做 Mapper 转换！");
 		}
-		return taskExecutor.jsonServiceNotNull().toMapper(toByteStream());
+		return taskExecutor.convertor().toMapper(toByteStream());
 	}
 
 
 	public Array toArray() {
 		if (taskExecutor == null) {
-			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
+			throw new IllegalStateException("没有 taskExecutor，不可做 Array 转换！");
 		}
-		return taskExecutor.jsonServiceNotNull().toArray(toByteStream());
+		return taskExecutor.convertor().toArray(toByteStream());
 	}
 
 
 	public <T> T toBean(Class<T> type) {
 		if (taskExecutor == null) {
-			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
+			throw new IllegalStateException("没有 taskExecutor，不可做 Bean 转换！");
 		}
-		return taskExecutor.jsonServiceNotNull().toBean(type, toByteStream());
+		return taskExecutor.convertor().toBean(type, toByteStream());
 	}
 	
 
 	public <T> List<T> toList(Class<T> type) {
 		if (taskExecutor == null) {
-			throw new IllegalStateException("没有 taskExecutor，不可做 Json 转换！");
+			throw new IllegalStateException("没有 taskExecutor，不可做 List 转换！");
 		}
-		return taskExecutor.jsonServiceNotNull().toList(type, toByteStream());
+		return taskExecutor.convertor().toList(type, toByteStream());
 	}
 	
 }
