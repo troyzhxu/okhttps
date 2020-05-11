@@ -6,6 +6,8 @@ import okhttp3.*;
 import okhttp3.WebSocket;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.Executor;
 
@@ -71,7 +73,7 @@ public interface HTTP {
      * 获取任务执行器
      * @return TaskExecutor
      */
-    TaskExecutor getExecutor();
+    TaskExecutor executor();
 
     /**
      * 新的构建器
@@ -129,6 +131,8 @@ public interface HTTP {
 
         private int preprocTimeoutTimes = 10;
 
+        private Charset charset = StandardCharsets.UTF_8;
+
         public Builder() {
             mediaTypes = new HashMap<>();
             mediaTypes.put("*", "application/octet-stream");
@@ -149,18 +153,19 @@ public interface HTTP {
         }
 
         public Builder(HttpClient hc) {
-            this.okClient = hc.getOkClient();
-            this.baseUrl = hc.getBaseUrl();
-            this.mediaTypes = hc.getMediaTypes();
+            this.okClient = hc.okClient();
+            this.baseUrl = hc.baseUrl();
+            this.mediaTypes = hc.mediaTypes();
             this.preprocessors = new ArrayList<>();
-            Collections.addAll(this.preprocessors, hc.getPreprocessors());
-            TaskExecutor executor = hc.getExecutor();
+            Collections.addAll(this.preprocessors, hc.preprocessors());
+            TaskExecutor executor = hc.executor();
             this.downloadListener = executor.getDownloadListener();
             this.responseListener = executor.getResponseListener();
             this.exceptionListener = executor.getExceptionListener();
             this.completeListener = executor.getCompleteListener();
             this.msgConvertor = executor.getMsgConvertor();
-            this.preprocTimeoutTimes = hc.getPreprocTimeoutTimes();
+            this.preprocTimeoutTimes = hc.preprocTimeoutTimes();
+            this.charset = hc.charset();
         }
 
         /**
@@ -309,6 +314,16 @@ public interface HTTP {
         }
 
         /**
+         * 设置编码格式
+         * @param charset 编码
+         * @return Builder
+         */
+        public Builder charset(Charset charset) {
+            this.charset = charset;
+            return this;
+        }
+
+        /**
          * 构建 HTTP 实例
          * @return HTTP
          */
@@ -323,11 +338,11 @@ public interface HTTP {
             return new HttpClient(this);
         }
 
-        public OkHttpClient getOkClient() {
+        public OkHttpClient okClient() {
             return okClient;
         }
 
-        public String getBaseUrl() {
+        public String baseUrl() {
             return baseUrl;
         }
 
@@ -335,36 +350,40 @@ public interface HTTP {
             return mediaTypes;
         }
 
-        public Executor getMainExecutor() {
+        public Executor mainExecutor() {
             return mainExecutor;
         }
 
-        public List<Preprocessor> getPreprocessors() {
+        public List<Preprocessor> preprocessors() {
             return preprocessors;
         }
 
-        public DownListener getDownloadListener() {
+        public DownListener downloadListener() {
             return downloadListener;
         }
 
-        public TaskListener<HttpResult> getResponseListener() {
+        public TaskListener<HttpResult> responseListener() {
             return responseListener;
         }
 
-        public TaskListener<IOException> getExceptionListener() {
+        public TaskListener<IOException> exceptionListener() {
             return exceptionListener;
         }
 
-        public TaskListener<HttpResult.State> getCompleteListener() {
+        public TaskListener<HttpResult.State> completeListener() {
             return completeListener;
         }
 
-        public MsgConvertor getMsgConvertor() {
+        public MsgConvertor msgConvertor() {
             return msgConvertor;
         }
 
-        public int getPreprocTimeoutTimes() {
+        public int preprocTimeoutTimes() {
             return preprocTimeoutTimes;
+        }
+
+        public Charset charset() {
+            return charset;
         }
 
     }

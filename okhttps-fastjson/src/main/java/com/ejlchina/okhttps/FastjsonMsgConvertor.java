@@ -39,13 +39,13 @@ public class FastjsonMsgConvertor implements MsgConvertor, ConvertProvider {
 	}
 
 	@Override
-	public String serialize(Object bean) {
-		return JSON.toJSONString(bean);
+	public byte[] serialize(Object bean) {
+		return JSON.toJSONString(bean).getBytes(charset);
 	}
 
 	@Override
-	public String serialize(Object bean, String dateFormat) {
-		return JSON.toJSONStringWithDateFormat(bean, dateFormat);
+	public byte[] serialize(Object bean, String dateFormat) {
+		return JSON.toJSONStringWithDateFormat(bean, dateFormat).getBytes(charset);
 	}
 
 	@Override

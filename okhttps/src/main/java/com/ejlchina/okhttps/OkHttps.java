@@ -6,8 +6,6 @@ import okhttp3.Request;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 
-import java.util.ServiceLoader;
-
 /**
  * OkHttps 工具类
  * 支持 SPI 方式配置
@@ -99,7 +97,7 @@ public final class OkHttps {
      * @return TaskExecutor
      */
     public static TaskExecutor getExecutor() {
-        return getHttp().getExecutor();
+        return getHttp().executor();
     }
 
 }

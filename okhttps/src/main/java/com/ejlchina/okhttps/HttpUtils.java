@@ -10,8 +10,6 @@ import okhttp3.Request;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 
-import java.util.ServiceLoader;
-
 /**
  * Http 工具类（可供第三方库，非主应用使用）
  * 若需要配置，请使用 {@link OkHttps } 类
@@ -115,7 +113,7 @@ public class HttpUtils {
      * @return TaskExecutor
      */
     public static TaskExecutor getExecutor() {
-    	return getHttp().getExecutor();
+    	return getHttp().executor();
     }
     
 }

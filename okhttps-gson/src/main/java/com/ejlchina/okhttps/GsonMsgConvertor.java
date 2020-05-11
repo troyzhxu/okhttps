@@ -43,13 +43,13 @@ public class GsonMsgConvertor implements MsgConvertor, ConvertProvider {
 	}
 
 	@Override
-	public String serialize(Object bean) {
-		return gson.toJson(bean);
+	public byte[] serialize(Object bean) {
+		return gson.toJson(bean).getBytes(charset);
 	}
 
 	@Override
-	public String serialize(Object bean, String dateFormat) {
-		return gson.newBuilder().setDateFormat(dateFormat).create().toJson(bean);
+	public byte[] serialize(Object bean, String dateFormat) {
+		return gson.newBuilder().setDateFormat(dateFormat).create().toJson(bean).getBytes(charset);
 	}
 
 	@Override

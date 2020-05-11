@@ -107,21 +107,6 @@ public class TaskExecutor {
     	throw new IllegalStateException("没有设置 MsgConvertor，不可做转换操作！");
     }
 
-    private MediaType mapperMediaType;
-
-    public MediaType getMapperMediaType() {
-        if (mapperMediaType == null && msgConvertor != null) {
-            String mediaType = msgConvertor.mediaType();
-            if (mediaType != null) {
-                mapperMediaType = MediaType.parse(mediaType);
-            }
-        }
-        if (mapperMediaType == null) {
-            MediaType.parse("application/json; charset=utf-8");
-        }
-        return mapperMediaType;
-    }
-
     /**
      * 关闭线程池
      * @since OkHttps V1.0.2

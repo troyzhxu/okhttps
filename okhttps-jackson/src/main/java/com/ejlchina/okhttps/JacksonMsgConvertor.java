@@ -70,21 +70,22 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 	}
 
 	@Override
-	public String serialize(Object bean) {
+	public byte[] serialize(Object bean) {
 		try {
-			return objectMapper.writeValueAsString(bean);
+			objectMapper.writeValueAsBytes(bean);
+			return objectMapper.writeValueAsString(bean).getBytes(charset);
 		} catch (JsonProcessingException e) {
 			throw new HttpException("Java Bean [" + bean + "] Jackson 序列化异常", e);
 		}
 	}
 
 	@Override
-	public String serialize(Object bean, String dateFormat) {
+	public byte[] serialize(Object bean, String dateFormat) {
 		ObjectMapper mapper = objectMapper.copy();
 		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 		mapper.setDateFormat(new SimpleDateFormat(dateFormat));
 		try {
-			return mapper.writeValueAsString(bean);
+			return mapper.writeValueAsString(bean).getBytes(charset);
 		} catch (JsonProcessingException e) {
 			throw new HttpException("Java Bean [" + bean + "] Jackson 序列化异常", e);
 		}

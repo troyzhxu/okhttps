@@ -234,7 +234,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 				State state = toState(error, false);
 				HttpResult result = new RealHttpResult(AsyncHttpTask.this, state, error);
 				onCallback(httpCall, result, () -> {
-					TaskExecutor executor = httpClient.getExecutor();
+					TaskExecutor executor = httpClient.executor();
 					executor.executeOnComplete(AsyncHttpTask.this, onComplete, state, cOnIO);
 					if (!executor.executeOnException(AsyncHttpTask.this, onException, error, eOnIO)
 							&& !nothrow) {
@@ -245,7 +245,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-            	TaskExecutor executor = httpClient.getExecutor();
+            	TaskExecutor executor = httpClient.executor();
 				HttpResult result = new RealHttpResult(AsyncHttpTask.this, response, executor);
 				onCallback(httpCall, result, () -> {
 					executor.executeOnComplete(AsyncHttpTask.this, onComplete, State.RESPONSED, cOnIO);

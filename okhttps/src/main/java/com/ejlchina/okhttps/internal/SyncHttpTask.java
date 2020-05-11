@@ -72,7 +72,7 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
     	if (method == null || method.isEmpty()) {
     		throw new IllegalArgumentException("HTTP 请求方法 method 不可为空！");
     	}
-    	RealHttpResult result = new RealHttpResult(this, httpClient.getExecutor());
+    	RealHttpResult result = new RealHttpResult(this, httpClient.executor());
 		SyncHttpCall httpCall = new SyncHttpCall();
 		// 注册标签任务
 		registeTagTask(httpCall);

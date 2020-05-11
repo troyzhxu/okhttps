@@ -50,7 +50,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     private Map<String, String> bodyParams;
     private Map<String, Object> jsonParams;
     private Map<String, FilePara> files;
-    private String requestJson;
+    private byte[] requestJson;
     private OnCallback<Process> onProcess;
     private boolean pOnIO;
     private long stepBytes = 0;
@@ -415,14 +415,16 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      **/
     public C setRequestJson(Object json, String dateFormat) {
         if (json != null) {
-            if (json instanceof String) {
-                requestJson = json.toString();
+            if (json instanceof byte[]) {
+                requestJson = (byte[]) json;
+            } else if (json instanceof String) {
+                requestJson = json.toString().getBytes(httpClient.charset());
             } else if (dateFormat != null) {
-                requestJson = httpClient.getExecutor()
+                requestJson = httpClient.executor()
                 		.convertor()
                 		.serialize(json, dateFormat);
             } else {
-                requestJson = httpClient.getExecutor()
+                requestJson = httpClient.executor()
                 		.convertor()
                 		.serialize(json);
             }
@@ -596,7 +598,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
                     stepBytes = Process.DEFAULT_STEP_BYTES;
                 }
                 reqBody = new ProcessRequestBody(reqBody, onProcess,
-                        httpClient.getExecutor().getExecutor(pOnIO),
+                        httpClient.executor().getExecutor(pOnIO),
                         contentLength, stepBytes);
             }
         }
@@ -655,20 +657,21 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
 
     private RequestBody buildRequestBody() {
         if (jsonParams != null) {
-            requestJson = httpClient.getExecutor().convertor()
+            requestJson = httpClient.executor().convertor()
             		.serialize(jsonParams);
         }
         if (files != null) {
             MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
             if (bodyParams != null) {
                 for (String name : bodyParams.keySet()) {
-                    String value = bodyParams.get(name);
-                    builder.addFormDataPart(name, value);
+                    byte[] value = bodyParams.get(name).getBytes(httpClient.charset());
+                    RequestBody body = RequestBody.create(null, value);
+                    builder.addPart(MultipartBody.Part.createFormData(name, null, body));
                 }
             }
             for (String name : files.keySet()) {
                 FilePara file = files.get(name);
-                MediaType type = httpClient.getMediaType(file.type);
+                MediaType type = httpClient.mediaType(file.type);
                 RequestBody bodyPart;
                 if (file.file != null) {
                     bodyPart = RequestBody.create(type, file.file);
@@ -679,9 +682,9 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             }
             return builder.build();
         } else if (requestJson != null) {
-            return RequestBody.create(httpClient.getExecutor().getMapperMediaType(), requestJson);
+            return RequestBody.create(httpClient.mapperType(), requestJson);
         } else {
-            FormBody.Builder builder = new FormBody.Builder();
+            FormBody.Builder builder = new FormBody.Builder(httpClient.charset());
             if (bodyParams != null) {
                 for (String name : bodyParams.keySet()) {
                     String value = bodyParams.get(name);

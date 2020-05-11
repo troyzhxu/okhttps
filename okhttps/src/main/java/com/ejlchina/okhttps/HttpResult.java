@@ -33,7 +33,7 @@ public interface HttpResult {
 	/**
 	 * 构造一个 HttpResult
 	 * @param response Response
-	 * @param taskExecutor 任务执行器, 可通过方法 {@link HTTP#getExecutor()} 获得
+	 * @param taskExecutor 任务执行器, 可通过方法 {@link HTTP#executor()} 获得
 	 * @return HttpResult
 	 */
 	static HttpResult of(Response response, TaskExecutor taskExecutor) {

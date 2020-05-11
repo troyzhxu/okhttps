@@ -1,6 +1,7 @@
 package com.ejlchina.okhttps;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.List;
 
 /**
@@ -29,19 +30,19 @@ public interface MsgConvertor {
 	Array toArray(InputStream in);
 	
 	/**
-	 * 将 Java 对象序列化为字符串
+	 * 将 Java 对象序列化为字节数组
 	 * @param bean Java Bean
-	 * @return 字符串
+	 * @return 字节数组
 	 */
-	String serialize(Object bean);
+	byte[] serialize(Object bean);
 	
 	/**
-	 * 将 Java 对象序列化为字符串
+	 * 将 Java 对象序列化为字节数组
 	 * @param bean Java Bean
 	 * @param dateFormat 日期类的处理格式
-	 * @return 字符串
+	 * @return 字节数组
 	 */
-	String serialize(Object bean, String dateFormat);
+	byte[] serialize(Object bean, String dateFormat);
 	
 	/**
 	 * 解析 Java Bean
