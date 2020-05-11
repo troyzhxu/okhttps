@@ -81,6 +81,10 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         return tag;
     }
 
+    public String getBodyType() {
+        return bodyType;
+    }
+
     /**
      * 标签匹配
      * 判断任务标签与指定的标签是否匹配（包含指定的标签）
@@ -729,32 +733,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         return State.EXCEPTION;
     }
 
-
-    /**
-     * 请求体为json
-     * @param body JSON字符串 或 Java对象，将跟换 bean的get方法序列化程 json 字符串
-     * @return HttpTask 实例
-     **/
-    public C setBodyParaxxx(Object body) {
-        if (bodyType == null) {
-            throw new IllegalArgumentException("type can not be null");
-        }
-        if (body != null) {
-            if (body instanceof byte[]) {
-                requestBody = body;
-            } else if (body instanceof String) {
-                requestBody = body.toString().getBytes(charset);
-            } else if (dateFormat != null) {
-                requestBody = httpClient.executor().doMsgConvert(bodyType, (MsgConvertor c) ->
-                        c.serialize(body, dateFormat, charset));
-            } else {
-                requestBody = httpClient.executor().doMsgConvert(bodyType, (MsgConvertor c) ->
-                        c.serialize(body, charset));
-            }
-        }
-        return (C) this;
-    }
-
     private RequestBody buildRequestBody() {
         if (files != null) {
             MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
@@ -796,15 +774,14 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     private RequestBody toRequestBody(Object object) {
-        TaskExecutor.Data<byte[]> data = httpClient.executor()
-                .doMsgConvert(bodyType, (MsgConvertor c)
-                    -> c.serialize(object, dateFormat, charset));
-        byte[] body = data.data;
-        String mediaType = data.mediaType;
-        if (mediaType == null) {
-            mediaType = "application/json";
+        if (object instanceof byte[] || object instanceof String) {
+            String mediaType = httpClient.executor().doMsgConvert(bodyType, null).mediaType;
+            byte[] body = object instanceof byte[] ? (byte[]) object : ((String) object).getBytes(charset);
+            return RequestBody.create(MediaType.parse(mediaType + "; charset=" + charset.name()), body);
         }
-        return RequestBody.create(MediaType.parse(mediaType + "; charset=" + charset.name()), body);
+        TaskExecutor.Data<byte[]> data = httpClient.executor()
+                .doMsgConvert(bodyType, (MsgConvertor c) -> c.serialize(object, dateFormat, charset));
+        return RequestBody.create(MediaType.parse(data.mediaType + "; charset=" + charset.name()), data.data);
     }
 
     private String buildUrlPath() {

@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import com.ejlchina.okhttps.WebSocket.Message;
@@ -18,13 +19,13 @@ public class MessageBody extends AbstractBody implements Message {
 	private ByteString bytes;
 	
 	
-	public MessageBody(String text, TaskExecutor taskExecutor) {
-		super(taskExecutor);
+	public MessageBody(String text, TaskExecutor taskExecutor, Charset charset) {
+		super(taskExecutor, charset);
 		this.text = text;
 	}
 
-	public MessageBody(ByteString bytes, TaskExecutor taskExecutor) {
-		super(taskExecutor);
+	public MessageBody(ByteString bytes, TaskExecutor taskExecutor, Charset charset) {
+		super(taskExecutor, charset);
 		this.bytes = bytes;
 	}
 	
