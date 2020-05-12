@@ -76,7 +76,7 @@ public interface HttpResult {
 	/**
 	 * HTTP响应报文体
 	 */
-	interface Body {
+	interface Body extends Toable {
 		
 		/**
 		 * @return 媒体类型
@@ -122,59 +122,7 @@ public interface HttpResult {
 		 * @return Body
 		 */
 		Body setRangeIgnored();
-		
-		/**
-		 * 同一个 Body 对象的 toXXX 类方法只可使用一个并且只能调用一次
-		 * @return 报文体转字节流
-		 */
-		InputStream toByteStream();
-		
-		/**
-		 * 同一个 Body 对象的 toXXX 类方法只可使用一个并且只能调用一次
-		 * @return 报文体转字节数组
-		 */
-		byte[] toBytes();
-		
-		/**
-		 * 同一个 Body 对象的 toXXX 类方法只可使用一个并且只能调用一次
-		 * @return 报文体转字符流
-		 */
-		Reader toCharStream();
 
-		/**
-		 * 同一个 Body 对象的 toXXX 类方法只可使用一个并且只能调用一次
-		 * @return 报文体转字符串
-		 */
-		String toString();
-
-		/**
-		 * 同一个 Body 对象的 toXXX 类方法只可使用一个并且只能调用一次
-		 * @return 报文体转Json对象
-		 */
-		Mapper toMapper();
-
-		/**
-		 * 同一个 Body 对象的 toXXX 类方法只可使用一个并且只能调用一次
-		 * @return 报文体转Json数组
-		 */
-		Array toArray();
-
-		/**
-		 * 同一个 Body 对象的 toXXX 类方法只可使用一个并且只能调用一次
-		 * @param <T> 目标泛型
-		 * @param type 目标类型
-		 * @return 报文体Json文本转JavaBean
-		 */
-		<T> T toBean(Class<T> type);
-
-		/**
-		 * 同一个 Body 对象的 toXXX 类方法只可使用一个并且只能调用一次
-		 * @param <T> 目标泛型
-		 * @param type 目标类型
-		 * @return 报文体Json文本转JavaBean列表
-		 */
-		<T> List<T> toList(Class<T> type);
-		
 		/**
 		 * 下载到指定路径
 		 * 同一个 Body 对象的 toXXX 类方法只可使用一个并且只能调用一次

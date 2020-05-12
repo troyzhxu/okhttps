@@ -83,7 +83,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		@Override
 		public void onMessage(okhttp3.WebSocket webSocket, String text) {
 			if (onMessage != null) {
-				onMessage.on(this.webSocket, new MessageBody(text, httpClient.executor, charset));
+				onMessage.on(this.webSocket, new WebsocketMsg(text, httpClient.executor, charset));
 			}
 		}
 
@@ -91,7 +91,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		@Override
 		public void onMessage(okhttp3.WebSocket webSocket, ByteString bytes) {
 			if (onMessage != null) {
-				onMessage.on(this.webSocket, new MessageBody(bytes, httpClient.executor, charset));
+				onMessage.on(this.webSocket, new WebsocketMsg(bytes, httpClient.executor, charset));
 			}
 		}
 
