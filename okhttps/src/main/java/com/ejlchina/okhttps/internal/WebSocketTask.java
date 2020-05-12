@@ -35,7 +35,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 */
 	public WebSocket listen() {
 		String bodyType = getBodyType();
-		String msgType = bodyType.toLowerCase().contains(OkHttps.FORM) ? OkHttps.JSON : bodyType;
+		String msgType = OkHttps.FORM.equalsIgnoreCase(bodyType) ? OkHttps.JSON : bodyType;
 		WebSocketImpl socket = new WebSocketImpl(httpClient.executor, msgType);
 		registeTagTask(socket);
 		httpClient.preprocess(this, () -> {
