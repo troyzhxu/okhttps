@@ -14,6 +14,7 @@ import okhttp3.MediaType;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okio.Buffer;
+import okio.ByteString;
 
 public class ResultBody extends AbstractBody implements Body {
 	
@@ -99,7 +100,7 @@ public class ResultBody extends AbstractBody implements Body {
 			if (body != null) {
 				input = body.byteStream();
 			} else {
-				input = new ByteArrayInputStream(new byte[]{});
+				input = new ByteArrayInputStream(new byte[0]);
 			}
 		}
 		if (onProcess != null) {
@@ -154,6 +155,11 @@ public class ResultBody extends AbstractBody implements Body {
 			throw new HttpException("报文体转化字符串出错", e);
 		}
 		return null;
+	}
+
+	@Override
+	public ByteString toByteString() {
+		return ByteString.of(toBytes());
 	}
 
 	@Override
@@ -250,7 +256,7 @@ public class ResultBody extends AbstractBody implements Body {
 				throw new HttpException("报文体转化字节数组出错", e);
 			}
 		}
-		return new byte[]{};
+		return new byte[0];
 	}
 	
 	private long getRangeStart() {
