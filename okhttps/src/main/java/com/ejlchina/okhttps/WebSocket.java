@@ -126,5 +126,11 @@ public interface WebSocket extends Cancelable {
 	 * 同 {@link okhttp3.WebSocket#close(int, String)}
 	 */
 	boolean close(int code, String reason);
-	
+
+	/**
+	 * 设置消息类型
+	 * @param type 消息类型，如 json、xml、protobuf 等
+	 */
+	void msgType(String type);
+
 }

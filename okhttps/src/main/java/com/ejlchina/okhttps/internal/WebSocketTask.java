@@ -40,7 +40,9 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * @return WebSocket
 	 */
 	public WebSocket listen() {
-		WebSocketImpl socket = new WebSocketImpl(httpClient.executor, getBodyType());
+		String bodyType = getBodyType();
+		String msgType = bodyType.toLowerCase().contains("form") ? "json" : bodyType;
+		WebSocketImpl socket = new WebSocketImpl(httpClient.executor, msgType);
 		registeTagTask(socket);
 		httpClient.preprocess(this, () -> {
 			synchronized (socket) {
@@ -131,11 +133,11 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 		Charset charset;
 
-		String bodyType;
+		String msgType;
 
-		public WebSocketImpl(TaskExecutor taskExecutor, String bodyType) {
+		public WebSocketImpl(TaskExecutor taskExecutor, String msgType) {
 			this.taskExecutor = taskExecutor;
-			this.bodyType = bodyType;
+			this.msgType = msgType;
 		}
 
 		public void setCharset(Charset charset) {
@@ -159,7 +161,12 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			cancelOrClosed = true;
 			return true;
 		}
-		
+
+		@Override
+		public void msgType(String type) {
+			this.msgType = type;
+		}
+
 		@Override
 		public long queueSize() {
 			if (webSocket != null) {
@@ -206,7 +213,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			if (msg instanceof byte[]) {
 				return webSocket.send(ByteString.of((byte[]) msg));
 			}
-			byte[] bytes = taskExecutor.doMsgConvert(bodyType, (MsgConvertor c) -> c.serialize(msg, charset)).data;
+			byte[] bytes = taskExecutor.doMsgConvert(msgType, (MsgConvertor c) -> c.serialize(msg, charset)).data;
 			return webSocket.send(new String(bytes, charset));
 		}
 		
