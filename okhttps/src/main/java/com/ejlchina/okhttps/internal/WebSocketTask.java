@@ -1,12 +1,12 @@
 package com.ejlchina.okhttps.internal;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.ejlchina.okhttps.HttpResult;
 import com.ejlchina.okhttps.HttpTask;
+import com.ejlchina.okhttps.MsgConvertor;
 import com.ejlchina.okhttps.WebSocket;
 import com.ejlchina.okhttps.WebSocket.Close;
 import com.ejlchina.okhttps.WebSocket.Listener;
@@ -30,6 +30,9 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 	public WebSocketTask(HttpClient httpClient, String url) {
 		super(httpClient, url);
+		if (getBodyType().toLowerCase().contains("form")) {
+			bodyType("json");
+		}
 	}
 
 	/**
@@ -37,7 +40,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * @return WebSocket
 	 */
 	public WebSocket listen() {
-		WebSocketImpl socket = new WebSocketImpl(httpClient.executor, httpClient.charset);
+		WebSocketImpl socket = new WebSocketImpl(httpClient.executor, getBodyType());
 		registeTagTask(socket);
 		httpClient.preprocess(this, () -> {
 			synchronized (socket) {
@@ -45,8 +48,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 					removeTagTask();
         		} else {
 					Request request = prepareRequest("GET");
-					MessageListener listener = new MessageListener(socket);
-					socket.setWebSocket(httpClient.webSocket(request, listener));
+					httpClient.webSocket(request, new MessageListener(socket));
 				}
 			}
     	}, skipPreproc, skipSerialPreproc);
@@ -56,14 +58,19 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	
 	class MessageListener extends WebSocketListener {
 
-		WebSocket webSocket;
+		WebSocketImpl webSocket;
 
-		public MessageListener(WebSocket webSocket) {
+		Charset charset;
+
+		public MessageListener(WebSocketImpl webSocket) {
 			this.webSocket = webSocket;
 		}
 
 		@Override
 		public void onOpen(okhttp3.WebSocket webSocket, Response response) {
+			this.charset = charset(response);
+			this.webSocket.setCharset(charset);
+			this.webSocket.setWebSocket(webSocket);
 			if (onOpen != null) {
 				HttpResult result = new RealHttpResult(WebSocketTask.this, response, httpClient.executor);
 				onOpen.on(this.webSocket, result);
@@ -74,7 +81,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		@Override
 		public void onMessage(okhttp3.WebSocket webSocket, String text) {
 			if (onMessage != null) {
-				onMessage.on(this.webSocket, new MessageBody(text, httpClient.executor));
+				onMessage.on(this.webSocket, new MessageBody(text, httpClient.executor, charset));
 			}
 		}
 
@@ -82,7 +89,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		@Override
 		public void onMessage(okhttp3.WebSocket webSocket, ByteString bytes) {
 			if (onMessage != null) {
-				onMessage.on(this.webSocket, new MessageBody(bytes, httpClient.executor));
+				onMessage.on(this.webSocket, new MessageBody(bytes, httpClient.executor, charset));
 			}
 		}
 
@@ -124,8 +131,14 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 		Charset charset;
 
-		public WebSocketImpl(TaskExecutor taskExecutor, Charset charset) {
+		String bodyType;
+
+		public WebSocketImpl(TaskExecutor taskExecutor, String bodyType) {
 			this.taskExecutor = taskExecutor;
+			this.bodyType = bodyType;
+		}
+
+		public void setCharset(Charset charset) {
 			this.charset = charset;
 		}
 
@@ -156,54 +169,18 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		}
 
 		@Override
-		public boolean send(String text) {
-			if (webSocket != null) {
-				return webSocket.send(text);
-			}
-			queueMsgToSend(text);
-			return true;
-		}
-
-		@Override
-		public boolean send(ByteString bytes) {
-			if (webSocket != null) {
-				return webSocket.send(bytes);
-			}
-			queueMsgToSend(bytes);
-			return true;
-		}
-
-		@Override
-		public boolean send(Object bean) {
-			return send(taskExecutor.convertor().serialize(bean, charset));
-		}
-
-		@Override
-		public boolean send(Object bean, String dateFormat) {
-			return send(taskExecutor.convertor().serialize(bean, dateFormat, charset));
-		}
-		
-		@Override
-		public boolean send(byte[] data) {
-			if (webSocket != null) {
-				return send(webSocket, data);
-			}
-			queueMsgToSend(data);
-			return true;
-		}
-		
-		
-		void queueMsgToSend(Object msg) {
+		public boolean send(Object msg) {
 			if (msg == null) {
-				return;
+				return false;
 			}
 			synchronized (queues) {
 				if (webSocket != null) {
-					send(webSocket, msg);
+					return send(webSocket, msg);
 				} else {
 					queues.add(msg);
 				}
 			}
+			return true;
 		}
 		
 		void setWebSocket(okhttp3.WebSocket webSocket) {
@@ -229,8 +206,8 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			if (msg instanceof byte[]) {
 				return webSocket.send(ByteString.of((byte[]) msg));
 			}
-			byte[] bytes = taskExecutor.convertor().serialize(msg, charset);
-			return webSocket.send(new String(bytes, StandardCharsets.UTF_8));
+			byte[] bytes = taskExecutor.doMsgConvert(bodyType, (MsgConvertor c) -> c.serialize(msg, charset)).data;
+			return webSocket.send(new String(bytes, charset));
 		}
 		
 	}

@@ -116,15 +116,24 @@ public class TaskExecutor {
         }
     }
 
+    public <V> V doMsgConvert(ConvertFunc<V> callable) {
+        Data<V> vData = doMsgConvert(null, callable);
+        return vData != null ? vData.data : null;
+    }
+
     public <V> Data<V> doMsgConvert(String type, ConvertFunc<V> callable) {
         Throwable cause = null;
         for (int i = msgConvertors.length - 1; i >= 0; i--) {
             MsgConvertor convertor = msgConvertors[i];
             String mediaType = convertor.mediaType();
-            if (mediaType == null || !mediaType.contains(type)) {
+            if (type != null && (mediaType == null || !mediaType.contains(type))) {
                 continue;
             }
+            if (callable == null && mediaType != null) {
+                return new Data<>(null, mediaType);
+            }
             try {
+                assert callable != null;
                 return new Data<>(callable.apply(convertor), mediaType);
             } catch (Exception e) {
                 if (cause != null) {
@@ -133,9 +142,13 @@ public class TaskExecutor {
                 cause = e;
             }
         }
+        if (callable == null) {
+            return new Data<>(null, "application/x-www-form-urlencoded");
+        }
         if (cause != null) {
             throw new HttpException("转换失败", cause);
         }
+
         throw new HttpException("没有匹配[" + type + "]类型的转换器！");
     }
 
