@@ -1,4 +1,4 @@
-package com.ejlchina.okhttps;
+package com.ejlchina.okhttps.test;
 
 public class User {
 

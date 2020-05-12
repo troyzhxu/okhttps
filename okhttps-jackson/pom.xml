@@ -22,6 +22,12 @@
 		    <artifactId>jackson-databind</artifactId>
 		    <version>${jackson.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>com.ejlchina</groupId>
+            <artifactId>okhttps-test</artifactId>
+            <version>${okhttps.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 	<build>

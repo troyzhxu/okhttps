@@ -1,44 +1,59 @@
-package com.ejlchina.okhttps;
+package com.ejlchina.okhttps.test;
+
+import com.ejlchina.okhttps.Array;
+import com.ejlchina.okhttps.Mapper;
+import com.ejlchina.okhttps.MsgConvertor;
+import org.junit.Assert;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Test;
+
+public class MsgConvertorTest {
+
+	MsgConvertor msgConvertor;
+
+	public MsgConvertorTest(MsgConvertor msgConvertor) {
+		this.msgConvertor = msgConvertor;
+	}
+
+	public void run() throws Exception {
+		testToMapper();
+		testToArray();
+		testSerialize();
+		testSerializeWithDateFormat();
+		testToBean();
+		testToList();
+	}
 
 
-public class TestCases {
-
-	MsgConvertor msgConvertor = new FastjsonMsgConvertor();
-	
-	@Test
-	public void testToJsonObj() {
+	void testToMapper() {
 		String json = "{\"id\":1,\"name\":\"Jack\"}";
 		InputStream in = new ByteArrayInputStream(json.getBytes());
-		Mapper mapper = msgConvertor.toMapper(in);
+		Mapper mapper = msgConvertor.toMapper(in, StandardCharsets.UTF_8);
 		Set<String> keys = mapper.keySet();
-		Assert.assertTrue(keys.size() == 2);
+		Assert.assertEquals(2, keys.size());
 		Assert.assertTrue(keys.contains("id"));
 		Assert.assertTrue(keys.contains("name"));
-		Assert.assertTrue(!mapper.isEmpty());
-		Assert.assertTrue(2 == mapper.size());
-		Assert.assertTrue(1 == mapper.getInt("id"));
-		Assert.assertTrue(!mapper.has("age"));
-		Assert.assertTrue(0 == mapper.getInt("age"));
+		Assert.assertFalse(mapper.isEmpty());
+		Assert.assertEquals(2, mapper.size());
+		Assert.assertEquals(1, mapper.getInt("id"));
+		Assert.assertFalse(mapper.has("age"));
+		Assert.assertEquals(0, mapper.getInt("age"));
 		Assert.assertEquals("Jack", mapper.getString("name"));
 	}
-	
-	@Test
-	public void testToJsonArr() {
+
+	void testToArray() {
 		String json = "[{\"id\":1,\"name\":\"Jack\"},{\"id\":2,\"name\":\"Tom\"}]";
 		InputStream in = new ByteArrayInputStream(json.getBytes());
-		Array jsonObj = msgConvertor.toArray(in);
-		Assert.assertTrue(!jsonObj.isEmpty());
-		Assert.assertTrue(jsonObj.size() == 2);
+		Array jsonObj = msgConvertor.toArray(in, StandardCharsets.UTF_8);
+		Assert.assertFalse(jsonObj.isEmpty());
+		Assert.assertEquals(2, jsonObj.size());
 		Mapper json1 = jsonObj.getMapper(0);
 		Mapper json2 = jsonObj.getMapper(1);
 		Assert.assertEquals(1, json1.getInt("id"));
@@ -46,37 +61,36 @@ public class TestCases {
 		Assert.assertEquals(2, json2.getInt("id"));
 		Assert.assertEquals("Tom", json2.getString("name"));
 	}
-	
-	@Test
-	public void testToJsonStr() {
-		String json = msgConvertor.serialize(new User(1, "Jack"));
+
+	void testSerialize() {
+		byte[] data = msgConvertor.serialize(new User(1, "Jack"), StandardCharsets.UTF_8);
+		String json = new String(data, StandardCharsets.UTF_8);
 		Assert.assertEquals("{\"id\":1,\"name\":\"Jack\"}", json);
 	}
 	
-	@Test
-	public void testToJsonStrWithDateFormat() throws ParseException {
+
+	void testSerializeWithDateFormat() throws ParseException {
 		String dataFormat = "yyyy-MM-dd HH:mm:ss";
 		SimpleDateFormat sdf = new SimpleDateFormat(dataFormat);
 		String date = "2020-05-09 12:30:15";
-		String json = msgConvertor.serialize(new DateBean(1, sdf.parse(date)), dataFormat);
+		byte[] data = msgConvertor.serialize(new DateBean(1, sdf.parse(date)), dataFormat, StandardCharsets.UTF_8);
+		String json = new String(data, StandardCharsets.UTF_8);
 		Assert.assertTrue(json.contains(date));
 	}
-	
-	@Test
-	public void testJsonToBean() {
+
+	void testToBean() {
 		String json = "{\"id\":1,\"name\":\"Jack\"}";
 		InputStream in = new ByteArrayInputStream(json.getBytes());
-		User user = msgConvertor.toBean(User.class, in);
+		User user = msgConvertor.toBean(User.class, in, StandardCharsets.UTF_8);
 		Assert.assertEquals(1, user.getId());
 		Assert.assertEquals("Jack", user.getName());
 	}
-	
-	@Test
-	public void testJsonToList() {
+
+	void testToList() {
 		String json = "[{\"id\":1,\"name\":\"Jack\"},{\"id\":2,\"name\":\"Tom\"}]";
 		InputStream in = new ByteArrayInputStream(json.getBytes());
-		List<User> users = msgConvertor.toList(User.class, in);
-		Assert.assertTrue(2 == users.size());
+		List<User> users = msgConvertor.toList(User.class, in, StandardCharsets.UTF_8);
+		Assert.assertEquals(2, users.size());
 		User u1 = users.get(0);
 		User u2 = users.get(1);
 		Assert.assertEquals(1, u1.getId());
