@@ -12,6 +12,11 @@ import okhttp3.WebSocketListener;
  */
 public final class OkHttps {
 
+    public static final String FORM = "form";
+    public static final String JSON = "json";
+    public static final String XML = "xml";
+    public static final String PROTOBUF = "protobuf";
+
     private static HTTP http;
 
     private OkHttps() {}

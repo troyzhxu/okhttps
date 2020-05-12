@@ -433,7 +433,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      */
     @Deprecated
     public C addJsonParam(String name, Object value) {
-        this.bodyType = "json";
+        this.bodyType = OkHttps.JSON;
         return addBodyPara(name, value);
     }
 
@@ -446,7 +446,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      */
     @Deprecated
     public C addJsonParam(Map<String, ?> params) {
-        this.bodyType = "json";
+        this.bodyType = OkHttps.JSON;
         return addBodyPara(params);
     }
 
@@ -458,7 +458,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      **/
     @Deprecated
     public C setRequestJson(Object body) {
-        this.bodyType = "json";
+        this.bodyType = OkHttps.JSON;
         return setBodyPara(body);
     }
 
@@ -471,7 +471,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      */
     @Deprecated
     public C setRequestJson(Object body, String dateFormat) {
-        this.bodyType = "json";
+        this.bodyType = OkHttps.JSON;
         this.dateFormat = dateFormat;
         return setBodyPara(body);
     }
@@ -762,7 +762,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         if (bodyParams == null) {
             return new FormBody.Builder(charset).build();
         }
-        if (bodyType.toLowerCase().contains("form")) {
+        if (bodyType.toLowerCase().contains(OkHttps.FORM)) {
             FormBody.Builder builder = new FormBody.Builder(charset);
             for (String name : bodyParams.keySet()) {
                 String value = bodyParams.get(name);
@@ -849,7 +849,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
                 throw new HttpException("方法 addFilePara 与 setBodyPara 不能同时调用！");
             }
         }
-        if (files != null && "form".equals(bodyType)) {
+        if (files != null && OkHttps.FORM.equals(bodyType)) {
             throw new HttpException("方法 addFilePara 只能使用 form 方式请求！");
         }
     }

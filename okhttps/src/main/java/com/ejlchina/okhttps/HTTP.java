@@ -133,7 +133,7 @@ public interface HTTP {
 
         private Charset charset = StandardCharsets.UTF_8;
 
-        private String bodyType = "json";
+        private String bodyType = OkHttps.FORM;
 
         public Builder() {
             mediaTypes = new HashMap<>();

@@ -4,10 +4,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ejlchina.okhttps.HttpResult;
-import com.ejlchina.okhttps.HttpTask;
-import com.ejlchina.okhttps.MsgConvertor;
-import com.ejlchina.okhttps.WebSocket;
+import com.ejlchina.okhttps.*;
 import com.ejlchina.okhttps.WebSocket.Close;
 import com.ejlchina.okhttps.WebSocket.Listener;
 import com.ejlchina.okhttps.WebSocket.Message;
@@ -30,9 +27,6 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 	public WebSocketTask(HttpClient httpClient, String url) {
 		super(httpClient, url);
-		if (getBodyType().toLowerCase().contains("form")) {
-			bodyType("json");
-		}
 	}
 
 	/**
@@ -41,7 +35,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 */
 	public WebSocket listen() {
 		String bodyType = getBodyType();
-		String msgType = bodyType.toLowerCase().contains("form") ? "json" : bodyType;
+		String msgType = bodyType.toLowerCase().contains(OkHttps.FORM) ? OkHttps.JSON : bodyType;
 		WebSocketImpl socket = new WebSocketImpl(httpClient.executor, msgType);
 		registeTagTask(socket);
 		httpClient.preprocess(this, () -> {
@@ -123,17 +117,17 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	
 	static class WebSocketImpl implements WebSocket {
 
-		boolean cancelOrClosed;
+		private boolean cancelOrClosed;
 
-		okhttp3.WebSocket webSocket;
-		
-		final List<Object> queues = new ArrayList<>();
-		
-		TaskExecutor taskExecutor;
+		private okhttp3.WebSocket webSocket;
 
-		Charset charset;
+		private final List<Object> queues = new ArrayList<>();
 
-		String msgType;
+		private TaskExecutor taskExecutor;
+
+		private Charset charset;
+
+		private String msgType;
 
 		public WebSocketImpl(TaskExecutor taskExecutor, String msgType) {
 			this.taskExecutor = taskExecutor;
