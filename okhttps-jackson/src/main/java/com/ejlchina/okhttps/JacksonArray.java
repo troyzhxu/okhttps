@@ -1,8 +1,5 @@
 package com.ejlchina.okhttps;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -93,24 +90,6 @@ public class JacksonArray implements Array {
 		JsonNode subJson = json.get(index);
 		if (subJson != null) {
 			return subJson.asText();
-		}
-		return null;
-	}
-
-	@Override
-	public BigDecimal getBigDecimal(int index) {
-		JsonNode subJson = json.get(index);
-		if (subJson != null && subJson.isNumber()) {
-			return subJson.decimalValue();
-		}
-		return null;
-	}
-
-	@Override
-	public BigInteger getBigInteger(int index) {
-		JsonNode subJson = json.get(index);
-		if (subJson != null && subJson.isNumber()) {
-			return subJson.bigIntegerValue();
 		}
 		return null;
 	}

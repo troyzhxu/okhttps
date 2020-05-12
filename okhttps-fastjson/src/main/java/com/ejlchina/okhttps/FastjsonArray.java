@@ -1,8 +1,5 @@
 package com.ejlchina.okhttps;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -70,16 +67,6 @@ public class FastjsonArray implements Array {
 	@Override
 	public String getString(int index) {
 		return json.getString(index);
-	}
-
-	@Override
-	public BigDecimal getBigDecimal(int index) {
-		return json.getBigDecimal(index);
-	}
-
-	@Override
-	public BigInteger getBigInteger(int index) {
-		return json.getBigInteger(index);
 	}
 
 	@Override

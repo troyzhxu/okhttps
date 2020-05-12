@@ -12,10 +12,9 @@ import okhttp3.WebSocketListener;
  */
 public final class OkHttps {
 
-    private OkHttps() {}
-
-
     private static HTTP http;
+
+    private OkHttps() {}
 
     static synchronized HTTP getHttp() {
         if (http != null) {
@@ -27,7 +26,6 @@ public final class OkHttps {
         http = builder.build();
         return http;
     }
-
 
     /**
      * 异步请求

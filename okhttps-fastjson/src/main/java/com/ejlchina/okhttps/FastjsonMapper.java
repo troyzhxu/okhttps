@@ -1,11 +1,9 @@
 package com.ejlchina.okhttps;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Set;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+
+import java.util.Set;
 
 public class FastjsonMapper implements Mapper {
 
@@ -73,16 +71,6 @@ public class FastjsonMapper implements Mapper {
 		return json.getString(key);
 	}
 
-	@Override
-	public BigDecimal getBigDecimal(String key) {
-		return json.getBigDecimal(key);
-	}
-
-	@Override
-	public BigInteger getBigInteger(String key) {
-		return json.getBigInteger(key);
-	}
-	
 	@Override
 	public boolean has(String key) {
 		return json.containsKey(key);

@@ -1,14 +1,12 @@
 package com.ejlchina.okhttps;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class JacksonMapper implements Mapper {
 
@@ -96,24 +94,6 @@ public class JacksonMapper implements Mapper {
 		JsonNode subJson = json.get(key);
 		if (subJson != null) {
 			return subJson.asText();
-		}
-		return null;
-	}
-
-	@Override
-	public BigDecimal getBigDecimal(String key) {
-		JsonNode subJson = json.get(key);
-		if (subJson != null && subJson.isNumber()) {
-			return subJson.decimalValue();
-		}
-		return null;
-	}
-
-	@Override
-	public BigInteger getBigInteger(String key) {
-		JsonNode subJson = json.get(key);
-		if (subJson != null && subJson.isNumber()) {
-			return subJson.bigIntegerValue();
 		}
 		return null;
 	}

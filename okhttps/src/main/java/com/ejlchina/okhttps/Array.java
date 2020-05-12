@@ -1,8 +1,10 @@
 package com.ejlchina.okhttps;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
+/**
+ * @since 2.0.0
+ * Array 接口 类似于 JsonArray
+ * 但为什么不取名为 json 呢，因它不止是 json，它还可以是 xml、yml、protobuf 等任何一种格式的数据
+ */
 public interface Array {
 
 	/**
@@ -62,17 +64,5 @@ public interface Array {
 	 * @return String 值
 	 */
 	String getString(int index);
-	
-	/**
-	 * @param index 元素下标
-	 * @return BigDecimal 值
-	 */
-	BigDecimal getBigDecimal(int index);
-	
-	/**
-	 * @param index 元素下标
-	 * @return BigInteger 值
-	 */
-	BigInteger getBigInteger(int index);
 
 }

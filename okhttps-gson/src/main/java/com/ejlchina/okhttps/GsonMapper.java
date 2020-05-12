@@ -1,11 +1,9 @@
 package com.ejlchina.okhttps;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Set;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import java.util.Set;
 
 public class GsonMapper implements Mapper {
 
@@ -93,24 +91,6 @@ public class GsonMapper implements Mapper {
 		JsonElement val = json.get(key);
 		if (val != null) {
 			return val.getAsString();
-		}
-		return null;
-	}
-
-	@Override
-	public BigDecimal getBigDecimal(String key) {
-		JsonElement val = json.get(key);
-		if (val != null) {
-			return val.getAsBigDecimal();
-		}
-		return null;
-	}
-
-	@Override
-	public BigInteger getBigInteger(String key) {
-		JsonElement val = json.get(key);
-		if (val != null) {
-			return val.getAsBigInteger();
 		}
 		return null;
 	}

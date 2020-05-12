@@ -1,8 +1,5 @@
 package com.ejlchina.okhttps;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
@@ -92,24 +89,6 @@ public class GsonArray implements Array {
 		JsonElement val = json.get(index);
 		if (val != null) {
 			return val.getAsString();
-		}
-		return null;
-	}
-
-	@Override
-	public BigDecimal getBigDecimal(int index) {
-		JsonElement val = json.get(index);
-		if (val != null) {
-			return val.getAsBigDecimal();
-		}
-		return null;
-	}
-
-	@Override
-	public BigInteger getBigInteger(int index) {
-		JsonElement val = json.get(index);
-		if (val != null) {
-			return val.getAsBigInteger();
 		}
 		return null;
 	}
