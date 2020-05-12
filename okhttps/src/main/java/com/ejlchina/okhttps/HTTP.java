@@ -335,7 +335,7 @@ public interface HTTP {
          * @param charset 编码
          * @return Builder
          */
-        public Builder defaultCharset(Charset charset) {
+        public Builder charset(Charset charset) {
             if (charset != null) {
                 this.charset = charset;
             }
@@ -348,7 +348,7 @@ public interface HTTP {
          * @param bodyType 请求体类型
          * @return Builder
          */
-        public Builder defaultBodyType(String bodyType) {
+        public Builder bodyType(String bodyType) {
             if (bodyType != null) {
                 this.bodyType = bodyType;
             }
