@@ -72,12 +72,6 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 
 	@Override
 	public byte[] serialize(Object object, String dateFormat, Charset charset) {
-		if (object instanceof byte[]) {
-			return (byte[]) object;
-		}
-		if (object instanceof String) {
-			return object.toString().getBytes(charset);
-		}
 		ObjectMapper mapper = objectMapper;
 		if (dateFormat != null) {
 			mapper = mapper.copy().configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)

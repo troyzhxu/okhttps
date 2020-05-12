@@ -46,12 +46,6 @@ public class GsonMsgConvertor implements MsgConvertor, ConvertProvider {
 
 	@Override
 	public byte[] serialize(Object object, String dateFormat, Charset charset) {
-		if (object instanceof byte[]) {
-			return (byte[]) object;
-		}
-		if (object instanceof String) {
-			return object.toString().getBytes(charset);
-		}
 		Gson gson = this.gson;
 		if (dateFormat != null) {
 			gson = gson.newBuilder().setDateFormat(dateFormat).create();

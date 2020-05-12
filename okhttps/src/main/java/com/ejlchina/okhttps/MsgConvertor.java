@@ -100,12 +100,6 @@ public interface MsgConvertor {
 
 		@Override
 		public byte[] serialize(Object object, String dateFormat, Charset charset) {
-			if (object instanceof byte[]) {
-				return (byte[]) object;
-			}
-			if (object instanceof String) {
-				return object.toString().getBytes(charset);
-			}
 			byte[] data = convertor.serialize(object, dateFormat, charset);
 			Mapper mapper = convertor.toMapper(new ByteArrayInputStream(data), charset);
 			StringBuilder sb = new StringBuilder();
