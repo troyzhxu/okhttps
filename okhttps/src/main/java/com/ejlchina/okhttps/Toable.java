@@ -34,12 +34,12 @@ public interface Toable {
     String toString();
 
     /**
-     * @return 消息体转Json对象
+     * @return 消息体转 Mapper 对象（不想定义 Java Bean 时使用）
      */
     Mapper toMapper();
 
     /**
-     * @return 消息体转Json数组
+     * @return 消息体转 Array 数组（不想定义 Java Bean 时使用）
      */
     Array toArray();
 
