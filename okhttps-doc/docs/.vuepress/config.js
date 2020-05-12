@@ -7,19 +7,36 @@ module.exports = {
   themeConfig: {
     logo: '/logo.png',
     nav: [
-      { text: '教程', link: '/guide/' },
+      { 
+        text: '教程',
+        ariaLabel: '版本',
+        items: [
+          { text: 'v1.x', link: '/v1/' },
+          { text: 'v2.x', link: '/v2/' }
+        ]
+      },
       { text: '历史版本', link: 'https://gitee.com/ejlchina-zhxu/okhttps/releases' },
       { text: 'Grails 中文', link: 'http://grails.ejlchina.com' },
       { text: '码云', link: 'https://gitee.com/ejlchina-zhxu/okhttps' }
     ],
-    sidebar: [
-      ['/guide/', '起步'],
-      ['/guide/foundation', '基础'],
-      ['/guide/configuration', '配置'],
-      ['/guide/features', '特色'],
-      ['/guide/updown', '上传下载'],
-      ['/guide/android', '安卓'],
-    ],
+    sidebar: {
+      '/v1/': [
+        '',
+        'foundation',
+        'configuration', 
+        'features', 
+        'updown',
+        'android'
+      ],
+      '/v2/': [
+        '',
+        'foundation',
+        'configuration', 
+        'features', 
+        'updown',
+        'android'
+      ]
+    },
     sidebarDepth: 2,
     smoothScroll: true,
     lastUpdated: '上次更新',

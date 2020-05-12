@@ -4,7 +4,7 @@ heroImage: /logo.png
 heroText: OkHttps
 tagline: 基于 OkHttp 增强版 HTTP 客户端
 actionText: 极速上手 →
-actionLink: /guide/
+actionLink: /v2/
 features:
 - title: 轻量纯粹优雅
   details: OkHttps 非常轻量，体积仅是 Retrofit 的一半不到，并且不依赖于特定平台，API 语义简洁舒适。
@@ -68,4 +68,4 @@ http.async("/users/jack")               //  http://api.demo.com/users/jack
 </CodeSwitcher> -->
 
 **<center>竟然不到 <font size=5>15</font> 秒，你已学会 <font size=6>90</font>% 的精髓！</center>**
-<center>[**了解更多**](/guide/)</center>
+<center>[**了解更多**](/v2/)</center>
