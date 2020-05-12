@@ -158,6 +158,9 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 		@Override
 		public void msgType(String type) {
+			if (type == null || type.equalsIgnoreCase(OkHttps.FORM)) {
+				throw new IllegalArgumentException("msgType 不可为空 或 form");
+			}
 			this.msgType = type;
 		}
 
