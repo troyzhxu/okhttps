@@ -35,9 +35,8 @@ public class ResultBody extends AbstractBody implements Body {
 	}
 
 
-
 	@Override
-	public MediaType getContentType() {
+	public MediaType getType() {
 		ResponseBody body = response.body();
 		if (body != null) {
 			return body.contentType();
@@ -46,12 +45,22 @@ public class ResultBody extends AbstractBody implements Body {
 	}
 
 	@Override
-	public long getContentLength() {
+	public long getLength() {
 		ResponseBody body = response.body();
 		if (body != null) {
 			return body.contentLength();
 		}
 		return 0;
+	}
+
+	@Override
+	public MediaType getContentType() {
+		return getType();
+	}
+
+	@Override
+	public long getContentLength() {
+		return getLength();
 	}
 	
 	@Override

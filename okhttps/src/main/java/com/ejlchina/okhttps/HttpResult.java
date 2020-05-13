@@ -75,15 +75,29 @@ public interface HttpResult {
 	 * HTTP响应报文体
 	 */
 	interface Body extends Toable {
-		
+
 		/**
 		 * @return 媒体类型
 		 */
-		MediaType getContentType();
-		
+		MediaType getType();
+
 		/**
 		 * @return 报文体字节长度
 		 */
+		long getLength();
+
+		/**
+		 * 推荐使用 {@link #getType()} 方法
+		 * @return 媒体类型
+		 */
+		@Deprecated
+		MediaType getContentType();
+		
+		/**
+		 * 推荐使用 {@link #getLength()} 方法
+		 * @return 报文体字节长度
+		 */
+		@Deprecated
 		long getContentLength();
 
 	    /**
@@ -200,7 +214,13 @@ public interface HttpResult {
 	 * @return 响应头
 	 */
 	String getHeader(String name);
-	
+
+	/**
+	 * 获取响应报文体长度（从请求头内提取）
+	 * @return 长度
+	 */
+	long getContentLength();
+
 	/**
 	 * @return 响应报文体
 	 */
