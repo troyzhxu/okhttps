@@ -25,12 +25,6 @@
  * 单方法回调，充分利用 Lambda 表达式
  * TCP连接池、Http2
 
-::: tip
-* OkHttps 非常轻量（83Kb，Retrofit：124Kb），除 Okhttp 无第三方依赖，并且更加的开箱即用，API 也更加自然和语义化。
-* OkHttps 是一个纯粹的 Java 网络开发包，并不依赖 Android，这一点和 Retrofit 不同
-* OkHttps 用起来很优美，可以像 RxJava 那样链式用，却比 RxJava 更简单。
-:::
-
 # 相关项目
 
 项目 | 最新版本 | 描述
