@@ -19,6 +19,7 @@ import com.ejlchina.okhttps.internal.HttpClient.TagTask;
 
 import okhttp3.*;
 import okhttp3.internal.Util;
+import okhttp3.internal.http.HttpMethod;
 import okio.Buffer;
 
 /**
@@ -655,18 +656,18 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     protected Call prepareCall(String method) {
-        assertNotConflict("GET".equals(method));
         Request request = prepareRequest(method);
 		return httpClient.request(request);
     }
 
     protected Request prepareRequest(String method) {
+        boolean bodyCanUsed = HttpMethod.permitsRequestBody(method);
+        assertNotConflict(!bodyCanUsed);
 		Request.Builder builder = new Request.Builder()
                 .url(buildUrlPath());
         buildHeaders(builder);
-        RequestBody reqBody = null;
-        if (!"GET".equals(method)) {
-            reqBody = buildRequestBody();
+        if (bodyCanUsed) {
+            RequestBody reqBody = buildRequestBody();
             if (onProcess != null) {
                 long contentLength = contentLength(reqBody);
                 if (stepRate > 0 && stepRate <= 1) {
@@ -679,22 +680,9 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
                         httpClient.executor().getExecutor(pOnIO),
                         contentLength, stepBytes);
             }
-        }
-        switch (method) {
-            case "GET":
-                builder.get();
-                break;
-            case "POST":
-                builder.post(reqBody);
-                break;
-            case "PUT":
-                builder.put(reqBody);
-                break;
-            case "DELETE":
-                builder.delete(reqBody);
-                break;
-            default:
-            	builder.method(method, reqBody);
+            builder.method(method, reqBody);
+        } else {
+            builder.method(method, null);
         }
 		return builder.build();
 	}
@@ -829,16 +817,16 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         return sb.toString();
     }
 
-    protected void assertNotConflict(boolean isGetRequest) {
-        if (isGetRequest) {
+    protected void assertNotConflict(boolean bodyCantUsed) {
+        if (bodyCantUsed) {
             if (requestBody != null) {
-                throw new HttpException("GET 请求 不能调用 setBodyPara 方法！");
+                throw new HttpException("GET | HEAD 请求 不能调用 setBodyPara 方法！");
             }
             if (bodyParams != null) {
-                throw new HttpException("GET 请求 不能调用 addBodyPara 方法！");
+                throw new HttpException("GET | HEAD 请求 不能调用 addBodyPara 方法！");
             }
             if (files != null) {
-                throw new HttpException("GET 请求 不能调用 addFilePara 方法！");
+                throw new HttpException("GET | HEAD 请求 不能调用 addFilePara 方法！");
             }
         }
         if (requestBody != null) {
