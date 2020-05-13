@@ -18,7 +18,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 </dependency>
 ```
 
-单独使用 OkHttps 需要自定义`MsgConvertor`，否则无法使用 **自动正反序列化** 相关功能，后文会详细讲解哪些功能会受到此影响。
+单独使用 OkHttps 需要自定义[`MsgConvertor`](https://gitee.com/ejlchina-zhxu/okhttps/blob/master/okhttps/src/main/java/com/ejlchina/okhttps/MsgConvertor.java)，否则无法使用 **自动正反序列化** 相关功能，后文会详细讲解哪些功能会受到此影响。
 
 #### 与 fastjson 一起使用
 
@@ -58,7 +58,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 implementation 'com.ejlchina:okhttps:2.0.0.RC'
 ```
 
-单独使用 OkHttps 需要自定义`MsgConvertor`，否则无法使用 **自动正反序列化** 相关功能，后文会详细讲解哪些功能会受到此影响。
+单独使用 OkHttps 需要自定义[`MsgConvertor`](https://gitee.com/ejlchina-zhxu/okhttps/blob/master/okhttps/src/main/java/com/ejlchina/okhttps/MsgConvertor.java)，否则无法使用 **自动正反序列化** 相关功能，后文会详细讲解哪些功能会受到此影响。
 
 #### 与 fastjson 一起使用
 
@@ -99,7 +99,8 @@ android {
 ```java
 HTTP http = HTTP.builder().build();
 ```
-　　以上代码构建了一个最简单的`HTTP`实例，它拥有以下方法：
+
+以上代码构建了一个最简单的`HTTP`实例，它拥有以下方法：
 
 * `sync(String url)`   开始一个同步 HTTP 请求 
 * `async(String url)`  开始一个异步 HTTP 请求 
@@ -108,9 +109,9 @@ HTTP http = HTTP.builder().build();
 * `cancelAll()`        取消所有（同步 | 异步 | WebSocket）连接
 * `request(Request request)`  OkHttp 原生 HTTP 请求 
 * `webSocket(Request request, WebSocketListener listener)` OkHttp 原生 WebSocket 连接
-* `newBuilder()`       用于重构构建一个 HTTP 实例
+* `newBuilder()`       用于重新构建一个 HTTP 实例
 
-　　为了使用方便，在构建的时候，我们更愿意指定一个`BaseUrl`和`MsgConvertor`（详见 [设置 BaseUrl](/v1/configuration.html#设置-baseurl)）:
+为了使用方便，在构建的时候，我们更愿意指定一个`BaseUrl`和[`MsgConvertor`](https://gitee.com/ejlchina-zhxu/okhttps/blob/master/okhttps/src/main/java/com/ejlchina/okhttps/MsgConvertor.java)（详见 [设置 BaseUrl](/v1/configuration.html#设置-baseurl)）:
 
 ```java
 HTTP http = HTTP.builder()
@@ -118,7 +119,8 @@ HTTP http = HTTP.builder()
         .addMsgConvertor(new GsonMsgConvertor());
         .build();
 ```
-　　为了简化文档，下文中出现的`http`均是在构建时设置了`BaseUrl`和`MsgConvertor`的`HTTP`实例。
+
+上例中的[`GsonMsgConvertor`](https://gitee.com/ejlchina-zhxu/okhttps/blob/master/okhttps-gson/src/main/java/com/ejlchina/okhttps/GsonMsgConvertor.java)来自[`okhttps-gson`](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-gson)。为了简化文档，下文中出现的`http`均是在构建时设置了`BaseUrl`和`MsgConvertor`的`HTTP`实例。
 
 
 ### 同步请求
@@ -174,10 +176,10 @@ OkHttps 提供了两个开箱即用的工具类，让你从此告别封装工具
 
 工具类 | 起始版本 | 功能特点
 -|-|-
-`OkHttps` | `2.0.0.RC` | 支持自动注入`MsgConvertor`，支持 SPI 方式注入配置，推荐用于主应用的网络开发
-`HttpUtils` | `1.0.0` | 自 `2.0.0.RC` 开始支持自动注入`MsgConvertor`，不建议再做其它配置，推荐用于第三方依赖包中的网络开发
+`OkHttps` | `2.0.0.RC` | 支持自动注入`MsgConvertor`，支持 [SPI 方式注入配置](#配置okhttps)，推荐用于主应用中的网络开发
+`HttpUtils` | `1.0.0` | 自`2.0.0.RC`开始支持自动注入`MsgConvertor`，不建议再做其它配置，推荐用于第三方依赖包中的网络开发
 
-这两个工具类会自动以 SPI 方式注入依赖中的`MsgConvertor`（在第一次使用的时候），只要你的项目中添加了相关依赖（如：okhttps-fastjson 等）。并且它们和`HTTP`接口拥有几乎一样的方法，并且这些方法都是静态的：
+这两个工具都类会自动以 SPI 方式注入依赖中的`MsgConvertor`（在第一次使用的时候），只要你的项目中添加了相关依赖（如：okhttps-fastjson 等）。并且它们和`HTTP`接口拥有几乎一样的方法，并且这些方法都是静态的：
 
 * `sync(String url)`   开始一个同步 HTTP 请求 
 * `async(String url)`  开始一个异步 HTTP 请求 
@@ -202,7 +204,9 @@ OkHttps.async("https://api.example.com/auth/login")
         .post();
 ```
 
-另外，`OkHttps`还支持以 SPI 方式注入自定义配置，分以下两步：
+### 配置`OkHttps`
+
+工具类`OkHttps`还支持以 SPI 方式注入自定义配置，分以下两步：
 
 #### 第一步、新建一个配置类，实现`com.ejlchina.okhttps.Config`接口
 
@@ -220,6 +224,11 @@ public class OkHttpsConfig implements Config {
     public void with(HTTP.Builder builder) {
         // 在这里对 HTTP.Builder 做一些自定义的配置
         builder.baseUrl("https://api.domo.com");
+        // 如果项目中添加了 okhttps-fastjson 或 okhttps-gson 或 okhttps-jackson 依赖
+        // OkHttps 会自动注入它们提供的 MsgConvertor 
+        // 所以这里就不需要再配置 MsgConvertor 了 (内部实现自动注入的原理也是 SPI)
+        // 但如果没有添加这些依赖，那还需要自定义一个 MsgConvertor
+        builder.addMsgConvertor(new MyCustomeMsgConvertor());
     }
 
 }
