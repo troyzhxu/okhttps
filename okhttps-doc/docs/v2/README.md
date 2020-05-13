@@ -2,102 +2,49 @@
 description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sync async BaseUrl request webSocket gradle maven ejlchina
 ---
 
-# 起步
+# 介绍
+
+## OkHttps 简介
 
 　　OkHttps 是近期开源的对 OkHttp3 轻量封装的框架，它独创的异步预处理器，特色的标签，灵活的上传下载进度监听与过程控制功能，在轻松解决很多原本另人头疼问题的同时，设计上也力求纯粹与优雅。
 
  * 链式调用，一点到底
- * BaseURL、URL占位符、JSON自动封装与解析
+ * BaseURL、URL占位符、HTTP、WebSocket
+ * JSON、Xml 等自动封装与解析，且支持与任意格式的数据解析框架集成
  * 同步拦截器、异步预处理器、回调执行器、全局监听、回调阻断
  * 文件上传下载（过程控制、进度监听）
  * 单方法回调，充分利用 Lambda 表达式
  * TCP连接池、Http2
 
 ::: tip
-* OkHttps 非常轻量（59Kb），仅是 Retrofit（124Kb）的一半，并且更加的开箱即用，API 也更加自然和语义化。
+* OkHttps 非常轻量（83Kb，Retrofit：124Kb），除 Okhttp 无第三方依赖，并且更加的开箱即用，API 也更加自然和语义化。
 * OkHttps 是一个纯粹的 Java 网络开发包，并不依赖 Android，这一点和 Retrofit 不同
 * OkHttps 用起来很优美，可以像 RxJava 那样链式用，却比 RxJava 更简单。
 :::
 
-## 安装
+### 可选依赖
 
-### Maven
+项目 | 最新版本 | 描述
+-|-|-
+okhttps-fastjson | 2.0.0.RC | 与 fastjson 集成
+okhttps-gson | 2.0.0.RC | 与 gson 集成
+okhttps-jackson | 2.0.0.RC | 与 jackson 集成
 
-```xml
-<dependency>
-     <groupId>com.ejlchina</groupId>
-     <artifactId>okhttps</artifactId>
-     <version>1.0.5</version>
-</dependency>
-```
-### Gradle
-
-```groovy
-implementation 'com.ejlchina:okhttps:1.0.5'
-```
-
-安卓中使用需要把 JDK 版本调成 1.8，在 app 模块的 build.gradle 中加入以下配置即可：
-
-```groovy
-android {
-    // 省略其它配置..
-    compileOptions {
-        sourceCompatibility = 1.8
-        targetCompatibility = 1.8
-    }
-}
-```
-
-## 使用
-
-### 构建实例
-
-```java
-HTTP http = HTTP.builder().build();
-```
-　　以上代码构建了一个最简单的`HTTP`实例，它拥有以下方法：
-
-* `sync(String url)`   开始一个同步请求 
-* `async(String url)`  开始一个异步请求 
-* `cancel(String tag)` 按标签取消请求
-* `cancelAll()`        取消所有HTTP任务，包括同步和异步
-* `request(Request request)`  OkHttp 原生请求 
-* `webSocket(Request request, WebSocketListener listener)` WebSocket通讯
-
-　　为了使用方便，在构建的时候，我们更愿意指定一个`BaseUrl`（详见 [设置 BaseUrl](/v1/configuration.html#设置-baseurl)）:
-
-```java
-HTTP http = HTTP.builder()
-        .baseUrl("http://api.demo.com")
-        .build();
-```
-　　为了简化文档，下文中出现的`http`均是在构建时设置了`BaseUrl`的`HTTP`实例。
-
-### 同步请求
-
-　　使用方法`sync(String url)`开始一个同步请求：
-
-```java
-List<User> users = http.sync("/users") // http://api.demo.com/users
-        .get()                         // GET请求
-        .getBody()                     // 获取响应报文体
-        .toList(User.class);           // 得到目标数据
-```
-　　方法`sync`返回一个同步`HttpTask`，可链式使用。
-
-### 异步请求
-
-　　使用方法`async(String url)`开始一个异步请求：
-
-```java
-http.async("/users/1")                //  http://api.demo.com/users/1
-        .setOnResponse((HttpResult result) -> {
-            // 得到目标数据
-            User user = result.getBody().toBean(User.class);
-        })
-        .get();                       // GET请求
-```
-　　方法`async`返回一个异步`HttpTask`，可链式使用。
+以上是官方维护的与三大JSON框架集成的案例，后续将提供 xml 和 protobuf 的集成。
 
 
-**至此，你已轻松学会了 OkHttps 95% 的常规用法！但别急，后面还有更精彩的。**
+## v2.x 的新特性
+
+* HTTP 任务新增`patch()`方法，可发起 PATCH 请求，目前直接支持的 HTTP 方法有：GET、POST、PUT、PATCH、DELETE，并且暴露了`request(String method)`方法，可自定义发起任何请求，如：HEAD、OPTIONS、TRACE、CONNECT 等；
+
+* HTTP 任务新增`skipPreproc()`和`skipSerialPreproc()`，具体请求可跳过 所有 或只跳过 串行 预处理器；
+
+* 新增`MsgConvertor`接口，实现 OkHttps 与 fastjson 解耦，且不再依赖某个具体 json 框架、甚至不依赖 json，它可以与 **任何格式** 的数据解析框架 集成，如：json 、xml 、protobuf 等;
+
+* 构建`HTTP`实例时支持注入多个`MsgConvertor`，可实现同一个`HTTP`实例下，既有 json 解析，又有 xml 解析等强大特性，同时还可以让表单（form）请求参数 同 json、xml 一样，支持序列化功能。
+
+* `HTTP`接口新增`webSocket(String url)`方法，与`sync(String url)`和`async(String url)`一样，支持 Lamda 编程、预处理器机制、消息数据自动序列化和反序列化机制；
+
+* 新增`OkHttps`工具类，支持 SPI 方式注入配置，`OkHttps`和`HttpUtils`默认自动以 SPI 方式寻找依赖中的`MsgConvertor`；
+
+* 新增可自定义默认编码（不自定义依然默认为 utf-8）、具体请求可指定特殊编码功能。

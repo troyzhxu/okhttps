@@ -30,6 +30,7 @@ module.exports = {
       ],
       '/v2/': [
         '',
+        'getstart',
         'foundation',
         'configuration', 
         'features', 
