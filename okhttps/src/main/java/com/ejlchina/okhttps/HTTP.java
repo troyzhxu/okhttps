@@ -18,6 +18,13 @@ import java.util.concurrent.Executor;
  */
 public interface HTTP {
 
+    String GET = "GET";
+    String HEAD = "HEAD";
+    String POST = "POST";
+    String PUT = "PUT";
+    String PATCH = "PATCH";
+    String DELETE = "DELETE";
+
     /**
      * 同步请求
      * @param url 请求地址

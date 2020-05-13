@@ -42,7 +42,20 @@ public class DownloadTests extends BaseTest {
                 .start();
     }
 
+    @Test
+    public void testDownload1() {
+        HTTP http = HTTP.builder().build();
+        http.async("https://download.cocos.com/CocosDashboard/v1.0.1/CocosDashboard-v1.0.1-win32-031816.exe")
+                .setOnResponse((HttpResult result) -> {
+                    System.out.println(result.toString());
 
+                    System.out.println(result.getBody().getLength());
+                    System.out.println("type = " + result.getBody().getType());
+                    System.out.println("body = " + result.getBody().toString());
+                })
+                .head();
+        sleep(5000);
+    }
 
     @Test
     public void testDownload() {
