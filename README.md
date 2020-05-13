@@ -1,6 +1,6 @@
 <p align="center">
   <a href="http://okhttps.ejlchina.com/" target="_blank">
-    <img width="128" src="http://okhttps.ejlchina.com/logo.png" alt="logo">
+    <img width="128" src="https://images.gitee.com/uploads/images/2020/0511/091408_c26f1306_1393412.png" alt="logo">
   </a>
 </p>
 <p align="center">
@@ -1072,7 +1072,7 @@ HTTP http = HTTP.builder()
 
 ## 联系方式
 
-* 微信：<img src="https://images.gitee.com/uploads/images/2020/0423/170356_3c038dd6_1393412.png" width="700px">
+* 微信：<img src="https://images.gitee.com/uploads/images/2020/0511/091344_4dad5453_1393412.png" width="700px">
 * 邮箱：zhou.xu@ejlchina.com
 
 ## 参与贡献

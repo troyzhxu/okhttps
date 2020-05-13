@@ -1,75 +1,22 @@
 package com.ejlchina.okhttps;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.util.List;
-
-import okio.ByteString;
-
 public interface WebSocket extends Cancelable {
 
-
-	public interface Message {
+	/**
+	 * WebSocket 消息
+	 */
+	interface Message extends Toable {
 		
 		/**
 		 * 判断是文本消息还是二进制消息
 		 * @return 是否是文本消息
 		 */
 		boolean isText();
-		
-		/**
-		 * @return 消息体转字节流
-		 */
-		InputStream toByteStream();
-		
-		/**
-		 * @return 消息体转字节数组
-		 */
-		byte[] toBytes();
-		
-		/**
-		 * @return ByteString
-		 */
-		ByteString toByteString();
-		
-		/**
-		 * @return 消息体转字符流
-		 */
-		Reader toCharStream();
 
-		/**
-		 * @return 消息体转字符串
-		 */
-		String toString();
-
-		/**
-		 * @return 消息体转Json对象
-		 */
-		JsonObj toJsonObj();
-
-		/**
-		 * @return 消息体转Json数组
-		 */
-		JsonArr toJsonArr();
-
-		/**
-		 * @param <T> 目标泛型
-		 * @param type 目标类型
-		 * @return 报文体Json文本转JavaBean
-		 */
-		<T> T toBean(Class<T> type);
-
-		/**
-		 * @param <T> 目标泛型
-		 * @param type 目标类型
-		 * @return 报文体Json文本转JavaBean列表
-		 */
-		<T> List<T> toList(Class<T> type);
-		
 	}
 	
 
-	public static class Close {
+	class Close {
 		
 		private int code;
 		private String reason;
@@ -102,7 +49,7 @@ public interface WebSocket extends Cancelable {
 	}
 	
 
-	public interface Listener<T> {
+	interface Listener<T> {
 		
 		void on(WebSocket ws, T data);
 		
@@ -117,44 +64,20 @@ public interface WebSocket extends Cancelable {
 	long queueSize();
 
 	/**
-	 * 同 {@link okhttp3.WebSocket#send(String)}
-	 * @param text 文本数据
-	 * @return 是否可以发送
-	 */
-	boolean send(String text);
-
-	/**
-	 * 同 {@link okhttp3.WebSocket#send(ByteString)}
-	 * @param bytes 二进制数据
-	 * @return 是否可以发送
-	 */
-	boolean send(ByteString bytes);
-
-	/**
-	 * 以JSON文本格式发送对象消息
-	 * @param bean 待发送的对象
+	 * @param object 待发送的对象，可以是 String | ByteString | byte[] | Java Bean
 	 * @return 如果连接已断开 返回 false
 	 */
-	public boolean send(Object bean);
-
-	/**
-	 * 以JSON文本格式发送对象消息
-	 * @param bean 待发送的对象
-	 * @param dateFormat 日期类型字段的处理格式
-	 * @return 如果连接已断开 返回 false
-	 */
-	public boolean send(Object bean, String dateFormat);
-	
-	/**
-	 * 发送字节流
-	 * @param data 待发送的数据
-	 * @return 如果连接已断开 返回 false
-	 */
-	public boolean send(byte[] data);
+	boolean send(Object object);
 	
 	/**
 	 * 同 {@link okhttp3.WebSocket#close(int, String)}
 	 */
 	boolean close(int code, String reason);
-	
+
+	/**
+	 * 设置消息类型
+	 * @param type 消息类型，如 json、xml、protobuf 等
+	 */
+	void msgType(String type);
+
 }

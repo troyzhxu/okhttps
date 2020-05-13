@@ -6,36 +6,31 @@ import okhttp3.Request;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 
-import java.util.ServiceLoader;
-
 /**
  * OkHttps 工具类
  * 支持 SPI 方式配置
  */
 public final class OkHttps {
 
-    private OkHttps() {}
-
-    public interface Config {
-
-        void withConfig(HTTP.Builder builder);
-
-    }
+    public static final String FORM = "form";
+    public static final String JSON = "json";
+    public static final String XML = "xml";
+    public static final String PROTOBUF = "protobuf";
 
     private static HTTP http;
+
+    private OkHttps() {}
 
     static synchronized HTTP getHttp() {
         if (http != null) {
             return http;
         }
         HTTP.Builder builder = HTTP.builder();
-        for (Config config : ServiceLoader.load(Config.class)) {
-            config.withConfig(builder);
-        }
+        ConvertProvider.inject(builder);
+        Config.config(builder);
         http = builder.build();
         return http;
     }
-
 
     /**
      * 异步请求
@@ -105,7 +100,7 @@ public final class OkHttps {
      * @return TaskExecutor
      */
     public static TaskExecutor getExecutor() {
-        return getHttp().getExecutor();
+        return getHttp().executor();
     }
 
 }

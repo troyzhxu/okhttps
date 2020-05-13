@@ -10,31 +10,31 @@ import com.ejlchina.okhttps.DownListener;
 import com.ejlchina.okhttps.Download;
 import com.ejlchina.okhttps.HttpResult;
 import com.ejlchina.okhttps.HttpTask;
-import com.ejlchina.okhttps.JsonService;
+import com.ejlchina.okhttps.MsgConvertor;
 import com.ejlchina.okhttps.OnCallback;
 import com.ejlchina.okhttps.TaskListener;
 import com.ejlchina.okhttps.HttpResult.State;
 
 public class TaskExecutor {
 
-    Executor ioExecutor;
-    Executor mainExecutor;
-    DownListener downloadListener;
-    TaskListener<HttpResult> responseListener;
-    TaskListener<IOException> exceptionListener;
-    TaskListener<State> completeListener;
-    JsonService jsonService;
+    private Executor ioExecutor;
+    private Executor mainExecutor;
+    private DownListener downloadListener;
+    private TaskListener<HttpResult> responseListener;
+    private TaskListener<IOException> exceptionListener;
+    private TaskListener<State> completeListener;
+    private MsgConvertor[] msgConvertors;
     
     public TaskExecutor(Executor ioExecutor, Executor mainExecutor, DownListener downloadListener, 
             TaskListener<HttpResult> responseListener, TaskListener<IOException> exceptionListener, 
-            TaskListener<State> completeListener, JsonService jsonService) {
+            TaskListener<State> completeListener, MsgConvertor[] msgConvertors) {
         this.ioExecutor = ioExecutor;
         this.mainExecutor = mainExecutor;
         this.downloadListener = downloadListener;
         this.responseListener = responseListener;
         this.exceptionListener = exceptionListener;
         this.completeListener = completeListener;
-        this.jsonService = jsonService;
+        this.msgConvertors = msgConvertors;
     }
 
     public Executor getExecutor(boolean onIoThread) {
@@ -99,13 +99,67 @@ public class TaskExecutor {
         }
     }
 
-    public JsonService jsonServiceNotNull() {
-    	if (jsonService != null) {
-    		return jsonService;
-    	}
-    	throw new IllegalStateException("没有设置 JsonService，不可做 Json 操作！");
+    public interface ConvertFunc<T> {
+
+        T apply(MsgConvertor convertor);
+
     }
-    
+
+    public static class Data<T> {
+
+        public T data;
+        public String mediaType;
+
+        public Data(T data, String mediaType) {
+            this.data = data;
+            this.mediaType = mediaType;
+        }
+    }
+
+    public <V> V doMsgConvert(ConvertFunc<V> callable) {
+        Data<V> vData = doMsgConvert(null, callable);
+        return vData != null ? vData.data : null;
+    }
+
+    public <V> Data<V> doMsgConvert(String type, ConvertFunc<V> callable) {
+        Throwable cause = null;
+        for (int i = msgConvertors.length - 1; i >= 0; i--) {
+            MsgConvertor convertor = msgConvertors[i];
+            String mediaType = convertor.mediaType();
+            if (type != null && (mediaType == null || !mediaType.contains(type))) {
+                continue;
+            }
+            if (callable == null && mediaType != null) {
+                return new Data<>(null, mediaType);
+            }
+            try {
+                assert callable != null;
+                return new Data<>(callable.apply(convertor), mediaType);
+            } catch (Exception e) {
+                if (cause != null) {
+                    initRootCause(e, cause);
+                }
+                cause = e;
+            }
+        }
+        if (callable == null) {
+            return new Data<>(null, "application/x-www-form-urlencoded");
+        }
+        if (cause != null) {
+            throw new HttpException("转换失败", cause);
+        }
+
+        throw new HttpException("没有匹配[" + type + "]类型的转换器！");
+    }
+
+    private void initRootCause(Throwable throwable, Throwable cause) {
+        Throwable lastCause = throwable.getCause();
+        if (lastCause != null) {
+            initRootCause(lastCause, cause);
+        }
+        throwable.initCause(cause);
+    }
+
     /**
      * 关闭线程池
      * @since OkHttps V1.0.2
@@ -143,8 +197,8 @@ public class TaskExecutor {
         return completeListener;
     }
 
-    public JsonService getJsonService() {
-        return jsonService;
+    public MsgConvertor[] getMsgConvertors() {
+        return msgConvertors;
     }
 
 }

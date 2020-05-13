@@ -1,11 +1,10 @@
 package com.ejlchina.okhttps.internal;
 
-import com.ejlchina.okhttps.Cancelable;
-import com.ejlchina.okhttps.HTTP;
-import com.ejlchina.okhttps.HttpTask;
-import com.ejlchina.okhttps.Preprocessor;
+import com.ejlchina.okhttps.*;
 import okhttp3.*;
+import okhttp3.WebSocket;
 
+import java.nio.charset.Charset;
 import java.util.*;
 
 
@@ -25,17 +24,23 @@ public class HttpClient implements HTTP {
     final List<TagTask> tagTasks;
     // 最大预处理时间倍数（相对于普通请求的超时时间）
     final int preprocTimeoutTimes;
+    // 编码格式
+    final Charset charset;
+    // 默认的请求体类型
+    final String bodyType;
 
     public HttpClient(Builder builder) {
-        this.okClient = builder.getOkClient();
-        this.baseUrl = builder.getBaseUrl();
+        this.okClient = builder.okClient();
+        this.baseUrl = builder.baseUrl();
         this.mediaTypes = builder.getMediaTypes();
         this.executor = new TaskExecutor(okClient.dispatcher().executorService(),
-                builder.getMainExecutor(), builder.getDownloadListener(),
-                builder.getResponseListener(), builder.getExceptionListener(),
-                builder.getCompleteListener(), builder.getJsonService());
-        this.preprocessors = builder.getPreprocessors().toArray(new Preprocessor[0]);
-        this.preprocTimeoutTimes = builder.getPreprocTimeoutTimes();
+                builder.mainExecutor(), builder.downloadListener(),
+                builder.responseListener(), builder.exceptionListener(),
+                builder.completeListener(), builder.msgConvertors());
+        this.preprocessors = builder.preprocessors();
+        this.preprocTimeoutTimes = builder.preprocTimeoutTimes();
+        this.charset = builder.charset();
+        this.bodyType = builder.bodyType();
         this.tagTasks = new LinkedList<>();
     }
 
@@ -96,7 +101,7 @@ public class HttpClient implements HTTP {
         return okClient.newWebSocket(request, listener);
     }
 
-    public OkHttpClient getOkClient() {
+    public OkHttpClient okClient() {
         return okClient;
     }
 
@@ -159,7 +164,7 @@ public class HttpClient implements HTTP {
 
     }
 
-    public MediaType getMediaType(String type) {
+    public MediaType mediaType(String type) {
         String mediaType = mediaTypes.get(type);
         if (mediaType != null) {
             return MediaType.parse(mediaType);
@@ -168,7 +173,7 @@ public class HttpClient implements HTTP {
     }
 
     @Override
-    public TaskExecutor getExecutor() {
+    public TaskExecutor executor() {
         return executor;
     }
 
@@ -334,24 +339,33 @@ public class HttpClient implements HTTP {
         return fullUrl;
     }
 
-    public String getBaseUrl() {
+    public String baseUrl() {
         return baseUrl;
     }
 
-    public Map<String, String> getMediaTypes() {
+    public Map<String, String> mediaTypes() {
         return mediaTypes;
     }
 
-    public Preprocessor[] getPreprocessors() {
+    public Preprocessor[] preprocessors() {
         return preprocessors;
     }
 
-    public List<TagTask> getTagTasks() {
+    public List<TagTask> tagTasks() {
         return tagTasks;
     }
 
-    public int getPreprocTimeoutTimes() {
+    public int preprocTimeoutTimes() {
         return preprocTimeoutTimes;
     }
+
+    public Charset charset() {
+        return charset;
+    }
+
+    public String bodyType() {
+        return bodyType;
+    }
+
 
 }

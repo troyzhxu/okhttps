@@ -6,6 +6,8 @@ import okhttp3.*;
 import okhttp3.WebSocket;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.Executor;
 
@@ -71,7 +73,7 @@ public interface HTTP {
      * 获取任务执行器
      * @return TaskExecutor
      */
-    TaskExecutor getExecutor();
+    TaskExecutor executor();
 
     /**
      * 新的构建器
@@ -88,6 +90,21 @@ public interface HTTP {
     }
 
 
+    /**
+     * Http 配置器
+     *
+     */
+    interface OkConfig {
+
+        /**
+         * 使用 builder 配置 HttpClient
+         * @param builder OkHttpClient 构建器
+         */
+        void config(OkHttpClient.Builder builder);
+
+    }
+
+
     class Builder {
 
         private OkHttpClient okClient;
@@ -96,7 +113,7 @@ public interface HTTP {
 
         private Map<String, String> mediaTypes;
 
-        private Configurator configurator;
+        private OkConfig config;
 
         private Executor mainExecutor;
 
@@ -110,9 +127,13 @@ public interface HTTP {
 
         private TaskListener<HttpResult.State> completeListener;
 
-        private JsonService jsonService;
+        private List<MsgConvertor> msgConvertors;
 
         private int preprocTimeoutTimes = 10;
+
+        private Charset charset = StandardCharsets.UTF_8;
+
+        private String bodyType = OkHttps.FORM;
 
         public Builder() {
             mediaTypes = new HashMap<>();
@@ -131,31 +152,35 @@ public interface HTTP {
             mediaTypes.put("pdf", "application/pdf");
             mediaTypes.put("html", "text/html");
             preprocessors = new ArrayList<>();
+            msgConvertors = new ArrayList<>();
         }
 
         public Builder(HttpClient hc) {
-            this.okClient = hc.getOkClient();
-            this.baseUrl = hc.getBaseUrl();
-            this.mediaTypes = hc.getMediaTypes();
+            this.okClient = hc.okClient();
+            this.baseUrl = hc.baseUrl();
+            this.mediaTypes = hc.mediaTypes();
             this.preprocessors = new ArrayList<>();
-            Collections.addAll(this.preprocessors, hc.getPreprocessors());
-            TaskExecutor executor = hc.getExecutor();
+            Collections.addAll(this.preprocessors, hc.preprocessors());
+            TaskExecutor executor = hc.executor();
             this.downloadListener = executor.getDownloadListener();
             this.responseListener = executor.getResponseListener();
             this.exceptionListener = executor.getExceptionListener();
             this.completeListener = executor.getCompleteListener();
-            this.jsonService = executor.getJsonService();
-            this.preprocTimeoutTimes = hc.getPreprocTimeoutTimes();
+            this.msgConvertors = new ArrayList<>();
+            Collections.addAll(this.msgConvertors, executor.getMsgConvertors());
+            this.preprocTimeoutTimes = hc.preprocTimeoutTimes();
+            this.charset = hc.charset();
+            this.bodyType = hc.bodyType();
         }
 
         /**
          * 配置 OkHttpClient
          *
-         * @param configurator 配置器
+         * @param config 配置器
          * @return Builder
          */
-        public Builder config(Configurator configurator) {
-            this.configurator = configurator;
+        public Builder config(OkConfig config) {
+            this.config = config;
             return this;
         }
 
@@ -177,7 +202,9 @@ public interface HTTP {
          * @return Builder
          */
         public Builder mediaTypes(Map<String, String> mediaTypes) {
-            this.mediaTypes.putAll(mediaTypes);
+            if (mediaTypes != null) {
+                this.mediaTypes.putAll(mediaTypes);
+            }
             return this;
         }
 
@@ -189,7 +216,9 @@ public interface HTTP {
          * @return Builder
          */
         public Builder mediaTypes(String key, String value) {
-            this.mediaTypes.put(key, value);
+            if (key != null && value != null) {
+                this.mediaTypes.put(key, value);
+            }
             return this;
         }
 
@@ -211,7 +240,9 @@ public interface HTTP {
          * @return Builder
          */
         public Builder addPreprocessor(Preprocessor preprocessor) {
-            preprocessors.add(preprocessor);
+            if (preprocessor != null) {
+                preprocessors.add(preprocessor);
+            }
             return this;
         }
 
@@ -222,7 +253,9 @@ public interface HTTP {
          * @return Builder
          */
         public Builder addSerialPreprocessor(Preprocessor preprocessor) {
-            preprocessors.add(new HttpClient.SerialPreprocessor(preprocessor));
+            if (preprocessor != null) {
+                preprocessors.add(new HttpClient.SerialPreprocessor(preprocessor));
+            }
             return this;
         }
 
@@ -284,12 +317,41 @@ public interface HTTP {
         }
 
         /**
-         * 设置 JSON 服务
-         * @param jsonService JSON 服务
+         * @since 2.0.0
+         * 添加消息转换器
+         * @param msgConvertor JSON 服务
          * @return Builder
          */
-        public Builder jsonService(JsonService jsonService) {
-            this.jsonService = jsonService;
+        public Builder addMsgConvertor(MsgConvertor msgConvertor) {
+            if (msgConvertor != null) {
+                this.msgConvertors.add(msgConvertor);
+            }
+            return this;
+        }
+
+        /**
+         * @since 2.0.0
+         * 设置默认编码格式
+         * @param charset 编码
+         * @return Builder
+         */
+        public Builder charset(Charset charset) {
+            if (charset != null) {
+                this.charset = charset;
+            }
+            return this;
+        }
+
+        /**
+         * @since 2.0.0
+         * 设置默认请求体类型
+         * @param bodyType 请求体类型
+         * @return Builder
+         */
+        public Builder bodyType(String bodyType) {
+            if (bodyType != null) {
+                this.bodyType = bodyType;
+            }
             return this;
         }
 
@@ -298,21 +360,21 @@ public interface HTTP {
          * @return HTTP
          */
         public HTTP build() {
-            if (configurator != null || okClient == null) {
+            if (config != null || okClient == null) {
                 OkHttpClient.Builder builder = new OkHttpClient.Builder();
-                if (configurator != null) {
-                    configurator.config(builder);
+                if (config != null) {
+                    config.config(builder);
                 }
                 okClient = builder.build();
             }
             return new HttpClient(this);
         }
 
-        public OkHttpClient getOkClient() {
+        public OkHttpClient okClient() {
             return okClient;
         }
 
-        public String getBaseUrl() {
+        public String baseUrl() {
             return baseUrl;
         }
 
@@ -320,40 +382,44 @@ public interface HTTP {
             return mediaTypes;
         }
 
-        public Configurator getConfigurator() {
-            return configurator;
-        }
-
-        public Executor getMainExecutor() {
+        public Executor mainExecutor() {
             return mainExecutor;
         }
 
-        public List<Preprocessor> getPreprocessors() {
-            return preprocessors;
+        public Preprocessor[] preprocessors() {
+            return preprocessors.toArray(new Preprocessor[0]);
         }
 
-        public DownListener getDownloadListener() {
+        public DownListener downloadListener() {
             return downloadListener;
         }
 
-        public TaskListener<HttpResult> getResponseListener() {
+        public TaskListener<HttpResult> responseListener() {
             return responseListener;
         }
 
-        public TaskListener<IOException> getExceptionListener() {
+        public TaskListener<IOException> exceptionListener() {
             return exceptionListener;
         }
 
-        public TaskListener<HttpResult.State> getCompleteListener() {
+        public TaskListener<HttpResult.State> completeListener() {
             return completeListener;
         }
 
-        public JsonService getJsonService() {
-            return jsonService;
+        public MsgConvertor[] msgConvertors() {
+            return msgConvertors.toArray(new MsgConvertor[0]);
         }
 
-        public int getPreprocTimeoutTimes() {
+        public int preprocTimeoutTimes() {
             return preprocTimeoutTimes;
+        }
+
+        public Charset charset() {
+            return charset;
+        }
+
+        public String bodyType() {
+            return bodyType;
         }
 
     }

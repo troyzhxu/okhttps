@@ -21,7 +21,6 @@ public class HttpUtils {
 
     private static HTTP http;
 
-
     /**
      * 配置HttpUtils持有的HTTP实例（不调用此方法前默认使用一个没有没有经过任何配置的HTTP懒实例）
      * @param http HTTP实例
@@ -40,30 +39,10 @@ public class HttpUtils {
         if (http != null) {
             return http;
         }
-        http = HTTP.builder().jsonService(findJsonService(new String[] {
-                "com.ejlchina.okhttps.GsonService",
-                "com.ejlchina.okhttps.FastJsonService",
-                "com.ejlchina.okhttps.JacksonService"
-        }, 0)).build();
+        HTTP.Builder builder = HTTP.builder();
+        ConvertProvider.inject(builder);
+        http = builder.build();
         return http;
-    }
-
-    static private JsonService findJsonService(String[] classes, int index) {
-        if (index >= classes.length) {
-            return null;
-        }
-        Class<?> clazz = null;
-        try {
-            clazz = Class.forName(classes[0]);
-        } catch (Exception ignore) {}
-        if (clazz == null || !JsonService.class.isAssignableFrom(clazz)) {
-            return findJsonService(classes, index + 1);
-        }
-        try {
-            return (JsonService) clazz.getDeclaredConstructor().newInstance();
-        } catch (Exception ignore) {
-            return null;
-        }
     }
 
     /**
@@ -134,7 +113,7 @@ public class HttpUtils {
      * @return TaskExecutor
      */
     public static TaskExecutor getExecutor() {
-    	return getHttp().getExecutor();
+    	return getHttp().executor();
     }
     
 }
