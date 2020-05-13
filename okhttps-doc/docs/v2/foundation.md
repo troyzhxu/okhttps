@@ -4,6 +4,8 @@ description: OkHttps 请求方法 回调函数 HttpResult cache 多次 消费报
 
 # 基础
 
+#### 哎呀，作者还在加班中，2.x 的文档很快就出来，先看一下 1.x 的文档吧 :joy:
+
 ## 请求方法
 
 　　同步与异步的`HttpTask`都拥有`get`、`post`、`put`与`delete`方法。不同的是：同步`HttpTask`的这些方法返回一个`HttpResult`，而异步`HttpTask`的这些方法返回一个`HttpCall`。

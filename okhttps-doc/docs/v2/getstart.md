@@ -4,6 +4,8 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 
 # 起步
 
+#### 哎呀，作者还在加班中，2.x 的文档很快就出来，先看一下 1.x 的文档吧 :joy:
+
 ## 安装
 
 ### Maven

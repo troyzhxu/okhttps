@@ -4,6 +4,8 @@ description: OkHttps 配置 BaseUrl 回调执行器 主线程 UI线程 OkHttpCli
 
 # 配置
 
+#### 哎呀，作者还在加班中，2.x 的文档很快就出来，先看一下 1.x 的文档吧 :joy:
+
 ## 设置 BaseUrl
 
 ```java

@@ -32,7 +32,6 @@ okhttps-jackson | 2.0.0.RC | 与 jackson 集成
 
 以上是官方维护的与三大 JSON 框架集成的案例，后续将提供 xml 和 protobuf 的集成。
 
-
 ## v2.x 的新特性
 
 * HTTP 任务新增`patch()`方法，可发起 PATCH 请求，目前直接支持的 HTTP 方法有：GET、POST、PUT、PATCH、DELETE，并且暴露了`request(String method)`方法，可自定义发起任何请求，如：HEAD、OPTIONS、TRACE、CONNECT 等；
