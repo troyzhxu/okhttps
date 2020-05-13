@@ -22,7 +22,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 * OkHttps 用起来很优美，可以像 RxJava 那样链式用，却比 RxJava 更简单。
 :::
 
-### 可选依赖
+### 相关项目
 
 项目 | 最新版本 | 描述
 -|-|-
@@ -30,16 +30,16 @@ okhttps-fastjson | 2.0.0.RC | 与 fastjson 集成
 okhttps-gson | 2.0.0.RC | 与 gson 集成
 okhttps-jackson | 2.0.0.RC | 与 jackson 集成
 
-以上是官方维护的与三大JSON框架集成的案例，后续将提供 xml 和 protobuf 的集成。
+以上是官方维护的与三大 JSON 框架集成的案例，后续将提供 xml 和 protobuf 的集成。
 
 
 ## v2.x 的新特性
 
 * HTTP 任务新增`patch()`方法，可发起 PATCH 请求，目前直接支持的 HTTP 方法有：GET、POST、PUT、PATCH、DELETE，并且暴露了`request(String method)`方法，可自定义发起任何请求，如：HEAD、OPTIONS、TRACE、CONNECT 等；
 
-* HTTP 任务新增`skipPreproc()`和`skipSerialPreproc()`，具体请求可跳过 所有 或只跳过 串行 预处理器；
+* HTTP 任务新增`skipPreproc()`和`skipSerialPreproc()`方法，具体请求可跳过 所有 或只跳过 串行 预处理器；
 
-* 新增`MsgConvertor`接口，实现 OkHttps 与 fastjson 解耦，且不再依赖某个具体 json 框架、甚至不依赖 json，它可以与 **任何格式** 的数据解析框架 集成，如：json 、xml 、protobuf 等;
+* 新增`MsgConvertor`接口，实现 OkHttps 与 fastjson 解耦，且不再依赖某个具体 json 框架、甚至不依赖 json，它可以与 **任何格式** 的数据解析框架集成，如：json 、xml 、protobuf 等;
 
 * 构建`HTTP`实例时支持注入多个`MsgConvertor`，可实现同一个`HTTP`实例下，既有 json 解析，又有 xml 解析等强大特性，同时还可以让表单（form）请求参数 同 json、xml 一样，支持序列化功能。
 
