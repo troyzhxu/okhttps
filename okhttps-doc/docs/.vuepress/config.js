@@ -51,7 +51,7 @@ module.exports = {
   },
   // 若全局使用 vuepress，back-to-top 就会失效
   plugins: [
-    '@vuepress/back-to-top', 'code-switcher', 'baidu-autopush', 'seo',
+    '@vuepress/back-to-top', 'baidu-autopush', 'seo',
     ['baidu-tongji', {hm: '6eb41c0ab450d5a4ae8769682ecb0ab2'}],
   ],
   markdown: {
