@@ -208,7 +208,7 @@ OkHttps.async("https://api.example.com/auth/login")
 
 工具类`OkHttps`还支持以 SPI 方式注入自定义配置，分以下两步：
 
-#### 第一步、新建一个配置类，实现`com.ejlchina.okhttps.Config`接口
+#### 第一步、新建一个配置类，实现[`com.ejlchina.okhttps.Config`](https://gitee.com/ejlchina-zhxu/okhttps/blob/master/okhttps/src/main/java/com/ejlchina/okhttps/Config.java)接口
 
 例如：
 
