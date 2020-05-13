@@ -53,7 +53,7 @@ okhttps-jackson | 2.0.0.RC | 与 jackson 集成
 * 新增可自定义默认编码（不自定义依然默认为 utf-8）、具体请求可指定特殊编码功能。
 
 
-## v2.x 的文档续完善中请关注官网：http://okhttps.ejlchina.com/
+## v2.x 的文档续完善中，请关注官网：http://okhttps.ejlchina.com/
 
 ## 以下是 v1.x 的文档
 
@@ -160,9 +160,7 @@ HTTP http = HTTP.builder().build();
 　　以上代码构建了一个最简单的`HTTP`实例，它拥有以下方法：
 
 * `async(String url)`  开始一个异步请求 （内部通过一个`HTTP`单例实现）
-* `async()`            开始一个异步HTTP任务，使用该方法必须在构建时设置 BaseUrl
 * `sync(String url)`   开始一个同步请求 （内部通过一个`HTTP`单例实现）
-* `sync()`             开始一个同步HTTP任务，使用该方法必须在构建时设置 BaseUrl
 * `cancel(String tag)` 按标签取消请求（内部通过一个`HTTP`单例实现）
 * `cancelAll()`        取消所有HTTP任务，包括同步和异步（内部通过一个`HTTP`单例实现）
 * `request(Request request)`  OkHttp 原生请求 （该请求不经过 预处理器）
@@ -563,9 +561,7 @@ HTTP http = HTTP.builder()
  
 * `of(HTTP http)`      配置`HttpUtils`持有的`HTTP`实例（不调用此方法前默认使用一个没有没有经过任何配置的`HTTP`懒实例）
 * `async(String url)`  开始一个异步请求 （内部通过一个`HTTP`单例实现）
-* `async()`            开始一个异步HTTP任务，使用该方法必须在构建时设置 BaseUrl
 * `sync(String url)`   开始一个同步请求 （内部通过一个`HTTP`单例实现）
-* `sync()`             开始一个同步HTTP任务，使用该方法必须在构建时设置 BaseUrl
 * `cancel(String tag)` 按标签取消请求（内部通过一个`HTTP`单例实现）
 * `cancelAll()`        取消所有HTTP任务，包括同步和异步（内部通过一个`HTTP`单例实现）
 * `request(Request request)`  OkHttp 原生请求 （该请求不经过 预处理器）
