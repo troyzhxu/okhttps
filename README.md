@@ -53,7 +53,7 @@ okhttps-jackson | 2.0.0.RC | 与 jackson 集成
 * 新增可自定义默认编码（不自定义依然默认为 utf-8）、具体请求可指定特殊编码功能。
 
 
-## v2.x 的文档续完善中，请关注官网：http://okhttps.ejlchina.com/
+## v2.x 的文档将在官网中持续完善，请关注：http://okhttps.ejlchina.com/
 
 ## 以下是 v1.x 的文档
 
