@@ -12,10 +12,11 @@ public class WebSocketTests {
     public void test() throws InterruptedException {
 
         HTTP http = HTTP.builder()
-                .baseUrl("ws://123.207.136.134:9010")
+//                .baseUrl("ws://123.207.136.134:9010")
                 .build();
 
-        WebSocket socket = http.webSocket("/ajaxchattest")
+        WebSocket socket = http.webSocket("wss://tst-wss-cloud.eiotyun.com/ws")
+                .tag("AAA")
                 .setOnOpen((WebSocket webSocket, HttpResult result) -> {
                     System.out.println("连接已打开：" + result);
                     webSocket.send("Hello");
@@ -37,12 +38,13 @@ public class WebSocketTests {
         Thread.sleep(2000);
 
         socket.send("你好呀");
+        System.out.println("发送信息");
+        Thread.sleep(2000);
+        System.out.println("取消");
+        http.cancel("AAA");
+//        socket.close(1000, "close");
 
-        Thread.sleep(5000);
-
-        socket.close(1000, "close");
-
-        Thread.sleep(3000);
+        Thread.sleep(10000);
         System.out.println("。。。");
     }
 

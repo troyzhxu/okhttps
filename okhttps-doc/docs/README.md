@@ -1,7 +1,7 @@
 ---
 home: true
 heroImage: /logo.png
-heroText: OkHttps
+heroText: OkHttps V2
 tagline: 基于 OkHttp 增强版 HTTP 客户端
 actionText: 极速上手 →
 actionLink: /v2/
@@ -20,52 +20,30 @@ footer: Apache Licensed | Copyright © 2020-present ejlchina
 <template v-slot:java> -->
 
 ```java
-// 构建 HTTP
-HTTP http = HTTP.builder()
-        .baseUrl("https://api.demo.com")
-        .build();
-
-// 同步请求
-List<User> users = http.sync("/users")  // http://api.demo.com/users
+// 同步 HTTP
+List<User> users = OkHttps.sync("/users") 
         .get()                          // GET请求
         .getBody()                      // 获取响应报文体
         .toList(User.class);            // 得到目标数据
 
-// 异步请求
-http.async("/users/jack")               //  http://api.demo.com/users/jack
-        .setOnResponse((HttpResult result) -> {
+// 异步 HTTP
+OkHttps.async("/users/1")
+        .setOnResponse((HttpResult res) -> {
             // 得到目标数据
-            User jack = result.getBody().toBean(User.class);
+            User user = res.getBody().toBean(User.class);
         })
         .get();                         // GET请求
-```
 
-<!-- </template>
-<template v-slot:kotlin>
-
-```java
-// 构建 HTTP
-HTTP http = HTTP.builder()
-        .baseUrl("https://api.demo.com")
-        .build();
-
-// 同步请求
-List<User> users = http.sync("/users")  // http://api.demo.com/users
-        .get()                          // GET请求
-        .getBody()                      // 获取响应报文体
-        .toList(User.class);            // 得到目标数据
-
-// 异步请求
-http.async("/users/jack")               //  http://api.demo.com/users/jack
-        .setOnResponse((HttpResult result) -> {
-            // 得到目标数据
-            User jack = result.getBody().toBean(User.class);
+// WebSocket
+OkHttps.webSocket("/chat") 
+        .onMessage((WebSocket ws，Message msg) -> {
+            // 从服务器接收消息
+            Chat chat = msg.toBean(Chat.class);
+            // 向服务器发送消息
+            ws.send(chat); 
         })
-        .get();                         // GET请求
+        .listen();                     // 启动监听
 ```
-
-</template>
-</CodeSwitcher> -->
 
 **<center>竟然不到 <font size=5>15</font> 秒，你已学会 <font size=6>90</font>% 的精髓！</center>**
 <center>[**了解更多**](/v2/)</center>
