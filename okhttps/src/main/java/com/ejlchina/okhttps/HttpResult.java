@@ -217,6 +217,7 @@ public interface HttpResult {
 
 	/**
 	 * 获取响应报文体长度（从请求头内提取）
+	 * 在 HEAD 请求时，该方法返回不为 0，但{@link Body#getLength()} 将返回 0
 	 * @return 长度
 	 */
 	long getContentLength();
