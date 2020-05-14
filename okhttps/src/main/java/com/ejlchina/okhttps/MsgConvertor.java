@@ -69,7 +69,9 @@ public interface MsgConvertor {
 	 */
 	<T> List<T> toList(Class<T> type, InputStream in, Charset charset);
 
-
+	/**
+	 * 表单转换器，可用于自动系列化表单参数
+	 */
 	class FormConvertor implements MsgConvertor {
 
 		private MsgConvertor convertor;
