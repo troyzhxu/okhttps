@@ -527,6 +527,18 @@ http.sync("/upload")
         .post();
 ```
 
+::: warning 
+如果你使用的是 v2.0.0.RC 版本中，以上代码会报 **“方法 addFilePara 只能使用 form 方式请求”** 错误，可以用以下方式解决该问题：
+```java
+http.async("/upload")
+        .bodyType("multipart/form")
+        .addBodyPara("title", "头像")
+        .addFilePara("test", "D:/image/avatar.jpg")
+        .post();
+```
+详见 ISSUE: [https://gitee.com/ejlchina-zhxu/okhttps/issues/I1H8G9](https://gitee.com/ejlchina-zhxu/okhttps/issues/I1H8G9)
+:::
+
 无论当前的默认`bodyType`是什么，和文件参数一起添加的`Body`参数都将以`form`（表单）模式提交。
 
 ### 其它
