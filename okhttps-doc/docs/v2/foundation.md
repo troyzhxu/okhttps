@@ -565,7 +565,7 @@ http.async("/users")    //（5）
         .get();
 
 http.webSocket("/websocket")
-        .tag("B")       // (6) 标签同样可以作用在 WebSocket 请求上
+        .tag("B")       // (6) 标签同样可以作用在 WebSocket 连接上
         .listen();
 ```
 
