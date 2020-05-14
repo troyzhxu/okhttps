@@ -4,8 +4,6 @@ description: OkHttps 配置 BaseUrl 回调执行器 主线程 UI线程 OkHttpCli
 
 # 配置
 
-#### 哎呀，作者还在加班中，2.x 的文档很快就出来，先看一下 1.x 的文档吧 :joy:
-
 ## 设置 BaseUrl
 
 ```java
@@ -54,7 +52,7 @@ HTTP http = HTTP.builder()
         })
         .build();
 ```
-　　该配置默认 **影响所有回调**。
+　　该配置默认 **影响所有回调**，更多实现细节可参考 [安卓-回调线程切换](/v2/android.html#回调线程切换) 章节。
 
 ## 配置 OkHttpClient
 
@@ -62,11 +60,13 @@ HTTP http = HTTP.builder()
 
 ```java
 HTTP http = HTTP.builder()
-    .config((Builder builder) -> {
+    .config((OkHttpClient.Builder builder) -> {
         // 配置连接池 最小10个连接（不配置默认为 5）
         builder.connectionPool(new ConnectionPool(10, 5, TimeUnit.MINUTES));
         // 配置连接超时时间（默认10秒）
         builder.connectTimeout(20, TimeUnit.SECONDS);
+        // 配置 WebSocket 心跳间隔（默认没有心跳）
+        builder.pingInterval(60, TimeUnit.SECONDS);
         // 配置拦截器
         builder.addInterceptor((Chain chain) -> {
             Request request = chain.request();
@@ -74,6 +74,7 @@ HTTP http = HTTP.builder()
             return chain.proceed(request);
         });
         // 其它配置: CookieJar、SSL、缓存、代理、事件监听...
+        // 所有 OkHttp 能配置的，都可以在这里配置
     })
     .build();
 ```
@@ -124,12 +125,29 @@ HTTP http = HTTP.builder()
             // 检查过期，若需要则刷新Token
             requestTokenAndRefreshIfExpired((String token) -> {
                 task.addHeader("Token", token);            
-                chain.proceed();               // 调用此方法前，不会有其它任务进入该处理器
+                chain.proceed();    // 调用此方法前，不会有其它任务进入该处理器
             });
         })
         .build();
 ```
 　　串行预处理器实现了让HTTP任务排队串行处理的功能，但值得一提的是：它并没有因此而阻塞任何线程！
+
+::: warning 注意
+由于 串行预处理器 只能一个一个的处理任务，所以在上述中的`requestTokenAndRefreshIfExpired`方法里，若发起网络请求，一定要跳过串行预处理器 [可使用`skipSerialPreproc()`方法]，例如：
+
+```java
+http.async("/oauth/refresh-token")
+        .skipSerialPreproc()    // 跳过串行预处理器
+        .addBodyPara("refreshToken", "xxxxxx")
+        .setOnResponse((HttpResult result) -> {
+
+        })
+        .post();
+```
+否则就会发生两个 HTTP 任务相互等待谁也执行不了的问题。
+
+如果你使用的是 v1.x 的版本，则可以使用`HTTP`实例的`request(Request request)`方法发起原生请求，这样则不经过任何预处理器。
+:::
 
 ## 全局回调监听
 
@@ -140,20 +158,58 @@ HTTP http = HTTP.builder()
         .responseListener((HttpTask<?> task, HttpResult result) -> {
             // 所有请求响应后都会走这里
 
-            return true; // 返回 true 表示继续执行 task 的 OnResponse 回调，false 表示不再执行
+            // 返回 true 表示继续执行 task 的 OnResponse 回调，
+            // 返回 false 则表示不再执行，即 阻断
+            return true; 
         })
         .completeListener((HttpTask<?> task, State state) -> {
             // 所有请求执行完都会走这里
 
-            return true; // 返回 true 表示继续执行 task 的 OnComplete 回调，false 表示不再执行
+            // 返回 true 表示继续执行 task 的 OnComplete 回调，
+            // 返回 false 则表示不再执行，即 阻断
+            return true;
         })
         .exceptionListener((HttpTask<?> task, IOException error) -> {
             // 所有请求发生异常都会走这里
 
-            return true; // 返回 true 表示继续执行 task 的 OnException 回调，false 表示不再执行
+            // 返回 true 表示继续执行 task 的 OnException 回调，
+            // 返回 false 则表示不再执行，即 阻断
+            return true;
         })
         .build();
 ```
+
+**回调阻断** 其实是日常开发中比较常见的需求，比如：
+
+只有当接口响应的状态码在 [200, 300) 之间时，应用才做具体的业务处理，其它则一律向用户提示接口返回的错误信息，则可以这么做：
+
+```java
+HTTP http = HTTP.builder()
+        .responseListener((HttpTask<?> task, HttpResult result) -> {
+            if (result.isSuccessful()) {
+                return true;            // 继续接口的业务处理
+            }
+            showApiMsgToUser(result);   // 向用户展示接口的错误信息
+            return false;               // 阻断
+        })
+        .build();
+```
+
+然后具体的请求，就可以专注于业务处理，而不需担心接口的状态出错，比如：
+
+```java
+Order order = newOrder();   // 订单信息
+
+http.async('/orders')       // 提交订单
+        .setBodyPara(order)
+        .setOnResponse((HttpResult result) -> {
+            // 进入该回调，则表示订单已提交成功，就可以放心的做接下来的业务处理
+            // 比如去发起支付：
+            startPay(result.getBody().toBean(PayInfo.class));
+        })
+        .post();
+```
+
 
 ::: tip 全局回调监听与拦截器的异同：
 * 拦截器可以添加多个，全局回调监听分三种，每种最多添加一个
@@ -172,3 +228,91 @@ HTTP http = HTTP.builder()
         })
         .build();
 ```
+
+## 消息转换器
+
+OkHttps 自 2.0 版本器支持自定义消息转换器，并且可以添加多个，例如：
+
+```java
+HTTP http = HTTP.builder()
+        .addMsgConvertor(new MyJsonMsgConvertor());
+        .addMsgConvertor(new MyXmlMsgConvertor());
+        .build()
+```
+
+配置了消息转换器后，`HTTP`实例便具有了序列化和反序列化这些格式数据的能力，例如下例中，无论该接口响应的是 JSON 还是 XML，都可以反序列化成功：
+
+```java
+// 无论该接口响应的是 JSON 还是 XML，都可以反序列化成功
+List<Order> orders = http.sync('/orders')
+        .get().getBody().toList(Order.class);
+```
+
+在 Websocket 通讯中，也是如此：
+
+```java
+http.webSocket("/redpacket/status") // 监听红包的领取状态
+        .onMessage((WebSocket ws，Message msg) -> {
+            // 无论该接口响应的是 JSON 还是 XML，都可以反序列化成功
+            Status status = msg.toBean(Status.class);
+        })
+        .listen();
+```
+
+另外，如果要在请求发出阶段正向序列化参数，则需要指定`bodyType`参数告诉 OkHttps 你想使用哪一个消息转换器，如：
+
+```java
+http.async('/orders')       // 提交订单
+        .bodyType("json")
+        .setBodyPara(newOrder())
+        .post();
+```
+
+或者 XML：
+
+```java
+http.async('/orders')       // 提交订单
+        .bodyType("xml")
+        .setBodyPara(newOrder())
+        .post();
+```
+
+在 Websocket 里，也是同样的方法：
+
+```java
+http.webSocket("/chat") 
+        .bodyType("json")
+        .onOpen((WebSocket ws，HttpResult res) -> {
+            Hello hello = getHello();
+            ws.send(hello);     // 以 JSON 格式序列化 Hello 对象
+        })
+        .listen();
+```
+
+但如果你在 Websocket 通讯到某一个阶段后，突然想换另外一种格式来发送数据了，你还可以这样：
+
+```java
+http.webSocket("/chat") 
+        .bodyType("json")
+        .onOpen((WebSocket ws，HttpResult res) -> {
+            Hello hello = getHello();
+            ws.send(hello);     // 以 JSON 格式序列化 Hello 对象
+
+            ws.msgType("xml")   // 切换为 XML 格式
+            ws.send(hello);     // 以 XML 格式序列化 Hello 对象
+        })
+        .listen();
+```
+
+### 默认消息转换类型
+
+然而大多数情况下，我们都使用一种消息转换器，比如 json，这时候你可以为`bodyType`配置一个默认值：
+
+```java
+HTTP http = HTTP.builder()
+        .bodyType("json");      // 修改 bodyType 的默认值为 json
+        .addMsgConvertor(new MyJsonMsgConvertor());
+        .build()
+```
+
+若不配置，`bodyType`的默认值是`form`。
