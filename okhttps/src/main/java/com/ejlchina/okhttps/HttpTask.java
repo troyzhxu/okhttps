@@ -837,9 +837,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
                 throw new HttpException("方法 addFilePara 与 setBodyPara 不能同时调用！");
             }
         }
-        if (files != null && OkHttps.FORM.equals(bodyType)) {
-            throw new HttpException("方法 addFilePara 只能使用 form 方式请求！");
-        }
     }
 
     /**
