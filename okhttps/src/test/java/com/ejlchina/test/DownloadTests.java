@@ -53,7 +53,7 @@ public class DownloadTests extends BaseTest {
                     System.out.println("type = " + result.getBody().getType());
                     System.out.println("body = " + result.getBody().toString());
                 })
-                .request("OPTIONS");
+                .head();
         sleep(5000);
     }
 

@@ -15,11 +15,13 @@ public class WebSocketTests {
 //                .baseUrl("ws://123.207.136.134:9010")
                 .build();
 
-        WebSocket socket = http.webSocket("wss://tst-wss-cloud.eiotyun.com/ws")
+        String url = "ws://121.40.165.18:8800";
+
+        WebSocket socket = http.webSocket(url)
                 .tag("AAA")
                 .setOnOpen((WebSocket webSocket, HttpResult result) -> {
                     System.out.println("连接已打开：" + result);
-                    webSocket.send("Hello");
+//                    webSocket.send("Hello");
                 })
                 .setOnMessage((WebSocket webSocket, Message message) -> {
                     System.out.println("接收到消息：" + message.toString());
@@ -37,10 +39,10 @@ public class WebSocketTests {
 
         Thread.sleep(2000);
 
-        socket.send("你好呀");
-        System.out.println("发送信息");
+//        socket.send("你好呀");
+//        System.out.println("发送信息");
         Thread.sleep(2000);
-        System.out.println("取消");
+        System.out.println("关闭");
         http.cancel("AAA");
 //        socket.close(1000, "close");
 
