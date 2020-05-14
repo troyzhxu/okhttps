@@ -388,7 +388,23 @@ http.async("/users/1/projects")
         .post();  
 ```
 
-如果你配置了`MsgConvertor.FormConvertor`（如果添加了如`okhttps-gson`的扩展依赖包，`OkHttps`和`HttpUtils`工具类都会自动配置`FormConvertor`），还可以使用`setBodyPara`方法，可以直接传入一个 POJO：
+如果你配置了`MsgConvertor.FormConvertor`，如：
+
+```java
+MsgConvertor convertor = new GsonMsgConvertor();
+
+HTTP http = HTTP.builder()
+        .addMsgConvertor(convertor);
+        .addMsgConvertor(new MsgConvertor.FormConvertor(convertor));
+        .build()
+```
+
+::: tip
+* 如果你直接使用[`OkHttps`或`HttpUtils`工具类](/v2/getstart.html#工具类)，它们都会自动配置`FormConvertor`，不用再手动配置
+* `FormConvertor`在 v2.2.0.RC 版本里是`MsgConvertor.FormMsgConvertor`
+:::
+
+然后便可以使用`setBodyPara`方法，直接传入一个 POJO：
 
 ```java
 Proejct project = new Proejct();
@@ -396,8 +412,8 @@ project.setName("OkHttps");
 project.setDesc("最好用的网络框架");
 
 http.async("/users/1/projects") 
-        .setBodyPara(project)       // 自动序列化
-        .post();   
+        .setBodyPara(project)       // 将自动序列化为表单格式
+        .post();
 ```
 
 或者一个拼接好的字符串：
