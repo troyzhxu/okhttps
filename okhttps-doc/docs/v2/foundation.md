@@ -269,7 +269,7 @@ System.out.println("size = " + size);
 
 ```java
 long size = http.sync("/download/test.zip").head().getContentLength(); 
-// 因为 HEAD 请求没有报文体，所以就不需要关闭啦
+// 因为 HEAD 请求没有响应报文体，所以就不需要关闭啦
 System.out.println("size = " + size);
 ```
 
