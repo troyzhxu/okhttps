@@ -238,7 +238,7 @@ public class OkHttpsConfig implements Config {
 
 例如：
 
-![](/spi_config_android.png)
+![](/spi_config.png)
 
 以上两步就完成了对`OkHttps`工具类的自定义配置。
 

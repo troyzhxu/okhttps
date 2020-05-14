@@ -388,7 +388,7 @@ http.async("/users/1/projects")
         .post();  
 ```
 
-如果你配置了`MsgConvertor`，还可以使用`setBodyPara`方法，可以直接传入一个 POJO：
+如果你配置了`MsgConvertor.FormConvertor`（如果添加了如`okhttps-gson`的扩展依赖包，`OkHttps`和`HttpUtils`工具类都会自动配置`FormConvertor`），还可以使用`setBodyPara`方法，可以直接传入一个 POJO：
 
 ```java
 Proejct project = new Proejct();
@@ -490,7 +490,7 @@ http.async("/users/1/projects")
 
 #### 其它数据格式的请求
 
-只需要扩展相应的`MsgConvert`，OkHttps 支持任意数据格式的请求。
+只需要扩展了相应的`MsgConvertor`，OkHttps 支持任意数据格式的请求。
 
 ### 文件参数
 
