@@ -351,16 +351,64 @@ OkHttps 信仰统一与一致更加优雅，所以自 v2.0.0.RC 开始、它便�
 
 #### 表单请求
 
-默认的报文体类型就是表单：
+默认的请求报文体类型就是`form`表单，所以可以直接使用`addBodyPara`方法：
 
 ```java
-http.async("/users/1/projects") 
+http.async("/projects") 
         .addBodyPara("name", "OkHttps")
         .addBodyPara("desc", "最好用的网络框架")
         .post();
 ```
 
-如果你修改了默认的报文体类型（不再默认是`form`），那需要显式指定当前请求的报文体类型：
+或者是传入一个 Map 对象：
+
+```java
+Map<String, Object> params = new HashMap<>();
+params.put("name", "OkHttps");
+params.put("desc", "最好用的网络框架");
+
+http.async("/projects")
+        .addBodyPara(params)
+        .post();  
+```
+
+甚至可以用`setBodyPara`传入一个`String`：
+
+```java
+http.async("/users/1/projects") 
+        .setBodyPara("name=OkHttps&desc=最好用的网络框架")
+        .post();  
+```
+
+如果你配置了`MsgConvertor.FormConvertor`，如：
+
+```java
+// 可以是任何一个 MsgConvertor 的实现类
+MsgConvertor convertor = new GsonMsgConvertor();
+
+HTTP http = HTTP.builder()
+        .addMsgConvertor(new MsgConvertor.FormConvertor(convertor));
+        .build()
+```
+
+还可以直接传入一个 POJO（自定义的一个 Java 类）：
+
+```java
+Proejct project = new Proejct();
+project.setName("OkHttps");
+project.setDesc("最好用的网络框架");
+
+http.async("/users/1/projects") 
+        .setBodyPara(project)       // 将自动序列化为表单格式
+        .post();
+```
+
+::: tip
+* 如果你直接使用[`OkHttps`或`HttpUtils`工具类](/v2/getstart.html#工具类)，它们都会自动配置`FormConvertor`，无需手动配置
+* `FormConvertor`在 v2.2.0.RC 版本里是`MsgConvertor.FormMsgConvertor`
+:::
+
+以上 **4** 种方式具有相同的效果，但如果你修改了默认的报文体类型，那还需在请求时指定当前的请求报文体类型：
 
 ```java
 http.async("/users/1/projects") 
@@ -376,7 +424,20 @@ http.async("/users/1/projects")
         ...
 ```
 
-为了简化文档，现在假设默认的报文体类型都是`form`，表单参数还可以通过以下方式添加：
+#### JSON 请求
+
+JSON 请求要求默认的请求`bodyType`为`json` 或者 在具体请求中显式指明`bodyType`为`json`，其它用法和表单请求一模一样。
+
+单个添加
+
+```java
+http.async("/users/1/projects") 
+        .addBodyPara("name", "OkHttps")
+        .addBodyPara("desc", "最好用的网络框架")
+        .post();
+```
+
+Map 方式：
 
 ```java
 Map<String, Object> params = new HashMap<>();
@@ -388,23 +449,7 @@ http.async("/users/1/projects")
         .post();  
 ```
 
-如果你配置了`MsgConvertor.FormConvertor`，如：
-
-```java
-MsgConvertor convertor = new GsonMsgConvertor();
-
-HTTP http = HTTP.builder()
-        .addMsgConvertor(convertor);
-        .addMsgConvertor(new MsgConvertor.FormConvertor(convertor));
-        .build()
-```
-
-::: tip
-* 如果你直接使用[`OkHttps`或`HttpUtils`工具类](/v2/getstart.html#工具类)，它们都会自动配置`FormConvertor`，不用再手动配置
-* `FormConvertor`在 v2.2.0.RC 版本里是`MsgConvertor.FormMsgConvertor`
-:::
-
-然后便可以使用`setBodyPara`方法，直接传入一个 POJO：
+POJO 方式：
 
 ```java
 Proejct project = new Proejct();
@@ -412,30 +457,19 @@ project.setName("OkHttps");
 project.setDesc("最好用的网络框架");
 
 http.async("/users/1/projects") 
-        .setBodyPara(project)       // 将自动序列化为表单格式
-        .post();
+        .setBodyPara(project)       // 自动序列化
+        .post();   
 ```
 
-或者一个拼接好的字符串：
+字符串方式：
 
 ```java
 http.async("/users/1/projects") 
-        .setBodyPara("name=OkHttps&desc=最好用的网络框架")
+        .setBodyPara("{\"name\":\"OkHttps\",\"desc\":\"最好用的网络框架\"}")
         .post();  
 ```
 
-#### JSON 请求
-
-如果设置了默认的报文体类型为`json`，可以直接这样：
-
-```java
-http.async("/users/1/projects") 
-        .addBodyPara("name", "OkHttps")
-        .addBodyPara("desc", "最好用的网络框架")
-        .post();
-```
-
-若不是，那需要显式指定当前请求的报文体类型：
+唯一的不同是，如果默认的`bodyType`不是`json`，那需要显式指定当前请求的`bodyType`为`json`：
 
 ```java
 http.async("/users/1/projects") 
@@ -449,39 +483,6 @@ http.async("/users/1/projects")
 http.async("/users/1/projects") 
         .bodyType(OkHttps.JSON)     // 指明请求体类型是 JSON
         ...
-```
-
-其它用法和表单请求一致：
-
-
-```java
-Map<String, Object> params = new HashMap<>();
-params.put("name", "OkHttps");
-params.put("desc", "最好用的网络框架");
-
-http.async("/users/1/projects") 
-        .addBodyPara(params)
-        .post();  
-```
-
-传入 POJO 方式：
-
-```java
-Proejct project = new Proejct();
-project.setName("OkHttps");
-project.setDesc("最好用的网络框架");
-
-http.async("/users/1/projects") 
-        .setBodyPara(project)       // 自动序列化
-        .post();   
-```
-
-或者一个拼接好的字符串：
-
-```java
-http.async("/users/1/projects") 
-        .setBodyPara("{\"name\":\"OkHttps\",\"desc\":\"最好用的网络框架\"}")
-        .post();  
 ```
 
 #### XML 请求
