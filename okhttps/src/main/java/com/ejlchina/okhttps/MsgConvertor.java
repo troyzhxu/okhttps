@@ -70,11 +70,11 @@ public interface MsgConvertor {
 	<T> List<T> toList(Class<T> type, InputStream in, Charset charset);
 
 
-	class FormMsgConvertor implements MsgConvertor {
+	class FormConvertor implements MsgConvertor {
 
-		MsgConvertor convertor;
+		private MsgConvertor convertor;
 
-		public FormMsgConvertor(MsgConvertor convertor) {
+		public FormConvertor(MsgConvertor convertor) {
 			this.convertor = convertor;
 		}
 

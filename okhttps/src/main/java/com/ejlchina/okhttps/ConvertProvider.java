@@ -13,7 +13,7 @@ public interface ConvertProvider {
         for (ConvertProvider provider : ServiceLoader.load(ConvertProvider.class)) {
             MsgConvertor convertor = provider.getConvertor();
             if (convertor != null) {
-                builder.addMsgConvertor(new MsgConvertor.FormMsgConvertor(convertor));
+                builder.addMsgConvertor(new MsgConvertor.FormConvertor(convertor));
                 builder.addMsgConvertor(convertor);
             }
         }
