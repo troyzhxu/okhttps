@@ -1,5 +1,6 @@
 package com.ejlchina.okhttps.internal;
 
+import java.net.SocketException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +78,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		@Override
 		public void onMessage(okhttp3.WebSocket webSocket, String text) {
 			if (onMessage != null) {
-				onMessage.on(this.webSocket, new WebsocketMsg(text, httpClient.executor, charset));
+				onMessage.on(this.webSocket, new WebSocketMsg(text, httpClient.executor, charset));
 			}
 		}
 
@@ -85,7 +86,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		@Override
 		public void onMessage(okhttp3.WebSocket webSocket, ByteString bytes) {
 			if (onMessage != null) {
-				onMessage.on(this.webSocket, new WebsocketMsg(bytes, httpClient.executor, charset));
+				onMessage.on(this.webSocket, new WebSocketMsg(bytes, httpClient.executor, charset));
 			}
 		}
 
@@ -105,10 +106,19 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 		@Override
 		public void onFailure(okhttp3.WebSocket webSocket, Throwable t, Response response) {
-			if (onException != null) {
-				onException.on(this.webSocket,  t);
-			} else if (!nothrow) {
-				throw new HttpException("WebSockt 异常", t);
+			if (t instanceof SocketException && "Socket closed".equals(t.getMessage())) {
+				if (onClosed != null) {
+					onClosed.on(this.webSocket, new Close(Close.CANCELED, "Canceled"));
+				}
+			} else {
+				if (onClosed != null) {
+					onClosed.on(this.webSocket, new Close(Close.EXCEPTION, t.getMessage()));
+				}
+				if (onException != null) {
+					onException.on(this.webSocket,  t);
+				} else if (!nothrow) {
+					throw new HttpException("WebSockt 异常", t);
+				}
 			}
 		}
 		
@@ -257,7 +267,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	}
 
 	/**
-	 * 已关闭监听
+	 * 已关闭监听（当连接被取消或发生异常时，也会走该回调）
 	 * @param onClosed 监听器
 	 * @return WebSocketTask
 	 */

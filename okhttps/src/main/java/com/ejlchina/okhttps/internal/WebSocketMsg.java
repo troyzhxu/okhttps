@@ -13,18 +13,18 @@ import com.ejlchina.okhttps.WebSocket.Message;
 
 import okio.ByteString;
 
-public class WebsocketMsg extends AbstractBody implements Message {
+public class WebSocketMsg extends AbstractBody implements Message {
 
 	private String text;
 	private ByteString bytes;
 	
 	
-	public WebsocketMsg(String text, TaskExecutor taskExecutor, Charset charset) {
+	public WebSocketMsg(String text, TaskExecutor taskExecutor, Charset charset) {
 		super(taskExecutor, charset);
 		this.text = text;
 	}
 
-	public WebsocketMsg(ByteString bytes, TaskExecutor taskExecutor, Charset charset) {
+	public WebSocketMsg(ByteString bytes, TaskExecutor taskExecutor, Charset charset) {
 		super(taskExecutor, charset);
 		this.bytes = bytes;
 	}
