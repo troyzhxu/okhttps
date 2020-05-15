@@ -80,17 +80,27 @@ public class ResultBody extends AbstractBody implements Body {
 		this.onProcess = onProcess;
 		return this;
 	}
-	
+
 	@Override
-	public Body setStepBytes(long stepBytes) {
+	public Body stepBytes(long stepBytes) {
 		this.stepBytes = stepBytes;
 		return this;
 	}
-	
+
 	@Override
-	public Body setStepRate(double stepRate) {
+	public Body setStepBytes(long stepBytes) {
+		return stepBytes(stepBytes);
+	}
+
+	@Override
+	public Body stepRate(double stepRate) {
 		this.stepRate = stepRate;
 		return this;
+	}
+
+	@Override
+	public Body setStepRate(double stepRate) {
+		return stepRate(stepRate);
 	}
 
 	@Override

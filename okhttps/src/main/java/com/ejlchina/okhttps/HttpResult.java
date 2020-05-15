@@ -119,16 +119,28 @@ public interface HttpResult {
 		 * @param stepBytes 步进字节
 		 * @return Body 
 		 */
+		Body stepBytes(long stepBytes);
+
+		/**
+		 * 推荐使用 {@link #stepBytes(long)} 方法
+		 */
+		@Deprecated
 		Body setStepBytes(long stepBytes);
-		
+
 		/**
 		 * 设置进度回调的步进比例
 		 * 表示每接收 stepRate 比例，执行一次进度回调
 		 * @param stepRate 步进比例
 		 * @return Body
 		 */
+		Body stepRate(double stepRate);
+
+		/**
+		 * 推荐使用 {@link #stepRate(double)} 方法
+		 */
+		@Deprecated
 		Body setStepRate(double stepRate);
-		
+
 		/**
 		 * 设置进度回调忽略响应的Range头信息，即进度回调会从0开始
 		 * @return Body

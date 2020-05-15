@@ -281,9 +281,14 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      * @param stepBytes 步进字节
      * @return HttpTask 实例
      */
-    public C setStepBytes(long stepBytes) {
+    public C stepBytes(long stepBytes) {
         this.stepBytes = stepBytes;
         return (C) this;
+    }
+    
+    @Deprecated
+    public C setStepBytes(long stepBytes) {
+        return stepBytes(stepBytes);
     }
 
     /**
@@ -292,9 +297,14 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      * @param stepRate 步进比例
      * @return HttpTask 实例
      */
-    public C setStepRate(double stepRate) {
+    public C stepRate(double stepRate) {
         this.stepRate = stepRate;
         return (C) this;
+    }
+    
+    @Deprecated
+    public C setStepRate(double stepRate) {
+        return stepRate(stepRate);
     }
 
     @Deprecated
