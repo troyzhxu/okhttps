@@ -29,7 +29,7 @@ HTTP http = HTTP.builder()
 
 ```java
 http.async("/users")
-        .addBodyParam("name", "Jack")
+        .addBodyPara("name", "Jack")
         .setOnProcess((Process process) -> {
             // 在主线程执行
         })
@@ -48,7 +48,7 @@ http.async("/users")
 
 ```java
 http.async("/users")
-        .addBodyParam("name", "Jack")
+        .addBodyPara("name", "Jack")
         .setOnProcess((Process process) -> {
             // 在主线程执行
         })

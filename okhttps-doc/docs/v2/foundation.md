@@ -11,7 +11,7 @@ OkHttps 使用`sync()`和`async()`方式发起的请求，支持的 HTTP 方法�
 HTTP 请求方法 | 实现方法 | Restful 释义 | 起始版本
 -|-|-|-
 GET | `get()` | 获取资源 | 1.0.0
-HEAD | `head()` | 获取资源头信息 | 2.0.0（即将发布）
+HEAD | `head()` | 获取资源头信息 | 2.0.0
 POST | `post()` | 提交资源 | 1.0.0
 PUT | `put()` | 更新资源 | 1.0.0
 PATCH | `patch()` | 部分更新资源 | 2.0.0.RC
@@ -328,6 +328,9 @@ http.async(BOOKS_QUERY_URL)     // /authors/1/books?bookType=2
 * `addUrlPara(String name, Object value)`  添加 URL 参数：拼接在 URL 的`?`之后（查询参数）
 * `addUrlPara(Map<String, ?> params)`      添加 URL 参数：拼接在 URL 的`?`之后（查询参数）
 
+::: warning
+方法`addXxxPara`在 v2.0.0.RC 之前名为`addXxxParam`, v2.0.0.RC 之后推荐使用简洁版的方法，老方法将在 v2.1.0 中移除。
+:::
 
 ### 报文体类型
 
@@ -347,6 +350,8 @@ OkHttps 信仰统一与一致更加优雅，所以自 v2.0.0.RC 开始、它便�
 
 ::: warning 注意
 添加报文体参数后，不可使用 GET、HEAD 请求方法
+
+方法`setBodyPara`在 v2.0.0.RC 之前名为`setRequestJson`, v2.0.0.RC 之后推荐使用统一 API，老方法将在 v2.1.0 中移除。
 :::
 
 #### 表单请求

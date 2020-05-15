@@ -29,16 +29,16 @@
 
 项目 | 最新版本 | 描述
 -|-|-
-okhttps-fastjson | 2.0.0.RC | 与 fastjson 集成
-okhttps-gson | 2.0.0.RC | 与 gson 集成
-okhttps-jackson | 2.0.0.RC | 与 jackson 集成
+okhttps-fastjson | 2.0.0 | 与 fastjson 集成
+okhttps-gson | 2.0.0 | 与 gson 集成
+okhttps-jackson | 2.0.0 | 与 jackson 集成
 
 以上是官方维护的与三大 JSON 框架集成的案例，后续将提供 xml 和 protobuf 的集成。
 
 
 # v2.x 的新特性
 
-* HTTP 任务新增`patch()`方法，可发起 PATCH 请求，目前直接支持的 HTTP 方法有：GET、POST、PUT、PATCH、DELETE，并且暴露了`request(String method)`方法，可自定义发起任何请求，如：HEAD、OPTIONS、TRACE、CONNECT 等；
+* HTTP 任务新增`patch()`和`head()`方法，可发起 PATCH 请求，目前直接支持的 HTTP 方法有：GET、POST、PUT、PATCH、DELETE，并且暴露了`request(String method)`方法，可自定义发起任何请求，如：HEAD、OPTIONS、TRACE、CONNECT 等；
 
 * HTTP 任务新增`skipPreproc()`和`skipSerialPreproc()`方法，具体请求可跳过 所有 或只跳过 串行 预处理器；
 
@@ -1106,9 +1106,9 @@ HTTP http = HTTP.builder()
 
 ## 后期计划（v1.1.0）
 
-* 简化 WebSocket 编程：可直接发送 JavaBean 对象消息
-* 简化 WebSocket 编程：可直接接收 JavaBean 对象消息
-* 简化 WebSocket 编程：可使用 Lambda 表达式进行 WebSocket 编程
+* 简化 WebSocket 编程：可直接发送 JavaBean 对象消息（已完成）
+* 简化 WebSocket 编程：可直接接收 JavaBean 对象消息（已完成）
+* 简化 WebSocket 编程：可使用 Lambda 表达式进行 WebSocket 编程（已完成）
 
 ## 联系方式
 

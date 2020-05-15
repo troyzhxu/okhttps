@@ -38,8 +38,8 @@ http.async("/download/test.zip")
 http.sync("/download/test.zip")
         .get()
         .getBody()
-        .setStepBytes(1024)   // 设置每接收 1024 个字节执行一次进度回调（不设置默认为 8192）  
- //     .setStepRate(0.01)    // 设置每接收 1% 执行一次进度回调（不设置以 StepBytes 为准）  
+        .stepBytes(1024)   // 设置每接收 1024 个字节执行一次进度回调（不设置默认为 8192）  
+ //     .stepRate(0.01)    // 设置每接收 1% 执行一次进度回调（不设置以 StepBytes 为准）  
         .setOnProcess((Process process) -> {           // 下载进度回调
             long doneBytes = process.getDoneBytes();   // 已下载字节数
             long totalBytes = process.getTotalBytes(); // 总共的字节数
@@ -59,12 +59,16 @@ http.sync("/download/test.zip")
 List<User> users = http.sync("/users")
         .get()
         .getBody()
-        .setStepBytes(2)
+        .stepBytes(2)
         .setOnProcess((Process process) -> {
             System.out.println(process.getRate());
         })
         .toList(User.class);
 ```
+
+::: warning
+方法`stepBytes`和`stepRate`在 v2.0.0 正式版之前名为`setStepBytes`和`setStepRate`, v2.0.0 之后推荐使用简洁版的方法，老方法将在 v2.1.0 中移除。
+:::
 
 ### 下载过程控制
 
@@ -207,8 +211,8 @@ http.sync("/upload")
         .addBodyPara("name", "Jack")
         .addBodyPara("age", 20)
         .addFilePara("avatar", "D:/image/avatar.jpg")
-        .setStepBytes(1024)   // 设置每发送 1024 个字节执行一次进度回调（不设置默认为 8192）  
- //     .setStepRate(0.01)    // 设置每发送 1% 执行一次进度回调（不设置以 StepBytes 为准）  
+        .stepBytes(1024)   // 设置每发送 1024 个字节执行一次进度回调（不设置默认为 8192）  
+ //     .stepRate(0.01)    // 设置每发送 1% 执行一次进度回调（不设置以 StepBytes 为准）  
         .setOnProcess((Process process) -> {           // 上传进度回调
             long doneBytes = process.getDoneBytes();   // 已发送字节数
             long totalBytes = process.getTotalBytes(); // 总共的字节数
