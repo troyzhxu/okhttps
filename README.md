@@ -25,10 +25,13 @@
  * 单方法回调，充分利用 Lambda 表达式
  * TCP连接池、Http2
 
+## OkHttps 2.0.0 正式版本已发布!
+
 # 相关项目
 
 项目 | 最新版本 | 描述
 -|-|-
+okhttps | 2.0.0 | OkHttps 核心模块
 okhttps-fastjson | 2.0.0 | 与 fastjson 集成
 okhttps-gson | 2.0.0 | 与 gson 集成
 okhttps-jackson | 2.0.0 | 与 jackson 集成
