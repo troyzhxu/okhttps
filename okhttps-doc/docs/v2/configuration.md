@@ -17,8 +17,8 @@ HTTP http = HTTP.builder()
 http.sync("/users").get()                  // http://api.demo.com/users
 
 http.sync("/auth/signin")                  // http://api.demo.com/auth/signin
-        .addBodyParam("username", "Jackson")
-        .addBodyParam("password", "xxxxxx")
+        .addBodyPara("username", "Jackson")
+        .addBodyPara("password", "xxxxxx")
         .post();                           // POST请求
 ```
 　　在配置了`BaseUrl`之后，如有特殊请求任务，仍然可以使用全路径的方式，一点都不妨碍：
@@ -54,34 +54,11 @@ HTTP http = HTTP.builder()
 ```
 　　该配置默认 **影响所有回调**，更多实现细节可参考 [安卓-回调线程切换](/v2/android.html#回调线程切换) 章节。
 
-## 配置 OkHttpClient
-
-　　与其他封装 OkHttp3 的框架不同，OkHttps 并不会遮蔽 OkHttp3 本身就很好用的功能，如下：
-
-```java
-HTTP http = HTTP.builder()
-    .config((OkHttpClient.Builder builder) -> {
-        // 配置连接池 最小10个连接（不配置默认为 5）
-        builder.connectionPool(new ConnectionPool(10, 5, TimeUnit.MINUTES));
-        // 配置连接超时时间（默认10秒）
-        builder.connectTimeout(20, TimeUnit.SECONDS);
-        // 配置 WebSocket 心跳间隔（默认没有心跳）
-        builder.pingInterval(60, TimeUnit.SECONDS);
-        // 配置拦截器
-        builder.addInterceptor((Chain chain) -> {
-            Request request = chain.request();
-            // 必须同步返回，拦截器内无法执行异步操作
-            return chain.proceed(request);
-        });
-        // 其它配置: CookieJar、SSL、缓存、代理、事件监听...
-        // 所有 OkHttp 能配置的，都可以在这里配置
-    })
-    .build();
-```
-
-## 并行预处理器
+## 预处理器
 
 　　预处理器（`Preprocessor`）可以让我们在请求发出之前对请求本身做一些改变，但与`OkHttp`的拦截器（`Interceptor`）不同：预处理器可以让我们 **异步** 处理这些问题。
+
+### 并行预处理器
 
 　　例如，当我们想为请求任务自动添加`Token`头信息，而`Token`只能通过异步方法`requestToken`获取时，这时使用`Interceptor`就很难处理了，但可以使用预处理器轻松解决：
 
@@ -108,7 +85,7 @@ HTTP http = HTTP.builder()
 * 拦截器处理时机在请求前和响应后，预处理器只在请求前，并且先于拦截器执行。关于响应后，OkHttps还提供了全局回调监听（详见6.6章节）
 :::
 
-## 串行预处理器（TOKEN问题最佳解决方案）
+### 串行预处理器（TOKEN问题最佳解决方案）
 
 　　普通预处理器都是可并行处理的，然而有时我们希望某个预处理器同时只处理一个任务。比如 当`Token`过期时我们需要去刷新获取新`Token`，而刷新`Token`这个操作只能有一个任务去执行，因为如果`n`个任务同时执行的话，那么必有`n-1`个任务刚刷新得到的`Token`可能就立马失效了，而这是我们所不希望的。
 
@@ -149,7 +126,157 @@ http.async("/oauth/refresh-token")
 如果你使用的是 v1.x 的版本，则可以使用`HTTP`实例的`request(Request request)`方法发起原生请求，这样则不经过任何预处理器。
 :::
 
-## 全局回调监听
+## 消息转换器
+
+OkHttps 自 2.0 版本器支持自定义消息转换器，并且可以添加多个，例如：
+
+```java
+HTTP http = HTTP.builder()
+        .addMsgConvertor(new MyJsonMsgConvertor());
+        .addMsgConvertor(new MyXmlMsgConvertor());
+        .build();
+```
+
+配置了消息转换器后，`HTTP`实例便具有了序列化和反序列化这些格式数据的能力。
+
+### 反序列化
+
+例如下例中，无论该接口响应的是 JSON 还是 XML，都可以反序列化成功：
+
+```java
+// 无论该接口响应的是 JSON 还是 XML，都可以反序列化成功
+List<Order> orders = http.sync('/orders')
+        .get().getBody().toList(Order.class);
+```
+
+在 Websocket 通讯中，也是如此：
+
+```java
+http.webSocket("/redpacket/status") // 监听红包的领取状态
+        .onMessage((WebSocket ws，Message msg) -> {
+            // 无论该接口响应的是 JSON 还是 XML，都可以反序列化成功
+            Status status = msg.toBean(Status.class);
+        })
+        .listen();
+```
+
+### 正序列化
+
+另外，如果要在请求发出阶段正向序列化参数，则需要指定`bodyType`参数告诉 OkHttps 你想使用哪一个消息转换器，如：
+
+```java
+Order order = newOrder();
+http.async('/orders')           // 提交订单
+        .bodyType("json")
+        .setBodyPara(order)     // 以 JSON 格式序列化 Order 对象
+        .post();
+```
+
+或者 XML：
+
+```java
+Order order = newOrder();
+http.async('/orders')           // 提交订单
+        .bodyType("xml")
+        .setBodyPara(order)     // 以 XML 格式序列化 Order 对象
+        .post();
+```
+
+在 Websocket 里，也是同样的方法：
+
+```java
+http.webSocket("/chat") 
+        .bodyType("json")
+        .onOpen((WebSocket ws，HttpResult res) -> {
+            Hello hello = getHello();
+            ws.send(hello);     // 以 JSON 格式序列化 Hello 对象
+        })
+        .listen();
+```
+
+但如果你在 Websocket 通讯到某一个阶段后，突然想换另外一种格式来发送数据了，你还可以这样：
+
+```java
+http.webSocket("/chat") 
+        .bodyType("json")
+        .onOpen((WebSocket ws，HttpResult res) -> {
+            Hello hello = getHello();
+            ws.send(hello);     // 以 JSON 格式序列化 Hello 对象
+
+            ws.msgType("xml")   // 切换为 XML 格式
+            ws.send(hello);     // 以 XML 格式序列化 Hello 对象
+        })
+        .listen();
+```
+
+### 默认序列化类型
+
+然而大多数情况下，我们都使用一种消息转换器，比如 json，这时候你可以为`bodyType`配置一个默认值：
+
+```java
+HTTP http = HTTP.builder()
+        // 修改 bodyType 的默认值为 json，若不修改，则默认是 form
+        .bodyType("json");      
+        .addMsgConvertor(new MyJsonMsgConvertor());
+        .build();
+```
+::: tip 提示
+只有请求报文体的正向序列化才会收到`bodyType`的影响，对于响应报文体的反向序列化不受其影响。
+:::
+
+### 表单序列化
+
+OkHttps 不但能做 JSON 或 XML 的序列化，并且还能做表单参数的序列化，并且自带了一个`FormConvertor`，它可以给任意`MsgConvertor`赋予表单序列化的能力，例如你已经实现了一个`MyJsonMsgConvertor`，可以这么做：
+
+```java
+// 这里并不要求是一个 JSON 转换器，XML 也可以
+// 有啥就给啥，效果是一样的
+MsgConvertor convertor = new MyJsonMsgConvertor();
+
+HTTP http = HTTP.builder()
+        .addMsgConvertor(new MsgConvertor.FormConvertor(convertor));
+        .build();
+```
+
+这样，你再做表单请求时，就可以直接扔进一个对象，它将自动完成序列化的事情：
+
+```java
+Order order = newOrder();
+http.async('/orders')           // 提交订单
+        .bodyType("form")
+        .setBodyPara(order)     // 以 表单 格式序列化 Order 对象
+        .post();
+```
+
+一般情况下，如果你有实现了一个`MsgConvertor`，我们推荐把它和`FormConvertor`都添加进去，例如：
+
+```java
+MsgConvertor convertor = new MyJsonMsgConvertor();
+
+HTTP http = HTTP.builder()
+        .addMsgConvertor(convertor);
+        .addMsgConvertor(new MsgConvertor.FormConvertor(convertor));
+        .build();
+```
+
+如果你添加了官方提供的`MsgConvertor`依赖包（例如：`okhttps-jackson`等），在构建实例时，还可以这样直接注入：
+
+```java
+HTTP.Builder builder = HTTP.builder()
+// 自动完成依赖中的 MsgConvertor 和 FormConvertor 的注入
+ConvertProvider.inject(builder);
+HTTP http = builder.build();
+```
+
+::: tip
+如果你使用的是[`OkHttps`或`HttpUtils`工具类](/v2/getstart.html#工具类)，它们都会自动配置`MsgConvertor`和`FormConvertor`，无需手动配置
+
+在 v2.2.0.RC 版本中`FormConvertor`的名字是`MsgConvertor.FormMsgConvertor`
+:::
+
+## 全局监听
+
+### 全局回调监听
 
 　　全局回调是实际开发中经常需要的功能，比如对服务器响应的状态码进行统一处理等，同时 OkHttps 的全局回调还具有 **回调阻断** 的功能：
 
@@ -217,7 +344,7 @@ http.async('/orders')       // 提交订单
 * 全局回调监听可以 **阻断**（return false）某个请求的具体回调，而拦截器不能
 :::
 
-## 全局下载监听
+### 全局下载监听
 
 ```java
 HTTP http = HTTP.builder()
@@ -229,96 +356,27 @@ HTTP http = HTTP.builder()
         .build();
 ```
 
-## 消息转换器
+## 配置 OkHttpClient
 
-OkHttps 自 2.0 版本器支持自定义消息转换器，并且可以添加多个，例如：
-
-```java
-HTTP http = HTTP.builder()
-        .addMsgConvertor(new MyJsonMsgConvertor());
-        .addMsgConvertor(new MyXmlMsgConvertor());
-        .build()
-```
-
-配置了消息转换器后，`HTTP`实例便具有了序列化和反序列化这些格式数据的能力。
-
-### 反序列化
-
-例如下例中，无论该接口响应的是 JSON 还是 XML，都可以反序列化成功：
-
-```java
-// 无论该接口响应的是 JSON 还是 XML，都可以反序列化成功
-List<Order> orders = http.sync('/orders')
-        .get().getBody().toList(Order.class);
-```
-
-在 Websocket 通讯中，也是如此：
-
-```java
-http.webSocket("/redpacket/status") // 监听红包的领取状态
-        .onMessage((WebSocket ws，Message msg) -> {
-            // 无论该接口响应的是 JSON 还是 XML，都可以反序列化成功
-            Status status = msg.toBean(Status.class);
-        })
-        .listen();
-```
-
-### 正序列化
-
-另外，如果要在请求发出阶段正向序列化参数，则需要指定`bodyType`参数告诉 OkHttps 你想使用哪一个消息转换器，如：
-
-```java
-http.async('/orders')       // 提交订单
-        .bodyType("json")
-        .setBodyPara(newOrder())
-        .post();
-```
-
-或者 XML：
-
-```java
-http.async('/orders')       // 提交订单
-        .bodyType("xml")
-        .setBodyPara(newOrder())
-        .post();
-```
-
-在 Websocket 里，也是同样的方法：
-
-```java
-http.webSocket("/chat") 
-        .bodyType("json")
-        .onOpen((WebSocket ws，HttpResult res) -> {
-            Hello hello = getHello();
-            ws.send(hello);     // 以 JSON 格式序列化 Hello 对象
-        })
-        .listen();
-```
-
-但如果你在 Websocket 通讯到某一个阶段后，突然想换另外一种格式来发送数据了，你还可以这样：
-
-```java
-http.webSocket("/chat") 
-        .bodyType("json")
-        .onOpen((WebSocket ws，HttpResult res) -> {
-            Hello hello = getHello();
-            ws.send(hello);     // 以 JSON 格式序列化 Hello 对象
-
-            ws.msgType("xml")   // 切换为 XML 格式
-            ws.send(hello);     // 以 XML 格式序列化 Hello 对象
-        })
-        .listen();
-```
-
-### 默认类型
-
-然而大多数情况下，我们都使用一种消息转换器，比如 json，这时候你可以为`bodyType`配置一个默认值：
+　　与其他封装 OkHttp3 的框架不同，OkHttps 并不会遮蔽 OkHttp3 本身就很好用的功能，如下：
 
 ```java
 HTTP http = HTTP.builder()
-        .bodyType("json");      // 修改 bodyType 的默认值为 json
-        .addMsgConvertor(new MyJsonMsgConvertor());
-        .build()
+    .config((OkHttpClient.Builder builder) -> {
+        // 配置连接池 最小10个连接（不配置默认为 5）
+        builder.connectionPool(new ConnectionPool(10, 5, TimeUnit.MINUTES));
+        // 配置连接超时时间（默认10秒）
+        builder.connectTimeout(20, TimeUnit.SECONDS);
+        // 配置 WebSocket 心跳间隔（默认没有心跳）
+        builder.pingInterval(60, TimeUnit.SECONDS);
+        // 配置拦截器
+        builder.addInterceptor((Chain chain) -> {
+            Request request = chain.request();
+            // 必须同步返回，拦截器内无法执行异步操作
+            return chain.proceed(request);
+        });
+        // 其它配置: CookieJar、SSL、缓存、代理、事件监听...
+        // 所有 OkHttp 能配置的，都可以在这里配置
+    })
+    .build();
 ```
-
-若不配置，`bodyType`的默认值是`form`。

@@ -4,8 +4,6 @@ description: OkHttps 文件 上传 下载 进度监听 过程控制 断点续传
 
 # 上传下载
 
-#### 哎呀，作者还在加班中，2.x 的文档很快就出来，先看一下 1.x 的文档吧 :joy:
-
 ## 文件下载
 
 　　OkHttps 并没有把文件的下载排除在常规的请求之外，同一套API，它优雅的设计使得下载与常规请求融合的毫无违和感，一个最简单的示例：
@@ -143,7 +141,7 @@ http.sync("/download/test.zip")
 static String url = "http://api.demo.com/download/test.zip"
 
 public static void main(String[] args) {
-    long totalSize = HttpUtils.sync(url).get().getBody()
+    long totalSize = OkHttps.sync(url).get().getBody()
             .close()             // 因为这次请求只是为了获得文件大小，不消费报文体，所以直接关闭
             .getContentLength(); // 获得待下载文件的大小（由于未消费报文体，所以该请求不会消耗下载报文体的时间和网络流量）
     download(totalSize, 0);      // 从第 0 块开始下载
@@ -154,7 +152,7 @@ static void download(long totalSize, int index) {
     long size = 3 * 1024 * 1024;                 // 每块下载 3M  
     long start = index * size;
     long end = Math.min(start + size, totalSize);
-    HttpUtils.sync(url)
+    OkHttps.sync(url)
             .setRange(start, end)                // 设置本次下载的范围
             .get().getBody()
             .toFile("D:/download/test.zip")      // 下载到同一个文件里
@@ -170,20 +168,22 @@ static void download(long totalSize, int index) {
 }
 ```
 
+本例中用到了`OkHttps`工具类，在应用的开发者我们推荐使用它，请参考 [工具类](/v2/getstart.html#工具类) 章节。
+
 ## 文件上传
 
 　　一个简单文件上传的示例：
 
 ```java
 http.sync("/upload")
-        .addFileParam("test", "D:/download/test.zip")
+        .addFilePara("test", "D:/download/test.zip")
         .post();     // 上传发法一般使用 POST 或 PUT，看服务器支持
 ```
 　　异步上传也是完全一样：
 
 ```java
 http.async("/upload")
-        .addFileParam("test", "D:/download/test.zip")
+        .addFilePara("test", "D:/download/test.zip")
         .post();
 ```
 
@@ -192,7 +192,7 @@ http.async("/upload")
 ```java
 http.async("/upload")
         .bodyType("multipart/form")
-        .addFileParam("test", "D:/download/test.zip")
+        .addFilePara("test", "D:/download/test.zip")
         .post();
 ```
 详见 ISSUE: [https://gitee.com/ejlchina-zhxu/okhttps/issues/I1H8G9](https://gitee.com/ejlchina-zhxu/okhttps/issues/I1H8G9)
@@ -204,9 +204,9 @@ http.async("/upload")
 
 ```java
 http.sync("/upload")
-        .addBodyParam("name", "Jack")
-        .addBodyParam("age", 20)
-        .addFileParam("avatar", "D:/image/avatar.jpg")
+        .addBodyPara("name", "Jack")
+        .addBodyPara("age", 20)
+        .addFilePara("avatar", "D:/image/avatar.jpg")
         .setStepBytes(1024)   // 设置每发送 1024 个字节执行一次进度回调（不设置默认为 8192）  
  //     .setStepRate(0.01)    // 设置每发送 1% 执行一次进度回调（不设置以 StepBytes 为准）  
         .setOnProcess((Process process) -> {           // 上传进度回调
@@ -225,7 +225,7 @@ http.sync("/upload")
 
 ```java
 HttpCall call = http.async("/upload")
-        .addFileParam("test", "D:/download/test.zip")
+        .addFilePara("test", "D:/download/test.zip")
         .setOnProcess((Process process) -> {
             System.out.println(process.getRate());
         })

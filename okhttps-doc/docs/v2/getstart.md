@@ -111,7 +111,7 @@ HTTP http = HTTP.builder().build();
 * `webSocket(Request request, WebSocketListener listener)` OkHttp 原生 WebSocket 连接
 * `newBuilder()`       用于重新构建一个 HTTP 实例
 
-为了使用方便，在构建的时候，我们更愿意指定一个`BaseUrl`和[`MsgConvertor`](https://gitee.com/ejlchina-zhxu/okhttps/blob/master/okhttps/src/main/java/com/ejlchina/okhttps/MsgConvertor.java)（详见 [设置 BaseUrl](/v1/configuration.html#设置-baseurl)）:
+为了使用方便，在构建的时候，我们更愿意指定一个`BaseUrl`和[`MsgConvertor`](https://gitee.com/ejlchina-zhxu/okhttps/blob/master/okhttps/src/main/java/com/ejlchina/okhttps/MsgConvertor.java)（详见 [设置 BaseUrl](/v1/configuration.html#设置-baseurl) 和 [消息转换器](/v2/configuration.html#消息转换器)）:
 
 ```java
 HTTP http = HTTP.builder()
@@ -228,7 +228,7 @@ public class OkHttpsConfig implements Config {
         // OkHttps 会自动注入它们提供的 MsgConvertor 
         // 所以这里就不需要再配置 MsgConvertor 了 (内部实现自动注入的原理也是 SPI)
         // 但如果没有添加这些依赖，那还需要自定义一个 MsgConvertor
-        builder.addMsgConvertor(new MyCustomeMsgConvertor());
+        builder.addMsgConvertor(new MyMsgConvertor());
     }
 
 }

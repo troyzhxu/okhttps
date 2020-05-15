@@ -4,8 +4,6 @@ description: OkHttps 安卓 生命周期 UI线程 主线程 IO线程 自由 灵�
 
 # 安卓
 
-#### 哎呀，作者还在加班中，2.x 的文档很快就出来，先看一下 1.x 的文档吧 :joy:
-
 ## 回调线程切换
 
 　　在 Android 开发中，经常会把某些代码放到特点的线程去执行，比如网络请求响应后的页面更新在主线程（UI线程）执行，而保存文件则在IO线程操作。OkHttps 为这类问题提供了良好的方案。
@@ -178,6 +176,6 @@ HTTP http = HTTP.builder()
 
 **以上三步便在Android中实现了生命周期与HTTP请求绑定的功能**
 
-　　非常简单，懒得敲代码的同学还可以 [点这里 OkHttps.java](https://gitee.com/ejlchina-zhxu/okhttps-android-demo/blob/master/app/src/main/java/com/flower/myapplication/http/OkHttps.java) 直接下载封装好的源码，其中不仅编写了生命周期绑定的配置，还有在UI线程执行回调的配置。
-
-　　有需要的同学，可以直接下载下来使用，还可以基于它再次扩展，比如实现自动添加 TOKEN 的功能，具体可以参考[6.5 串行预处理器（TOKEN问题最佳解决方案）](#65-串行预处理器token问题最佳解决方案)，再比如扩展实现生命周期与下载事件绑定的功能，都非常简单。
+::: tip 提示
+以上三步实现的生命周期绑定，不仅对 HTTP 请求有作用，对 WebSocket 连接也同样有效哦。
+:::

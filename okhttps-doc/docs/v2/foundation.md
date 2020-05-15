@@ -375,43 +375,27 @@ http.async("/projects")
 甚至可以用`setBodyPara`传入一个`String`：
 
 ```java
-http.async("/users/1/projects") 
+http.async("/projects") 
         .setBodyPara("name=OkHttps&desc=最好用的网络框架")
         .post();  
 ```
 
-如果你配置了`MsgConvertor.FormConvertor`，如：
-
-```java
-// 可以是任何一个 MsgConvertor 的实现类
-MsgConvertor convertor = new GsonMsgConvertor();
-
-HTTP http = HTTP.builder()
-        .addMsgConvertor(new MsgConvertor.FormConvertor(convertor));
-        .build()
-```
-
-还可以直接传入一个 POJO（自定义的一个 Java 类）：
+如果你配置了`FormConvertor`（请参考 [配置-表单序列化](/v2/configuration.html#表单序列化) 章节），那你还可以直接传入一个 POJO（自定义的一个 Java 类）：
 
 ```java
 Proejct project = new Proejct();
 project.setName("OkHttps");
 project.setDesc("最好用的网络框架");
 
-http.async("/users/1/projects") 
+http.async("/projects") 
         .setBodyPara(project)       // 将自动序列化为表单格式
         .post();
 ```
 
-::: tip
-* 如果你直接使用[`OkHttps`或`HttpUtils`工具类](/v2/getstart.html#工具类)，它们都会自动配置`FormConvertor`，无需手动配置
-* `FormConvertor`在 v2.2.0.RC 版本里是`MsgConvertor.FormMsgConvertor`
-:::
-
-以上 **4** 种方式具有相同的效果，但如果你修改了默认的报文体类型，那还需在请求时指定当前的请求报文体类型：
+以上 **4** 种方式具有相同的效果，但如果你修改了默认的报文体序列化类型（请参考 [默认序列化类型](/v2/configuration.html#默认序列化类型) 章节），那还需在请求时指定当前的请求报文体类型：
 
 ```java
-http.async("/users/1/projects") 
+http.async("/projects") 
         .bodyType("form")           // 指明请求体类型是表单
         ...
 ```
@@ -419,7 +403,7 @@ http.async("/users/1/projects")
 或使用`OkHttps.FORM`常量
 
 ```java
-http.async("/users/1/projects") 
+http.async("/projects") 
         .bodyType(OkHttps.FORM)     // 指明请求体类型是表单
         ...
 ```
@@ -431,7 +415,7 @@ JSON 请求要求默认的请求`bodyType`为`json` 或者 在具体请求中显
 单个添加
 
 ```java
-http.async("/users/1/projects") 
+http.async("/projects") 
         .addBodyPara("name", "OkHttps")
         .addBodyPara("desc", "最好用的网络框架")
         .post();
@@ -444,7 +428,7 @@ Map<String, Object> params = new HashMap<>();
 params.put("name", "OkHttps");
 params.put("desc", "最好用的网络框架");
 
-http.async("/users/1/projects") 
+http.async("/projects") 
         .addBodyPara(params)
         .post();  
 ```
@@ -456,7 +440,7 @@ Proejct project = new Proejct();
 project.setName("OkHttps");
 project.setDesc("最好用的网络框架");
 
-http.async("/users/1/projects") 
+http.async("/projects") 
         .setBodyPara(project)       // 自动序列化
         .post();   
 ```
@@ -464,7 +448,7 @@ http.async("/users/1/projects")
 字符串方式：
 
 ```java
-http.async("/users/1/projects") 
+http.async("/projects") 
         .setBodyPara("{\"name\":\"OkHttps\",\"desc\":\"最好用的网络框架\"}")
         .post();  
 ```
@@ -472,7 +456,7 @@ http.async("/users/1/projects")
 唯一的不同是，如果默认的`bodyType`不是`json`，那需要显式指定当前请求的`bodyType`为`json`：
 
 ```java
-http.async("/users/1/projects") 
+http.async("/projects") 
         .bodyType("json")           // 指明请求体类型是 JSON
         ...
 ```
@@ -480,7 +464,7 @@ http.async("/users/1/projects")
 或使用`OkHttps.JSON`常量
 
 ```java
-http.async("/users/1/projects") 
+http.async("/projects") 
         .bodyType(OkHttps.JSON)     // 指明请求体类型是 JSON
         ...
 ```
@@ -490,7 +474,7 @@ http.async("/users/1/projects")
 若默认不是 XML，则显式指定当前请求的报文体类型
 
 ```java
-http.async("/users/1/projects") 
+http.async("/projects") 
         .bodyType("xml")           // 指明请求体类型是 XML
         ...
 ```
@@ -498,7 +482,7 @@ http.async("/users/1/projects")
 或使用`OkHttps.XML`常量
 
 ```java
-http.async("/users/1/projects") 
+http.async("/projects") 
         .bodyType(OkHttps.XML)     // 指明请求体类型是 XML
         ...
 ```
@@ -590,3 +574,148 @@ System.out.println(count);     // 输出 4
 ```
 
 标签除了可以用来取消任务，在预处理器中它也可以发挥作用，请参见 [并行预处理器](/v2/configuration.html#并行预处理器) 与 [串行预处理器（token问题最佳解决方案）](/v2/configuration.html#串行预处理器（token问题最佳解决方案）)。
+
+## 异常处理
+
+　　使用 OkHttps 时，**异常处理不是必须的**，但相比其它的 HTTP 开发包，它还提供一个特别的处理方法：`nothrow()`，以满足不同的异常处理需求。
+
+### 同步请求的异常
+
+　　默认情况下，当同步请求执行异常时，会直接向外抛出，我们可以用 `try catch` 来捕获，例如：
+
+```java
+try {
+    HttpResult result = http.sync("/users/1").get();
+} catch (HttpException e) {
+    Throwable cause = e.getCause(); // 得到异常原因
+    if (cause instanceof ConnectException) {
+        // 当没网络时，会抛出连接异常
+    }
+    if (cause instanceof SocketTimeoutException) {
+        // 当接口长时间未响应，会抛出超时异常
+    }
+    if (cause instanceof UnknownHostException) {
+        // 当把域名或IP写错，会抛出 UnknownHost 异常
+    }
+    // ...
+}
+``` 
+　　这种传统的异常处理方式，当然可以解决问题，但 OkHttps 有更佳的方案：
+
+```java
+// 方法  nothrow() 让异常不直接抛出
+HttpResult result = http.sync("/users/1").nothrow().get();
+// 判断执行状态
+switch (result.getState()) {
+    case RESPONSED:     // 请求已正常响应
+        break;
+    case CANCELED:      // 请求已被取消
+        break;
+    case NETWORK_ERROR: // 网络错误，说明用户没网了
+        break;
+    case TIMEOUT:       // 请求超时
+        break;
+    case EXCEPTION:     // 其它异常
+        break;
+}
+// 还可以获得具体的异常信息
+IOException error = result.getError();
+``` 
+
+### 异步请求的异常
+
+　　异步请求最常用的异常处理方式就是设置一个异常回调：
+
+```java
+http.async("/users/1")
+        .setOnResponse((HttpResult result) -> {
+            // 当发生异常时就不会走这里
+        })
+        .setOnException((IOException e) -> {
+            // 这里处理请求异常
+        })
+        .get();
+```
+　　当然，还有一个全局异常监听（`ExceptionListener`，请参考 [全局回调监听](/v2/configuration.html#全局回调监听) 章节）：
+
+```java
+HTTP http = HTTP.builder()
+        .exceptionListener((HttpTask<?> task, IOException error) -> {
+            // 所有请求执行完都会走这里
+
+            // 返回 true 表示继续执行 task 的 OnComplete 回调，
+            // 返回 false 则表示不再执行，即 阻断
+            return true;
+        })
+        .build();
+```
+　　如果不设置`OnException`回调，也没有`ExceptionListener`，发生异常时会在 **IO 线程** 中向上抛出，外层无法捕获：
+
+```java
+try {
+    http.async("/users/1")
+            .setOnResponse((HttpResult result) -> {
+                // 当发生异常时就不会走这里
+            })
+            .get();
+} catch (HttpException e) {
+    // 这种方式是捕获不到异常的！！！！！！
+}
+```
+　　即使没有`OnException`回调，发生异常时，依然会走`OnComplete`回调，如果设置了的话：
+
+```java
+http.async("/users/1")
+        .setOnResponse((HttpResult result) -> {
+            // 当发生异常时就不会走这里
+        })
+        .setOnComplete((State state) -> {
+            // 发生异常，会先执行这里，可以根据 state 判断发生了什么
+            // 但执行完后依然会在IO线程中向上抛出
+        })
+        .get();
+```
+　　如果就是想 **不处理异常，也不向上抛出**，发生错误完全无视，可以做到吗？可以！还是使用`nothrow()`方法：
+
+```java
+http.async("/users/1")
+        .nothrow()  // 告诉 OkHttps 发生异常时不向外抛出
+        .setOnResponse((HttpResult result) -> {
+            // 当发生异常时就不会走这里
+        })
+        .get();
+```
+
+## 取消请求
+
+　　在 OkHttps 里取消请求共有 **4 种** 方式可选：
+
+**1、** 使用`HttpCall#cancel()`取消单个请求（适用于异步请求，[详见 3.3 章节](#33-httpcall)）
+
+**2、** 使用`HttpTask#cancel()`取消单个请求（适用于所有请求）（since v1.0.4）
+
+```java
+HttpTask<?> task = http.async("/users")
+        .setOnResponse((HttpResult result) -> {
+            // 响应回调
+        });
+
+task.get(); // 发起 GET 请求
+
+// 取消请求，并返回是否取消成功
+boolean canceled = task.cancel();   
+```
+
+**3、** 使用`HTTP#cancel(String tag)`按标签批量取消请求（适用于所有请求，[详见第 5 章节](#5-使用标签)）
+
+**4、** 使用`HTTP#cancelAll()`取消所有请求（适用于所有请求）（since v1.0.2）
+
+```java
+http.cancelAll();   // 取消所有请求
+```
+
+::: tip 提示
+以上四种方式都对所有类型的请求有效，包括：同步 HTTP、异步 HTTP 和 WebSocket 连接。
+:::
+
+除了以上的 4 种方式，OkHttps 里还可以实现自动取消，请参考 [安卓-生命周期绑定](/v2/android.html#生命周期绑定) 章节。

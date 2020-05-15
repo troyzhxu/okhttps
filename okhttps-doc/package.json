@@ -5,11 +5,11 @@
   },
   "devDependencies": {
     "@vuepress/plugin-back-to-top": "^1.4.1",
+    "@vuepress/plugin-medium-zoom": "^1.4.1",
     "vuepress": "^1.4.1",
     "vuepress-plugin-baidu-autopush": "^1.0.1",
     "vuepress-plugin-baidu-tongji": "^1.0.1",
     "vuepress-plugin-seo": "^0.1.2"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
