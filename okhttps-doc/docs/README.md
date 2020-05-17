@@ -2,7 +2,7 @@
 home: true
 heroImage: /logo.png
 heroText: OkHttps V2
-tagline: 基于 OkHttp 增强版 HTTP 客户端
+tagline: 强大轻量 且 前后端通用的 HTTP 客户端
 actionText: 极速上手 →
 actionLink: /v2/
 features:
@@ -19,23 +19,30 @@ footer: Apache Licensed | Copyright © 2020-present ejlchina
 <!-- <CodeSwitcher :languages="{java:'Java',kotlin:'Kotlin'}" name="java">
 <template v-slot:java> -->
 
+**<center>如艺术一般优雅，像 1、2、3 一样简单</center>**
+
 ```java
+HTTP http = HTTP.builder()
+        .baseUrl("http://api.example.com")
+        .addMsgConvertor(new GsonMsgConvertor());
+        .build();
+
 // 同步 HTTP
-List<User> users = OkHttps.sync("/users") 
+List<User> users = http.sync("/users") 
         .get()                          // GET请求
-        .getBody()                      // 获取响应报文体
-        .toList(User.class);            // 得到目标数据
+        .getBody()                      // 响应报文体
+        .toList(User.class);            // 自动反序列化 List 
 
 // 异步 HTTP
-OkHttps.async("/users/1")
+http.async("/users/1")
         .setOnResponse((HttpResult res) -> {
-            // 得到目标数据
+            // // 自动反序列化 Bean 
             User user = res.getBody().toBean(User.class);
         })
         .get();                         // GET请求
 
 // WebSocket
-OkHttps.webSocket("/chat") 
+http.webSocket("/chat") 
         .onMessage((WebSocket ws，Message msg) -> {
             // 从服务器接收消息
             Chat chat = msg.toBean(Chat.class);
