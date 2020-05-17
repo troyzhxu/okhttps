@@ -43,8 +43,8 @@ public class JacksonArray implements Array {
 	@Override
 	public boolean getBool(int index) {
 		JsonNode subJson = json.get(index);
-		if (subJson != null && subJson.asBoolean()) {
-			return subJson.asBoolean();
+		if (subJson != null) {
+			return subJson.asBoolean(false);
 		}
 		return false;
 	}
@@ -52,8 +52,8 @@ public class JacksonArray implements Array {
 	@Override
 	public int getInt(int index) {
 		JsonNode subJson = json.get(index);
-		if (subJson != null && subJson.isNumber()) {
-			return subJson.intValue();
+		if (subJson != null) {
+			return subJson.asInt(0);
 		}
 		return 0;
 	}
@@ -61,8 +61,8 @@ public class JacksonArray implements Array {
 	@Override
 	public long getLong(int index) {
 		JsonNode subJson = json.get(index);
-		if (subJson != null && subJson.isNumber()) {
-			return subJson.longValue();
+		if (subJson != null) {
+			return subJson.asLong(0);
 		}
 		return 0;
 	}
@@ -73,14 +73,17 @@ public class JacksonArray implements Array {
 		if (subJson != null && subJson.isNumber()) {
 			return subJson.floatValue();
 		}
+		if (subJson != null) {
+			return (float) subJson.asDouble(0);
+		}
 		return 0;
 	}
 
 	@Override
 	public double getDouble(int index) {
 		JsonNode subJson = json.get(index);
-		if (subJson != null && subJson.isNumber()) {
-			return subJson.doubleValue();
+		if (subJson != null) {
+			return subJson.asDouble(0);
 		}
 		return 0;
 	}
