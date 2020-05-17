@@ -16,18 +16,22 @@ features:
 footer: Apache Licensed | Copyright © 2020-present ejlchina
 ---
 
-<!-- <CodeSwitcher :languages="{java:'Java',kotlin:'Kotlin'}" name="java">
-<template v-slot:java> -->
-**<center>As Elegant as Art, As Easy as 1, 2, 3</center>**
+#### <center> As Elegant as Art, As Easy as 1, 2, 3 </center>
+
 ```java
+HTTP http = HTTP.builder()
+        .baseUrl("http://api.example.com")
+        .addMsgConvertor(new GsonMsgConvertor());
+        .build();
+
 // Synchronous HTTP
-List<User> users = OkHttps.sync("/users") 
+List<User> users = http.sync("/users") 
         .get()                          // GET method
         .getBody()                      // response body
         .toList(User.class);            // Automatic deserialization
 
 // Asynchronous HTTP
-OkHttps.async("/users/1")
+http.async("/users/1")
         .setOnResponse((HttpResult res) -> {
             // Automatic deserialization
             User user = res.getBody().toBean(User.class);
@@ -35,7 +39,7 @@ OkHttps.async("/users/1")
         .get();                         // GET method
 
 // WebSocket
-OkHttps.webSocket("/chat") 
+http.webSocket("/chat") 
         .onMessage((WebSocket ws，Message msg) -> {
             // Automatic deserialization
             Chat chat = msg.toBean(Chat.class);
@@ -45,4 +49,4 @@ OkHttps.webSocket("/chat")
         .listen();                     // Start listening
 ```
 
-[<center> **Lean More** </center>](/en/v2/)
+[<center> Lean More </center>](/en/v2/)

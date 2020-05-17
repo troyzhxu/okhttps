@@ -16,10 +16,7 @@ features:
 footer: Apache Licensed | Copyright © 2020-present ejlchina
 ---
 
-<!-- <CodeSwitcher :languages="{java:'Java',kotlin:'Kotlin'}" name="java">
-<template v-slot:java> -->
-
-**<center>如艺术一般优雅，像 1、2、3 一样简单</center>**
+#### <center> 如艺术一般优雅，像 1、2、3 一样简单 </center>
 
 ```java
 HTTP http = HTTP.builder()
@@ -52,5 +49,4 @@ http.webSocket("/chat")
         .listen();                     // 启动监听
 ```
 
-**<center>竟然不到 <font size=5>15</font> 秒，你已学会 <font size=6>90</font>% 的精髓！</center>**
-<center>[**了解更多**](/v2/)</center>
+[<center> 了解更多 </center>](/v2/)
