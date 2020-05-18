@@ -724,3 +724,7 @@ http.cancelAll();   // 取消所有请求
 :::
 
 除了以上的 4 种方式，OkHttps 里还可以实现自动取消，请参考 [安卓-生命周期绑定](/v2/android.html#生命周期绑定) 章节。
+
+<br/>
+
+<Vssue :title="$title" />

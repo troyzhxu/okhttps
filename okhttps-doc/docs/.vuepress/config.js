@@ -87,6 +87,16 @@ module.exports = {
     '@vuepress/medium-zoom', 
     'baidu-autopush', 'seo',
     ['baidu-tongji', {hm: '6eb41c0ab450d5a4ae8769682ecb0ab2'}],
+    ['@vssue/vuepress-plugin-vssue', {
+      // 设置 `platform` 而不是 `api`
+      platform: 'github-v4',
+      // 其他的 Vssue 配置
+      owner: 'ejlchina',
+      repo: 'okhttps',
+      clientId: '4e308eb78d3a64abd2a8',
+      clientSecret: '17bf99c60a396b66e8ac841e3dc7a6256ab6cbcf',
+      autoCreateIssue: true
+    }]
   ],
   markdown: {
     lineNumbers: true

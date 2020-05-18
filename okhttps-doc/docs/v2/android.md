@@ -179,3 +179,7 @@ HTTP http = HTTP.builder()
 ::: tip 提示
 以上三步实现的生命周期绑定，不仅对 HTTP 请求有作用，对 WebSocket 连接也同样有效哦。
 :::
+
+<br/>
+
+<Vssue :title="$title" />

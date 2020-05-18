@@ -238,3 +238,7 @@ HttpCall call = http.async("/upload")
 call.cancel();  // 取消上传
 ```
 　　上传就没有暂停和继续这个功能啦，应该没人有这个需求吧?
+
+<br/>
+
+<Vssue :title="$title" />

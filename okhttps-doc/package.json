@@ -11,5 +11,8 @@
     "vuepress-plugin-baidu-tongji": "^1.0.1",
     "vuepress-plugin-seo": "^0.1.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@vssue/api-github-v4": "^1.4.0",
+    "@vssue/vuepress-plugin-vssue": "^1.4.4"
+  }
 }

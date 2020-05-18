@@ -35,7 +35,7 @@ okhttps-jackson | 2.0.0 | 扩展包：与 jackson 集成
 
 ## v2.x 的新特性
 
-* HTTP 任务新增`patch()`方法，可发起 PATCH 请求，目前直接支持的 HTTP 方法有：GET、POST、PUT、PATCH、DELETE，并且暴露了`request(String method)`方法，可自定义发起任何请求，如：HEAD、OPTIONS、TRACE、CONNECT 等；
+* HTTP 任务新增`patch()`和`head()`方法，可发起 PATCH 和 HEAD 请求，目前直接支持的 HTTP 方法有：GET、POST、PUT、PATCH、DELETE，并且暴露了`request(String method)`方法，可自定义发起任何请求，如：HEAD、OPTIONS、TRACE、CONNECT 等；
 
 * HTTP 任务新增`skipPreproc()`和`skipSerialPreproc()`方法，具体请求可跳过 所有 或只跳过 串行 预处理器；
 
@@ -48,3 +48,7 @@ okhttps-jackson | 2.0.0 | 扩展包：与 jackson 集成
 * 新增`OkHttps`工具类，支持 SPI 方式注入配置，`OkHttps`和`HttpUtils`默认自动以 SPI 方式寻找依赖中的`MsgConvertor`；
 
 * 新增可自定义默认编码（不自定义依然默认为 utf-8）、具体请求可指定特殊编码功能。
+
+<br/>
+
+<Vssue :title="$title" />
