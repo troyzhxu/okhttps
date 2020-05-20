@@ -364,9 +364,11 @@ public class OkHttpsConfig implements Config {
                         if (token != null) {
                             // 添加 Token 头信息，名字需要和后端商定
                             task.addHeader("Access-Token", token);
-                        } else {
+                        } else if (ctx != null) {
                             // 若没有得到 Token, 则跳转登录页面
                             ctx.startActivity(new Intent(ctx, LoginActivity.class));
+                        } else {
+                            Log.e("没有 Context 无法跳转登录页面！");
                         }
                         // 无论如何，这行代码一定要执行到，不然后续接口会一直在排队中
                         chain.proceed();
