@@ -131,7 +131,6 @@ HTTP http = HTTP.builder()
 
 上例中的[`GsonMsgConvertor`](https://gitee.com/ejlchina-zhxu/okhttps/blob/master/okhttps-gson/src/main/java/com/ejlchina/okhttps/GsonMsgConvertor.java)来自[`okhttps-gson`](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-gson)。为了简化文档，下文中出现的`http`均是在构建时设置了`BaseUrl`和`MsgConvertor`的`HTTP`实例。
 
-
 ### 同步请求
 
 　　使用方法`sync(String url)`开始一个同步请求：
@@ -178,6 +177,34 @@ http.webSocket("/chat")
 ```
 　　方法`webSocket`返回一个支持 WebSocket 的`HttpTask`，也可链式使用。
 
+### 请求三步曲
+
+#### 第一步、确定请求方式
+    
+同步 HTTP（`sync`）、异步 HTTP（`async`）或 WebSocket（`webSocket`）
+
+#### 第二步、构建请求任务
+
+* `addXxxPara` - 添加请求参数
+* `setOnXxxx` - 设置回调函数
+* `tag` - 添加标签
+* ...
+
+#### 第三步、调用请求方法
+
+HTTP 请求方法：
+
+* `get()` - GET 请求
+* `post()` - POST 请求
+* `put()` - PUT 请求
+* `delete()` - DELETE 请求
+* ...
+
+Websocket 方法：
+
+* `listen()` - 启动监听
+
+#### 任意请求，都遵循请求三部曲！
 
 ### 工具类
 
@@ -276,8 +303,19 @@ OkHttps.set(http);
 
 而在开发具有网络请求需求的依赖项目时，直接使用`HttpUtils`并且不做自定义的配置，如果一定要自定义配置，那就使用`HTTP.Builder`重新构建一个`HTTP`实例使用吧。
 
+### IDEA 小技巧
 
-**至此，你已轻松学会了 OkHttps 95% 的常规用法！但别急，后面还有更精彩的。**
+由于 OkHttps 遵循请求三部曲，所以我们在 IDEA 中设置一个代码模板（Android Studio 一样设置）
+
+* 菜单 File -> Settings 打开 Settings 设置框
+* 展开 Editor -> Live Templates
+
+![](/code_temp.png)
+
+如图设置好后，写代码时，输入`oks`，按回车键，就会自动生成模版，赶快尝试一下吧。
+
+
+**至此，你已轻松学会了 OkHttps 90% 的常规用法！但别急，后面还有更加精彩的。**
 
 <br/>
 

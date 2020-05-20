@@ -578,7 +578,8 @@ int count = http.cancel("B");  //（2）（3）（4）（6）被取消（取消�
 System.out.println(count);     // 输出 4
 ```
 
-标签除了可以用来取消任务，在预处理器中它也可以发挥作用，请参见 [并行预处理器](/v2/configuration.html#并行预处理器) 与 [串行预处理器（token问题最佳解决方案）](/v2/configuration.html#串行预处理器（token问题最佳解决方案）)。
+标签除了可以用来取消任务，在预处理器中它也可以发挥作用，请参见 [并行预处理器](/v2/configuration.html#并行预处理器)、[串行预处理器（token问题最佳解决方案）](/v2/configuration.html#串行预处理器（token问题最佳解决方案）)和 [安卓-自动加载框](/v2/android.html#自动加载框) 章节。
+
 
 ## 异常处理
 
