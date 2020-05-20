@@ -23,7 +23,7 @@
 * 同步拦截器、异步预处理器、回调执行器、全局监听、回调阻断 等等，让你扩展无限功能！
 * 文件上传下载（过程控制、进度监听），上传下载如此简单！
 * 单方法回调，充分利用 Lambda 表达式，让你代码超级简洁！
-* TCP连接池、Http2，性能跑起来！
+* 超级轻量，但性能卓越！
 
 ## 如何使用
 
@@ -39,7 +39,7 @@ List<User> users = OkHttps.sync("/users")
 // 异步 HTTP
 OkHttps.async("/users/1")
         .setOnResponse(res -> {
-            // // 自动反序列化 Bean 
+            // 自动反序列化 Bean 
             User user = res.getBody().toBean(User.class);
         })
         .get();                         // GET请求
