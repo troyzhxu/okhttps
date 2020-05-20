@@ -1115,7 +1115,7 @@ HTTP http = HTTP.builder()
 
 ## 联系方式
 
-* 微信：<img src="https://images.gitee.com/uploads/images/2020/0511/091344_4dad5453_1393412.png" width="700px">
+* 微信：<img src="https://images.gitee.com/uploads/images/2020/0520/170722_504b1ae2_1393412.png" width="700px">
 * 邮箱：zhou.xu@ejlchina.com
 
 ## 参与贡献
