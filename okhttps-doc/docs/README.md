@@ -40,7 +40,7 @@ http.async("/users/1")
 
 // WebSocket
 http.webSocket("/chat") 
-        .onMessage((WebSocket ws，Message msg) -> {
+        .onMessage((WebSocket ws, Message msg) -> {
             // 从服务器接收消息
             Chat chat = msg.toBean(Chat.class);
             // 向服务器发送消息

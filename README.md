@@ -13,17 +13,17 @@
 
 官网 http://okhttps.ejlchina.com/
 
-## OkHttps 简介
+## 为什么要用 OkHttps
 
-　　OkHttps 是近期开源的对 OkHttp3 轻量封装的框架，它独创的异步预处理器，特色的标签，灵活的上传下载进度监听与过程控制功能，在轻松解决很多原本另人头疼问题的同时，设计上也力求纯粹与优雅。
+　　OkHttps 是近期开源的对 OkHttp3 轻量封装的框架，它独创的异步预处理器，特色的标签，灵活的上传下载进度监听与过程控制功能，在轻松解决很多问题的同时，设计上也力求纯粹与优雅。
 
- * 链式调用，一点到底
- * BaseURL、URL占位符、HTTP、WebSocket
- * JSON、Xml 等自动封装与解析，且支持与任意格式的数据解析框架集成
- * 同步拦截器、异步预处理器、回调执行器、全局监听、回调阻断
- * 文件上传下载（过程控制、进度监听）
- * 单方法回调，充分利用 Lambda 表达式
- * TCP连接池、Http2
+* 超级优雅的 API 设计，并且链式调用，让你顺滑到底！
+* BaseURL、URL占位符、HTTP 同步 异步、WebSocket，让你想干啥就干啥！ 
+* JSON、Xml 等自动封装与解析，且支持与任意格式的数据解析框架集成，想用啥就用啥！
+* 同步拦截器、异步预处理器、回调执行器、全局监听、回调阻断，让你扩展无限功能！
+* 文件上传下载（过程控制、进度监听），上传下载如此简单！
+* 单方法回调，充分利用 Lambda 表达式，让你代码超级简洁！
+* TCP连接池、Http2，性能跑起来！
 
 ## 如何使用
 
@@ -38,7 +38,7 @@ List<User> users = OkHttps.sync("/users")
 
 // 异步 HTTP
 OkHttps.async("/users/1")
-        .setOnResponse((HttpResult res) -> {
+        .setOnResponse(res -> {
             // // 自动反序列化 Bean 
             User user = res.getBody().toBean(User.class);
         })
