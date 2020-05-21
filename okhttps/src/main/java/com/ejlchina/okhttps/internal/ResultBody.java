@@ -72,7 +72,7 @@ public class ResultBody extends AbstractBody implements Body {
 	@Override
 	public Body setOnProcess(OnCallback<Process> onProcess) {
 		if (taskExecutor == null) {
-			throw new IllegalStateException("没有 taskExecutor， 不可设置下载进度回调！");
+			throw new IllegalStateException("没有 taskExecutor，不可设置下载进度回调！");
 		}
 		if (cached) {
 			throw new IllegalStateException("开启缓存后，不可设置下载进度回调！");

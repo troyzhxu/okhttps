@@ -27,7 +27,7 @@ public class Download {
 	private long seekBytes = 0;
 	private boolean appended;
 	private volatile int status;
-	private Object lock = new Object();
+	private final Object lock = new Object();
 	
 	protected boolean nextOnIO = false;
     private boolean sOnIO;
