@@ -92,7 +92,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 	 * @param onResBody 响应报文体回调
 	 * @return HttpTask 实例
 	 */
-    public AsyncHttpTask setOnRespBody(OnCallback<HttpResult.Body> onResBody) {
+    public AsyncHttpTask setOnResBody(OnCallback<HttpResult.Body> onResBody) {
     	this.onResBody = onResBody;
     	resBodyOnIO = nextOnIO;
         nextOnIO = false;
