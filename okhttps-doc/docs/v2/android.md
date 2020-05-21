@@ -256,7 +256,7 @@ HTTP http = HTTP.builder()
 
 ## 最佳实践
 
-本章节，将以源代码的方式为你呈现使用 OkHttps 的正确姿势，包括：
+本章节，将以源码的方式为你呈现使用 OkHttps 的正确姿势，包括：
 
 * 默认回调线程
 * 生命周期绑定
@@ -380,6 +380,7 @@ public class OkHttpsConfig implements Config {
                     // 刷新 Token 的接口可以例外
                     if (task.getUrl().contains(Urls.TOKEN_REFRESH) 
                             || result.isSuccessful()) {
+                        // 这里演示的是 HTTP 状态码的处理，如果有自定义的 code, 也可以进行深层次的判断
                         return true;            // 继续接口的业务处理
                     }
                     // 向用户展示接口的错误信息

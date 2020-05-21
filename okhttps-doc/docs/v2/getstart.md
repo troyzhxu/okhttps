@@ -270,6 +270,8 @@ public class OkHttpsConfig implements Config {
 }
 ```
 
+以上做简单的演示，更多配置案例可参考 [安卓-最佳实践](/v2/android.html#最佳实践) 章节。
+
 #### 第二步、在项目的`/src/main`目录下新建`resources/META-INF/services/com.ejlchina.okhttps.Config`文件，文件内容是上一步自定义的配置类的全名
 
 例如：

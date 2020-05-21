@@ -578,8 +578,11 @@ int count = http.cancel("B");  //（2）（3）（4）（6）被取消（取消�
 System.out.println(count);     // 输出 4
 ```
 
-标签除了可以用来取消任务，在预处理器中它也可以发挥作用，请参见 [并行预处理器](/v2/configuration.html#并行预处理器)、[串行预处理器（token问题最佳解决方案）](/v2/configuration.html#串行预处理器（token问题最佳解决方案）)和 [安卓-自动加载框](/v2/android.html#自动加载框) 章节。
+取消请求任务，只是标签的一个附带功能。
 
+标签 真正的强大之处在于：它可以和 [预处理器](/v2/configuration.html#并行预处理器) 和 [全局监听](/v2/configuration.html#全局监听) 配合使用，以此来扩展很多功能。可参考 [串行预处理器（token问题最佳解决方案）](/v2/configuration.html#串行预处理器（token问题最佳解决方案）)和 [安卓-自动加载框](/v2/android.html#自动加载框) 等章节。
+
+另外，请求任务的取消，还有更多的方式，可参考 [取消请求](/v2/foundation.html#取消请求) 章节
 
 ## 异常处理
 
