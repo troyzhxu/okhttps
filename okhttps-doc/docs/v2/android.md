@@ -14,7 +14,7 @@ description: OkHttps 安卓 生命周期 UI线程 主线程 IO线程 自由 灵�
 
 　　但是在 Android 里使用  OkHttps 的话，UI线程的问题能否优雅的解决呢？当然可以！简单粗暴的方法就是配置一个 回调执行器：
 
- ```java
+```java
 HTTP http = HTTP.builder()
         .callbackExecutor((Runnable run) -> {
             // 实际编码中可以吧 Handler 提出来，不需要每次执行回调都重新创建
@@ -22,6 +22,25 @@ HTTP http = HTTP.builder()
         })
         .build();
 ```
+
+::: warning 注意
+在 Android 中使用 v2.0.0 及以前版本，当在主线程里消费报文体时（调用`Body#toXxx()`方法），会引发`android.os.NetworkOnMainThreadException`异常。可以通过添加一个拦截器来解决：
+
+```java
+HTTP http = HTTP.builder()
+        .config( builder -> builder.addInterceptor(chain -> {
+            Response res = chain.proceed(chain.request());
+            ResponseBody body = res.body();
+            ResponseBody newBody = null;
+            if (body != null) {
+                newBody = ResponseBody.create(body.contentType(), body.bytes());
+            }
+            return res.newBuilder().body(newBody).build();
+        }))
+        // 省略其它...
+        .build();
+```
+:::
 
 ### 用例
 

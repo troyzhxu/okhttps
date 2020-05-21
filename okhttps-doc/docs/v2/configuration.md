@@ -54,6 +54,25 @@ HTTP http = HTTP.builder()
 ```
 　　该配置默认 **影响所有回调**，更多实现细节可参考 [安卓-回调线程切换](/v2/android.html#回调线程切换) 章节。
 
+::: warning 注意
+在 Android 中使用 v2.0.0 及以前版本，当在主线程里消费报文体时（调用`Body#toXxx()`方法），会引发`android.os.NetworkOnMainThreadException`异常。可以通过添加一个拦截器来解决：
+
+```java
+HTTP http = HTTP.builder()
+        .config( builder -> builder.addInterceptor(chain -> {
+            Response res = chain.proceed(chain.request());
+            ResponseBody body = res.body();
+            ResponseBody newBody = null;
+            if (body != null) {
+                newBody = ResponseBody.create(body.contentType(), body.bytes());
+            }
+            return res.newBuilder().body(newBody).build();
+        }))
+        // 省略其它...
+        .build();
+```
+:::
+
 ## 预处理器
 
 　　预处理器（`Preprocessor`）可以让我们在请求发出之前对请求本身做一些改变，但与`OkHttp`的拦截器（`Interceptor`）不同：预处理器可以让我们 **异步** 处理这些问题。
@@ -127,7 +146,7 @@ http.async("/oauth/refresh-token")
 ```
 否则就会发生两个 HTTP 任务相互等待谁也执行不了的问题。
 
-如果你使用的是 v1.x 的版本，则可以使用`HTTP`实例的`request(Request request)`方法发起原生请求，这样则不经过任何预处理器。
+如果你使用的是 v1.x 的版本，则可以使用`HTTP`实例的`request(Request request)`方法发起原生请求，这样也不经过任何预处理器。
 :::
 
 关于 TOKEN 的更多处理细节，请参考 [安卓-最佳实践](/v2/android.html#最佳实践) 章节。
@@ -193,7 +212,7 @@ http.async('/orders')           // 提交订单
 ```java
 http.webSocket("/chat") 
         .bodyType("json")
-        .onOpen((WebSocket ws，HttpResult res) -> {
+        .setOnOpen((WebSocket ws，HttpResult res) -> {
             Hello hello = getHello();
             ws.send(hello);     // 以 JSON 格式序列化 Hello 对象
         })
@@ -205,7 +224,7 @@ http.webSocket("/chat")
 ```java
 http.webSocket("/chat") 
         .bodyType("json")
-        .onOpen((WebSocket ws，HttpResult res) -> {
+        .setOnOpen((WebSocket ws，HttpResult res) -> {
             Hello hello = getHello();
             ws.send(hello);     // 以 JSON 格式序列化 Hello 对象
 

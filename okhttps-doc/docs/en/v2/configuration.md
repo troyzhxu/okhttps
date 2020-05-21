@@ -187,7 +187,7 @@ http.async('/orders')           // 提交订单
 ```java
 http.webSocket("/chat") 
         .bodyType("json")
-        .onOpen((WebSocket ws，HttpResult res) -> {
+        .setOnOpen((WebSocket ws，HttpResult res) -> {
             Hello hello = getHello();
             ws.send(hello);     // 以 JSON 格式序列化 Hello 对象
         })
@@ -199,7 +199,7 @@ http.webSocket("/chat")
 ```java
 http.webSocket("/chat") 
         .bodyType("json")
-        .onOpen((WebSocket ws，HttpResult res) -> {
+        .setOnOpen((WebSocket ws，HttpResult res) -> {
             Hello hello = getHello();
             ws.send(hello);     // 以 JSON 格式序列化 Hello 对象
 
