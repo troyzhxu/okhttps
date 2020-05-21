@@ -194,8 +194,8 @@ OkHttps 的所有回调函数都默认在 IO 线程执行，若要切换默认�
     * `toString()`               报文体转换为字符串文本
     * `toBean(Class<T> type)`    报文体根据`type`自动反序列化为 JavaBean（依赖`MsgConvertor`）
     * `toList(Class<T> type)`    报文体根据`type`自动反序列化为 JavaBean 列表（依赖`MsgConvertor`）
-    * `toMapper()`               报文体自动反序列化为映射结构的对象（依赖`MsgConvertor`，v2.2.0.RC 之前是`toJsonObject()`）
-    * `toArray()`                报文体自动反序列化为数组结构的对象（依赖`MsgConvertor`，v2.2.0.RC 之前是`toJsonArray()`）
+    * `toMapper()`               报文体自动反序列化为映射结构的对象（依赖`MsgConvertor`，v2.0.0.RC 之前是`toJsonObject()`）
+    * `toArray()`                报文体自动反序列化为数组结构的对象（依赖`MsgConvertor`，v2.0.0.RC 之前是`toJsonArray()`）
     * `toFile(String filePath)`  下载到指定路径
     * `toFile(File file)`        下载到指定文件
     * `toFolder(String dirPath)` 下载到指定目录

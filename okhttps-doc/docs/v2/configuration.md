@@ -277,7 +277,7 @@ HTTP http = builder.build();
 ::: tip
 如果你使用的是[`OkHttps`或`HttpUtils`工具类](/v2/getstart.html#工具类)，它们都会自动配置`MsgConvertor`和`FormConvertor`，无需手动配置
 
-在 v2.2.0.RC 版本中`FormConvertor`的名字是`MsgConvertor.FormMsgConvertor`
+在 v2.0.0.RC 版本中`FormConvertor`的名字是`MsgConvertor.FormMsgConvertor`
 :::
 
 ## 全局监听
