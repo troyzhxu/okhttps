@@ -177,7 +177,7 @@ public class HttpClient implements HTTP {
         return executor;
     }
 
-    public void preprocess(HttpTask<? extends HttpTask<?>> httpTask, Runnable request, 
+    public void preprocess(HttpTask<?> httpTask, Runnable request, 
     		boolean skipPreproc, boolean skipSerialPreproc) {
     	if (preprocessors.length == 0 || skipPreproc) {
     		request.run();
