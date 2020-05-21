@@ -55,7 +55,7 @@ HTTP http = HTTP.builder()
 　　该配置默认 **影响所有回调**，更多实现细节可参考 [安卓-回调线程切换](/v2/android.html#回调线程切换) 章节。
 
 ::: warning 注意
-在 Android 中使用 v2.0.0 及以前版本，当在主线程里消费报文体时（调用`Body#toXxx()`方法），会引发`android.os.NetworkOnMainThreadException`异常。可以通过添加一个拦截器来解决：
+在 Android 7+（SDK 24 以上）中使用 v2.0.0 及以前版本，当在主线程里消费报文体时（调用`Body#toXxx()`方法），会引发`android.os.NetworkOnMainThreadException`异常。可以通过添加一个拦截器来解决：
 
 ```java
 HTTP http = HTTP.builder()
