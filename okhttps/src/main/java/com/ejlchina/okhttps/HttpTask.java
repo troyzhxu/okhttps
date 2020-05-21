@@ -45,7 +45,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     private String dateFormat;
     private String bodyType;
     private OnCallback<Process> onProcess;
-    private boolean pOnIO;
+    private boolean processOnIO;
     private long stepBytes = 0;
     private double stepRate = -1;
 
@@ -149,7 +149,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     /**
-     * @since 2.2.0
+     * @since 2.0.0.RC
      * 为请求任务添加标签
      * @param tag 标签
      * @return HttpTask 实例
@@ -270,7 +270,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      */
     public C setOnProcess(OnCallback<Process> onProcess) {
         this.onProcess = onProcess;
-        pOnIO = nextOnIO;
+        processOnIO = nextOnIO;
         nextOnIO = false;
         return (C) this;
     }
@@ -687,7 +687,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
                     stepBytes = Process.DEFAULT_STEP_BYTES;
                 }
                 reqBody = new ProcessRequestBody(reqBody, onProcess,
-                        httpClient.executor().getExecutor(pOnIO),
+                        httpClient.executor().getExecutor(processOnIO),
                         contentLength, stepBytes);
             }
             builder.method(method, reqBody);

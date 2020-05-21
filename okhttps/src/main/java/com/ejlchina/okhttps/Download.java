@@ -14,7 +14,6 @@ import okhttp3.internal.Util;
 /**
  * 文件下载
  * @author Troy.Zhou
- * @since 2.2.0
  */
 public class Download {
 	

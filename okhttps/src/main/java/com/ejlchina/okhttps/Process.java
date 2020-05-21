@@ -2,7 +2,6 @@ package com.ejlchina.okhttps;
 
 /**
  * 进度（上传或下载）
- * @since 2.2.0
  */
 public interface Process {
 
