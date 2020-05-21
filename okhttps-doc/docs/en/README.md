@@ -40,7 +40,7 @@ http.async("/users/1")
 
 // WebSocket
 http.webSocket("/chat") 
-        .onMessage((WebSocket ws, Message msg) -> {
+        .setOnMessage((WebSocket ws, Message msg) -> {
             // Automatic deserialization
             Chat chat = msg.toBean(Chat.class);
             // Automatic Serialization

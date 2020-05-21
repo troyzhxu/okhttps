@@ -159,7 +159,7 @@ List<Order> orders = http.sync('/orders')
 
 ```java
 http.webSocket("/redpacket/status") // 监听红包的领取状态
-        .onMessage((WebSocket ws，Message msg) -> {
+        .setOnMessage((WebSocket ws，Message msg) -> {
             // 无论该接口响应的是 JSON 还是 XML，都可以反序列化成功
             Status status = msg.toBean(Status.class);
         })

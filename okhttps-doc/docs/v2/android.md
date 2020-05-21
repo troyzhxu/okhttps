@@ -585,8 +585,8 @@ public class OkHttpsConfig implements Config {
         }
         // 访问令牌已过期，刷新令牌未过期，则调接口刷新当前令牌
         http.async(Urls.TOKEN_REFRESH)
+                .skipPreproc()      // 跳过所有预处理器
                 .addBodyPara("refreshToken", refreshToken)
-                .skipSerialPreproc()    // 跳过串行预处理器
                 .setOnResponse(res -> {
                     if (!res.isSuccessful()) {
                         callback.on(null);

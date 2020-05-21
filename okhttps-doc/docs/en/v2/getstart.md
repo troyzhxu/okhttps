@@ -168,7 +168,7 @@ http.webSocket("/chat")
         .setOnOpen((WebSocket ws, HttpResult res) -> {
             ws.send("向服务器问好");
         })
-        .onMessage((WebSocket ws，Message msg) -> {
+        .setOnMessage((WebSocket ws，Message msg) -> {
             // 从服务器接收消息（自动反序列化）
             Chat chat = msg.toBean(Chat.class);
             // 相同的消息发送给服务器（自动序列化 Chat 对象）

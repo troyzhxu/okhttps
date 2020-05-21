@@ -46,7 +46,7 @@ OkHttps.async("/users/1")
 
 // WebSocket
 OkHttps.webSocket("/chat") 
-        .onMessage((WebSocket ws, Message msg) -> {
+        .setOnMessage((WebSocket ws, Message msg) -> {
             // 从服务器接收消息
             Chat chat = msg.toBean(Chat.class);
             // 向服务器发送消息
