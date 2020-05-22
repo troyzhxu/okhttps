@@ -6,16 +6,10 @@ import java.io.InputStream;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
-import com.ejlchina.okhttps.DownListener;
-import com.ejlchina.okhttps.Download;
-import com.ejlchina.okhttps.HttpResult;
-import com.ejlchina.okhttps.HttpTask;
-import com.ejlchina.okhttps.MsgConvertor;
-import com.ejlchina.okhttps.OnCallback;
-import com.ejlchina.okhttps.TaskListener;
+import com.ejlchina.okhttps.*;
 import com.ejlchina.okhttps.HttpResult.State;
 
-public class TaskExecutor {
+public final class TaskExecutor {
 
     private Executor ioExecutor;
     private Executor mainExecutor;
@@ -60,44 +54,39 @@ public class TaskExecutor {
         executor.execute(command);
     }
     
-    public void executeOnResponse(HttpTask<?> task, OnCallback<HttpResult> onResponse, HttpResult result, boolean onIoThread) {
+    public void executeOnResponse(HttpTask<?> task, OnCallback<HttpResult> onResponse, HttpResult result, boolean onIo) {
         if (responseListener != null) {
-            execute(() -> {
-                if (responseListener.listen(task, result) && onResponse != null) {
-                    onResponse.on(result);
-                }
-            }, onIoThread);
+            if (responseListener.listen(task, result) && onResponse != null) {
+                execute(() -> onResponse.on(result), onIo);
+            }
         } else if (onResponse != null) {
-            execute(() -> { onResponse.on(result); }, onIoThread);
+            execute(() -> onResponse.on(result), onIo);
         }
     }
 
-    public boolean executeOnException(HttpTask<?> task, OnCallback<IOException> onException, IOException error, boolean onIoThread) {
+    public boolean executeOnException(HttpTask<?> task, OnCallback<IOException> onException, IOException error, boolean onIo) {
         if (exceptionListener != null) {
-            execute(() -> {
-                if (exceptionListener.listen(task, error) && onException != null) {
-                    onException.on(error);
-                }
-            }, onIoThread);
-            return true;
+            if (exceptionListener.listen(task, error) && onException != null) {
+                execute(() -> onException.on(error), onIo);
+            }
         } else if (onException != null) {
-            execute(() -> { onException.on(error); }, onIoThread);
-            return true;
+            execute(() -> onException.on(error), onIo);
+        } else {
+            return false;
         }
-        return false;
+        return true;
     }
     
-    public void executeOnComplete(HttpTask<?> task, OnCallback<State> onComplete, State state, boolean onIoThread) {
+    public void executeOnComplete(HttpTask<?> task, OnCallback<State> onComplete, State state, boolean onIo) {
         if (completeListener != null) {
-            execute(() -> {
-                if (completeListener.listen(task, state) && onComplete != null) {
-                    onComplete.on(state);
-                }
-            }, onIoThread);
+            if (completeListener.listen(task, state) && onComplete != null) {
+                execute(() -> onComplete.on(state), onIo);
+            }
         } else if (onComplete != null) {
-            execute(() -> { onComplete.on(state); }, onIoThread);
+            execute(() -> onComplete.on(state), onIo);
         }
     }
+
 
     public interface ConvertFunc<T> {
 
@@ -117,8 +106,7 @@ public class TaskExecutor {
     }
 
     public <V> V doMsgConvert(ConvertFunc<V> callable) {
-        Data<V> vData = doMsgConvert(null, callable);
-        return vData != null ? vData.data : null;
+        return doMsgConvert(null, callable).data;
     }
 
     public <V> Data<V> doMsgConvert(String type, ConvertFunc<V> callable) {
