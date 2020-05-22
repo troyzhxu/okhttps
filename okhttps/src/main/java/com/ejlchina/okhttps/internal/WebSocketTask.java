@@ -24,7 +24,13 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	private Listener<Message> onMessage;
 	private Listener<Close> onClosing;
 	private Listener<Close> onClosed;
-	
+
+	private boolean openOnIO;
+	private boolean exceptionOnIO;
+	private boolean messageOnIO;
+	private boolean closingOnIO;
+	private boolean closedOnIO;
+
 
 	public WebSocketTask(HttpClient httpClient, String url) {
 		super(httpClient, url);
@@ -70,7 +76,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			this.webSocket.setWebSocket(webSocket);
 			if (onOpen != null) {
 				HttpResult result = new RealHttpResult(WebSocketTask.this, response, httpClient.executor);
-				onOpen.on(this.webSocket, result);
+				execute(() -> onOpen.on(this.webSocket, result), openOnIO);
 			}
 		}
 
@@ -78,7 +84,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		@Override
 		public void onMessage(okhttp3.WebSocket webSocket, String text) {
 			if (onMessage != null) {
-				onMessage.on(this.webSocket, new WebSocketMsg(text, httpClient.executor, charset));
+				execute(() -> onMessage.on(this.webSocket, new WebSocketMsg(text, httpClient.executor, charset)), messageOnIO);
 			}
 		}
 
@@ -86,21 +92,21 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		@Override
 		public void onMessage(okhttp3.WebSocket webSocket, ByteString bytes) {
 			if (onMessage != null) {
-				onMessage.on(this.webSocket, new WebSocketMsg(bytes, httpClient.executor, charset));
+				execute(() -> onMessage.on(this.webSocket, new WebSocketMsg(bytes, httpClient.executor, charset)), messageOnIO);
 			}
 		}
 
 		@Override
 		public void onClosing(okhttp3.WebSocket webSocket, int code, String reason) {
 			if (onClosing != null) {
-				onClosing.on(this.webSocket, new Close(code, reason));
+				execute(() -> onClosing.on(this.webSocket, new Close(code, reason)), closingOnIO);
 			}
 		}
 
 		@Override
 		public void onClosed(okhttp3.WebSocket webSocket, int code, String reason) {
 			if (onClosed != null) {
-				onClosed.on(this.webSocket, new Close(code, reason));
+				execute(() -> onClosed.on(this.webSocket, new Close(code, reason)), closedOnIO);
 			}
 		}
 
@@ -108,14 +114,14 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		public void onFailure(okhttp3.WebSocket webSocket, Throwable t, Response response) {
 			if (t instanceof SocketException && "Socket closed".equals(t.getMessage())) {
 				if (onClosed != null) {
-					onClosed.on(this.webSocket, new Close(Close.CANCELED, "Canceled"));
+					execute(() -> onClosed.on(this.webSocket, new Close(Close.CANCELED, "Canceled")), closedOnIO);
 				}
 			} else {
 				if (onClosed != null) {
-					onClosed.on(this.webSocket, new Close(Close.EXCEPTION, t.getMessage()));
+					execute(() -> onClosed.on(this.webSocket, new Close(Close.EXCEPTION, t.getMessage())), closedOnIO);
 				}
 				if (onException != null) {
-					onException.on(this.webSocket,  t);
+					execute(() -> onException.on(this.webSocket,  t), exceptionOnIO);
 				} else if (!nothrow) {
 					throw new HttpException("WebSockt 异常", t);
 				}
@@ -123,7 +129,10 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		}
 		
 	}
-	
+
+	private void execute(Runnable command, boolean onIoThread) {
+		httpClient.executor().execute(command, onIoThread);
+	}
 	
 	static class WebSocketImpl implements WebSocket {
 
@@ -233,6 +242,8 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 */
 	public WebSocketTask setOnOpen(Listener<HttpResult> onOpen) {
 		this.onOpen = onOpen;
+		openOnIO = nextOnIO;
+		nextOnIO = false;
 		return this;
 	}
 
@@ -243,6 +254,8 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 */
 	public WebSocketTask setOnException(Listener<Throwable> onException) {
 		this.onException = onException;
+		exceptionOnIO = nextOnIO;
+		nextOnIO = false;
 		return this;
 	}
 
@@ -253,6 +266,8 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 */
 	public WebSocketTask setOnMessage(Listener<Message> onMessage) {
 		this.onMessage = onMessage;
+		messageOnIO = nextOnIO;
+		nextOnIO = false;
 		return this;
 	}
 
@@ -263,6 +278,8 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 */
 	public WebSocketTask setOnClosing(Listener<Close> onClosing) {
 		this.onClosing = onClosing;
+		closingOnIO = nextOnIO;
+		nextOnIO = false;
 		return this;
 	}
 
@@ -273,6 +290,8 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 */
 	public WebSocketTask setOnClosed(Listener<Close> onClosed) {
 		this.onClosed = onClosed;
+		closedOnIO = nextOnIO;
+		nextOnIO = false;
 		return this;
 	}
 
