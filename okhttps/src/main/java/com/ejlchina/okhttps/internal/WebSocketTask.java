@@ -75,8 +75,13 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			this.charset = charset(response);
 			this.webSocket.setCharset(charset);
 			this.webSocket.setWebSocket(webSocket);
-			if (onOpen != null) {
-				HttpResult result = new RealHttpResult(WebSocketTask.this, response, httpClient.executor);
+			TaskListener<HttpResult> listener = httpClient.executor.getResponseListener();
+			HttpResult result = new RealHttpResult(WebSocketTask.this, response, httpClient.executor);
+			if (listener != null) {
+				if (listener.listen(WebSocketTask.this, result) && onOpen != null) {
+					execute(() -> onOpen.on(this.webSocket, result), openOnIO);
+				}
+			} else if (onOpen != null) {
 				execute(() -> onOpen.on(this.webSocket, result), openOnIO);
 			}
 		}
@@ -106,56 +111,45 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 		@Override
 		public void onClosed(okhttp3.WebSocket webSocket, int code, String reason) {
-			TaskListener<HttpResult.State> listener = httpClient.executor.getCompleteListener();
-			if (listener != null) {
-				HttpResult.State state;
-				if (code == Close.CANCELED) {
-					state = HttpResult.State.CANCELED;
-				} else if (code == Close.EXCEPTION) {
-					state = HttpResult.State.EXCEPTION;
-				} else {
-					state = HttpResult.State.RESPONSED;
-				}
-				listener.listen(WebSocketTask.this, state);
-			}
-			if (onClosed != null) {
-				execute(() -> onClosed.on(this.webSocket, new Close(code, reason)), closedOnIO);
-			}
+			doOnClose(HttpResult.State.RESPONSED, code, reason);
 		}
 
 		private void doOnClose(HttpResult.State state, int code, String reason) {
-			Close close;
-			if (state == HttpResult.State.CANCELED) {
-				close = new Close(Close.CANCELED, "Canceled");
-			} else if (state == HttpResult.State.EXCEPTION) {
-				close = new Close(Close.CANCELED, reason);
-			} else if (state == HttpResult.State.NETWORK_ERROR) {
-				// TODO:
-				close = new Close(code, reason);
+			TaskListener<HttpResult.State> listener = httpClient.executor.getCompleteListener();
+			if (listener != null) {
+				if (listener.listen(WebSocketTask.this, state) && onClosed != null) {
+					execute(() -> onClosed.on(this.webSocket, toClose(state, code, reason)), closedOnIO);
+				}
+			} else if (onClosed != null) {
+				execute(() -> onClosed.on(this.webSocket, toClose(state, code, reason)), closedOnIO);
 			}
+		}
 
-			execute(() -> onClosed.on(this.webSocket, close), closedOnIO);
+		private Close toClose(HttpResult.State state, int code, String reason) {
+			if (state == HttpResult.State.CANCELED) {
+				return new Close(Close.CANCELED, "Canceled");
+			}
+			if (state == HttpResult.State.EXCEPTION) {
+				return new Close(Close.CANCELED, reason);
+			}
+			if (state == HttpResult.State.NETWORK_ERROR) {
+				return new Close(Close.NETWORK_ERROR, reason);
+			}
+			if (state == HttpResult.State.TIMEOUT) {
+				return new Close(Close.TIMEOUT, reason);
+			}
+			return new Close(code, reason);
 		}
 
 		@Override
 		public void onFailure(okhttp3.WebSocket webSocket, Throwable t, Response response) {
-			IOException e = t instanceof IOException ? (IOException) t : new IOException(t);
-			HttpResult.State state = toState(e);
-			doOnClose(state, 0, state == HttpResult.State.EXCEPTION ? e.getMessage() : null);
-
-			if (t instanceof SocketException && "Socket closed".equals(t.getMessage())) {
-				onClosed(webSocket, Close.CANCELED, "Canceled");
-				return;
-			}
-			onClosed(webSocket, Close.EXCEPTION, t.getMessage());
+			IOException e = t instanceof IOException ? (IOException) t : new IOException(t.getMessage(), t);
+			doOnClose(toState(e), 0, t.getMessage());
 			TaskListener<IOException> listener = httpClient.executor.getExceptionListener();
 			if (listener != null) {
-
-				execute(() -> {
-					if (listener.listen(WebSocketTask.this,  e) && onException != null) {
-						onException.on(this.webSocket,  t);
-					}
-				}, exceptionOnIO);
+				if (listener.listen(WebSocketTask.this,  e) && onException != null) {
+					execute(() -> onException.on(this.webSocket,  t), exceptionOnIO);
+				}
 			} else if (onException != null) {
 				execute(() -> onException.on(this.webSocket,  t), exceptionOnIO);
 			} else if (!nothrow) {
