@@ -374,15 +374,15 @@ public interface HTTP {
                     config.config(builder);
                 }
                 // fix issue: https://github.com/ejlchina/okhttps/issues/8
-                if (androidSdkInt() > 24) {
-                    addInterceptor(builder);
+                if (mainExecutor != null && androidSdkInt() > 24) {
+                    addCopyInterceptor(builder);
                 }
                 okClient = builder.build();
             }
             return new HttpClient(this);
         }
 
-        private static void addInterceptor(OkHttpClient.Builder builder) {
+        private static void addCopyInterceptor(OkHttpClient.Builder builder) {
             builder.addInterceptor(chain -> {
                 Request request = chain.request();
                 Response response = chain.proceed(request);
