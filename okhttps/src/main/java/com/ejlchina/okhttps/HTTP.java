@@ -6,6 +6,7 @@ import okhttp3.*;
 import okhttp3.WebSocket;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -372,9 +373,37 @@ public interface HTTP {
                 if (config != null) {
                     config.config(builder);
                 }
+                // fix issue: https://github.com/ejlchina/okhttps/issues/8
+                if (androidSdkInt() > 24) {
+                    addInterceptor(builder);
+                }
                 okClient = builder.build();
             }
             return new HttpClient(this);
+        }
+
+        private static void addInterceptor(OkHttpClient.Builder builder) {
+            builder.addInterceptor(chain -> {
+                Request request = chain.request();
+                Response response = chain.proceed(request);
+                ResponseBody body = response.body();
+                String contentType = response.header("Content-Type");
+                if (body == null || contentType != null && contentType.contains("octet-stream")) {
+                    return response;
+                }
+                ResponseBody newBody = ResponseBody.create(body.contentType(), body.bytes());
+                return response.newBuilder().body(newBody).build();
+            });
+        }
+
+        private static int androidSdkInt() {
+            try {
+                Class<?> versionClass = Class.forName("android.os.Build$VERSION");
+                Field field = versionClass.getDeclaredField("SDK_INT");
+                return field.getInt(field);
+            } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
+                return 0;
+            }
         }
 
         public OkHttpClient okClient() {
