@@ -387,8 +387,12 @@ public interface HTTP {
                 Request request = chain.request();
                 Response response = chain.proceed(request);
                 ResponseBody body = response.body();
-                String contentType = response.header("Content-Type");
-                if (body == null || contentType != null && contentType.contains("octet-stream")) {
+                String type = response.header("Content-Type");
+                if (body == null || type != null && (type.contains("octet-stream")
+                        || type.contains("image") || type.contains("video")
+                        || type.contains("archive") || type.contains("word")
+                        || type.contains("xls") || type.contains("pdf"))) {
+                    // 若是下载文件，则必须指定在 IO 线程操作
                     return response;
                 }
                 ResponseBody newBody = ResponseBody.create(body.contentType(), body.bytes());
