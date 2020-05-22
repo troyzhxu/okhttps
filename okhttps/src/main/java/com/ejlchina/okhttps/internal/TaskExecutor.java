@@ -37,8 +37,8 @@ public class TaskExecutor {
         this.msgConvertors = msgConvertors;
     }
 
-    public Executor getExecutor(boolean onIoThread) {
-        if (onIoThread || mainExecutor == null) {
+    public Executor getExecutor(boolean onIo) {
+        if (onIo || mainExecutor == null) {
             return ioExecutor;
         }
         return mainExecutor;
@@ -52,9 +52,9 @@ public class TaskExecutor {
         return download;
     }
     
-    public void execute(Runnable command, boolean onIoThread) {
+    public void execute(Runnable command, boolean onIo) {
         Executor executor = ioExecutor;
-        if (mainExecutor != null && !onIoThread) {
+        if (mainExecutor != null && !onIo) {
             executor = mainExecutor;
         }
         executor.execute(command);

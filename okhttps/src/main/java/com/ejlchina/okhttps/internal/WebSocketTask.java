@@ -130,8 +130,8 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		
 	}
 
-	private void execute(Runnable command, boolean onIoThread) {
-		httpClient.executor().execute(command, onIoThread);
+	private void execute(Runnable command, boolean onIo) {
+		httpClient.executor().execute(command, onIo);
 	}
 	
 	static class WebSocketImpl implements WebSocket {
