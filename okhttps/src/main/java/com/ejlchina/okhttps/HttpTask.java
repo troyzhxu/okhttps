@@ -694,6 +694,9 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         } else {
             builder.method(method, null);
         }
+        if (tag != null) {
+            builder.tag(String.class, tag);
+        }
 		return builder.build();
 	}
 
