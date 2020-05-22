@@ -43,7 +43,7 @@ http.sync("https://www.baidu.com").get();
 
 ## 回调执行器
 
-　　OkHttps 默认所有回调都在 **IO线程** 执行，如何想改变执行回调的线程时，可以配置回调执行器。例如在Android里，让所有的回调函数都在UI线程执行，则可以在构建`HTTP`时配置如下：
+　　OkHttps 默认所有回调都在 **IO线程** 执行，如何想改变执行回调的线程时，可以配置回调执行器。例如在Android里，让所有的回调函数都在 UI 线程执行，则可以在构建`HTTP`时配置如下：
 
 ```java
 HTTP http = HTTP.builder()

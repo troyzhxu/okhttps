@@ -699,7 +699,7 @@ http.async("/users/1")
 
 　　在 OkHttps 里取消请求共有 **4 种** 方式可选：
 
-**1、** 使用`HttpCall#cancel()`取消单个请求（适用于异步请求，[详见 3.3 章节](#33-httpcall)）
+**1、** 使用`HttpCall#cancel()`取消单个请求（适用于异步请求，[详见`HttpCall`章节](/v2/foundation.html#httpcall)）
 
 **2、** 使用`HttpTask#cancel()`取消单个请求（适用于所有请求）（since v1.0.4）
 
@@ -715,7 +715,7 @@ task.get(); // 发起 GET 请求
 boolean canceled = task.cancel();   
 ```
 
-**3、** 使用`HTTP#cancel(String tag)`按标签批量取消请求（适用于所有请求，[详见第 5 章节](#5-使用标签)）
+**3、** 使用`HTTP#cancel(String tag)`按标签批量取消请求（适用于所有请求，[详见 标签 章节](/v2/foundation.html#使用标签)）
 
 **4、** 使用`HTTP#cancelAll()`取消所有请求（适用于所有请求）（since v1.0.2）
 
