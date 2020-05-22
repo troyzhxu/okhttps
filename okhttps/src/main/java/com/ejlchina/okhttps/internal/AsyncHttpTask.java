@@ -239,7 +239,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException error) {
-				State state = toState(error, false);
+				State state = toState(error);
 				HttpResult result = new RealHttpResult(AsyncHttpTask.this, state, error);
 				onCallback(httpCall, result, () -> {
 					TaskExecutor executor = httpClient.executor();

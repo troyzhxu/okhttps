@@ -1,5 +1,6 @@
 package com.ejlchina.okhttps.internal;
 
+import java.io.IOException;
 import java.net.SocketException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -105,33 +106,67 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 		@Override
 		public void onClosed(okhttp3.WebSocket webSocket, int code, String reason) {
+			TaskListener<HttpResult.State> listener = httpClient.executor.getCompleteListener();
+			if (listener != null) {
+				HttpResult.State state;
+				if (code == Close.CANCELED) {
+					state = HttpResult.State.CANCELED;
+				} else if (code == Close.EXCEPTION) {
+					state = HttpResult.State.EXCEPTION;
+				} else {
+					state = HttpResult.State.RESPONSED;
+				}
+				listener.listen(WebSocketTask.this, state);
+			}
 			if (onClosed != null) {
 				execute(() -> onClosed.on(this.webSocket, new Close(code, reason)), closedOnIO);
 			}
 		}
 
+		private void doOnClose(HttpResult.State state, int code, String reason) {
+			Close close;
+			if (state == HttpResult.State.CANCELED) {
+				close = new Close(Close.CANCELED, "Canceled");
+			} else if (state == HttpResult.State.EXCEPTION) {
+				close = new Close(Close.CANCELED, reason);
+			} else if (state == HttpResult.State.NETWORK_ERROR) {
+				// TODO:
+				close = new Close(code, reason);
+			}
+
+			execute(() -> onClosed.on(this.webSocket, close), closedOnIO);
+		}
+
 		@Override
 		public void onFailure(okhttp3.WebSocket webSocket, Throwable t, Response response) {
+			IOException e = t instanceof IOException ? (IOException) t : new IOException(t);
+			HttpResult.State state = toState(e);
+			doOnClose(state, 0, state == HttpResult.State.EXCEPTION ? e.getMessage() : null);
+
 			if (t instanceof SocketException && "Socket closed".equals(t.getMessage())) {
-				if (onClosed != null) {
-					execute(() -> onClosed.on(this.webSocket, new Close(Close.CANCELED, "Canceled")), closedOnIO);
-				}
-			} else {
-				if (onClosed != null) {
-					execute(() -> onClosed.on(this.webSocket, new Close(Close.EXCEPTION, t.getMessage())), closedOnIO);
-				}
-				if (onException != null) {
-					execute(() -> onException.on(this.webSocket,  t), exceptionOnIO);
-				} else if (!nothrow) {
-					throw new HttpException("WebSockt 异常", t);
-				}
+				onClosed(webSocket, Close.CANCELED, "Canceled");
+				return;
+			}
+			onClosed(webSocket, Close.EXCEPTION, t.getMessage());
+			TaskListener<IOException> listener = httpClient.executor.getExceptionListener();
+			if (listener != null) {
+
+				execute(() -> {
+					if (listener.listen(WebSocketTask.this,  e) && onException != null) {
+						onException.on(this.webSocket,  t);
+					}
+				}, exceptionOnIO);
+			} else if (onException != null) {
+				execute(() -> onException.on(this.webSocket,  t), exceptionOnIO);
+			} else if (!nothrow) {
+				throw new HttpException("WebSockt 异常", t);
 			}
 		}
 		
 	}
 
 	private void execute(Runnable command, boolean onIo) {
-		httpClient.executor().execute(command, onIo);
+		httpClient.executor.execute(command, onIo);
 	}
 	
 	static class WebSocketImpl implements WebSocket {

@@ -99,7 +99,7 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
 				result.response(httpCall.call.execute());
 				httpCall.done = true;
             } catch (IOException e) {
-				result.exception(toState(e, true), e);
+				result.exception(toState(e), e);
             } finally {
 				latch.countDown();
 			}

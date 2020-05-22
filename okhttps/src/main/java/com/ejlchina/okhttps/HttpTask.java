@@ -719,16 +719,15 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         }
     }
 
-    protected State toState(IOException e, boolean sync) {
+    protected State toState(IOException e) {
         if (e instanceof SocketTimeoutException) {
             return State.TIMEOUT;
         } else if (e instanceof UnknownHostException || e instanceof ConnectException) {
             return State.NETWORK_ERROR;
         }
         String msg = e.getMessage();
-        if (msg != null && ("Canceled".equals(msg)
-                || sync && e instanceof SocketException
-                && msg.startsWith("Socket operation on nonsocket"))) {
+        if (msg != null && ("Canceled".equals(msg) || e instanceof SocketException
+                && (msg.startsWith("Socket operation on nonsocket") || "Socket closed".equals(msg)))) {
             return State.CANCELED;
         }
         return State.EXCEPTION;
