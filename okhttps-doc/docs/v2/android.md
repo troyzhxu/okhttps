@@ -387,7 +387,7 @@ public class OkHttpsConfig implements Config {
                             // 若没有得到 Token, 则跳转登录页面
                             ctx.startActivity(new Intent(ctx, LoginActivity.class));
                         } else {
-                            Log.e("没有 Context 无法跳转登录页面！");
+                            Log.e("OkHttps", "没有 Context 无法跳转登录页面！");
                         }
                         // 无论如何，这行代码一定要执行到，不然后续接口会一直在排队中
                         chain.proceed();
@@ -587,7 +587,7 @@ public class OkHttpsConfig implements Config {
                 Context.MODE_PRIVATE);
         long now = System.currentTimeMillis();
         // 刷新令牌
-        long refreshToken = token.getString("refreshToken", null);
+        String refreshToken = token.getString("refreshToken", null);
         // 判断有效期可以提前 60 秒，以防在接下来的网络延迟中过期了
         if (token.getLong("refreshTokenExpiresAt", 0) < now + 60000 
                 || refreshToken == null) {
@@ -615,8 +615,8 @@ public class OkHttpsConfig implements Config {
                     Mapper mapper = res.getBody().toMapper();
                     String newRefreshToken = mapper.getString("refreshToken");
                     String newAccessToken = mapper.getString("accessToken");
-                    int refreshTokenExpiresIn = mapper.getString("refreshTokenExpiresIn");
-                    int accessTokenExpiresIn = mapper.getString("accessTokenExpiresIn");
+                    int refreshTokenExpiresIn = mapper.getInt("refreshTokenExpiresIn");
+                    int accessTokenExpiresIn = mapper.getInt("accessTokenExpiresIn");
                     // 因为发生了请求，当前时间已经变化，所有重新获取时间
                     long now2 = System.currentTimeMillis();
                     // 保存到 SharedPreferences
