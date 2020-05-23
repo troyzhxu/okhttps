@@ -20,6 +20,8 @@ public interface WebSocket extends Cancelable {
 
 		public static int CANCELED = 0;
 		public static int EXCEPTION = -1;
+		public static int NETWORK_ERROR = -2;
+		public static int TIMEOUT = -3;
 
 		private int code;
 		private String reason;
@@ -55,6 +57,20 @@ public interface WebSocket extends Cancelable {
 		 */
 		public boolean isException() {
 			return code == EXCEPTION;
+		}
+
+		/**
+		 * @return 是否因 网络错误 而关闭
+		 */
+		public boolean isNetworkError() {
+			return code == NETWORK_ERROR;
+		}
+
+		/**
+		 * @return 是否因 网络超时 而关闭
+		 */
+		public boolean isTimeout() {
+			return code == TIMEOUT;
 		}
 
 		@Override
