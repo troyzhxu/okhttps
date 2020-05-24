@@ -164,10 +164,6 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		
 	}
 
-	private void execute(Runnable command, boolean onIo) {
-		httpClient.executor.execute(command, onIo);
-	}
-	
 	static class WebSocketImpl implements WebSocket {
 
 		private boolean cancelOrClosed;

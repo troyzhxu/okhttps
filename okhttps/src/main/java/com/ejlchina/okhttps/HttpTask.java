@@ -884,4 +884,8 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         return type != null ? type.charset(charset) : charset;
     }
 
+    protected void execute(Runnable command, boolean onIo) {
+        httpClient.executor().execute(command, onIo);
+    }
+
 }

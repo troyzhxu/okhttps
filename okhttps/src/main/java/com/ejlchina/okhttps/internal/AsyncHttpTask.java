@@ -1,6 +1,8 @@
 package com.ejlchina.okhttps.internal;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -346,18 +348,92 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, Response response) {
             	TaskExecutor executor = httpClient.executor();
 				HttpResult result = new RealHttpResult(AsyncHttpTask.this, response, executor);
 				onCallback(httpCall, result, () -> {
 					executor.executeOnComplete(AsyncHttpTask.this, onComplete, State.RESPONSED, completeOnIO);
-					executor.executeOnResponse(AsyncHttpTask.this, onResponse, result, responseOnIO);
+					executor.executeOnResponse(AsyncHttpTask.this, complexOnResponse(), result, responseOnIO);
 				});
             }
 
         });
 		return httpCall;
     }
+
+    private OnCallback<HttpResult> complexOnResponse() {
+		int count = responseCallbackCount();
+		if (count == 0 || count == 1 && onResponse != null) {
+			return onResponse;
+		}
+		return res -> {
+			HttpResult.Body body = res.getBody();
+			if (count > 1)
+				body.cache();
+			if (onResponse != null)
+				onResponse.on(res);
+			if (onResBody != null)
+				execute(() -> onResBody.on(body), resBodyOnIO);
+			if (onResMapper != null)
+				execute(() -> onResMapper.on(body.toMapper()), resMapperOnIO);
+			if (onResArray != null)
+				execute(() -> onResArray.on(body.toArray()), resArrayOnIO);
+			if (onResBean != null) {
+				execute(() -> {
+					try {
+						callbackMethod(onResBean.getClass(), beanType).invoke(onResBean, body.toBean(beanType));
+					} catch (IllegalAccessException | InvocationTargetException e) {
+						throw new HttpException("回调方法调用失败！", e);
+					}
+				}, resBeanOnIO);
+			}
+			if (onResList != null) {
+				execute(() -> {
+					try {
+						List<?> list = body.toList(beanType);
+						callbackMethod(onResList.getClass(), list.getClass()).invoke(onResList, list);
+					} catch (IllegalAccessException | InvocationTargetException e) {
+						throw new HttpException("回调方法调用失败！", e);
+					}
+				}, resListOnIO);
+			}
+			if (onResString != null)
+				execute(() -> onResString.on(body.toString()), resStringOnIO);
+		};
+	}
+
+	static final String OnCallbackMethod = OnCallback.class.getDeclaredMethods()[0].getName();
+
+	private Method callbackMethod(Class<?> clazz, Class<?> paraType) {
+		Method[] methods = clazz.getDeclaredMethods();
+		for (Method method : methods) {
+			if (method.getName().equals(OnCallbackMethod) && method.getParameterCount() == 1
+					&& method.getParameterTypes()[0].isAssignableFrom(paraType)) {
+				method.setAccessible(true);
+				return method;
+			}
+		}
+		throw new IllegalStateException("没有可调用的方法");
+	}
+
+	private int responseCallbackCount() {
+    	int count = 0;
+		if (onResponse != null)
+			count++;
+		if (onResBody != null)
+			count++;
+		if (onResMapper != null)
+			count++;
+		if (onResArray != null)
+			count++;
+		if (onResBean != null)
+			count++;
+		if (onResList != null)
+			count++;
+		if (onResString != null)
+			count++;
+		return count;
+	}
 
 	@SuppressWarnings("all")
     private void onCallback(OkHttpCall httpCall, HttpResult result, Runnable runnable) {
