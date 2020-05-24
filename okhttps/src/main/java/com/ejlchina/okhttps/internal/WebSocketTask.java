@@ -37,6 +37,11 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		super(httpClient, url);
 	}
 
+	@Override
+	public boolean isWebsocket() {
+		return true;
+	}
+
 	/**
 	 * 启动 WebSocket 监听
 	 * @return WebSocket
