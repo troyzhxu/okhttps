@@ -90,10 +90,10 @@ Websocket 方法：
 
 项目 | 最新版本 | 描述
 -|-|-
-okhttps | 2.0.0 | OkHttps 核心模块
-okhttps-fastjson | 2.0.0 | 与 fastjson 集成
-okhttps-gson | 2.0.0 | 与 gson 集成
-okhttps-jackson | 2.0.0 | 与 jackson 集成
+okhttps | 2.0.1 | OkHttps 核心模块
+okhttps-fastjson | 2.0.1 | 与 fastjson 集成
+okhttps-gson | 2.0.1 | 与 gson 集成
+okhttps-jackson | 2.0.1 | 与 jackson 集成
 
 以上是官方维护的与三大 JSON 框架集成的案例，后续将提供 xml 和 protobuf 的集成。
 
