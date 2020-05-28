@@ -35,9 +35,8 @@ public class ResultBody extends AbstractBody implements Body {
 	}
 
 
-
 	@Override
-	public MediaType getContentType() {
+	public MediaType getType() {
 		ResponseBody body = response.body();
 		if (body != null) {
 			return body.contentType();
@@ -46,12 +45,22 @@ public class ResultBody extends AbstractBody implements Body {
 	}
 
 	@Override
-	public long getContentLength() {
+	public long getLength() {
 		ResponseBody body = response.body();
 		if (body != null) {
 			return body.contentLength();
 		}
 		return 0;
+	}
+
+	@Override
+	public MediaType getContentType() {
+		return getType();
+	}
+
+	@Override
+	public long getContentLength() {
+		return getLength();
 	}
 	
 	@Override
@@ -63,7 +72,7 @@ public class ResultBody extends AbstractBody implements Body {
 	@Override
 	public Body setOnProcess(OnCallback<Process> onProcess) {
 		if (taskExecutor == null) {
-			throw new IllegalStateException("没有 taskExecutor， 不可设置下载进度回调！");
+			throw new IllegalStateException("没有 taskExecutor，不可设置下载进度回调！");
 		}
 		if (cached) {
 			throw new IllegalStateException("开启缓存后，不可设置下载进度回调！");
@@ -71,17 +80,27 @@ public class ResultBody extends AbstractBody implements Body {
 		this.onProcess = onProcess;
 		return this;
 	}
-	
+
 	@Override
-	public Body setStepBytes(long stepBytes) {
+	public Body stepBytes(long stepBytes) {
 		this.stepBytes = stepBytes;
 		return this;
 	}
-	
+
 	@Override
-	public Body setStepRate(double stepRate) {
+	public Body setStepBytes(long stepBytes) {
+		return stepBytes(stepBytes);
+	}
+
+	@Override
+	public Body stepRate(double stepRate) {
 		this.stepRate = stepRate;
 		return this;
+	}
+
+	@Override
+	public Body setStepRate(double stepRate) {
+		return stepRate(stepRate);
 	}
 
 	@Override

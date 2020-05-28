@@ -17,6 +17,8 @@ public class TagTests extends BaseTest {
                     builder.connectTimeout(1, TimeUnit.SECONDS);
                     builder.writeTimeout(1, TimeUnit.SECONDS);
                     builder.readTimeout(1, TimeUnit.SECONDS);
+
+                    builder.pingInterval(60, TimeUnit.SECONDS);
                 })
                 .build();
 

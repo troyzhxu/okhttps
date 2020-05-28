@@ -1,5 +1,7 @@
 package com.ejlchina.okhttps.internal;
 
+import java.io.IOException;
+import java.net.SocketException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +25,13 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	private Listener<Message> onMessage;
 	private Listener<Close> onClosing;
 	private Listener<Close> onClosed;
-	
+
+	private boolean openOnIO;
+	private boolean exceptionOnIO;
+	private boolean messageOnIO;
+	private boolean closingOnIO;
+	private boolean closedOnIO;
+
 
 	public WebSocketTask(HttpClient httpClient, String url) {
 		super(httpClient, url);
@@ -67,9 +75,14 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			this.charset = charset(response);
 			this.webSocket.setCharset(charset);
 			this.webSocket.setWebSocket(webSocket);
-			if (onOpen != null) {
-				HttpResult result = new RealHttpResult(WebSocketTask.this, response, httpClient.executor);
-				onOpen.on(this.webSocket, result);
+			TaskListener<HttpResult> listener = httpClient.executor.getResponseListener();
+			HttpResult result = new RealHttpResult(WebSocketTask.this, response, httpClient.executor);
+			if (listener != null) {
+				if (listener.listen(WebSocketTask.this, result) && onOpen != null) {
+					execute(() -> onOpen.on(this.webSocket, result), openOnIO);
+				}
+			} else if (onOpen != null) {
+				execute(() -> onOpen.on(this.webSocket, result), openOnIO);
 			}
 		}
 
@@ -77,7 +90,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		@Override
 		public void onMessage(okhttp3.WebSocket webSocket, String text) {
 			if (onMessage != null) {
-				onMessage.on(this.webSocket, new WebsocketMsg(text, httpClient.executor, charset));
+				execute(() -> onMessage.on(this.webSocket, new WebSocketMsg(text, httpClient.executor, charset)), messageOnIO);
 			}
 		}
 
@@ -85,35 +98,70 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		@Override
 		public void onMessage(okhttp3.WebSocket webSocket, ByteString bytes) {
 			if (onMessage != null) {
-				onMessage.on(this.webSocket, new WebsocketMsg(bytes, httpClient.executor, charset));
+				execute(() -> onMessage.on(this.webSocket, new WebSocketMsg(bytes, httpClient.executor, charset)), messageOnIO);
 			}
 		}
 
 		@Override
 		public void onClosing(okhttp3.WebSocket webSocket, int code, String reason) {
 			if (onClosing != null) {
-				onClosing.on(this.webSocket, new Close(code, reason));
+				execute(() -> onClosing.on(this.webSocket, new Close(code, reason)), closingOnIO);
 			}
 		}
 
 		@Override
 		public void onClosed(okhttp3.WebSocket webSocket, int code, String reason) {
-			if (onClosed != null) {
-				onClosed.on(this.webSocket, new Close(code, reason));
+			doOnClose(HttpResult.State.RESPONSED, code, reason);
+		}
+
+		private void doOnClose(HttpResult.State state, int code, String reason) {
+			TaskListener<HttpResult.State> listener = httpClient.executor.getCompleteListener();
+			if (listener != null) {
+				if (listener.listen(WebSocketTask.this, state) && onClosed != null) {
+					execute(() -> onClosed.on(this.webSocket, toClose(state, code, reason)), closedOnIO);
+				}
+			} else if (onClosed != null) {
+				execute(() -> onClosed.on(this.webSocket, toClose(state, code, reason)), closedOnIO);
 			}
+		}
+
+		private Close toClose(HttpResult.State state, int code, String reason) {
+			if (state == HttpResult.State.CANCELED) {
+				return new Close(Close.CANCELED, "Canceled");
+			}
+			if (state == HttpResult.State.EXCEPTION) {
+				return new Close(Close.CANCELED, reason);
+			}
+			if (state == HttpResult.State.NETWORK_ERROR) {
+				return new Close(Close.NETWORK_ERROR, reason);
+			}
+			if (state == HttpResult.State.TIMEOUT) {
+				return new Close(Close.TIMEOUT, reason);
+			}
+			return new Close(code, reason);
 		}
 
 		@Override
 		public void onFailure(okhttp3.WebSocket webSocket, Throwable t, Response response) {
-			if (onException != null) {
-				onException.on(this.webSocket,  t);
+			IOException e = t instanceof IOException ? (IOException) t : new IOException(t.getMessage(), t);
+			doOnClose(toState(e), 0, t.getMessage());
+			TaskListener<IOException> listener = httpClient.executor.getExceptionListener();
+			if (listener != null) {
+				if (listener.listen(WebSocketTask.this,  e) && onException != null) {
+					execute(() -> onException.on(this.webSocket,  t), exceptionOnIO);
+				}
+			} else if (onException != null) {
+				execute(() -> onException.on(this.webSocket,  t), exceptionOnIO);
 			} else if (!nothrow) {
 				throw new HttpException("WebSockt 异常", t);
 			}
 		}
 		
 	}
-	
+
+	private void execute(Runnable command, boolean onIo) {
+		httpClient.executor.execute(command, onIo);
+	}
 	
 	static class WebSocketImpl implements WebSocket {
 
@@ -223,6 +271,8 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 */
 	public WebSocketTask setOnOpen(Listener<HttpResult> onOpen) {
 		this.onOpen = onOpen;
+		openOnIO = nextOnIO;
+		nextOnIO = false;
 		return this;
 	}
 
@@ -233,6 +283,8 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 */
 	public WebSocketTask setOnException(Listener<Throwable> onException) {
 		this.onException = onException;
+		exceptionOnIO = nextOnIO;
+		nextOnIO = false;
 		return this;
 	}
 
@@ -243,6 +295,8 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 */
 	public WebSocketTask setOnMessage(Listener<Message> onMessage) {
 		this.onMessage = onMessage;
+		messageOnIO = nextOnIO;
+		nextOnIO = false;
 		return this;
 	}
 
@@ -253,16 +307,20 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 */
 	public WebSocketTask setOnClosing(Listener<Close> onClosing) {
 		this.onClosing = onClosing;
+		closingOnIO = nextOnIO;
+		nextOnIO = false;
 		return this;
 	}
 
 	/**
-	 * 已关闭监听
+	 * 已关闭监听（当连接被取消或发生异常时，也会走该回调）
 	 * @param onClosed 监听器
 	 * @return WebSocketTask
 	 */
 	public WebSocketTask setOnClosed(Listener<Close> onClosed) {
 		this.onClosed = onClosed;
+		closedOnIO = nextOnIO;
+		nextOnIO = false;
 		return this;
 	}
 

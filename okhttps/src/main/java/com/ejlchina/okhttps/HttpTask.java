@@ -19,6 +19,7 @@ import com.ejlchina.okhttps.internal.HttpClient.TagTask;
 
 import okhttp3.*;
 import okhttp3.internal.Util;
+import okhttp3.internal.http.HttpMethod;
 import okio.Buffer;
 
 /**
@@ -44,7 +45,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     private String dateFormat;
     private String bodyType;
     private OnCallback<Process> onProcess;
-    private boolean pOnIO;
+    private boolean processOnIO;
     private long stepBytes = 0;
     private double stepRate = -1;
 
@@ -148,7 +149,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     /**
-     * @since 2.2.0
+     * @since 2.0.0.RC
      * 为请求任务添加标签
      * @param tag 标签
      * @return HttpTask 实例
@@ -269,7 +270,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      */
     public C setOnProcess(OnCallback<Process> onProcess) {
         this.onProcess = onProcess;
-        pOnIO = nextOnIO;
+        processOnIO = nextOnIO;
         nextOnIO = false;
         return (C) this;
     }
@@ -280,9 +281,14 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      * @param stepBytes 步进字节
      * @return HttpTask 实例
      */
-    public C setStepBytes(long stepBytes) {
+    public C stepBytes(long stepBytes) {
         this.stepBytes = stepBytes;
         return (C) this;
+    }
+    
+    @Deprecated
+    public C setStepBytes(long stepBytes) {
+        return stepBytes(stepBytes);
     }
 
     /**
@@ -291,9 +297,14 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      * @param stepRate 步进比例
      * @return HttpTask 实例
      */
-    public C setStepRate(double stepRate) {
+    public C stepRate(double stepRate) {
         this.stepRate = stepRate;
         return (C) this;
+    }
+    
+    @Deprecated
+    public C setStepRate(double stepRate) {
+        return stepRate(stepRate);
     }
 
     @Deprecated
@@ -655,18 +666,18 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     protected Call prepareCall(String method) {
-        assertNotConflict("GET".equals(method));
         Request request = prepareRequest(method);
 		return httpClient.request(request);
     }
 
     protected Request prepareRequest(String method) {
+        boolean bodyCanUsed = HttpMethod.permitsRequestBody(method);
+        assertNotConflict(!bodyCanUsed);
 		Request.Builder builder = new Request.Builder()
                 .url(buildUrlPath());
         buildHeaders(builder);
-        RequestBody reqBody = null;
-        if (!"GET".equals(method)) {
-            reqBody = buildRequestBody();
+        if (bodyCanUsed) {
+            RequestBody reqBody = buildRequestBody();
             if (onProcess != null) {
                 long contentLength = contentLength(reqBody);
                 if (stepRate > 0 && stepRate <= 1) {
@@ -676,25 +687,15 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
                     stepBytes = Process.DEFAULT_STEP_BYTES;
                 }
                 reqBody = new ProcessRequestBody(reqBody, onProcess,
-                        httpClient.executor().getExecutor(pOnIO),
+                        httpClient.executor().getExecutor(processOnIO),
                         contentLength, stepBytes);
             }
+            builder.method(method, reqBody);
+        } else {
+            builder.method(method, null);
         }
-        switch (method) {
-            case "GET":
-                builder.get();
-                break;
-            case "POST":
-                builder.post(reqBody);
-                break;
-            case "PUT":
-                builder.put(reqBody);
-                break;
-            case "DELETE":
-                builder.delete(reqBody);
-                break;
-            default:
-            	builder.method(method, reqBody);
+        if (tag != null) {
+            builder.tag(String.class, tag);
         }
 		return builder.build();
 	}
@@ -718,16 +719,15 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         }
     }
 
-    protected State toState(IOException e, boolean sync) {
+    protected State toState(IOException e) {
         if (e instanceof SocketTimeoutException) {
             return State.TIMEOUT;
         } else if (e instanceof UnknownHostException || e instanceof ConnectException) {
             return State.NETWORK_ERROR;
         }
         String msg = e.getMessage();
-        if (msg != null && ("Canceled".equals(msg)
-                || sync && e instanceof SocketException
-                && msg.startsWith("Socket operation on nonsocket"))) {
+        if (msg != null && ("Canceled".equals(msg) || e instanceof SocketException
+                && (msg.startsWith("Socket operation on nonsocket") || "Socket closed".equals(msg)))) {
             return State.CANCELED;
         }
         return State.EXCEPTION;
@@ -829,16 +829,16 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         return sb.toString();
     }
 
-    protected void assertNotConflict(boolean isGetRequest) {
-        if (isGetRequest) {
+    protected void assertNotConflict(boolean bodyCantUsed) {
+        if (bodyCantUsed) {
             if (requestBody != null) {
-                throw new HttpException("GET 请求 不能调用 setBodyPara 方法！");
+                throw new HttpException("GET | HEAD 请求 不能调用 setBodyPara 方法！");
             }
             if (bodyParams != null) {
-                throw new HttpException("GET 请求 不能调用 addBodyPara 方法！");
+                throw new HttpException("GET | HEAD 请求 不能调用 addBodyPara 方法！");
             }
             if (files != null) {
-                throw new HttpException("GET 请求 不能调用 addFilePara 方法！");
+                throw new HttpException("GET | HEAD 请求 不能调用 addFilePara 方法！");
             }
         }
         if (requestBody != null) {
@@ -848,9 +848,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             if (files != null) {
                 throw new HttpException("方法 addFilePara 与 setBodyPara 不能同时调用！");
             }
-        }
-        if (files != null && OkHttps.FORM.equals(bodyType)) {
-            throw new HttpException("方法 addFilePara 只能使用 form 方式请求！");
         }
     }
 

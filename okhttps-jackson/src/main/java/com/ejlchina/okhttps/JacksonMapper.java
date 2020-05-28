@@ -47,8 +47,8 @@ public class JacksonMapper implements Mapper {
 	@Override
 	public boolean getBool(String key) {
 		JsonNode subJson = json.get(key);
-		if (subJson != null && subJson.asBoolean()) {
-			return subJson.asBoolean();
+		if (subJson != null) {
+			return subJson.asBoolean(false);
 		}
 		return false;
 	}
@@ -56,8 +56,8 @@ public class JacksonMapper implements Mapper {
 	@Override
 	public int getInt(String key) {
 		JsonNode subJson = json.get(key);
-		if (subJson != null && subJson.isNumber()) {
-			return subJson.intValue();
+		if (subJson != null) {
+			return subJson.asInt(0);
 		}
 		return 0;
 	}
@@ -65,17 +65,20 @@ public class JacksonMapper implements Mapper {
 	@Override
 	public long getLong(String key) {
 		JsonNode subJson = json.get(key);
-		if (subJson != null && subJson.isNumber()) {
-			return subJson.longValue();
+		if (subJson != null) {
+			return subJson.asLong(0);
 		}
 		return 0;
 	}
-	
+
 	@Override
 	public float getFloat(String key) {
 		JsonNode subJson = json.get(key);
 		if (subJson != null && subJson.isNumber()) {
 			return subJson.floatValue();
+		}
+		if (subJson != null) {
+			return (float) subJson.asDouble(0);
 		}
 		return 0;
 	}
@@ -83,8 +86,8 @@ public class JacksonMapper implements Mapper {
 	@Override
 	public double getDouble(String key) {
 		JsonNode subJson = json.get(key);
-		if (subJson != null && subJson.isNumber()) {
-			return subJson.doubleValue();
+		if (subJson != null) {
+			return subJson.asDouble(0);
 		}
 		return 0;
 	}

@@ -42,31 +42,49 @@ public class DownloadTests extends BaseTest {
                 .start();
     }
 
-
+    @Test
+    public void testDownload1() {
+        HTTP http = HTTP.builder().build();
+        http.async("https://download.cocos.com/CocosDashboard/v1.0.1/CocosDashboard-v1.0.1-win32-031816.exe")
+                .setOnResponse((HttpResult result) -> {
+                    System.out.println(result.toString());
+                    System.out.println("ContentLength = " + result.getContentLength());
+                    System.out.println(result.getBody().getLength());
+                    System.out.println("type = " + result.getBody().getType());
+                    System.out.println("body = " + result.getBody().toString());
+                })
+                .head();
+        sleep(5000);
+    }
 
     @Test
     public void testDownload() {
         HTTP http = HTTP.builder()
                 .config((OkHttpClient.Builder builder) -> {
-                    builder.readTimeout(300, TimeUnit.MILLISECONDS);
+//                    builder.readTimeout(300, TimeUnit.MILLISECONDS);
                 })
                 .build();
 
-        String url = "https://download.cocos.com/CocosDashboard/v1.0.1/CocosDashboard-v1.0.1-win32-031816.exe";
+        String url = "https://gitee.com/ejlchina-zhxu/okhttps/blob/master/README.md";
 //		String url = "http://47.100.7.202/ejl-test.zip";
 
         long t0 = now();
 
 //		Ctrl ctrl =
-        http.sync(url)
+        HttpResult result = http.sync(url)
 //				.setRange(24771214)
                 .bind(this)
-                .get()
+                .get();
+
+        println(result.getHeaders());
+        println();
+
+        result
                 .getBody()
                 .setOnProcess((Process process) -> {
                     println(t0, process.getDoneBytes() + "/" + process.getTotalBytes() + "\t" + process.getRate());
                 })
-                .setStepRate(0.1)
+                .stepRate(0.1)
                 .toFolder("D:/WorkSpace/download/")
 //				.toFile("D:\\WorkSpace\\download\\CocosDashboard-v1.0.1-win32-031816(9).exe")
 //				.setAppended() // 启用 断点续传

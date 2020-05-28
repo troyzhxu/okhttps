@@ -14,7 +14,6 @@ import okhttp3.internal.Util;
 /**
  * 文件下载
  * @author Troy.Zhou
- * @since 2.2.0
  */
 public class Download {
 	
@@ -28,7 +27,7 @@ public class Download {
 	private long seekBytes = 0;
 	private boolean appended;
 	private volatile int status;
-	private Object lock = new Object();
+	private final Object lock = new Object();
 	
 	protected boolean nextOnIO = false;
     private boolean sOnIO;

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
 import com.ejlchina.okhttps.Cancelable;
+import com.ejlchina.okhttps.HTTP;
 import com.ejlchina.okhttps.HttpResult;
 import com.ejlchina.okhttps.HttpTask;
 import com.ejlchina.okhttps.HttpResult.State;
@@ -28,15 +29,23 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
      * @return 请求结果  
      */
     public HttpResult get() {
-        return request("GET");
+        return request(HTTP.GET);
     }
+
+	/**
+	 * 发起 HEAD 请求（Rest：读取资源头信息，幂等）
+	 * @return 请求结果
+	 */
+	public HttpResult head() {
+		return request(HTTP.HEAD);
+	}
 
     /**
      * 发起 POST 请求（Rest：创建资源，非幂等）
      * @return 请求结果  
      */
     public HttpResult post() {
-        return request("POST");
+        return request(HTTP.POST);
     }
 
     /**
@@ -44,7 +53,7 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
      * @return 请求结果  
      */
     public HttpResult put() {
-        return request("PUT");
+        return request(HTTP.PUT);
     }
 
 	/**
@@ -52,7 +61,7 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
 	 * @return HttpCall
 	 */
 	public HttpResult patch() {
-		return request("PATCH");
+		return request(HTTP.PATCH);
 	}
 
     /**
@@ -60,7 +69,7 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
      * @return 请求结果  
      */
     public HttpResult delete() {
-        return request("DELETE");
+        return request(HTTP.DELETE);
     }
 
     /**
@@ -90,7 +99,7 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
 				result.response(httpCall.call.execute());
 				httpCall.done = true;
             } catch (IOException e) {
-				result.exception(toState(e, true), e);
+				result.exception(toState(e), e);
             } finally {
 				latch.countDown();
 			}

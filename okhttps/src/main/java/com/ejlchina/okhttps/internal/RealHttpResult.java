@@ -95,6 +95,17 @@ public class RealHttpResult implements HttpResult {
     }
 
     @Override
+    public long getContentLength() {
+        String length = getHeader("Content-Length");
+        if (length != null) {
+            try {
+                return Long.parseLong(length);
+            } catch (Exception ignore) {}
+        }
+        return 0;
+    }
+
+    @Override
     public Body getBody() {
         if (body == null && response != null) {
             body = new ResultBody(httpTask, response, taskExecutor);
@@ -117,7 +128,7 @@ public class RealHttpResult implements HttpResult {
         String str = "HttpResult [\n  state: " + state + ",\n  status: " + getStatus() 
                 + ",\n  headers: " + getHeaders();
         if (body != null) {
-            str += ",\n  contentType: " + body.getContentType();
+            str += ",\n  contentType: " + body.getType();
         }
         return str + ",\n  error: " + error + "\n]";
     }

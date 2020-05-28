@@ -74,15 +74,23 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
      * @return HttpCall
      */
     public HttpCall get() {
-        return request("GET");
+        return request(HTTP.GET);
     }
+
+	/**
+	 * 发起 HEAD 请求（Rest：读取资源头信息，幂等）
+	 * @return HttpCall
+	 */
+	public HttpCall head() {
+		return request(HTTP.HEAD);
+	}
 
     /**
      * 发起 POST 请求（Rest：创建资源，非幂等）
      * @return HttpCall
      */
     public HttpCall post() {
-        return request("POST");
+        return request(HTTP.POST);
     }
 
     /**
@@ -90,7 +98,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
      * @return HttpCall
      */
     public HttpCall put() {
-        return request("PUT");
+        return request(HTTP.PUT);
     }
 
 	/**
@@ -98,7 +106,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 	 * @return HttpCall
 	 */
 	public HttpCall patch() {
-		return request("PATCH");
+		return request(HTTP.PATCH);
 	}
 
     /**
@@ -106,7 +114,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
      * @return HttpCall
      */
     public HttpCall delete() {
-        return request("DELETE");
+        return request(HTTP.DELETE);
     }
     
     /**
@@ -231,7 +239,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException error) {
-				State state = toState(error, false);
+				State state = toState(error);
 				HttpResult result = new RealHttpResult(AsyncHttpTask.this, state, error);
 				onCallback(httpCall, result, () -> {
 					TaskExecutor executor = httpClient.executor();

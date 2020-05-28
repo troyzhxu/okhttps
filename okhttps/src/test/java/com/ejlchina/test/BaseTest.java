@@ -1,6 +1,13 @@
 package com.ejlchina.test;
 
+import okhttp3.mockwebserver.MockWebServer;
+
 public class BaseTest {
+
+	protected MockWebServer server = new MockWebServer();
+	
+	protected String mockUrl = "http://" + server.getHostName() + ":" + server.getPort();
+	
 
     public static void sleep(int millis) {
         try {

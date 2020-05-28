@@ -17,7 +17,12 @@ public interface WebSocket extends Cancelable {
 	
 
 	class Close {
-		
+
+		public static int CANCELED = 0;
+		public static int EXCEPTION = -1;
+		public static int NETWORK_ERROR = -2;
+		public static int TIMEOUT = -3;
+
 		private int code;
 		private String reason;
 		
@@ -26,20 +31,46 @@ public interface WebSocket extends Cancelable {
 			this.reason = reason;
 		}
 
+		/**
+		 * @return 关闭状态码
+		 */
 		public int getCode() {
 			return code;
 		}
 
-		public void setCode(int code) {
-			this.code = code;
-		}
-
+		/**
+		 * @return 关闭原因
+		 */
 		public String getReason() {
 			return reason;
 		}
 
-		public void setReason(String reason) {
-			this.reason = reason;
+		/**
+		 * @return 是否因 WebSocket 连接被取消而关闭
+		 */
+		public boolean isCanceled() {
+			return code == CANCELED;
+		}
+
+		/**
+		 * @return 是否因 WebSocket 连接发生异常而关闭
+		 */
+		public boolean isException() {
+			return code == EXCEPTION;
+		}
+
+		/**
+		 * @return 是否因 网络错误 而关闭
+		 */
+		public boolean isNetworkError() {
+			return code == NETWORK_ERROR;
+		}
+
+		/**
+		 * @return 是否因 网络超时 而关闭
+		 */
+		public boolean isTimeout() {
+			return code == TIMEOUT;
 		}
 
 		@Override

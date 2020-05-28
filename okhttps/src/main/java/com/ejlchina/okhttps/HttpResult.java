@@ -2,8 +2,6 @@ package com.ejlchina.okhttps;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
 import java.util.List;
 
 import com.ejlchina.okhttps.internal.RealHttpResult;
@@ -77,15 +75,29 @@ public interface HttpResult {
 	 * HTTP响应报文体
 	 */
 	interface Body extends Toable {
-		
+
 		/**
 		 * @return 媒体类型
 		 */
-		MediaType getContentType();
-		
+		MediaType getType();
+
 		/**
 		 * @return 报文体字节长度
 		 */
+		long getLength();
+
+		/**
+		 * 推荐使用 {@link #getType()} 方法
+		 * @return 媒体类型
+		 */
+		@Deprecated
+		MediaType getContentType();
+		
+		/**
+		 * 推荐使用 {@link #getLength()} 方法
+		 * @return 报文体字节长度
+		 */
+		@Deprecated
 		long getContentLength();
 
 	    /**
@@ -107,16 +119,28 @@ public interface HttpResult {
 		 * @param stepBytes 步进字节
 		 * @return Body 
 		 */
+		Body stepBytes(long stepBytes);
+
+		/**
+		 * 推荐使用 {@link #stepBytes(long)} 方法
+		 */
+		@Deprecated
 		Body setStepBytes(long stepBytes);
-		
+
 		/**
 		 * 设置进度回调的步进比例
 		 * 表示每接收 stepRate 比例，执行一次进度回调
 		 * @param stepRate 步进比例
 		 * @return Body
 		 */
+		Body stepRate(double stepRate);
+
+		/**
+		 * 推荐使用 {@link #stepRate(double)} 方法
+		 */
+		@Deprecated
 		Body setStepRate(double stepRate);
-		
+
 		/**
 		 * 设置进度回调忽略响应的Range头信息，即进度回调会从0开始
 		 * @return Body
@@ -202,7 +226,14 @@ public interface HttpResult {
 	 * @return 响应头
 	 */
 	String getHeader(String name);
-	
+
+	/**
+	 * 获取响应报文体长度（从请求头内提取）
+	 * 在 HEAD 请求时，该方法返回不为 0，但{@link Body#getLength()} 将返回 0
+	 * @return 长度
+	 */
+	long getContentLength();
+
 	/**
 	 * @return 响应报文体
 	 */

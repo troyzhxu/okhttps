@@ -39,7 +39,7 @@ http.async("/users/{id}")             // http://api.demo.com/users/1
         .get();
 ```
 
-　　OkHttps 同时还支持 **全局回调** 和 **回调阻断** 机制，详见 [全局回调监听](/guide/configuration.html#全局回调监听)。
+　　OkHttps 同时还支持 **全局回调** 和 **回调阻断** 机制，详见 [全局回调监听](/v1/configuration.html#全局回调监听)。
 
 ::: tip
 * 只有异步请求才可以设置这三种（响应|异常|完成）回调
@@ -169,10 +169,10 @@ System.out.println(call.isCanceled());     // true
 * `addFileParam(String name, String type, String fileName, byte[] content)` 上传文件
 
 * `setTag(String tag)` 为HTTP任务添加标签
-* `setRange(long rangeStart)` 设置Range头信息，用于[断点续传](/guide/updown.html#实现断点续传)
-* `setRange(long rangeStart, long rangeEnd)` 设置Range头信息，可用于[分块下载](/guide/updown.html#实现分块下载)
+* `setRange(long rangeStart)` 设置Range头信息，用于[断点续传](/v1/updown.html#实现断点续传)
+* `setRange(long rangeStart, long rangeEnd)` 设置Range头信息，可用于[分块下载](/v1/updown.html#实现分块下载)
 
-* `bind(Object object)` 绑定一个对象，可用于实现Android里的[生命周期绑定](/guide/android.html#生命周期绑定)
+* `bind(Object object)` 绑定一个对象，可用于实现Android里的[生命周期绑定](/v1/android.html#生命周期绑定)
 
 ## 使用标签
 
@@ -206,4 +206,4 @@ http.async("/users")    //（5）
 int count = http.cancel("B");              //（2）（3）（4）被取消（取消标签包含"B"的任务）
 System.out.println(count);                 // 输出 3
 ```
-　　标签除了可以用来取消任务，在预处理器中它也可以发挥作用，请参见 [并行预处理器](/guide/configuration.html#并行预处理器) 与 [串行预处理器（token问题最佳解决方案）](/guide/configuration.html#串行预处理器（token问题最佳解决方案）)。
+　　标签除了可以用来取消任务，在预处理器中它也可以发挥作用，请参见 [并行预处理器](/v1/configuration.html#并行预处理器) 与 [串行预处理器（token问题最佳解决方案）](/v1/configuration.html#串行预处理器（token问题最佳解决方案）)。

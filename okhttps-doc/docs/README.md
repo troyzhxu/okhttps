@@ -1,10 +1,10 @@
 ---
 home: true
 heroImage: /logo.png
-heroText: OkHttps
-tagline: 基于 OkHttp 增强版 HTTP 客户端
+heroText: OkHttps V2
+tagline: 强大轻量 且 前后端通用的 HTTP 客户端
 actionText: 极速上手 →
-actionLink: /guide/
+actionLink: /v2/
 features:
 - title: 轻量纯粹优雅
   details: OkHttps 非常轻量，体积仅是 Retrofit 的一半不到，并且不依赖于特定平台，API 语义简洁舒适。
@@ -16,56 +16,37 @@ features:
 footer: Apache Licensed | Copyright © 2020-present ejlchina
 ---
 
-<!-- <CodeSwitcher :languages="{java:'Java',kotlin:'Kotlin'}" name="java">
-<template v-slot:java> -->
+#### <center> 如艺术一般优雅，像 1、2、3 一样简单 </center>
 
 ```java
-// 构建 HTTP
 HTTP http = HTTP.builder()
-        .baseUrl("https://api.demo.com")
+        .baseUrl("http://api.example.com")
+        .addMsgConvertor(new GsonMsgConvertor());
         .build();
 
-// 同步请求
-List<User> users = http.sync("/users")  // http://api.demo.com/users
+// 同步 HTTP
+List<User> users = http.sync("/users") 
         .get()                          // GET请求
-        .getBody()                      // 获取响应报文体
-        .toList(User.class);            // 得到目标数据
+        .getBody()                      // 响应报文体
+        .toList(User.class);            // 自动反序列化 List 
 
-// 异步请求
-http.async("/users/jack")               //  http://api.demo.com/users/jack
-        .setOnResponse((HttpResult result) -> {
-            // 得到目标数据
-            User jack = result.getBody().toBean(User.class);
+// 异步 HTTP
+http.async("/users/1")
+        .setOnResponse((HttpResult res) -> {
+            // // 自动反序列化 Bean 
+            User user = res.getBody().toBean(User.class);
         })
         .get();                         // GET请求
-```
 
-<!-- </template>
-<template v-slot:kotlin>
-
-```java
-// 构建 HTTP
-HTTP http = HTTP.builder()
-        .baseUrl("https://api.demo.com")
-        .build();
-
-// 同步请求
-List<User> users = http.sync("/users")  // http://api.demo.com/users
-        .get()                          // GET请求
-        .getBody()                      // 获取响应报文体
-        .toList(User.class);            // 得到目标数据
-
-// 异步请求
-http.async("/users/jack")               //  http://api.demo.com/users/jack
-        .setOnResponse((HttpResult result) -> {
-            // 得到目标数据
-            User jack = result.getBody().toBean(User.class);
+// WebSocket
+http.webSocket("/chat") 
+        .setOnMessage((WebSocket ws, Message msg) -> {
+            // 从服务器接收消息
+            Chat chat = msg.toBean(Chat.class);
+            // 向服务器发送消息
+            ws.send(chat); 
         })
-        .get();                         // GET请求
+        .listen();                     // 启动监听
 ```
 
-</template>
-</CodeSwitcher> -->
-
-**<center>竟然不到 <font size=5>15</font> 秒，你已学会 <font size=6>90</font>% 的精髓！</center>**
-<center>[**了解更多**](/guide/)</center>
+[<center> 了解更多 </center>](/v2/)

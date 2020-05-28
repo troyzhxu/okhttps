@@ -64,7 +64,7 @@ HTTP http = HTTP.builder().build();
 * `request(Request request)`  OkHttp 原生请求 
 * `webSocket(Request request, WebSocketListener listener)` WebSocket通讯
 
-　　为了使用方便，在构建的时候，我们更愿意指定一个`BaseUrl`（详见 [设置 BaseUrl](/guide/configuration.html#设置-baseurl)）:
+　　为了使用方便，在构建的时候，我们更愿意指定一个`BaseUrl`（详见 [设置 BaseUrl](/v1/configuration.html#设置-baseurl)）:
 
 ```java
 HTTP http = HTTP.builder()

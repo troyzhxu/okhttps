@@ -6,6 +6,7 @@ import okhttp3.*;
 import okhttp3.WebSocket;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -17,6 +18,13 @@ import java.util.concurrent.Executor;
  * @author 15735
  */
 public interface HTTP {
+
+    String GET = "GET";
+    String HEAD = "HEAD";
+    String POST = "POST";
+    String PUT = "PUT";
+    String PATCH = "PATCH";
+    String DELETE = "DELETE";
 
     /**
      * 同步请求
@@ -365,9 +373,41 @@ public interface HTTP {
                 if (config != null) {
                     config.config(builder);
                 }
+                // fix issue: https://github.com/ejlchina/okhttps/issues/8
+                if (mainExecutor != null && androidSdkInt() > 24) {
+                    addCopyInterceptor(builder);
+                }
                 okClient = builder.build();
             }
             return new HttpClient(this);
+        }
+
+        private static void addCopyInterceptor(OkHttpClient.Builder builder) {
+            builder.addInterceptor(chain -> {
+                Request request = chain.request();
+                Response response = chain.proceed(request);
+                ResponseBody body = response.body();
+                String type = response.header("Content-Type");
+                if (body == null || type != null && (type.contains("octet-stream")
+                        || type.contains("image") || type.contains("video")
+                        || type.contains("archive") || type.contains("word")
+                        || type.contains("xls") || type.contains("pdf"))) {
+                    // 若是下载文件，则必须指定在 IO 线程操作
+                    return response;
+                }
+                ResponseBody newBody = ResponseBody.create(body.contentType(), body.bytes());
+                return response.newBuilder().body(newBody).build();
+            });
+        }
+
+        private static int androidSdkInt() {
+            try {
+                Class<?> versionClass = Class.forName("android.os.Build$VERSION");
+                Field field = versionClass.getDeclaredField("SDK_INT");
+                return field.getInt(field);
+            } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
+                return 0;
+            }
         }
 
         public OkHttpClient okClient() {
