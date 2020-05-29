@@ -407,8 +407,9 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 	private Method callbackMethod(Class<?> clazz, Class<?> paraType) {
 		Method[] methods = clazz.getDeclaredMethods();
 		for (Method method : methods) {
-			if (method.getName().equals(OnCallbackMethod) && method.getParameterCount() == 1
-					&& method.getParameterTypes()[0].isAssignableFrom(paraType)) {
+			Class<?>[] paraTypes = method.getParameterTypes();
+			if (method.getName().equals(OnCallbackMethod) && paraTypes.length == 1
+					&& paraTypes[0].isAssignableFrom(paraType)) {
 				method.setAccessible(true);
 				return method;
 			}
