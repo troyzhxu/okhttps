@@ -169,6 +169,7 @@ public interface HTTP {
             this.preprocessors = new ArrayList<>();
             Collections.addAll(this.preprocessors, hc.preprocessors());
             TaskExecutor executor = hc.executor();
+            this.mainExecutor = executor.getMainExecutor();
             this.downloadListener = executor.getDownloadListener();
             this.responseListener = executor.getResponseListener();
             this.exceptionListener = executor.getExceptionListener();
