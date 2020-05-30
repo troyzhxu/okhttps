@@ -368,7 +368,12 @@ public interface HTTP {
          */
         public HTTP build() {
             if (config != null || okClient == null) {
-                OkHttpClient.Builder builder = new OkHttpClient.Builder();
+                OkHttpClient.Builder builder;
+                if (okClient != null) {
+                    builder = okClient.newBuilder();
+                } else {
+                    builder = new OkHttpClient.Builder();
+                }
                 if (config != null) {
                     config.config(builder);
                 }
