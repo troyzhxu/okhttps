@@ -379,13 +379,21 @@ public interface HTTP {
                     config.config(builder);
                 }
                 // fix issue: https://github.com/ejlchina/okhttps/issues/8
-                if (mainExecutor != null && Platform.ANDROID_SDK_INT > 24
-                        && CopyInterceptor.notIn(builder.interceptors())) {
+                if (needCopyInterceptor(builder.interceptors())) {
                     builder.addInterceptor(new CopyInterceptor());
                 }
                 okClient = builder.build();
+            } else if (needCopyInterceptor(okClient.interceptors())) {
+                okClient = okClient.newBuilder()
+                        .addInterceptor(new CopyInterceptor())
+                        .build();
             }
             return new HttpClient(this);
+        }
+
+        private boolean needCopyInterceptor(List<Interceptor> list) {
+            return mainExecutor != null && Platform.ANDROID_SDK_INT > 24
+                    && CopyInterceptor.notIn(list);
         }
 
         public OkHttpClient okClient() {
