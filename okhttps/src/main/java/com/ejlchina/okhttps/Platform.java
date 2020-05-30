@@ -16,7 +16,7 @@ public class Platform {
             Field field = versionClass.getDeclaredField("SDK_INT");
             return field.getInt(field);
         } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
-            return  0;
+            return 0;
         }
     }
 
