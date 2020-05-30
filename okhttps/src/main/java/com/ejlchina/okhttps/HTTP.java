@@ -378,30 +378,13 @@ public interface HTTP {
                     config.config(builder);
                 }
                 // fix issue: https://github.com/ejlchina/okhttps/issues/8
-                if (mainExecutor != null && Platform.ANDROID_SDK_INT > 24) {
-                    addCopyInterceptor(builder);
+                if (mainExecutor != null && Platform.ANDROID_SDK_INT > 24
+                        && CopyInterceptor.notIn(builder.interceptors())) {
+                    builder.addInterceptor(new CopyInterceptor());
                 }
                 okClient = builder.build();
             }
             return new HttpClient(this);
-        }
-
-        private static void addCopyInterceptor(OkHttpClient.Builder builder) {
-            builder.addInterceptor(chain -> {
-                Request request = chain.request();
-                Response response = chain.proceed(request);
-                ResponseBody body = response.body();
-                String type = response.header("Content-Type");
-                if (body == null || type != null && (type.contains("octet-stream")
-                        || type.contains("image") || type.contains("video")
-                        || type.contains("archive") || type.contains("word")
-                        || type.contains("xls") || type.contains("pdf"))) {
-                    // 若是下载文件，则必须指定在 IO 线程操作
-                    return response;
-                }
-                ResponseBody newBody = ResponseBody.create(body.contentType(), body.bytes());
-                return response.newBuilder().body(newBody).build();
-            });
         }
 
         public OkHttpClient okClient() {
