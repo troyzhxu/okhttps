@@ -101,7 +101,7 @@ okhttps-jackson | 2.0.1 | 与 jackson 集成
 
 ## 联系方式
 
-* 微信：<img src="https://images.gitee.com/uploads/images/2020/0520/170722_504b1ae2_1393412.png" width="700px">
+* 微信：<img src="https://images.gitee.com/uploads/images/2020/0530/113022_4efd9863_1393412.png" width="700px">
 * 邮箱：zhou.xu@ejlchina.com
 
 ## 参与贡献
