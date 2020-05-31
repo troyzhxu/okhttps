@@ -6,7 +6,6 @@ import okhttp3.*;
 import okhttp3.WebSocket;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -170,6 +169,7 @@ public interface HTTP {
             this.preprocessors = new ArrayList<>();
             Collections.addAll(this.preprocessors, hc.preprocessors());
             TaskExecutor executor = hc.executor();
+            this.mainExecutor = executor.getMainExecutor();
             this.downloadListener = executor.getDownloadListener();
             this.responseListener = executor.getResponseListener();
             this.exceptionListener = executor.getExceptionListener();
@@ -369,45 +369,31 @@ public interface HTTP {
          */
         public HTTP build() {
             if (config != null || okClient == null) {
-                OkHttpClient.Builder builder = new OkHttpClient.Builder();
+                OkHttpClient.Builder builder;
+                if (okClient != null) {
+                    builder = okClient.newBuilder();
+                } else {
+                    builder = new OkHttpClient.Builder();
+                }
                 if (config != null) {
                     config.config(builder);
                 }
                 // fix issue: https://github.com/ejlchina/okhttps/issues/8
-                if (mainExecutor != null && androidSdkInt() > 24) {
-                    addCopyInterceptor(builder);
+                if (needCopyInterceptor(builder.interceptors())) {
+                    builder.addInterceptor(new CopyInterceptor());
                 }
                 okClient = builder.build();
+            } else if (needCopyInterceptor(okClient.interceptors())) {
+                okClient = okClient.newBuilder()
+                        .addInterceptor(new CopyInterceptor())
+                        .build();
             }
             return new HttpClient(this);
         }
 
-        private static void addCopyInterceptor(OkHttpClient.Builder builder) {
-            builder.addInterceptor(chain -> {
-                Request request = chain.request();
-                Response response = chain.proceed(request);
-                ResponseBody body = response.body();
-                String type = response.header("Content-Type");
-                if (body == null || type != null && (type.contains("octet-stream")
-                        || type.contains("image") || type.contains("video")
-                        || type.contains("archive") || type.contains("word")
-                        || type.contains("xls") || type.contains("pdf"))) {
-                    // 若是下载文件，则必须指定在 IO 线程操作
-                    return response;
-                }
-                ResponseBody newBody = ResponseBody.create(body.contentType(), body.bytes());
-                return response.newBuilder().body(newBody).build();
-            });
-        }
-
-        private static int androidSdkInt() {
-            try {
-                Class<?> versionClass = Class.forName("android.os.Build$VERSION");
-                Field field = versionClass.getDeclaredField("SDK_INT");
-                return field.getInt(field);
-            } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
-                return 0;
-            }
+        private boolean needCopyInterceptor(List<Interceptor> list) {
+            return mainExecutor != null && Platform.ANDROID_SDK_INT > 24
+                    && CopyInterceptor.notIn(list);
         }
 
         public OkHttpClient okClient() {

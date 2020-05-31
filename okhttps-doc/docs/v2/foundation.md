@@ -68,8 +68,11 @@ OkHttps 的回调函数全部使用单方法模式，这样可以充分利用 Ja
 
 ```java
 http.async("/users")        // http://api.demo.com/users
-        .setOnResponse((HttpResult result) -> {
+        .setOnResponse((HttpResult res) -> {
             // 响应回调
+            int status = res.getStatus();       // 状态码
+            Headers headers = res.getHeaders(); // 响应头
+            Body body = res.getBody();          // 报文体
         })
         .setOnException((IOException e) -> {
             // 异常回调
@@ -92,6 +95,36 @@ OkHttps 同时还支持 **全局回调** 和 **回调阻断** 机制，详见 [�
 * 只有异步请求才可以设置这三种（响应|异常|完成）回调
 * 同步请求直接返回结果，无需使用回调
 :::
+
+### 便捷回调
+
+OkHttps 自 v2.1.0 起，对异步请求提供了 **6** 种便捷回调方法，它们都是`OnResponse`回调的简化版，当在具体请求中不关心状态码和响应头信息时，使用起来非常方便：
+
+```java
+http.async("/users")        // http://api.demo.com/users
+        .setOnResBody(body -> {
+            // 得到响应报文体 Body 对象
+        })
+        .setOnResMapper(mapper -> {
+            // 得到响应报文体反序列化后的 Mapper 对象
+        })
+        .setOnResArray(array -> {
+            // 得到响应报文体反序列化后的 Array 对象
+        })
+        .setOnResBean(Bean.class, bean -> {
+            // 得到响应报文体根据 Bean.class 反序列化后的 Java Bean 对象
+        })
+        .setOnResList(Bean.class, list -> {
+            // 得到响应报文体根据 Bean.class 反序列化后的 Java Bean 列表
+        })
+        .setOnResString(str -> {
+            // 得到响应报文体的字符串 String 对象
+        })
+        .get();
+```
+
+以上的便捷回调里，无法像`OnResponse`那样获得响应的状态码和头信息，所以最好和 [全局回调监听](/v2/configuration.html#全局回调监听) 配合使用。在全局回调里对错误码先做统一处理。
+
 
 ### 进度回调
 
@@ -571,7 +604,77 @@ http.webSocket("/websocket")
         .listen();
 ```
 
-当使用标签后，就可以按标签批量的对HTTP任务进行取消：
+### 预处理器中访问标签
+
+在 [预处理器](/v2/configuration.html#并行预处理器) 中可以通过`chain`对象获得当前的请求任务`HttpTask`，然后使用`isTagged`或`getTag`方法获取标签信息：
+
+```java
+HTTP http = HTTP.builder()
+        // 添加预处理器
+        .addPreprocessor(chain -> {
+
+            // 获得当前的HTTP任务
+            HttpTask<?> task = chain.getTask();
+            // 判断该任务是否添加了 "A" 标签
+            boolean tagged = task.isTagged("A");
+            // 得到整个标签串
+            String tag = task.getTag();
+            
+            // ...
+        })
+        // ...
+```
+
+在 [串行预处理器](/v2/configuration.html#串行预处理器（token问题最佳解决方案）) 中也是同样的方法访问标签。
+
+### 全局监听中访问标签
+
+在 [全局监听](/v2/configuration.html#全局监听) 中，访问标签就加简单一点，因为`HttpTask`正是形参之一，例如全局响应监听：
+
+```java
+HTTP http = HTTP.builder()
+        // 全局响应监听
+        .responseListener((HttpTask<?> task, HttpResult result) -> {
+
+            // 判断该任务是否添加了 "A" 标签
+            boolean tagged = task.isTagged("A");
+            // 得到整个标签串
+            String tag = task.getTag();
+
+            // ...
+        })
+        // ...
+```
+
+其它类型的全局监听也是同样的方法访问标签。
+
+### 拦截器中访问标签
+
+自 v2.0.1 起，OkHttps 支持在拦截器内访问标签，可通过`Request`对象拿到整个标签串：
+
+```java
+HTTP http = HTTP.builder()
+        // OkHttpClient 原生配置
+        .config(b -> {
+            // 添加拦截器
+            b.addInterceptor(chain -> {
+
+                // 拿到 Request 对象
+                Request request = chain.request();
+                // 拿到整个标签串
+                String tag = request.tag(String.class);
+                
+                // ...
+            });
+        })
+        // ...
+```
+
+拦截器的配置，可参见 [配置 OkHttpClient](/v2/configuration.html#配置-okhttpclient) 章节。
+
+### 使用标签取消请求
+
+当使用标签后，还可以按标签批量的对HTTP任务进行取消：
 
 ```java
 int count = http.cancel("B");  //（2）（3）（4）（6）被取消（取消标签包含"B"的任务）
@@ -580,7 +683,7 @@ System.out.println(count);     // 输出 4
 
 取消请求任务，只是标签的一个附带功能。
 
-标签 真正的强大之处在于：它可以和 [预处理器](/v2/configuration.html#并行预处理器) 和 [全局监听](/v2/configuration.html#全局监听) 配合使用，以此来扩展很多功能。可参考 [串行预处理器（token问题最佳解决方案）](/v2/configuration.html#串行预处理器（token问题最佳解决方案）)和 [安卓-自动加载框](/v2/android.html#自动加载框) 等章节。
+标签 真正的强大之处在于：它可以和 [预处理器](/v2/configuration.html#并行预处理器) 和 [全局监听](/v2/configuration.html#全局监听) 及 拦截器 配合使用，以此来扩展很多功能。可参考 [串行预处理器（token问题最佳解决方案）](/v2/configuration.html#串行预处理器（token问题最佳解决方案）)和 [安卓-自动加载框](/v2/android.html#自动加载框) 等章节。
 
 另外，请求任务的取消，还有更多的方式，可参考 [取消请求](/v2/foundation.html#取消请求) 章节
 
@@ -695,11 +798,16 @@ http.async("/users/1")
         .get();
 ```
 
+::: warning
+如果你开发的是安卓应用，我们强烈建议你添加 [全局异常监听](/v2/configuration.html#全局回调监听)，这样当你在某个请求中忘记使用`OnException`或`nothrow`，而它又发生了超时或网络异常时，不至于让程序崩溃。
+:::
+
+
 ## 取消请求
 
 　　在 OkHttps 里取消请求共有 **4 种** 方式可选：
 
-**1、** 使用`HttpCall#cancel()`取消单个请求（适用于异步请求，[详见 3.3 章节](#33-httpcall)）
+**1、** 使用`HttpCall#cancel()`取消单个请求（适用于异步请求，[详见`HttpCall`章节](/v2/foundation.html#httpcall)）
 
 **2、** 使用`HttpTask#cancel()`取消单个请求（适用于所有请求）（since v1.0.4）
 
@@ -715,7 +823,7 @@ task.get(); // 发起 GET 请求
 boolean canceled = task.cancel();   
 ```
 
-**3、** 使用`HTTP#cancel(String tag)`按标签批量取消请求（适用于所有请求，[详见第 5 章节](#5-使用标签)）
+**3、** 使用`HTTP#cancel(String tag)`按标签批量取消请求（适用于所有请求，[详见 标签 章节](/v2/foundation.html#使用标签)）
 
 **4、** 使用`HTTP#cancelAll()`取消所有请求（适用于所有请求）（since v1.0.2）
 

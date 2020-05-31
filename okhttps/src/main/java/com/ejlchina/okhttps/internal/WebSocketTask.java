@@ -37,6 +37,11 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		super(httpClient, url);
 	}
 
+	@Override
+	public boolean isWebsocket() {
+		return true;
+	}
+
 	/**
 	 * 启动 WebSocket 监听
 	 * @return WebSocket
@@ -159,10 +164,6 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		
 	}
 
-	private void execute(Runnable command, boolean onIo) {
-		httpClient.executor.execute(command, onIo);
-	}
-	
 	static class WebSocketImpl implements WebSocket {
 
 		private boolean cancelOrClosed;

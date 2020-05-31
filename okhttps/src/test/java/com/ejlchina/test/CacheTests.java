@@ -17,41 +17,46 @@ public class CacheTests extends BaseTest {
 
         
         
-        HttpResult.Body body = http.sync("http://xxx.cdyun.vip/comm/provinces")
-        		
-                .get()
-                .getBody()
-                .cache();
-
-        println("result = " + body.toString());
-        println("result = " + body.toArray());
-
-        body.close();
-
-        println("result = " + body.toString());
-        println("result = " + body.toArray());
-        
-        
-        
-        http.async("")
-        	.addBodyPara("", "")
-        	.setOnResponse((HttpResult res) -> {
-        		
-        		Mapper mapper = res.getBody().toMapper(); 
-        		
-        	})
-        	.setOnComplete(state -> {
-        		
-        		testCache();
-        	})
-        	.setOnProcess(process -> {
-        		
-        		double rate = process.getRate();
-        		
-        	})
-        	.post()
-        	.cancel()
-        	;
+//        
+//        
+//        HttpResult.Body body = http.sync("http://xxx.cdyun.vip/comm/provinces")
+//        		
+//                .get()
+//                .getBody()
+//                .cache();
+//
+//        println("result = " + body.toString());
+//        println("result = " + body.toArray());
+//
+//        body.close();
+//
+//        println("result = " + body.toString());
+//        println("result = " + body.toArray());
+//        
+//        
+//        
+//        
+//        http.async("")
+//        	.addBodyPara("", "")
+//        	
+//        	
+//        	.setOnResponse((HttpResult res) -> {
+//        		
+//        		Mapper mapper = res.getBody().toMapper(); 
+//        		
+//        	})
+//        	.setOnComplete(state -> {
+//        		
+//        		testCache();
+//        	})
+//        	.setOnProcess(process -> {
+//        		
+//        		double rate = process.getRate();
+//        		
+//        	})
+//        	.post()
+//        	.cancel()
+//        	;
 
         
     }

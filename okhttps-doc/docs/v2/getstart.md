@@ -14,7 +14,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 <dependency>
      <groupId>com.ejlchina</groupId>
      <artifactId>okhttps</artifactId>
-     <version>2.0.1</version>
+     <version>2.1.0</version>
 </dependency>
 ```
 
@@ -26,7 +26,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 <dependency>
      <groupId>com.ejlchina</groupId>
      <artifactId>okhttps-fastjson</artifactId>
-     <version>2.0.1</version>
+     <version>2.1.0</version>
 </dependency>
 ```
 
@@ -36,7 +36,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 <dependency>
      <groupId>com.ejlchina</groupId>
      <artifactId>okhttps-gson</artifactId>
-     <version>2.0.1</version>
+     <version>2.1.0</version>
 </dependency>
 ```
 
@@ -46,7 +46,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 <dependency>
      <groupId>com.ejlchina</groupId>
      <artifactId>okhttps-jackson</artifactId>
-     <version>2.0.1</version>
+     <version>2.1.0</version>
 </dependency>
 ```
 
@@ -59,7 +59,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 #### 单独使用 OkHttps
 
 ```groovy
-implementation 'com.ejlchina:okhttps:2.0.1'
+implementation 'com.ejlchina:okhttps:2.1.0'
 ```
 
 单独使用 OkHttps 需要自定义[`MsgConvertor`](https://gitee.com/ejlchina-zhxu/okhttps/blob/master/okhttps/src/main/java/com/ejlchina/okhttps/MsgConvertor.java)，否则无法使用 **自动正反序列化** 相关功能，后文会详细讲解哪些功能会受到此影响。
@@ -67,19 +67,19 @@ implementation 'com.ejlchina:okhttps:2.0.1'
 #### 与 fastjson 一起使用
 
 ```groovy
-implementation 'com.ejlchina:okhttps-fastjson:2.0.1'
+implementation 'com.ejlchina:okhttps-fastjson:2.1.0'
 ```
 
 #### 与 gson 一起使用
 
 ```groovy
-implementation 'com.ejlchina:okhttps-gson:2.0.1'
+implementation 'com.ejlchina:okhttps-gson:2.1.0'
 ```
 
 #### 与 jackson 一起使用
 
 ```groovy
-implementation 'com.ejlchina:okhttps-jackson:2.0.1'
+implementation 'com.ejlchina:okhttps-jackson:2.1.0'
 ```
 
 ::: tip
@@ -150,9 +150,9 @@ List<User> users = http.sync("/users") // http://api.example.com/users
 
 ```java
 http.async("/users/1")                //  http://api.example.com/users/1
-        .setOnResponse((HttpResult result) -> {
+        .setOnResponse((HttpResult res) -> {
             // 得到目标数据
-            User user = result.getBody().toBean(User.class);
+            User user = res.getBody().toBean(User.class);
         })
         .get();                       // GET请求
 ```

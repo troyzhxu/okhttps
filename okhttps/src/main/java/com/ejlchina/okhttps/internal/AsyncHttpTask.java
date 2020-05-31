@@ -1,6 +1,9 @@
 package com.ejlchina.okhttps.internal;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import com.ejlchina.okhttps.*;
@@ -23,9 +26,26 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
     private OnCallback<HttpResult> onResponse;
     private OnCallback<IOException> onException;
     private OnCallback<State> onComplete;
-    private boolean rOnIO;
-    private boolean eOnIO;
-    private boolean cOnIO;
+    
+    private boolean responseOnIO;
+    private boolean exceptionOnIO;
+    private boolean completeOnIO;
+    
+    private OnCallback<HttpResult.Body> onResBody;
+    private OnCallback<Mapper> onResMapper;
+    private OnCallback<Array> onResArray;
+    private OnCallback<String> onResString;
+    private OnCallback<?> onResBean;
+    private OnCallback<?> onResList;
+    
+    private boolean resBodyOnIO;
+    private boolean resMapperOnIO;
+    private boolean resArrayOnIO;
+    private boolean resStringOnIO;
+    private boolean resBeanOnIO;
+    private boolean resListOnIO;
+    
+    private Class<?> beanType;
     
     
 	public AsyncHttpTask(HttpClient client, String url) {
@@ -40,7 +60,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 	 */
     public AsyncHttpTask setOnException(OnCallback<IOException> onException) {
         this.onException = onException;
-        eOnIO = nextOnIO;
+        exceptionOnIO = nextOnIO;
         nextOnIO = false;
         return this;
     }
@@ -52,7 +72,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 	 */
     public AsyncHttpTask setOnComplete(OnCallback<State> onComplete) {
         this.onComplete = onComplete;
-        cOnIO = nextOnIO;
+        completeOnIO = nextOnIO;
         nextOnIO = false;
         return this;
     }
@@ -64,7 +84,83 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 	 */
     public AsyncHttpTask setOnResponse(OnCallback<HttpResult> onResponse) {
         this.onResponse = onResponse;
-        rOnIO = nextOnIO;
+        responseOnIO = nextOnIO;
+        nextOnIO = false;
+        return this;
+    }
+    
+	/**
+	 * 设置请求得到响应后的回调函数
+	 * @param onResBody 响应报文体回调
+	 * @return HttpTask 实例
+	 */
+    public AsyncHttpTask setOnResBody(OnCallback<HttpResult.Body> onResBody) {
+    	this.onResBody = onResBody;
+    	resBodyOnIO = nextOnIO;
+        nextOnIO = false;
+        return this;
+    }
+    
+	/**
+	 * 设置请求得到响应后的回调函数
+	 * @param onResBean 响应 Bean 回调
+	 * @return HttpTask 实例
+	 */
+    public <T> AsyncHttpTask setOnResBean(Class<T> type, OnCallback<T> onResBean) {
+    	initBeanType(type);
+    	this.onResBean = onResBean;
+    	resBeanOnIO = nextOnIO;
+        nextOnIO = false;
+        return this;
+    }
+    
+	/**
+	 * 设置请求得到响应后的回调函数
+	 * @param onResList 请求响应回调
+	 * @return HttpTask 实例
+	 */
+    public <T> AsyncHttpTask setOnResList(Class<T> type, OnCallback<List<T>> onResList) {
+    	initBeanType(type);
+    	this.onResList = onResList;
+    	resListOnIO = nextOnIO;
+        nextOnIO = false;
+        return this;
+    }
+    
+
+    
+	/**
+	 * 设置请求得到响应后的回调函数
+	 * @param onResMapper 请求响应回调
+	 * @return HttpTask 实例
+	 */
+    public AsyncHttpTask setOnResMapper(OnCallback<Mapper> onResMapper) {
+    	this.onResMapper = onResMapper;
+    	resMapperOnIO = nextOnIO;
+        nextOnIO = false;
+        return this;
+    }
+    
+	/**
+	 * 设置请求得到响应后的回调函数
+	 * @param onResArray 请求响应回调
+	 * @return HttpTask 实例
+	 */
+    public AsyncHttpTask setOnResArray(OnCallback<Array> onResArray) {
+    	this.onResArray = onResArray;
+    	resArrayOnIO = nextOnIO;
+        nextOnIO = false;
+        return this;
+    }
+    
+	/**
+	 * 设置请求得到响应后的回调函数
+	 * @param onResString 请求响应回调
+	 * @return HttpTask 实例
+	 */
+    public AsyncHttpTask setOnResString(OnCallback<String> onResString) {
+    	this.onResString = onResString;
+    	resStringOnIO = nextOnIO;
         nextOnIO = false;
         return this;
     }
@@ -243,8 +339,8 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 				HttpResult result = new RealHttpResult(AsyncHttpTask.this, state, error);
 				onCallback(httpCall, result, () -> {
 					TaskExecutor executor = httpClient.executor();
-					executor.executeOnComplete(AsyncHttpTask.this, onComplete, state, cOnIO);
-					if (!executor.executeOnException(AsyncHttpTask.this, onException, error, eOnIO)
+					executor.executeOnComplete(AsyncHttpTask.this, onComplete, state, completeOnIO);
+					if (!executor.executeOnException(AsyncHttpTask.this, onException, error, exceptionOnIO)
 							&& !nothrow) {
 						throw new HttpException(state, error.getMessage(), error);
 					}
@@ -252,18 +348,93 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, Response response) {
             	TaskExecutor executor = httpClient.executor();
 				HttpResult result = new RealHttpResult(AsyncHttpTask.this, response, executor);
 				onCallback(httpCall, result, () -> {
-					executor.executeOnComplete(AsyncHttpTask.this, onComplete, State.RESPONSED, cOnIO);
-					executor.executeOnResponse(AsyncHttpTask.this, onResponse, result, rOnIO);
+					executor.executeOnComplete(AsyncHttpTask.this, onComplete, State.RESPONSED, completeOnIO);
+					executor.executeOnResponse(AsyncHttpTask.this, complexOnResponse(), result, responseOnIO);
 				});
             }
 
         });
 		return httpCall;
     }
+
+    private OnCallback<HttpResult> complexOnResponse() {
+		int count = responseCallbackCount();
+		if (count == 0 || count == 1 && onResponse != null) {
+			return onResponse;
+		}
+		return res -> {
+			HttpResult.Body body = res.getBody();
+			if (count > 1)
+				body.cache();
+			if (onResponse != null)
+				onResponse.on(res);
+			if (onResBody != null)
+				execute(() -> onResBody.on(body), resBodyOnIO);
+			if (onResMapper != null)
+				execute(() -> onResMapper.on(body.toMapper()), resMapperOnIO);
+			if (onResArray != null)
+				execute(() -> onResArray.on(body.toArray()), resArrayOnIO);
+			if (onResBean != null) {
+				execute(() -> {
+					try {
+						callbackMethod(onResBean.getClass(), beanType).invoke(onResBean, body.toBean(beanType));
+					} catch (IllegalAccessException | InvocationTargetException e) {
+						throw new HttpException("回调方法调用失败！", e);
+					}
+				}, resBeanOnIO);
+			}
+			if (onResList != null) {
+				execute(() -> {
+					try {
+						List<?> list = body.toList(beanType);
+						callbackMethod(onResList.getClass(), list.getClass()).invoke(onResList, list);
+					} catch (IllegalAccessException | InvocationTargetException e) {
+						throw new HttpException("回调方法调用失败！", e);
+					}
+				}, resListOnIO);
+			}
+			if (onResString != null)
+				execute(() -> onResString.on(body.toString()), resStringOnIO);
+		};
+	}
+
+	static final String OnCallbackMethod = OnCallback.class.getDeclaredMethods()[0].getName();
+
+	private Method callbackMethod(Class<?> clazz, Class<?> paraType) {
+		Method[] methods = clazz.getDeclaredMethods();
+		for (Method method : methods) {
+			Class<?>[] paraTypes = method.getParameterTypes();
+			if (method.getName().equals(OnCallbackMethod) && paraTypes.length == 1
+					&& paraTypes[0].isAssignableFrom(paraType)) {
+				method.setAccessible(true);
+				return method;
+			}
+		}
+		throw new IllegalStateException("没有可调用的方法");
+	}
+
+	private int responseCallbackCount() {
+    	int count = 0;
+		if (onResponse != null)
+			count++;
+		if (onResBody != null)
+			count++;
+		if (onResMapper != null)
+			count++;
+		if (onResArray != null)
+			count++;
+		if (onResBean != null)
+			count++;
+		if (onResList != null)
+			count++;
+		if (onResString != null)
+			count++;
+		return count;
+	}
 
 	@SuppressWarnings("all")
     private void onCallback(OkHttpCall httpCall, HttpResult result, Runnable runnable) {
@@ -277,5 +448,15 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 			runnable.run();
 		}
 	}
+	
+    private void initBeanType(Class<?> type) {
+    	if (type == null) {
+    		throw new IllegalArgumentException(" bean type can not be null!");
+    	}
+    	if (beanType != null && beanType != type) {
+    		throw new IllegalStateException("多次设置 bean type 必须一致！");
+    	}
+    	beanType = type;
+    }
 
 }
