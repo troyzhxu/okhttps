@@ -229,6 +229,9 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
     			if (call.canceled) {
 					removeTagTask();
         		} else {
+    				if (onResponse != null || onResBody != null) {
+    					tag(CopyInterceptor.TAG);
+					}
 					call.setCall(executeCall(prepareCall(method)));
 				}
 			}
@@ -353,7 +356,8 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 				HttpResult result = new RealHttpResult(AsyncHttpTask.this, response, executor);
 				onCallback(httpCall, result, () -> {
 					executor.executeOnComplete(AsyncHttpTask.this, onComplete, State.RESPONSED, completeOnIO);
-					executor.executeOnResponse(AsyncHttpTask.this, complexOnResponse(), result, responseOnIO);
+					executor.executeOnResponse(AsyncHttpTask.this, complexOnResponse(), result,
+							onResponse == null || responseOnIO);
 				});
             }
 
