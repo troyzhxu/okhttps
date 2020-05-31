@@ -118,9 +118,7 @@ public class Download {
 		}
 		RandomAccessFile raFile = randomAccessFile();
 		status = Ctrl.STATUS__DOWNLOADING;
-		taskExecutor.execute(() -> {
-			doDownload(raFile);
-		}, true);
+		taskExecutor.execute(() -> doDownload(raFile), true);
 		return ctrl;
 	}
 	
@@ -261,7 +259,7 @@ public class Download {
 			while (status != Ctrl.STATUS__CANCELED && status != Ctrl.STATUS__DONE) {
 				if (status == Ctrl.STATUS__DOWNLOADING) {
 					byte[] buff = new byte[buffSize];
-					int len = -1;
+					int len;
 					while ((len = input.read(buff)) != -1) {
 						raFile.write(buff, 0, len);
 						doneBytes += len;

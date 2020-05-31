@@ -75,6 +75,13 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     /**
+     * @return 是否是 Websocket 通讯
+     */
+    public boolean isWebsocket() {
+        return false;
+    }
+
+    /**
      * 获取请求任务的标签
      * @return 标签
      */
@@ -875,6 +882,10 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         ResponseBody b = response.body();
         MediaType type = b != null ? b.contentType() : null;
         return type != null ? type.charset(charset) : charset;
+    }
+
+    protected void execute(Runnable command, boolean onIo) {
+        httpClient.executor().execute(command, onIo);
     }
 
 }

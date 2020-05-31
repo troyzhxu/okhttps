@@ -571,7 +571,77 @@ http.webSocket("/websocket")
         .listen();
 ```
 
-当使用标签后，就可以按标签批量的对HTTP任务进行取消：
+### 预处理器中访问标签
+
+在 [预处理器](/v2/configuration.html#并行预处理器) 中可以通过`chain`对象获得当前的请求任务`HttpTask`，然后使用`isTagged`或`getTag`方法获取标签信息：
+
+```java
+HTTP http = HTTP.builder()
+        // 添加预处理器
+        .addPreprocessor(chain -> {
+
+            // 获得当前的HTTP任务
+            HttpTask<?> task = chain.getTask();
+            // 判断该任务是否添加了 "A" 标签
+            boolean tagged = task.isTagged("A");
+            // 得到整个标签串
+            String tag = task.getTag();
+            
+            // ...
+        })
+        // ...
+```
+
+在 [串行预处理器](/v2/configuration.html#串行预处理器（token问题最佳解决方案）) 中也是同样的方法访问标签。
+
+### 全局监听中访问标签
+
+在 [全局监听](/v2/configuration.html#全局监听) 中，访问标签就加简单一点，因为`HttpTask`正是形参之一，例如全局响应监听：
+
+```java
+HTTP http = HTTP.builder()
+        // 全局响应监听
+        .responseListener((HttpTask<?> task, HttpResult result) -> {
+
+            // 判断该任务是否添加了 "A" 标签
+            boolean tagged = task.isTagged("A");
+            // 得到整个标签串
+            String tag = task.getTag();
+
+            // ...
+        })
+        // ...
+```
+
+其它类型的全局监听也是同样的方法访问标签。
+
+### 拦截器中访问标签
+
+自 v2.0.1 起，OkHttps 支持在拦截器内访问标签，可通过`Request`对象拿到整个标签串：
+
+```java
+HTTP http = HTTP.builder()
+        // OkHttpClient 原生配置
+        .config(b -> {
+            // 添加拦截器
+            b.addInterceptor(chain -> {
+
+                // 拿到 Request 对象
+                Request request = chain.request();
+                // 拿到整个标签串
+                String tag = request.tag(String.class);
+                
+                // ...
+            });
+        })
+        // ...
+```
+
+拦截器的配置，可参见 [配置 OkHttpClient](/v2/configuration.html#配置-okhttpclient) 章节。
+
+### 使用标签取消请求
+
+当使用标签后，还可以按标签批量的对HTTP任务进行取消：
 
 ```java
 int count = http.cancel("B");  //（2）（3）（4）（6）被取消（取消标签包含"B"的任务）
@@ -580,7 +650,7 @@ System.out.println(count);     // 输出 4
 
 取消请求任务，只是标签的一个附带功能。
 
-标签 真正的强大之处在于：它可以和 [预处理器](/v2/configuration.html#并行预处理器) 和 [全局监听](/v2/configuration.html#全局监听) 配合使用，以此来扩展很多功能。可参考 [串行预处理器（token问题最佳解决方案）](/v2/configuration.html#串行预处理器（token问题最佳解决方案）)和 [安卓-自动加载框](/v2/android.html#自动加载框) 等章节。
+标签 真正的强大之处在于：它可以和 [预处理器](/v2/configuration.html#并行预处理器) 和 [全局监听](/v2/configuration.html#全局监听) 及 拦截器 配合使用，以此来扩展很多功能。可参考 [串行预处理器（token问题最佳解决方案）](/v2/configuration.html#串行预处理器（token问题最佳解决方案）)和 [安卓-自动加载框](/v2/android.html#自动加载框) 等章节。
 
 另外，请求任务的取消，还有更多的方式，可参考 [取消请求](/v2/foundation.html#取消请求) 章节
 
@@ -699,7 +769,7 @@ http.async("/users/1")
 
 　　在 OkHttps 里取消请求共有 **4 种** 方式可选：
 
-**1、** 使用`HttpCall#cancel()`取消单个请求（适用于异步请求，[详见 3.3 章节](#33-httpcall)）
+**1、** 使用`HttpCall#cancel()`取消单个请求（适用于异步请求，[详见`HttpCall`章节](/v2/foundation.html#httpcall)）
 
 **2、** 使用`HttpTask#cancel()`取消单个请求（适用于所有请求）（since v1.0.4）
 
@@ -715,7 +785,7 @@ task.get(); // 发起 GET 请求
 boolean canceled = task.cancel();   
 ```
 
-**3、** 使用`HTTP#cancel(String tag)`按标签批量取消请求（适用于所有请求，[详见第 5 章节](#5-使用标签)）
+**3、** 使用`HTTP#cancel(String tag)`按标签批量取消请求（适用于所有请求，[详见 标签 章节](/v2/foundation.html#使用标签)）
 
 **4、** 使用`HTTP#cancelAll()`取消所有请求（适用于所有请求）（since v1.0.2）
 
