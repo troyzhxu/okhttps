@@ -26,14 +26,27 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 
 项目 | 最新版本 | 描述
 -|-|-
-okhttps | 2.0.1 | OkHttps 核心模块
-okhttps-fastjson | 2.0.1 | 扩展包：与 fastjson 集成
-okhttps-gson | 2.0.1 | 扩展包：与 gson 集成
-okhttps-jackson | 2.0.1 | 扩展包：与 jackson 集成
+okhttps | 2.1.0 | OkHttps 核心模块
+okhttps-fastjson | 2.1.0 | 扩展包：与 fastjson 集成
+okhttps-gson | 2.1.0 | 扩展包：与 gson 集成
+okhttps-jackson | 2.1.0 | 扩展包：与 jackson 集成
 
 以上是官方维护的与三大 JSON 框架集成的案例，后续将提供 xml 和 protobuf 的集成。
 
-## v2.x 的新特性
+## v2.1 的新特性
+
+* 对异步请求的响应提供了 6 种便捷回调方法，在不关心具体状态时（与全局响应监听组合使用），使用非常方便；
+  - `setOnResBody` 在回调里直接取得`Body`对象，无需再使用`res.getBody()`
+  - `setOnResBean` 在回调里直接取得 Java Bean 对象，无需再使用`res.getBody().toBean(Class<?>)`
+  - `setOnResList` 在回调里直接取得 Java List 列表，无需再使用`res.getBody().toList(Class<?>)`
+  - `setOnResMapper` 在回调里直接取得 Mapper 对象，无需再使用`res.getBody().toMapper()`
+  - `setOnResArray` 在回调里直接取得 Array 对象，无需再使用`res.getBody().toArray()`
+  - `setOnResString` 在回调里直接取得 String 对象，无需再使用`res.getBody().toString()`
+
+* 优化性能：使用`HTTP#newBuilder()`方法克隆`HTTP`实例时，新实例与旧实例之间资源共享最大化。
+
+
+## v2.0 的新特性
 
 * HTTP 任务新增`patch()`和`head()`方法，可发起 PATCH 和 HEAD 请求，目前直接支持的 HTTP 方法有：GET、POST、PUT、PATCH、DELETE，并且暴露了`request(String method)`方法，可自定义发起任何请求，如：HEAD、OPTIONS、TRACE、CONNECT 等；
 

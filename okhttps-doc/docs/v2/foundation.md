@@ -68,8 +68,11 @@ OkHttps 的回调函数全部使用单方法模式，这样可以充分利用 Ja
 
 ```java
 http.async("/users")        // http://api.demo.com/users
-        .setOnResponse((HttpResult result) -> {
+        .setOnResponse((HttpResult res) -> {
             // 响应回调
+            int status = res.getStatus();       // 状态码
+            Headers headers = res.getHeaders(); // 响应头
+            Body body = res.getBody();          // 报文体
         })
         .setOnException((IOException e) -> {
             // 异常回调
@@ -92,6 +95,36 @@ OkHttps 同时还支持 **全局回调** 和 **回调阻断** 机制，详见 [�
 * 只有异步请求才可以设置这三种（响应|异常|完成）回调
 * 同步请求直接返回结果，无需使用回调
 :::
+
+### 便捷回调
+
+OkHttps 自 v2.1.0 起，对异步请求提供了 **6** 种便捷回调方法，它们都是`OnResponse`回调的简化版，当在具体请求中不关心状态码和响应头信息时，使用起来非常方便：
+
+```java
+http.async("/users")        // http://api.demo.com/users
+        .setOnResBody(body -> {
+            // 得到响应报文体 Body 对象
+        })
+        .setOnResMapper(mapper -> {
+            // 得到响应报文体反序列化后的 Mapper 对象
+        })
+        .setOnResArray(array -> {
+            // 得到响应报文体反序列化后的 Array 对象
+        })
+        .setOnResBean(Bean.class, bean -> {
+            // 得到响应报文体根据 Bean.class 反序列化后的 Java Bean 对象
+        })
+        .setOnResList(Bean.class, list -> {
+            // 得到响应报文体根据 Bean.class 反序列化后的 Java Bean 列表
+        })
+        .setOnResString(str -> {
+            // 得到响应报文体的字符串 String 对象
+        })
+        .get();
+```
+
+以上的便捷回调里，无法像`OnResponse`那样获得响应的状态码和头信息，所以最好和 [全局回调监听](/v2/configuration.html#全局回调监听) 配合使用。在全局回调里对错误码先做统一处理。
+
 
 ### 进度回调
 
@@ -764,6 +797,11 @@ http.async("/users/1")
         })
         .get();
 ```
+
+::: warning
+如果你开发的是安卓应用，我们强烈建议你添加 [全局异常监听](/v2/configuration.html#全局回调监听)，这样当你在某个请求中忘记使用`OnException`或`nothrow`，而它又发生了超时或网络异常时，不至于让程序崩溃。
+:::
+
 
 ## 取消请求
 
