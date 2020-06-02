@@ -6,6 +6,7 @@ import okio.Okio;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class FastjsonMsgConvertor implements MsgConvertor, ConvertProvider {
 	}
 
 	@Override
-	public <T> T toBean(Class<T> type, InputStream in, Charset charset) {
+	public <T> T toBean(Type type, InputStream in, Charset charset) {
 		return JSON.parseObject(toString(in, charset), type);
 	}
 

@@ -2,6 +2,7 @@ package com.ejlchina.okhttps;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.List;
 
@@ -57,7 +58,7 @@ public interface MsgConvertor {
 	 * @param charset 编码格式
 	 * @return Java Bean
 	 */
-	<T> T toBean(Class<T> type, InputStream in, Charset charset);
+	<T> T toBean(Type type, InputStream in, Charset charset);
 
 	/**
 	 * 解析为 Java List
@@ -115,7 +116,7 @@ public interface MsgConvertor {
 		}
 
 		@Override
-		public <T> T toBean(Class<T> type, InputStream in, Charset charset) {
+		public <T> T toBean(Type type, InputStream in, Charset charset) {
 			return convertor.toBean(type, in, charset);
 		}
 

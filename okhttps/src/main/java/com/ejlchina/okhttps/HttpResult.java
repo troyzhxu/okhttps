@@ -193,7 +193,6 @@ public interface HttpResult {
 		Body close();
 		
 	}
-	
 
 	/**
 	 * @return 执行状态
