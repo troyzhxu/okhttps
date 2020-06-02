@@ -15,6 +15,11 @@ public class XmlMsgConvertorTest extends BaseMsgConvertorTest {
 	}
 
 	@Override
+	String getResultUserObjectStr() {
+		return null;
+	}
+
+	@Override
 	String getUserListStr() {
 		return "<ArrayList><item><id>1</id><name>Jack</name></item><item><id>2</id><name>Tom</name></item></ArrayList>";
 	}
