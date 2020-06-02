@@ -3,6 +3,7 @@ package com.ejlchina.okhttps.internal;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -45,8 +46,8 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
     private boolean resBeanOnIO;
     private boolean resListOnIO;
     
-    private Class<?> beanType;
-    
+    private Type beanType;
+	private Class<?> listType;
     
 	public AsyncHttpTask(HttpClient client, String url) {
 		super(client, url);
@@ -113,14 +114,30 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
         nextOnIO = false;
         return this;
     }
-    
+
+	/**
+	 * 设置请求得到响应后的回调函数
+	 * @param onResBean 响应 Bean 回调
+	 * @return HttpTask 实例
+	 */
+	public <T> AsyncHttpTask setOnResBean(TypeRef<T> type, OnCallback<T> onResBean) {
+		initBeanType(type.getType());
+		this.onResBean = onResBean;
+		resBeanOnIO = nextOnIO;
+		nextOnIO = false;
+		return this;
+	}
+
 	/**
 	 * 设置请求得到响应后的回调函数
 	 * @param onResList 请求响应回调
 	 * @return HttpTask 实例
 	 */
     public <T> AsyncHttpTask setOnResList(Class<T> type, OnCallback<List<T>> onResList) {
-    	initBeanType(type);
+		if (type == null) {
+			throw new IllegalArgumentException(" list type can not be null!");
+		}
+    	listType = type;
     	this.onResList = onResList;
     	resListOnIO = nextOnIO;
         nextOnIO = false;
@@ -389,14 +406,14 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 				Object bean = body.toBean(beanType);
 				execute(() -> {
 					try {
-						callbackMethod(onResBean.getClass(), beanType).invoke(onResBean, bean);
+						callbackMethod(onResBean.getClass(), bean.getClass()).invoke(onResBean, bean);
 					} catch (IllegalAccessException | InvocationTargetException e) {
 						throw new HttpException("回调方法调用失败！", e);
 					}
 				}, resBeanOnIO);
 			}
 			if (onResList != null) {
-				List<?> list = body.toList(beanType);
+				List<?> list = body.toList(listType);
 				execute(() -> {
 					try {
 						callbackMethod(onResList.getClass(), list.getClass()).invoke(onResList, list);
@@ -459,12 +476,12 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 		}
 	}
 	
-    private void initBeanType(Class<?> type) {
+    private void initBeanType(Type type) {
     	if (type == null) {
     		throw new IllegalArgumentException(" bean type can not be null!");
     	}
-    	if (beanType != null && beanType != type) {
-    		throw new IllegalStateException("多次设置 bean type 必须一致！");
+    	if (beanType != null) {
+    		throw new IllegalStateException("已经添加了 OnResBean 回调！");
     	}
     	beanType = type;
     }
