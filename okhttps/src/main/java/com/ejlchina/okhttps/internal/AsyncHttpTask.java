@@ -356,8 +356,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 				HttpResult result = new RealHttpResult(AsyncHttpTask.this, response, executor);
 				onCallback(httpCall, result, () -> {
 					executor.executeOnComplete(AsyncHttpTask.this, onComplete, State.RESPONSED, completeOnIO);
-					executor.executeOnResponse(AsyncHttpTask.this, complexOnResponse(), result,
-							onResponse == null || responseOnIO);
+					executor.executeOnResponse(AsyncHttpTask.this, complexOnResponse(), result, true);
 				});
             }
 
@@ -366,43 +365,50 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
     }
 
     private OnCallback<HttpResult> complexOnResponse() {
-		int count = responseCallbackCount();
-		if (count == 0 || count == 1 && onResponse != null) {
-			return onResponse;
-		}
 		return res -> {
+			int count = responseCallbackCount();
 			HttpResult.Body body = res.getBody();
-			if (count > 1)
+			if (count > 1) {
 				body.cache();
-			if (onResponse != null)
-				onResponse.on(res);
-			if (onResBody != null)
+			}
+			if (onResponse != null) {
+				execute(() -> onResponse.on(res), responseOnIO);
+			}
+			if (onResBody != null) {
 				execute(() -> onResBody.on(body), resBodyOnIO);
-			if (onResMapper != null)
-				execute(() -> onResMapper.on(body.toMapper()), resMapperOnIO);
-			if (onResArray != null)
-				execute(() -> onResArray.on(body.toArray()), resArrayOnIO);
+			}
+			if (onResMapper != null) {
+				Mapper mapper = body.toMapper();
+				execute(() -> onResMapper.on(mapper), resMapperOnIO);
+			}
+			if (onResArray != null) {
+				Array array = body.toArray();
+				execute(() -> onResArray.on(array), resArrayOnIO);
+			}
 			if (onResBean != null) {
+				Object bean = body.toBean(beanType);
 				execute(() -> {
 					try {
-						callbackMethod(onResBean.getClass(), beanType).invoke(onResBean, body.toBean(beanType));
+						callbackMethod(onResBean.getClass(), beanType).invoke(onResBean, bean);
 					} catch (IllegalAccessException | InvocationTargetException e) {
 						throw new HttpException("回调方法调用失败！", e);
 					}
 				}, resBeanOnIO);
 			}
 			if (onResList != null) {
+				List<?> list = body.toList(beanType);
 				execute(() -> {
 					try {
-						List<?> list = body.toList(beanType);
 						callbackMethod(onResList.getClass(), list.getClass()).invoke(onResList, list);
 					} catch (IllegalAccessException | InvocationTargetException e) {
 						throw new HttpException("回调方法调用失败！", e);
 					}
 				}, resListOnIO);
 			}
-			if (onResString != null)
-				execute(() -> onResString.on(body.toString()), resStringOnIO);
+			if (onResString != null) {
+				String string = body.toString();
+				execute(() -> onResString.on(string), resStringOnIO);
+			}
 		};
 	}
 

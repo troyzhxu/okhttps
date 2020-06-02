@@ -33,7 +33,7 @@ public class ProcessRequestBody extends RequestBody {
 	}
 
 	@Override
-	public long contentLength() throws IOException {
+	public long contentLength() {
 		return process.getTotalBytes();
 	}
 

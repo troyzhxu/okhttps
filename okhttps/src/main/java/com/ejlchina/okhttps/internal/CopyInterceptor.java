@@ -25,6 +25,10 @@ public class CopyInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
         Response response = chain.proceed(request);
+        String tag = request.tag(String.class);
+        if (tag == null || !tag.contains(TAG)) {
+            return response;
+        }
         ResponseBody body = response.body();
         String type = response.header("Content-Type");
         if (body == null || type != null && (type.contains("octet-stream")
@@ -34,8 +38,9 @@ public class CopyInterceptor implements Interceptor {
             // 若是下载文件，则必须指定在 IO 线程操作
             return response;
         }
-        ResponseBody newBody = ResponseBody.create(body.contentType(), body.bytes());
-        return response.newBuilder().body(newBody).build();
+        return response.newBuilder()
+                .body(ResponseBody.create(body.contentType(), body.bytes()))
+                .build();
     }
 
 }
