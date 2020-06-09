@@ -1,8 +1,13 @@
 package com.ejlchina.okhttps;
 
+import com.ejlchina.okhttps.HttpResult.State;
+import com.ejlchina.okhttps.internal.*;
+import com.ejlchina.okhttps.internal.HttpClient.TagTask;
+import okhttp3.*;
+import okhttp3.internal.http.HttpMethod;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -12,15 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import com.ejlchina.okhttps.HttpResult.State;
-import com.ejlchina.okhttps.internal.*;
-import com.ejlchina.okhttps.internal.HttpClient.TagTask;
-
-import okhttp3.*;
-import okhttp3.internal.Util;
-import okhttp3.internal.http.HttpMethod;
-import okio.Buffer;
 
 /**
  * Created by 周旭（Troy.Zhou） on 2020/3/11.
@@ -149,11 +145,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
 		this.skipSerialPreproc = true;
 		return (C) this;
 	}
-
-    @Deprecated
-    public C setTag(String tag) {
-	    return tag(tag);
-    }
 
     /**
      * @since 2.0.0.RC
@@ -292,11 +283,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         this.stepBytes = stepBytes;
         return (C) this;
     }
-    
-    @Deprecated
-    public C setStepBytes(long stepBytes) {
-        return stepBytes(stepBytes);
-    }
 
     /**
      * 设置进度回调的步进比例
@@ -307,16 +293,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     public C stepRate(double stepRate) {
         this.stepRate = stepRate;
         return (C) this;
-    }
-    
-    @Deprecated
-    public C setStepRate(double stepRate) {
-        return stepRate(stepRate);
-    }
-
-    @Deprecated
-    public C addPathParam(String name, Object value) {
-        return addPathPara(name, value);
     }
 
     /**
@@ -335,11 +311,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         return (C) this;
     }
 
-    @Deprecated
-    public C addPathParam(Map<String, ?> params) {
-        return addPathPara(params);
-    }
-
     /**
      * 路径参数：替换URL里的{name}
      * @param params 参数集合
@@ -351,11 +322,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         }
         doAddParams(pathParams, params);
         return (C) this;
-    }
-
-    @Deprecated
-    public C addUrlParam(String name, Object value) {
-        return addUrlPara(name, value);
     }
 
     /**
@@ -374,11 +340,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         return (C) this;
     }
 
-    @Deprecated
-    public C addUrlParam(Map<String, ?> params) {
-        return addUrlPara(params);
-    }
-
     /**
      * URL参数：拼接在URL后的参数
      * @param params 参数集合
@@ -390,11 +351,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         }
         doAddParams(urlParams, params);
         return (C) this;
-    }
-
-    @Deprecated
-    public C addBodyParam(String name, Object value) {
-        return addBodyPara(name, value);
     }
 
     /**
@@ -411,11 +367,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             bodyParams.put(name, value.toString());
         }
         return (C) this;
-    }
-
-    @Deprecated
-    public C addBodyParam(Map<String, ?> params) {
-        return addBodyPara(params);
     }
 
     /**
@@ -443,58 +394,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     /**
-     * 推荐方案：setBodyPara 与 bodyType 方法
-     * Json参数：请求体为Json，支持多层结构
-     * @param name JSON键名
-     * @param value JSON键值
-     * @return HttpTask 实例
-     */
-    @Deprecated
-    public C addJsonParam(String name, Object value) {
-        this.bodyType = OkHttps.JSON;
-        return addBodyPara(name, value);
-    }
-
-    /**
-     * 推荐方案：setBodyPara 与 bodyType 方法
-     * Json参数：请求体为Json，只支持单层Json
-     * 若请求json为多层结构，请使用setRequestJson方法
-     * @param params JSON键值集合
-     * @return HttpTask 实例
-     */
-    @Deprecated
-    public C addJsonParam(Map<String, ?> params) {
-        this.bodyType = OkHttps.JSON;
-        return addBodyPara(params);
-    }
-
-    /**
-     * 推荐方案：setBodyPara 与 bodyType 方法
-     * 设置 json 请求体
-     * @param body JSON字符串 或 Java对象（将依据 对象的get方法序列化为 json 字符串）
-     * @return HttpTask 实例
-     **/
-    @Deprecated
-    public C setRequestJson(Object body) {
-        this.bodyType = OkHttps.JSON;
-        return setBodyPara(body);
-    }
-
-    /**
-     * 此方法性能较低
-     * 推荐方案：setBodyPara 与 bodyType 方法，日期格式在 Java Bean 上使用注解的方式指定
-     * @param body Json 请求体
-     * @param dateFormat 日期格式
-     * @return HttpTask 实例
-     */
-    @Deprecated
-    public C setRequestJson(Object body, String dateFormat) {
-        this.bodyType = OkHttps.JSON;
-        this.dateFormat = dateFormat;
-        return setBodyPara(body);
-    }
-
-    /**
      * 设置 json 请求体
      * @param body 请求体，字节数组、字符串 或 Java对象（由 MsgConvertor 来序列化）
      * @return HttpTask 实例
@@ -502,11 +401,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     public C setBodyPara(Object body) {
         this.requestBody = body;
         return (C) this;
-    }
-
-    @Deprecated
-    public C addFileParam(String name, String filePath) {
-        return addFilePara(name, filePath);
     }
 
     /**
@@ -517,11 +411,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      */
     public C addFilePara(String name, String filePath) {
         return addFilePara(name, new File(filePath));
-    }
-
-    @Deprecated
-    public C addFileParam(String name, File file) {
-        return addFilePara(name, file);
     }
 
     /**
@@ -543,51 +432,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     /**
-     * 建议直接使用文件上传，使用输入流性能较差
-     * 添加文件参数
-     * @param name 参数名
-     * @param type 文件类型: 如 png、jpg、jpeg 等
-     * @param inputStream 文件输入流
-     * @return HttpTask 实例
-     */
-    @Deprecated
-    public C addFileParam(String name, String type, InputStream inputStream) {
-        return addFileParam(name, type, null, inputStream);
-    }
-
-    /**
-     * 建议直接使用文件上传，使用输入流性能较差
-     * 添加文件参数
-     * @param name 参数名
-     * @param type 文件类型: 如 png、jpg、jpeg 等
-     * @param fileName 文件名
-     * @param input 文件输入流
-     * @return HttpTask 实例
-     */
-    @Deprecated
-    public C addFileParam(String name, String type, String fileName, InputStream input) {
-        if (name != null && input != null) {
-            byte[] content = null;
-            try {
-                Buffer buffer = new Buffer();
-                content = buffer.readFrom(input).readByteArray();
-                buffer.close();
-            } catch (IOException e) {
-                throw new HttpException("读取文件输入流出错：", e);
-            } finally {
-                Util.closeQuietly(input);
-            }
-            addFilePara(name, type, fileName, content);
-        }
-        return (C) this;
-    }
-
-    @Deprecated
-    public C addFileParam(String name, String type, byte[] content) {
-        return addFilePara(name, type, content);
-    }
-
-    /**
      * 添加文件参数
      * @param name 参数名
      * @param type 文件类型: 如 png、jpg、jpeg 等
@@ -596,11 +440,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      */
     public C addFilePara(String name, String type, byte[] content) {
         return addFilePara(name, type, null, content);
-    }
-
-    @Deprecated
-    public C addFileParam(String name, String type, String fileName, byte[] content) {
-        return addFilePara(name, type, fileName, content);
     }
 
     /**
