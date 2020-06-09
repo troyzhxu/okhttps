@@ -300,6 +300,11 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 			return call.getResult();
 		}
 
+		@Override
+		public AsyncHttpTask getTask() {
+			return AsyncHttpTask.this;
+		}
+
     }
 
     class OkHttpCall implements HttpCall {
@@ -340,6 +345,11 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 				}
 			}
 			return result;
+		}
+
+		@Override
+		public AsyncHttpTask getTask() {
+			return AsyncHttpTask.this;
 		}
 
 		void setResult(HttpResult result) {
