@@ -69,13 +69,13 @@ public class ListenerTests extends BaseTest {
 
 
         http.sync(url)
-                .setTag("ASD")
+                .tag("ASD")
                 .get()
                 .getBody()
                 .setOnProcess((Process process) -> {
                     println(t0, process.getDoneBytes() + "/" + process.getTotalBytes() + "\t" + process.getRate());
                 })
-                .setStepRate(0.01)
+                .stepRate(0.01)
                 .toFolder("D:/download/")
                 .nextOnIO()
                 .setOnSuccess((File file) -> {

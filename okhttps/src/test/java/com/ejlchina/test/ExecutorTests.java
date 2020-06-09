@@ -17,7 +17,7 @@ public class ExecutorTests extends BaseTest {
                 }).build();
 
         http.async("http://47.100.7.202/ejl-test.zip")
-                .addBodyParam("name", "Jack")
+                .addBodyPara("name", "Jack")
 //				.nextOnIO()
                 .setOnProcess((Process process) -> {
                     println("process： " + process.getRate());

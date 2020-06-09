@@ -15,15 +15,15 @@ public class UploadTests extends BaseTest {
         long t0 = System.currentTimeMillis();
 
         String res = http.sync("http://localhost:8080/test/index")
-                .addBodyParam("data", data)
-                .addFileParam("file", "D:\\WorkSpace\\download\\CocosDashboard-v1.0.1-win32-031816.exe")
-                .setStepRate(0.01)
+                .addBodyPara("data", data)
+                .addFilePara("file", "D:\\WorkSpace\\download\\CocosDashboard-v1.0.1-win32-031816.exe")
+                .stepRate(0.01)
                 .setOnProcess((Process process) -> {
                     println(t0, "上传：" + process.getDoneBytes() + "/" + process.getTotalBytes() + "\t" + process.getRate());
                 })
                 .post()
                 .getBody()
-                .setStepBytes(5)
+                .stepBytes(5)
                 .setOnProcess((Process process) -> {
                     println(t0, "下载：" + process.getDoneBytes() + "/" + process.getTotalBytes() + "\t" + process.getRate());
                 })
