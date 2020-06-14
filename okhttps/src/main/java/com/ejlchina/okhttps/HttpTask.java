@@ -78,6 +78,22 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     /**
+     * @since 2.2.0
+     * @return 是否是 同步 Http 请求
+     */
+    public boolean isSyncHttp() {
+        return false;
+    }
+
+    /**
+     * @since 2.2.0
+     * @return 是否是 异步 Http 请求
+     */
+    public boolean isAsyncHttp() {
+        return false;
+    }
+
+    /**
      * 获取请求任务的标签
      * @return 标签
      */

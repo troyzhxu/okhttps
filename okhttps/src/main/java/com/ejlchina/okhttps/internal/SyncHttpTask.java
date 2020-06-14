@@ -23,8 +23,14 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
 	public SyncHttpTask(HttpClient client, String url) {
 		super(client, url);
 	}
-	
-    /**
+
+
+	@Override
+	public boolean isSyncHttp() {
+		return true;
+	}
+
+	/**
      * 发起 GET 请求（Rest：获取资源，幂等）
      * @return 请求结果  
      */

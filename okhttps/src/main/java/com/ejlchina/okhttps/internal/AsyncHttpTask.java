@@ -54,6 +54,11 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 	}
 
 
+	@Override
+	public boolean isAsyncHttp() {
+		return true;
+	}
+
 	/**
 	 * 设置请求执行异常后的回调函数，设置后，相关异常将不再向上抛出
 	 * @param onException 请求异常回调
