@@ -29,14 +29,6 @@ public class FastjsonMsgConvertor implements MsgConvertor, ConvertProvider {
 
 	@Override
 	public byte[] serialize(Object object, Charset charset) {
-		return serialize(object, null, charset);
-	}
-
-	@Override
-	public byte[] serialize(Object object, String dateFormat, Charset charset) {
-		if (dateFormat != null) {
-			return JSON.toJSONStringWithDateFormat(object, dateFormat).getBytes(charset);
-		}
 		return JSON.toJSONString(object).getBytes(charset);
 	}
 

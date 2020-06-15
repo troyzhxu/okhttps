@@ -1,24 +1,22 @@
 package com.ejlchina.okhttps;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Type;
-import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.ejlchina.okhttps.internal.HttpException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.CollectionType;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 
@@ -74,18 +72,8 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 
 	@Override
 	public byte[] serialize(Object object, Charset charset) {
-		return serialize(object, null, charset);
-	}
-
-	@Override
-	public byte[] serialize(Object object, String dateFormat, Charset charset) {
-		ObjectMapper mapper = objectMapper;
-		if (dateFormat != null) {
-			mapper = mapper.copy().configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-					.setDateFormat(new SimpleDateFormat(dateFormat));
-		}
 		try {
-			return mapper.writeValueAsString(object).getBytes(charset);
+			return objectMapper.writeValueAsString(object).getBytes(charset);
 		} catch (JsonProcessingException e) {
 			throw new HttpException("Java Bean [" + object + "] Jackson 序列化异常", e);
 		}

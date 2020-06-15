@@ -42,15 +42,6 @@ public interface MsgConvertor {
 	byte[] serialize(Object object, Charset charset);
 	
 	/**
-	 * 将 Java 对象序列化为字节数组
-	 * @param object Java 对象
-	 * @param dateFormat 日期类的处理格式
-	 * @param charset 编码格式
-	 * @return 字节数组
-	 */
-	byte[] serialize(Object object, String dateFormat, Charset charset);
-	
-	/**
 	 * 解析 Java Bean
 	 * @param <T> 目标泛型
 	 * @param type 目标类型
@@ -98,12 +89,7 @@ public interface MsgConvertor {
 
 		@Override
 		public byte[] serialize(Object object, Charset charset) {
-			return serialize(object, null, charset);
-		}
-
-		@Override
-		public byte[] serialize(Object object, String dateFormat, Charset charset) {
-			byte[] data = convertor.serialize(object, dateFormat, charset);
+			byte[] data = convertor.serialize(object, charset);
 			Mapper mapper = convertor.toMapper(new ByteArrayInputStream(data), charset);
 			StringBuilder sb = new StringBuilder();
 			for (String key: mapper.keySet()) {

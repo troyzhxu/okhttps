@@ -38,7 +38,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     private Map<String, String> bodyParams;
     private Map<String, FilePara> files;
     private Object requestBody;
-    private String dateFormat;
     private String bodyType;
     private OnCallback<Process> onProcess;
     private boolean processOnIO;
@@ -642,7 +641,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             return RequestBody.create(MediaType.parse(mediaType + "; charset=" + charset.name()), body);
         }
         TaskExecutor.Data<byte[]> data = httpClient.executor()
-                .doMsgConvert(bodyType, (MsgConvertor c) -> c.serialize(object, dateFormat, charset));
+                .doMsgConvert(bodyType, (MsgConvertor c) -> c.serialize(object, charset));
         return RequestBody.create(MediaType.parse(data.mediaType + "; charset=" + charset.name()), data.data);
     }
 
