@@ -86,20 +86,6 @@ public interface HttpResult {
 		 */
 		long getLength();
 
-		/**
-		 * 推荐使用 {@link #getType()} 方法
-		 * @return 媒体类型
-		 */
-		@Deprecated
-		MediaType getContentType();
-		
-		/**
-		 * 推荐使用 {@link #getLength()} 方法
-		 * @return 报文体字节长度
-		 */
-		@Deprecated
-		long getContentLength();
-
 	    /**
 	     * 在IO线程执行
 	     * @return Body
@@ -122,24 +108,12 @@ public interface HttpResult {
 		Body stepBytes(long stepBytes);
 
 		/**
-		 * 推荐使用 {@link #stepBytes(long)} 方法
-		 */
-		@Deprecated
-		Body setStepBytes(long stepBytes);
-
-		/**
 		 * 设置进度回调的步进比例
 		 * 表示每接收 stepRate 比例，执行一次进度回调
 		 * @param stepRate 步进比例
 		 * @return Body
 		 */
 		Body stepRate(double stepRate);
-
-		/**
-		 * 推荐使用 {@link #stepRate(double)} 方法
-		 */
-		@Deprecated
-		Body setStepRate(double stepRate);
 
 		/**
 		 * 设置进度回调忽略响应的Range头信息，即进度回调会从0开始
@@ -193,7 +167,6 @@ public interface HttpResult {
 		Body close();
 		
 	}
-	
 
 	/**
 	 * @return 执行状态

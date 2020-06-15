@@ -28,7 +28,7 @@ public class CancelTests extends BaseTest {
         }).start();
         
         http.async("/ejlchina/comm/provinces")
-        	.setTag("A")
+        	.tag("A")
         	.setOnResponse((HttpResult result) -> {
         		println("异步：result = " + result);
         	})
@@ -39,7 +39,7 @@ public class CancelTests extends BaseTest {
         
         try {
 	        HttpResult result = http.sync("/ejlchina/comm/provinces")
-	        		.setTag("A")
+	        		.tag("A")
 	        		.get();
 	        
 	        println("同步：result = " + result);
@@ -66,7 +66,7 @@ public class CancelTests extends BaseTest {
                 .setOnComplete((HttpResult.State state) -> {
                     println(state);
                 })
-                .setTag("A")
+                .tag("A")
                 .get();
 
         println(((HttpClient) http).getTagTaskCount());
@@ -75,7 +75,7 @@ public class CancelTests extends BaseTest {
                 .setOnResponse((HttpResult result) -> {
                     println(result);
                 })
-                .setTag("A.B")
+                .tag("A.B")
                 .get();
 
         println(((HttpClient) http).getTagTaskCount());
@@ -84,7 +84,7 @@ public class CancelTests extends BaseTest {
                 .setOnResponse((HttpResult result) -> {
                     println(result);
                 })
-                .setTag("B.C")
+                .tag("B.C")
                 .get();
 
         println(((HttpClient) http).getTagTaskCount());
@@ -93,7 +93,7 @@ public class CancelTests extends BaseTest {
                 .setOnResponse((HttpResult result) -> {
                     println(result);
                 })
-                .setTag("C")
+                .tag("C")
                 .get();
 
         println(((HttpClient) http).getTagTaskCount());

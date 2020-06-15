@@ -1,12 +1,10 @@
 package com.ejlchina.okhttps.internal;
 
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.List;
 
-import com.ejlchina.okhttps.Array;
-import com.ejlchina.okhttps.Mapper;
-import com.ejlchina.okhttps.MsgConvertor;
-import com.ejlchina.okhttps.Toable;
+import com.ejlchina.okhttps.*;
 
 public abstract class AbstractBody implements Toable {
 
@@ -36,6 +34,20 @@ public abstract class AbstractBody implements Toable {
 
 	@Override
 	public <T> T toBean(Class<T> type) {
+		return doToBean(type);
+	}
+
+	@Override
+	public <T> T toBean(Type type) {
+		return doToBean(type);
+	}
+
+	@Override
+	public <T> T toBean(TypeRef<T> type) {
+		return doToBean(type.getType());
+	}
+
+	public <T> T doToBean(Type type) {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Bean 转换！");
 		}

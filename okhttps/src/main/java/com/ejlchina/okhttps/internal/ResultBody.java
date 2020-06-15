@@ -54,16 +54,6 @@ public class ResultBody extends AbstractBody implements Body {
 	}
 
 	@Override
-	public MediaType getContentType() {
-		return getType();
-	}
-
-	@Override
-	public long getContentLength() {
-		return getLength();
-	}
-	
-	@Override
     public Body nextOnIO() {
     	onIO = true;
     	return this;
@@ -88,19 +78,9 @@ public class ResultBody extends AbstractBody implements Body {
 	}
 
 	@Override
-	public Body setStepBytes(long stepBytes) {
-		return stepBytes(stepBytes);
-	}
-
-	@Override
 	public Body stepRate(double stepRate) {
 		this.stepRate = stepRate;
 		return this;
-	}
-
-	@Override
-	public Body setStepRate(double stepRate) {
-		return stepRate(stepRate);
 	}
 
 	@Override
@@ -124,7 +104,7 @@ public class ResultBody extends AbstractBody implements Body {
 		}
 		if (onProcess != null) {
 			long rangeStart = getRangeStart();
-			long totalBytes = getContentLength();
+			long totalBytes = getLength();
 			if (!rangeIgnored) {
 				totalBytes += rangeStart;
 			}

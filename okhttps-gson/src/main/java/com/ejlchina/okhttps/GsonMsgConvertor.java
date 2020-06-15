@@ -2,6 +2,7 @@ package com.ejlchina.okhttps;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,7 +55,7 @@ public class GsonMsgConvertor implements MsgConvertor, ConvertProvider {
 	}
 
 	@Override
-	public <T> T toBean(Class<T> type, InputStream in, Charset charset) {
+	public <T> T toBean(Type type, InputStream in, Charset charset) {
 		return gson.fromJson(new InputStreamReader(in), type);
 	}
 

@@ -23,7 +23,7 @@ public class TagTests extends BaseTest {
                 .build();
 
         http.async("http://www.baidu.com")
-                .setTag("AA")
+                .tag("AA")
                 .setOnResponse((HttpResult result) -> {
                     throw new RuntimeException("我是一个异常");
                 })

@@ -11,5 +11,5 @@ public class TestCase {
 		MsgConvertor msgConvertor = new GsonMsgConvertor();
 		new JsonMsgConvertorTest(msgConvertor).run();
 	}
-    
+
 }

@@ -96,6 +96,16 @@ public final class OkHttps {
     }
 
     /**
+     * @since 2.2.0
+     * 新的构建器
+     * @return Builder
+     */
+    public static HTTP.Builder newBuilder() {
+        return getHttp().newBuilder();
+    }
+
+
+    /**
      * 获取任务执行器
      * @return TaskExecutor
      */
