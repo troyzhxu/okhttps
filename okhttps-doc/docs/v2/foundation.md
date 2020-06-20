@@ -102,22 +102,25 @@ OkHttps 自 v2.1.0 起，对异步请求提供了 **6** 种便捷回调方法，
 
 ```java
 http.async("/users")        // http://api.demo.com/users
-        .setOnResBody(body -> {
+        .setOnResBody(Body body -> {
             // 得到响应报文体 Body 对象
         })
-        .setOnResMapper(mapper -> {
+        .setOnResMapper(Mapper mapper -> {
             // 得到响应报文体反序列化后的 Mapper 对象
         })
-        .setOnResArray(array -> {
+        .setOnResArray(Array array -> {
             // 得到响应报文体反序列化后的 Array 对象
         })
-        .setOnResBean(Bean.class, bean -> {
+        .setOnResBean(Bean.class, User bean -> {
             // 得到响应报文体根据 Bean.class 反序列化后的 Java Bean 对象
         })
-        .setOnResList(Bean.class, list -> {
+        .setOnResBean(new TypeRef<Result<Bean>>(){}, Result<Bean> result -> {
+            // 得到响应报文体根据 TypeRef 反序列化后的 复合泛型 对象
+        })
+        .setOnResList(Bean.class, List<Bean> list -> {
             // 得到响应报文体根据 Bean.class 反序列化后的 Java Bean 列表
         })
-        .setOnResString(str -> {
+        .setOnResString(String str -> {
             // 得到响应报文体的字符串 String 对象
         })
         .get();
@@ -226,6 +229,8 @@ OkHttps 的所有回调函数都默认在 IO 线程执行，若要切换默认�
     * `toCharStream()`           报文体转换为字符输入流
     * `toString()`               报文体转换为字符串文本
     * `toBean(Class<T> type)`    报文体根据`type`自动反序列化为 JavaBean（依赖`MsgConvertor`）
+    * `toBean(Type type)`        报文体根据`type`自动反序列化为 JavaBean（依赖`MsgConvertor`）(支持复合泛型)
+    * `toBean(TypeRef<T> type)`  报文体根据`type`自动反序列化为 JavaBean（依赖`MsgConvertor`）(支持复合泛型)
     * `toList(Class<T> type)`    报文体根据`type`自动反序列化为 JavaBean 列表（依赖`MsgConvertor`）
     * `toMapper()`               报文体自动反序列化为映射结构的对象（依赖`MsgConvertor`，v2.0.0.RC 之前是`toJsonObject()`）
     * `toArray()`                报文体自动反序列化为数组结构的对象（依赖`MsgConvertor`，v2.0.0.RC 之前是`toJsonArray()`）

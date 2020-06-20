@@ -26,12 +26,21 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 
 项目 | 最新版本 | 描述
 -|-|-
-okhttps | 2.1.0 | OkHttps 核心模块
-okhttps-fastjson | 2.1.0 | 扩展包：与 fastjson 集成
-okhttps-gson | 2.1.0 | 扩展包：与 gson 集成
-okhttps-jackson | 2.1.0 | 扩展包：与 jackson 集成
+okhttps | 2.2.0 | OkHttps 核心模块
+okhttps-fastjson | 2.2.0 | 扩展包：与 fastjson 集成
+okhttps-gson | 2.2.0 | 扩展包：与 gson 集成
+okhttps-jackson | 2.2.0 | 扩展包：与 jackson 集成
 
 以上是官方维护的与三大 JSON 框架集成的案例，后续将提供 xml 和 protobuf 的集成。
+
+
+## v2.2 的新特性
+
+1. 增强泛型反序列化，支持复合泛型
+2. HttpCall 接口新增 getTask 方法，可获取当前任务
+3. OkHttps 工具类 新增 newBuilder 方法，可用于复制 SPI 方式注入的配置信息
+4. HttpTask 类 新增 isAsyncHttp 和 isSyncHttp 方法（v2.1.0 新增了 isWebsocket 方法）可用于判断 HttpTask 的任务类型
+5. 优化在 Android 端的异步请求性能
 
 ## v2.1 的新特性
 
