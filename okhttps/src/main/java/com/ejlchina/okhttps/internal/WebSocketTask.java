@@ -422,4 +422,12 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		return this;
 	}
 
+	public int pingSeconds() {
+		return pingSeconds;
+	}
+
+	public int pongSeconds() {
+		return pongSeconds;
+	}
+
 }
