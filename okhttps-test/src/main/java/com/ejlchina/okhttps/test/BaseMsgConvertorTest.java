@@ -27,7 +27,6 @@ public abstract class BaseMsgConvertorTest {
         testToArray();
         testSerializeBean();
         testSerializeList();
-        testSerializeWithDateFormat();
         testToBean();
         testToResult();
         testToList();
@@ -86,16 +85,6 @@ public abstract class BaseMsgConvertorTest {
         String json = new String(data, StandardCharsets.UTF_8);
         Assert.assertEquals(getUserListStr(), json);
         System.out.println("case 4 passed!");
-    }
-
-    void testSerializeWithDateFormat() throws ParseException {
-        String dataFormat = "yyyy-MM-dd HH:mm:ss";
-        SimpleDateFormat sdf = new SimpleDateFormat(dataFormat);
-        String date = "2020-05-09 12:30:15";
-        byte[] data = msgConvertor.serialize(new DateBean(1, sdf.parse(date)), dataFormat, StandardCharsets.UTF_8);
-        String json = new String(data, StandardCharsets.UTF_8);
-        Assert.assertTrue(json.contains(date));
-        System.out.println("case 5 passed!");
     }
 
     void testToBean() {
