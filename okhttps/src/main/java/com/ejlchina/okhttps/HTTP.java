@@ -124,6 +124,8 @@ public interface HTTP {
 
         private Executor mainExecutor;
 
+        private Scheduler taskScheduler;
+
         private List<Preprocessor> preprocessors;
 
         private DownListener downloadListener;
@@ -170,6 +172,7 @@ public interface HTTP {
             Collections.addAll(this.preprocessors, hc.preprocessors());
             TaskExecutor executor = hc.executor();
             this.mainExecutor = executor.getMainExecutor();
+            this.taskScheduler = executor.getTaskScheduler();
             this.downloadListener = executor.getDownloadListener();
             this.responseListener = executor.getResponseListener();
             this.exceptionListener = executor.getExceptionListener();
@@ -238,6 +241,12 @@ public interface HTTP {
          */
         public Builder callbackExecutor(Executor executor) {
             this.mainExecutor = executor;
+            return this;
+        }
+
+
+        public Builder taskScheduler(Scheduler scheduler) {
+            this.taskScheduler = scheduler;
             return this;
         }
 
@@ -434,6 +443,10 @@ public interface HTTP {
 
         public MsgConvertor[] msgConvertors() {
             return msgConvertors.toArray(new MsgConvertor[0]);
+        }
+
+        public Scheduler taskScheduler() {
+            return taskScheduler;
         }
 
         public int preprocTimeoutTimes() {

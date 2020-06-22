@@ -13,15 +13,17 @@ public final class TaskExecutor {
 
     private Executor ioExecutor;
     private Executor mainExecutor;
+    private Scheduler taskScheduler;
     private DownListener downloadListener;
     private TaskListener<HttpResult> responseListener;
     private TaskListener<IOException> exceptionListener;
     private TaskListener<State> completeListener;
     private MsgConvertor[] msgConvertors;
     
-    public TaskExecutor(Executor ioExecutor, Executor mainExecutor, DownListener downloadListener, 
+    public TaskExecutor(Executor ioExecutor, Executor mainExecutor, DownListener downloadListener,
             TaskListener<HttpResult> responseListener, TaskListener<IOException> exceptionListener, 
-            TaskListener<State> completeListener, MsgConvertor[] msgConvertors) {
+            TaskListener<State> completeListener, MsgConvertor[] msgConvertors,
+                        Scheduler taskScheduler) {
         this.ioExecutor = ioExecutor;
         this.mainExecutor = mainExecutor;
         this.downloadListener = downloadListener;
@@ -29,6 +31,7 @@ public final class TaskExecutor {
         this.exceptionListener = exceptionListener;
         this.completeListener = completeListener;
         this.msgConvertors = msgConvertors;
+        this.taskScheduler = taskScheduler;
     }
 
     public Executor getExecutor(boolean onIo) {
@@ -188,6 +191,10 @@ public final class TaskExecutor {
 
     public MsgConvertor[] getMsgConvertors() {
         return msgConvertors;
+    }
+
+    public Scheduler getTaskScheduler() {
+        return taskScheduler;
     }
 
 }
