@@ -104,6 +104,11 @@ okhttps-jackson | 2.2.0 | 与 jackson 集成
 * 微信：<img src="https://images.gitee.com/uploads/images/2020/0624/000939_bb563819_1393412.png" width="700px">
 * 邮箱：zhou.xu@ejlchina.com
 
+## 后续计划
+
+* 在 Android 上通过 Kotlin 扩展使异步请求与 LiveData 集成（即将发布、敬请期待）
+* 在 WebSocket 基础上扩展支持 Stomp 协议（即将发布、敬请期待）
+
 ## 参与贡献
 
 1.  Fork 本仓库
