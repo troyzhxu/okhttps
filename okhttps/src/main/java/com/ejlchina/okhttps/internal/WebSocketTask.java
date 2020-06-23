@@ -136,9 +136,11 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			}
 			opened = true;
 			if (pingSeconds > 0) {
+				lastPingSecs = nowSeconds();
 				schedulePing();
 			}
 			if (pongSeconds > 0) {
+				lastPongSecs = nowSeconds();
 				schedulePong();
 			}
 		}
@@ -233,7 +235,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		if (!opened) {
 			return;
 		}
-		int delay = lastPingSecs > 0 ? (int) (pingSeconds + lastPingSecs - nowSeconds()) : pingSeconds;
+		int delay = (int) (pingSeconds + lastPingSecs - nowSeconds());
 		httpClient.executor.requireScheduler().schedule(() -> {
 			if (!opened) {
 				return;
@@ -255,7 +257,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		if (!opened) {
 			return;
 		}
-		int delay = lastPongSecs > 0 ? (int) (pongSeconds + lastPongSecs - nowSeconds()) : pongSeconds;
+		int delay = (int) (pongSeconds + lastPongSecs - nowSeconds());
 		httpClient.executor.requireScheduler().schedule(() -> {
 			if (!opened) {
 				return;
