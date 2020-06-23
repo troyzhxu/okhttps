@@ -239,12 +239,9 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 				return;
 			}
 			if (nowSeconds() - lastPingSecs >= pingSeconds) {
-				if (pingSupplier != null) {
-					webSocket.send(pingSupplier.get());
-				} else {
-					webSocket.send(ByteString.EMPTY);
-				}
-				Platform.logInfo("PING >>>");
+				ByteString ping = pingSupplier != null ? pingSupplier.get() : ByteString.EMPTY;
+				webSocket.send(ping);
+				Platform.logInfo("PING >>> " + ping.utf8());
 				lastPingSecs = nowSeconds();
 			}
 			schedulePing();
