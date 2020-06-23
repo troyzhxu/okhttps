@@ -5,8 +5,8 @@ import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import com.ejlchina.okhttps.*;
 import com.ejlchina.okhttps.WebSocket.Close;
@@ -39,6 +39,9 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	private int pongSeconds = -1;
 	private long lastPingSecs = 0;
 	private long lastPongSecs = 0;
+
+	// 心跳数据提供者
+	private Supplier<ByteString> pingSupplier;
 
 	private boolean opened = true;
 
@@ -76,6 +79,15 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	}
 
 	/**
+	 * @param pingSupplier 心跳数据提供者
+	 * @return WebSocketTask
+	 */
+	public WebSocketTask pingSupplier(Supplier<ByteString> pingSupplier) {
+		this.pingSupplier = pingSupplier;
+		return this;
+	}
+
+	/**
 	 * 启动 WebSocket 监听
 	 * @return WebSocket
 	 */
@@ -89,11 +101,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
         		} else {
 					Request request = prepareRequest("GET");
 					MessageListener listener = new MessageListener(socket);
-					if (pingSeconds > -1 || pongSeconds > -1) {
-						new RealWebSocket(request, listener, new Random(), 0).connect(httpClient.okClient);
-					} else {
-						httpClient.webSocket(request, listener);
-					}
+					httpClient.webSocket(request, listener);
 				}
 			}
     	}, skipPreproc, skipSerialPreproc);
@@ -141,7 +149,10 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			if (onMessage != null) {
 				execute(() -> onMessage.on(this.webSocket, new WebSocketMsg(text, httpClient.executor, charset)), messageOnIO);
 			}
-			lastPongSecs = nowSeconds();
+			if (pongSeconds > 0) {
+				lastPongSecs = nowSeconds();
+				Platform.logInfo("PONG <<< " + text);
+			}
 		}
 
 		// 接收二进制数据 仅当  websocket 消息中的 opcode == 2  时
@@ -150,7 +161,10 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			if (onMessage != null) {
 				execute(() -> onMessage.on(this.webSocket, new WebSocketMsg(bytes, httpClient.executor, charset)), messageOnIO);
 			}
-			lastPongSecs = nowSeconds();
+			if (pongSeconds > 0) {
+				lastPongSecs = nowSeconds();
+				Platform.logInfo("PONG <<< " + bytes.utf8());
+			}
 		}
 
 		@Override
@@ -225,7 +239,11 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 				return;
 			}
 			if (nowSeconds() - lastPingSecs >= pingSeconds) {
-				webSocket.send(ByteString.EMPTY);
+				if (pingSupplier != null) {
+					webSocket.send(pingSupplier.get());
+				} else {
+					webSocket.send(ByteString.EMPTY);
+				}
 				Platform.logInfo("PING >>>");
 				lastPingSecs = nowSeconds();
 			}
