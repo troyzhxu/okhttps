@@ -49,4 +49,10 @@ http.webSocket("/chat")
         .listen();                     // 启动监听
 ```
 
+<br/>
+
+#### <center> 有问必答微信交流群 </center>
+
+<center> <img src="/wx_discuss.png" width = "800" /> </center>
+
 [<center> 了解更多 </center>](/v2/)
