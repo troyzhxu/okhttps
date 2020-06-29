@@ -409,7 +409,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     /**
-     * 设置 json 请求体
+     * 设置 请求报文体
      * @param body 请求体，字节数组、字符串 或 Java对象（由 MsgConvertor 来序列化）
      * @return HttpTask 实例
      **/
