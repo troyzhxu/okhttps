@@ -310,12 +310,11 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		}
 
 		@Override
-		public synchronized boolean close(int code, String reason) {
+		public synchronized void close(int code, String reason) {
 			if (webSocket != null) {
 				webSocket.close(code, reason);
 			}
 			cancelOrClosed = true;
-			return true;
 		}
 
 		@Override

@@ -87,7 +87,7 @@ public interface WebSocket extends Cancelable {
 	}
 	
 	/**
-	 * 若连接已打开，则：
+	 * @return 若连接已打开，则：
 	 * 同 {@link okhttp3.WebSocket#queueSize()}，返回排序消息的字节数
 	 * 否则：
 	 * 返回排队消息的数量
@@ -102,8 +102,10 @@ public interface WebSocket extends Cancelable {
 	
 	/**
 	 * 同 {@link okhttp3.WebSocket#close(int, String)}
+	 * @param code Status code as defined by <a href="http://tools.ietf.org/html/rfc6455#section-7.4">Section 7.4 of RFC 6455</a>
+	 * @param reason Reason for shutting down or {@code null}.
 	 */
-	boolean close(int code, String reason);
+	void close(int code, String reason);
 
 	/**
 	 * 设置消息类型
