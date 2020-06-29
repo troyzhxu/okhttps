@@ -125,7 +125,7 @@ HTTP http = HTTP.builder().build();
 ```java
 HTTP http = HTTP.builder()
         .baseUrl("http://api.example.com")
-        .addMsgConvertor(new GsonMsgConvertor());
+        .addMsgConvertor(new GsonMsgConvertor())
         .build();
 ```
 
