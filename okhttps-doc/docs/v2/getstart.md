@@ -54,7 +54,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 以上依赖四选一即可
 :::
 
-如需使用 Stomp 客户端能力，则可以添加：
+#### 使用 Stomp 客户端
 
 ```xml
 <dependency>
@@ -96,7 +96,7 @@ implementation 'com.ejlchina:okhttps-jackson:2.3.0'
 以上依赖四选一即可
 :::
 
-如需使用 Stomp 客户端能力，则可以添加：
+#### 使用 Stomp 客户端
 
 ```groovy
 implementation 'com.ejlchina:okhttps-stomp:1.0.1'

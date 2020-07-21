@@ -1,5 +1,5 @@
 ---
-description: OkHttps 配置 BaseUrl 回调执行器 主线程 UI线程 OkHttpClient 预处理器 TOKEN问题最佳解决方案 刷新TOKEN 全局 回调监听 下载监听 回调阻断 拦截器 CookieJar、SSL、缓存、代理、事件监听
+description: OkHttps WebSocket Heatbeat 心跳 OkHttp
 ---
 
 # WebSocket
@@ -28,9 +28,9 @@ WebSocket 连接只能添加 **请求头**、 **Url 参数**（查询参数）�
 
 OkHttps 自带两种心跳机制
 
-### OkHttp 的心跳机制
+### 全局心跳配置
 
-在构建`HTTP`实例时，配置一个全局心跳间隔：
+在构建`HTTP`实例时，可以配置一个全局心跳时间间隔：
 
 ```java
 HTTP http = HTTP.builder()
@@ -44,9 +44,9 @@ HTTP http = HTTP.builder()
 
 如上配置，当使用这个`HTTP`实例发起 WebSocket 连接时，客户端会每隔 10秒 向服务器发送一次 PING 消息，同时服务器必须在客户端发送心跳后的 10秒 内回复 PONG 消息，否则就会触发`SocketTimeoutException`异常
 
-### OkHttps 的心跳机制
+### 单次心跳配置（since V2.3.0）
 
-OkHttps 提供了另外一种心跳机制，它在发起具体的 WebSocket 连接时通过`heatbeat(int pingSeconds, int pongSeconds)`方法指定：
+自 V2.3.0 起 OkHttps 提供了另外一种心跳机制，它在发起具体的 WebSocket 连接时通过方法`heatbeat(int pingSeconds, int pongSeconds)`分别指定客户端与服务器的心跳时间间隔：
 
 ```java
 http.webSocket("/chat") 
@@ -155,9 +155,6 @@ http.webSocket("/websocket-endpoint")
 ::: tip 需要注意的是
 如果设置了 [全局回调监听](/v2/configuration.html#全局回调监听), 它们对 WebSocket 连接 同样起作用
 :::
-
-
-
 
 
 <br/>
