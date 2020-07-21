@@ -17,15 +17,15 @@ description: OkHttps WebSocket Heatbeat 心跳 OkHttp
 
 ```java
 // 使用一个 Websocket 连接构建一个 Stomp 实例，同时设置心跳间隔为 20 秒
-Stomp stomp = Stomp.over(OkHttps.webSocket(UrlConsts.WEB_SOCKET).heatbeat(20, 20));
+Stomp stomp = Stomp.over(OkHttps.webSocket("wss://...").heatbeat(20, 20));
 ```
 
 以上代码构建了一个简单的 Stomp 客户端，并默认在收到消息时会**自动确认**，如果需要收到确认，可以使用下面的方式：
 
 ```java
 Stomp stomp = Stomp.over(
-        OkHttps.webSocket(UrlConsts.WEB_SOCKET).heatbeat(20, 20),
-        false       // 参数设置 autoAck 为 false，将不自动确认消息
+        OkHttps.webSocket("wss://...").heatbeat(20, 20),
+        false       // 参数设置 autoAck 为 false，将需要手动确认消息
     );
 ```
 
@@ -53,11 +53,71 @@ headers.add(new Header("host", "your_vhost"));
 stomp.connect(headers);
 ```
 
-## 消息定阅
+## 连接状态监听
 
+```java
+Stomp.over(OkHttps.webSocket("wss://...").heatbeat(20, 20))
+    .setOnConnected(stomp -> {
+        // 服务器连接成功回调
+    })
+    .setOnDisconnected(close -> {
+        // 连接已断开回调
+    })
+    .connect();
+```
 
+## 消息订阅与退订
 
+### 订阅广播
 
+```java
+stomp.topic("/your-topic", (Message msg) -> {
+    // 得到消息负载
+    String payload = msg.getPayload();
+
+    // 如果需要手动确认消息,调用此方法确认
+    stomp.ack(msg)
+});
+```
+
+### 退订广播
+
+```java
+stomp.untopic("/your-topic");
+```
+
+### 订阅队列
+
+```java
+stomp.queue("/your-queue", (Message msg) -> {
+    // 得到消息负载
+    String payload = msg.getPayload();
+
+    // 如果需要手动确认消息,调用此方法确认
+    stomp.ack(msg)
+});
+```
+
+### 退订队列
+
+```java
+stomp.unqueue("/your-queue");
+```
+
+## 发送消息
+
+```java
+// 发送到广播
+stomp.sendTo("/topic/your-topic", "Hello World");
+// 发送到队列
+stomp.sendTo("/queue/your-queue", "Hello World");
+```
+
+## 断开服务
+
+```java
+stomp.disconnect();
+```
 
 <br/>
 
