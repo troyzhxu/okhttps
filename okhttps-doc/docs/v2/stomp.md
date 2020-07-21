@@ -1,5 +1,5 @@
 ---
-description: OkHttps WebSocket Heatbeat 心跳 OkHttp
+description: OkHttps WebSocket Stomp OkHttp
 ---
 
 # Stomp
