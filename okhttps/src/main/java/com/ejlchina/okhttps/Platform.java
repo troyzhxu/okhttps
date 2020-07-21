@@ -2,6 +2,8 @@ package com.ejlchina.okhttps;
 
 import okhttp3.internal.Version;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class Platform {
 
@@ -22,9 +24,7 @@ public class Platform {
     }
 
     public static void logInfo(String message) {
-        if (isOkHttpVersionLessThan4()) {
-            okhttp3.internal.platform.Platform.get().log(okhttp3.internal.platform.Platform.INFO, message, null);
-        }
+        doLog(okhttp3.internal.platform.Platform.INFO, message, null);
     }
 
     public static void logError(String message) {
@@ -32,8 +32,22 @@ public class Platform {
     }
 
     public static void logError(String message, Throwable t) {
+        doLog(okhttp3.internal.platform.Platform.WARN, message, t);
+    }
+
+    private static void doLog(int level, String message, Throwable t) {
+        okhttp3.internal.platform.Platform platform = okhttp3.internal.platform.Platform.get();
         if (isOkHttpVersionLessThan4()) {
-            okhttp3.internal.platform.Platform.get().log(okhttp3.internal.platform.Platform.WARN, message, t);
+            platform.log(level, message, t);
+            return;
+        }
+        try {
+            Method logMethod = platform.getClass().getMethod("log", String.class, int.class, Throwable.class);
+            if (logMethod != null) {
+                logMethod.invoke(platform, message, level, t);
+            }
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
         }
     }
 
