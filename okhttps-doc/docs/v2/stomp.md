@@ -6,6 +6,26 @@ description: OkHttps WebSocket Stomp OkHttp
 
 项目 [OkHttps Stomp](https://gitee.com/ejlchina-zhxu/okhttps-stomp) 基于 OkHttps 的 [WebSocket](/v2/websocket.html) 功能实现了一个非常轻量的 Stomp 客户端协议，它可以让你轻松实现 **广播发布与订阅** 和 **队列发布与订阅** 的客户端功能。
 
+## 添加依赖
+
+要开启 Stomp 功能，需要添加以下依赖：
+
+### Maven
+
+```xml
+<dependency>
+     <groupId>com.ejlchina</groupId>
+     <artifactId>okhttps-stomp</artifactId>
+     <version>1.0.1</version>
+</dependency>
+```
+
+### Gradle
+
+```groovy
+implementation 'com.ejlchina:okhttps-stomp:1.0.1'
+```
+
 ## 构建 Stomp 实例
 
 类`Stomp`提供静态方法`over`来构建`Stomp`实例：
