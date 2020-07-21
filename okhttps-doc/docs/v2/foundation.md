@@ -6,7 +6,7 @@ description: OkHttps 请求方法 回调函数 HttpResult cache 多次 消费报
 
 ## 请求方法
 
-OkHttps 使用`sync()`和`async()`方式发起 同步和异步的 HTTP 请求，它们支持的方法有：
+OkHttps 使用`sync(String url)`和`async(String url)`方法发起 同步和异步的 HTTP 请求，它们支持的方法有：
 
 HTTP 请求方法 | 实现方法 | Restful 释义 | 起始版本
 -|-|-|-
