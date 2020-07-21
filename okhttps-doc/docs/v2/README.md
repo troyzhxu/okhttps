@@ -33,6 +33,15 @@ okhttps | 2.3.0 | OkHttps 核心模块
 [okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps-stomp) | 1.0.1 | 超级轻量的 Stomp 客户端
 
 
+## v2.3 的新特性
+
+重新实现 WebSocket 心跳机制
+使用者可以选择使用 OkHttp 自带的新桃模式，也可以选择使用 OkHttps 提供的增强型新增机制，它具有如下特性
+
+1. 客户端发送的任何消息都具有一次客户端心跳作用
+2. 服务器发送的任何消息都具有一次服务器心跳作用
+3. 若服务器超过 3 * pongSeconds 秒没有回复心跳，才判断心跳超时
+
 ## v2.2 的新特性
 
 1. 增强泛型反序列化，支持复合泛型

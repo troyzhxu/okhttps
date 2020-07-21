@@ -45,6 +45,8 @@ module.exports = {
             'foundation',
             'configuration',  
             'updownload',
+            'websocket',
+            'stomp',
             'android'
           ]
         },
