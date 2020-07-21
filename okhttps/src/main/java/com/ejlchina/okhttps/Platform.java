@@ -1,5 +1,6 @@
 package com.ejlchina.okhttps;
 
+import okhttp3.internal.Version;
 import java.lang.reflect.Field;
 
 public class Platform {
@@ -21,7 +22,9 @@ public class Platform {
     }
 
     public static void logInfo(String message) {
-        okhttp3.internal.platform.Platform.get().log(okhttp3.internal.platform.Platform.INFO, message, null);
+        if (isOkHttpVersionLessThan4()) {
+            okhttp3.internal.platform.Platform.get().log(okhttp3.internal.platform.Platform.INFO, message, null);
+        }
     }
 
     public static void logError(String message) {
@@ -29,7 +32,22 @@ public class Platform {
     }
 
     public static void logError(String message, Throwable t) {
-        okhttp3.internal.platform.Platform.get().log(okhttp3.internal.platform.Platform.WARN, message, t);
+        if (isOkHttpVersionLessThan4()) {
+            okhttp3.internal.platform.Platform.get().log(okhttp3.internal.platform.Platform.WARN, message, t);
+        }
+    }
+
+    private static String okHttpVersion;
+
+    private static boolean isOkHttpVersionLessThan4() {
+        if (okHttpVersion == null) {
+            try {
+                okHttpVersion = Version.userAgent();
+            } catch (Exception e) {
+                okHttpVersion = "4.x";
+            }
+        }
+        return !okHttpVersion.startsWith("4");
     }
 
 }
