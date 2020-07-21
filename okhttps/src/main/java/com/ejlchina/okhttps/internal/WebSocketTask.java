@@ -65,6 +65,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * 2、服务器发送的任何消息都具有一次心跳作用
 	 * 3、若服务器超过 3 * pongSeconds 秒没有回复心跳，才判断心跳超时
 	 *
+	 * @since v2.3.0
 	 * @param pingSeconds 客户端心跳间隔秒数（0 表示不需要心跳）
 	 * @param pongSeconds 服务器心跳间隔秒数（0 表示不需要心跳）
 	 * @return WebSocketTask
