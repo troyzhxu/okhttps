@@ -26,12 +26,11 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 
 项目 | 最新版本 | 描述
 -|-|-
-okhttps | 2.2.0 | OkHttps 核心模块
-okhttps-fastjson | 2.2.0 | 扩展包：与 fastjson 集成
-okhttps-gson | 2.2.0 | 扩展包：与 gson 集成
-okhttps-jackson | 2.2.0 | 扩展包：与 jackson 集成
-
-以上是官方维护的与三大 JSON 框架集成的案例，后续将提供 xml 和 protobuf 的集成。
+okhttps | 2.3.0 | OkHttps 核心模块
+[okhttps-fastjson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-fastjson) | 2.3.0 | 与 fastjson 集成
+[okhttps-gson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-gson) | 2.3.0 | 与 gson 集成
+[okhttps-jackson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-jackson) | 2.3.0 | 与 jackson 集成
+[okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps-stomp) | 1.0.1 | 超级轻量的 Stomp 客户端
 
 
 ## v2.2 的新特性
