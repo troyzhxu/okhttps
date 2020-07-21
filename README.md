@@ -105,8 +105,8 @@ okhttps | 2.3.0 | OkHttps 核心模块
 
 ## 后续计划
 
+* 在 WebSocket 基础上扩展支持 Stomp 协议【已发布 v1.0.1】
 * 在 Android 上通过 Kotlin 扩展使异步请求与 LiveData 集成（即将发布、敬请期待）
-* 在 WebSocket 基础上扩展支持 Stomp 协议（即将发布、敬请期待）
 
 ## 参与贡献
 
