@@ -1,15 +1,9 @@
 package com.ejlchina.okhttps;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
-
 import com.ejlchina.okhttps.internal.HttpException;
 import com.ejlchina.okhttps.internal.TaskExecutor;
 
-import okhttp3.internal.Util;
+import java.io.*;
 
 /**
  * 文件下载
@@ -239,7 +233,7 @@ public class Download {
 			return new RandomAccessFile(file, "rw");
 		} catch (FileNotFoundException e) {
 			status = Ctrl.STATUS__ERROR;
-			Util.closeQuietly(input);
+			closeQuietly(input);
 			throw new HttpException("无法获取文件[" + file.getAbsolutePath() + "]的输入流", e);
 		}
 	}
@@ -287,8 +281,8 @@ public class Download {
 				throw new HttpException("流传输失败", e);
 			}
 		} finally {
-			Util.closeQuietly(raFile);
-			Util.closeQuietly(input);
+			closeQuietly(raFile);
+			closeQuietly(input);
 			if (status == Ctrl.STATUS__CANCELED) {
 				file.delete();
 			}
@@ -298,6 +292,17 @@ public class Download {
 			taskExecutor.execute(() -> {
 				onSuccess.on(file);
 			}, sOnIO);
+		}
+	}
+
+	public static void closeQuietly(Closeable closeable) {
+		if (closeable != null) {
+			try {
+				closeable.close();
+			} catch (RuntimeException rethrown) {
+				throw rethrown;
+			} catch (Exception ignored) {
+			}
 		}
 	}
 
