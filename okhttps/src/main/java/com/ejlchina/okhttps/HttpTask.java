@@ -126,6 +126,46 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     /**
+     * @since 2.4.0
+     * @return 路径参数
+     */
+    public Map<String, String> getPathParas() {
+        return pathParams;
+    }
+
+    /**
+     * @since 2.4.0
+     * @return URL参数（查询参数）
+     */
+    public Map<String, String> getUrlParas() {
+        return urlParams;
+    }
+
+    /**
+     * @since 2.4.0
+     * @return 报文体参数
+     */
+    public Map<String, String> getBodyParas() {
+        return bodyParams;
+    }
+
+    /**
+     * @since 2.4.0
+     * @return 文件参数
+     */
+    public Map<String, FilePara> getFileParas() {
+        return files;
+    }
+
+    /**
+     * @since 2.4.0
+     * @return 报文体
+     */
+    public Object getRequestBody() {
+        return requestBody;
+    }
+
+    /**
      * 获得被绑定的对象
      * @return Object
      */
@@ -483,7 +523,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         return false;
     }
 
-    static class FilePara {
+    public static class FilePara {
 
         String type;
         String fileName;
@@ -502,6 +542,21 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             this.file = file;
         }
 
+        public String getType() {
+            return type;
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public byte[] getContent() {
+            return content;
+        }
+
+        public File getFile() {
+            return file;
+        }
     }
     
     protected void registeTagTask(Cancelable canceler) {
