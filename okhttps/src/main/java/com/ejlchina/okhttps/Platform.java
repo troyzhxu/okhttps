@@ -34,6 +34,8 @@ public class Platform {
         doLog(okhttp3.internal.platform.Platform.WARN, message, t);
     }
 
+    private static Method logMethod = null;
+
     private static void doLog(int level, String message, Throwable t) {
         okhttp3.internal.platform.Platform platform = okhttp3.internal.platform.Platform.get();
         if (isOkHttpVersionLessThan4()) {
@@ -41,7 +43,11 @@ public class Platform {
             return;
         }
         try {
-            Method logMethod = platform.getClass().getMethod("log", String.class, int.class, Throwable.class);
+            synchronized (Platform.class) {
+                if (logMethod == null) {
+                    logMethod = platform.getClass().getMethod("log", String.class, int.class, Throwable.class);
+                }
+            }
             if (logMethod != null) {
                 logMethod.invoke(platform, message, level, t);
             }
