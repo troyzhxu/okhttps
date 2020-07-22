@@ -1,6 +1,5 @@
 package com.ejlchina.okhttps;
 
-import okhttp3.internal.Version;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -56,7 +55,9 @@ public class Platform {
     private static boolean isOkHttpVersionLessThan4() {
         if (okHttpVersion == null) {
             try {
-                okHttpVersion = Version.userAgent();
+                Class<?> versionClass = Class.forName("okhttp3.internal.Version");
+                Method method = versionClass.getDeclaredMethod("userAgent");
+                okHttpVersion = (String) method.invoke(null);
             } catch (Exception e) {
                 okHttpVersion = "4.x";
             }
