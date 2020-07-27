@@ -109,6 +109,8 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
     
 	/**
 	 * 设置请求得到响应后的回调函数
+	 * @param <T> 泛型
+	 * @param type 期望的转换类型
 	 * @param onResBean 响应 Bean 回调
 	 * @return HttpTask 实例
 	 */
@@ -122,6 +124,8 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 
 	/**
 	 * 设置请求得到响应后的回调函数
+	 * @param <T> 泛型
+	 * @param type 期望的转换类型
 	 * @param onResBean 响应 Bean 回调
 	 * @return HttpTask 实例
 	 */
@@ -135,6 +139,8 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 
 	/**
 	 * 设置请求得到响应后的回调函数
+	 * @param <T> 泛型
+	 * @param type 期望的转换类型
 	 * @param onResList 请求响应回调
 	 * @return HttpTask 实例
 	 */

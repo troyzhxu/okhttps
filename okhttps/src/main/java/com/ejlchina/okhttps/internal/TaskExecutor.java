@@ -3,25 +3,27 @@ package com.ejlchina.okhttps.internal;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.*;
 
 import com.ejlchina.okhttps.*;
 import com.ejlchina.okhttps.HttpResult.State;
+import okhttp3.internal.Util;
 
 public final class TaskExecutor {
 
     private Executor ioExecutor;
     private Executor mainExecutor;
+    private Scheduler taskScheduler;
     private DownListener downloadListener;
     private TaskListener<HttpResult> responseListener;
     private TaskListener<IOException> exceptionListener;
     private TaskListener<State> completeListener;
     private MsgConvertor[] msgConvertors;
     
-    public TaskExecutor(Executor ioExecutor, Executor mainExecutor, DownListener downloadListener, 
+    public TaskExecutor(Executor ioExecutor, Executor mainExecutor, DownListener downloadListener,
             TaskListener<HttpResult> responseListener, TaskListener<IOException> exceptionListener, 
-            TaskListener<State> completeListener, MsgConvertor[] msgConvertors) {
+            TaskListener<State> completeListener, MsgConvertor[] msgConvertors,
+                        Scheduler taskScheduler) {
         this.ioExecutor = ioExecutor;
         this.mainExecutor = mainExecutor;
         this.downloadListener = downloadListener;
@@ -29,6 +31,7 @@ public final class TaskExecutor {
         this.exceptionListener = exceptionListener;
         this.completeListener = completeListener;
         this.msgConvertors = msgConvertors;
+        this.taskScheduler = taskScheduler;
     }
 
     public Executor getExecutor(boolean onIo) {
@@ -149,6 +152,16 @@ public final class TaskExecutor {
         }
     }
 
+    private ScheduledExecutorService scheduledService;
+
+    public synchronized Scheduler requireScheduler() {
+        if (taskScheduler == null) {
+            scheduledService = new ScheduledThreadPoolExecutor(1, Util.threadFactory("OkHttps-Scheduler", false));
+            taskScheduler = scheduledService::schedule;
+        }
+        return taskScheduler;
+    }
+
     /**
      * 关闭线程池
      * @since OkHttps V1.0.2
@@ -159,6 +172,9 @@ public final class TaskExecutor {
         }
         if (mainExecutor != null && mainExecutor instanceof ExecutorService) {
             ((ExecutorService) mainExecutor).shutdown();
+        }
+        if (scheduledService != null) {
+            scheduledService.shutdown();
         }
     }
 
@@ -188,6 +204,10 @@ public final class TaskExecutor {
 
     public MsgConvertor[] getMsgConvertors() {
         return msgConvertors;
+    }
+
+    public Scheduler getTaskScheduler() {
+        return taskScheduler;
     }
 
 }

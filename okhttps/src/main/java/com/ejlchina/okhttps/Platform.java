@@ -20,4 +20,16 @@ public class Platform {
         }
     }
 
+    public static void logInfo(String message) {
+        okhttp3.internal.platform.Platform.get().log(okhttp3.internal.platform.Platform.INFO, message, null);
+    }
+
+    public static void logError(String message) {
+        logError(message, null);
+    }
+
+    public static void logError(String message, Throwable t) {
+        okhttp3.internal.platform.Platform.get().log(okhttp3.internal.platform.Platform.WARN, message, t);
+    }
+
 }

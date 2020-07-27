@@ -36,7 +36,8 @@ public class HttpClient implements HTTP {
         this.executor = new TaskExecutor(okClient.dispatcher().executorService(),
                 builder.mainExecutor(), builder.downloadListener(),
                 builder.responseListener(), builder.exceptionListener(),
-                builder.completeListener(), builder.msgConvertors());
+                builder.completeListener(), builder.msgConvertors(),
+                builder.taskScheduler());
         this.preprocessors = builder.preprocessors();
         this.preprocTimeoutTimes = builder.preprocTimeoutTimes();
         this.charset = builder.charset();

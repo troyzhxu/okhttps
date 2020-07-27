@@ -38,7 +38,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     private Map<String, String> bodyParams;
     private Map<String, FilePara> files;
     private Object requestBody;
-    private String dateFormat;
     private String bodyType;
     private OnCallback<Process> onProcess;
     private boolean processOnIO;
@@ -410,7 +409,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     /**
-     * 设置 json 请求体
+     * 设置 请求报文体
      * @param body 请求体，字节数组、字符串 或 Java对象（由 MsgConvertor 来序列化）
      * @return HttpTask 实例
      **/
@@ -642,7 +641,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             return RequestBody.create(MediaType.parse(mediaType + "; charset=" + charset.name()), body);
         }
         TaskExecutor.Data<byte[]> data = httpClient.executor()
-                .doMsgConvert(bodyType, (MsgConvertor c) -> c.serialize(object, dateFormat, charset));
+                .doMsgConvert(bodyType, (MsgConvertor c) -> c.serialize(object, charset));
         return RequestBody.create(MediaType.parse(data.mediaType + "; charset=" + charset.name()), data.data);
     }
 

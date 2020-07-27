@@ -1,5 +1,10 @@
 package com.ejlchina.okhttps;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
@@ -7,11 +12,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 
 public class GsonMsgConvertor implements MsgConvertor, ConvertProvider {
 
@@ -42,15 +42,6 @@ public class GsonMsgConvertor implements MsgConvertor, ConvertProvider {
 
 	@Override
 	public byte[] serialize(Object object, Charset charset) {
-		return serialize(object, null, charset);
-	}
-
-	@Override
-	public byte[] serialize(Object object, String dateFormat, Charset charset) {
-		Gson gson = this.gson;
-		if (dateFormat != null) {
-			gson = gson.newBuilder().setDateFormat(dateFormat).create();
-		}
 		return gson.toJson(object).getBytes(charset);
 	}
 

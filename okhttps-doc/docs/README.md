@@ -16,7 +16,7 @@ features:
 footer: Apache Licensed | Copyright © 2020-present ejlchina
 ---
 
-#### <center> 如艺术一般优雅，像 1、2、3 一样简单 </center>
+### <center> 如艺术一般优雅，像 1、2、3 一样简单 </center>
 
 ```java
 HTTP http = HTTP.builder()
@@ -49,4 +49,12 @@ http.webSocket("/chat")
         .listen();                     // 启动监听
 ```
 
-[<center> 了解更多 </center>](/v2/)
+<br/>
+
+### <center> 有问必答微信交流群 </center>
+
+<center> <img src="/wx_discuss.png" width = "800" /> </center>
+
+<br/>
+
+### [<center> 了解更多 </center>](/v2/)

@@ -14,7 +14,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 <dependency>
      <groupId>com.ejlchina</groupId>
      <artifactId>okhttps</artifactId>
-     <version>2.2.0</version>
+     <version>2.3.0</version>
 </dependency>
 ```
 
@@ -26,7 +26,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 <dependency>
      <groupId>com.ejlchina</groupId>
      <artifactId>okhttps-fastjson</artifactId>
-     <version>2.2.0</version>
+     <version>2.3.0</version>
 </dependency>
 ```
 
@@ -36,7 +36,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 <dependency>
      <groupId>com.ejlchina</groupId>
      <artifactId>okhttps-gson</artifactId>
-     <version>2.2.0</version>
+     <version>2.3.0</version>
 </dependency>
 ```
 
@@ -46,7 +46,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 <dependency>
      <groupId>com.ejlchina</groupId>
      <artifactId>okhttps-jackson</artifactId>
-     <version>2.2.0</version>
+     <version>2.3.0</version>
 </dependency>
 ```
 
@@ -54,12 +54,22 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 以上依赖四选一即可
 :::
 
+#### 使用 Stomp 客户端
+
+```xml
+<dependency>
+     <groupId>com.ejlchina</groupId>
+     <artifactId>okhttps-stomp</artifactId>
+     <version>1.0.1</version>
+</dependency>
+```
+
 ### Gradle
 
 #### 单独使用 OkHttps
 
 ```groovy
-implementation 'com.ejlchina:okhttps:2.2.0'
+implementation 'com.ejlchina:okhttps:2.3.0'
 ```
 
 单独使用 OkHttps 需要自定义[`MsgConvertor`](https://gitee.com/ejlchina-zhxu/okhttps/blob/master/okhttps/src/main/java/com/ejlchina/okhttps/MsgConvertor.java)，否则无法使用 **自动正反序列化** 相关功能，后文会详细讲解哪些功能会受到此影响。
@@ -67,25 +77,30 @@ implementation 'com.ejlchina:okhttps:2.2.0'
 #### 与 fastjson 一起使用
 
 ```groovy
-implementation 'com.ejlchina:okhttps-fastjson:2.2.0'
+implementation 'com.ejlchina:okhttps-fastjson:2.3.0'
 ```
 
 #### 与 gson 一起使用
 
 ```groovy
-implementation 'com.ejlchina:okhttps-gson:2.2.0'
+implementation 'com.ejlchina:okhttps-gson:2.3.0'
 ```
 
 #### 与 jackson 一起使用
 
 ```groovy
-implementation 'com.ejlchina:okhttps-jackson:2.2.0'
+implementation 'com.ejlchina:okhttps-jackson:2.3.0'
 ```
 
 ::: tip
 以上依赖四选一即可
 :::
 
+#### 使用 Stomp 客户端
+
+```groovy
+implementation 'com.ejlchina:okhttps-stomp:1.0.1'
+```
 
 #### JDK 版本
 
@@ -125,7 +140,7 @@ HTTP http = HTTP.builder().build();
 ```java
 HTTP http = HTTP.builder()
         .baseUrl("http://api.example.com")
-        .addMsgConvertor(new GsonMsgConvertor());
+        .addMsgConvertor(new GsonMsgConvertor())
         .build();
 ```
 
