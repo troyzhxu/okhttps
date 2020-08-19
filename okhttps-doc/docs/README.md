@@ -13,7 +13,7 @@ features:
 - title: 更多实用特性
   details: URL 占位符、Lambda 回调、JSON自动封装解析、OkHttp 的特性：拦截器、连接池、CookieJar 等。
 
-footer: Apache Licensed | Copyright © 2020-present ejlchina
+footer: Apache Licensed | Copyright © 2020-present Troy Zhou
 ---
 
 ### <center> 如艺术一般优雅，像 1、2、3 一样简单 </center>
@@ -66,4 +66,14 @@ Stomp.over(http.webSocket("wss://...").heatbeat(20, 20))
 
 <br/>
 
+<center> 
+由于近期交流群的二维码被爬，扫码入群方式已被关闭
+<br/>
+库的使用上若有疑问，可加先微信【18556739726】（请备注 OkHttps）再入群交流
+</center>
+
+<br/>
+
 ### [<center> 了解更多 </center>](/v2/)
+
+<br/>
