@@ -489,12 +489,12 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     /**
      * 添加文件参数
      * @param name 参数名
-     * @param type 文件类型: 如 png、jpg、jpeg 等
+     * @param type 文件类型/扩展名: 如 txt、png、jpg、doc 等
      * @param content 文件内容
      * @return HttpTask 实例
      */
     public C addFilePara(String name, String type, byte[] content) {
-        return addFilePara(name, type, null, content);
+        return addFilePara(name, type, name + "." + type, content);
     }
 
     /**
