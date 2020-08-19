@@ -758,9 +758,9 @@ http.async("/users/1")
 ```java
 HTTP http = HTTP.builder()
         .exceptionListener((HttpTask<?> task, IOException error) -> {
-            // 所有请求执行完都会走这里
+            // 所有请求执发生异常后都会走这里
 
-            // 返回 true 表示继续执行 task 的 OnComplete 回调，
+            // 返回 true 表示继续执行 task 的 OnException 回调，
             // 返回 false 则表示不再执行，即 阻断
             return true;
         })
