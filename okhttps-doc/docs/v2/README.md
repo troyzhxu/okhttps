@@ -26,12 +26,17 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 
 项目 | 最新版本 | 描述
 -|-|-
-okhttps | 2.3.0 | OkHttps 核心模块
-[okhttps-fastjson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-fastjson) | 2.3.0 | 与 fastjson 集成
-[okhttps-gson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-gson) | 2.3.0 | 与 gson 集成
-[okhttps-jackson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-jackson) | 2.3.0 | 与 jackson 集成
-[okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps-stomp) | 1.0.1 | 超级轻量的 Stomp 客户端
+[okhttps](https://gitee.com/ejlchina-zhxu/okhttps) | 2.4.0 | OkHttps 核心模块
+[okhttps-fastjson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-fastjson) | 2.4.0 | 与 fastjson 集成
+[okhttps-gson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-gson) | 2.4.0 | 与 gson 集成
+[okhttps-jackson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-jackson) | 2.4.0 | 与 jackson 集成
+[okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps-stomp) | 2.4.0 | 超级轻量的 Stomp 客户端
 
+## v2.4 的新特性
+
+1. 兼容 OkHttp 4.x 版本
+2. HttpTask 新增 `getPathParas()`、`getUrlParas()`、`getBodyParas()`、`getFileParas()`、`getRequestBody()` 方法
+3. 优化`HttpTask#addFilePara(String name, String type, byte[] content)`方法，添加自动生成文件名逻辑，兼容某些必须要提供文件名才能接受到文件的后端接口
 
 ## v2.3 的新特性
 
