@@ -94,7 +94,7 @@ Websocket 方法：
 [okhttps-fastjson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-fastjson) | 2.4.0 | 与 fastjson 集成
 [okhttps-gson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-gson) | 2.4.0 | 与 gson 集成
 [okhttps-jackson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-jackson) | 2.4.0 | 与 jackson 集成
-[okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps-stomp) | 1.0.1 | 超级轻量的 Stomp 客户端
+[okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps-stomp) | 2.4.0 | 超级轻量的 Stomp 客户端
 
 ## 超详细教程，请查看：http://okhttps.ejlchina.com/
 
