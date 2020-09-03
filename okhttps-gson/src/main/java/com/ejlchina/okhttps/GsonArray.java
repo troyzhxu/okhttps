@@ -24,7 +24,7 @@ public class GsonArray implements Array {
 	@Override
 	public Mapper getMapper(int index) {
 		JsonElement subJson = json.get(index);
-		if (subJson != null) {
+		if (subJson != null && subJson.isJsonObject()) {
 			return new GsonMapper(subJson.getAsJsonObject());
 		}
 		return null;
@@ -33,7 +33,7 @@ public class GsonArray implements Array {
 	@Override
 	public Array getArray(int index) {
 		JsonElement subJson = json.get(index);
-		if (subJson != null) {
+		if (subJson != null && subJson.isJsonArray()) {
 			return new GsonArray(subJson.getAsJsonArray());
 		}
 		return null;
@@ -42,7 +42,7 @@ public class GsonArray implements Array {
 	@Override
 	public boolean getBool(int index) {
 		JsonElement val = json.get(index);
-		if (val != null) {
+		if (val != null && val.isJsonPrimitive()) {
 			return val.getAsBoolean();
 		}
 		return false;
@@ -51,7 +51,7 @@ public class GsonArray implements Array {
 	@Override
 	public int getInt(int index) {
 		JsonElement val = json.get(index);
-		if (val != null) {
+		if (val != null && val.isJsonPrimitive()) {
 			return val.getAsInt();
 		}
 		return 0;
@@ -60,7 +60,7 @@ public class GsonArray implements Array {
 	@Override
 	public long getLong(int index) {
 		JsonElement val = json.get(index);
-		if (val != null) {
+		if (val != null && val.isJsonPrimitive()) {
 			return val.getAsLong();
 		}
 		return 0;
@@ -69,7 +69,7 @@ public class GsonArray implements Array {
 	@Override
 	public float getFloat(int index) {
 		JsonElement val = json.get(index);
-		if (val != null) {
+		if (val != null && val.isJsonPrimitive()) {
 			return val.getAsFloat();
 		}
 		return 0;
@@ -78,7 +78,7 @@ public class GsonArray implements Array {
 	@Override
 	public double getDouble(int index) {
 		JsonElement val = json.get(index);
-		if (val != null) {
+		if (val != null && val.isJsonPrimitive()) {
 			return val.getAsDouble();
 		}
 		return 0;
@@ -87,7 +87,7 @@ public class GsonArray implements Array {
 	@Override
 	public String getString(int index) {
 		JsonElement val = json.get(index);
-		if (val != null) {
+		if (val != null && val.isJsonPrimitive()) {
 			return val.getAsString();
 		}
 		return null;

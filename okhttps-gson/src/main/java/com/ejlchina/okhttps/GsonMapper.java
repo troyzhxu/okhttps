@@ -26,7 +26,7 @@ public class GsonMapper implements Mapper {
 	@Override
 	public Mapper getMapper(String key) {
 		JsonElement subJson = json.get(key);
-		if (subJson != null) {
+		if (subJson != null && subJson.isJsonObject()) {
 			return new GsonMapper(subJson.getAsJsonObject());
 		}
 		return null;
@@ -35,7 +35,7 @@ public class GsonMapper implements Mapper {
 	@Override
 	public Array getArray(String key) {
 		JsonElement subJson = json.get(key);
-		if (subJson != null) {
+		if (subJson != null && subJson.isJsonArray()) {
 			return new GsonArray(subJson.getAsJsonArray());
 		}
 		return null;
@@ -44,7 +44,7 @@ public class GsonMapper implements Mapper {
 	@Override
 	public boolean getBool(String key) {
 		JsonElement val = json.get(key);
-		if (val != null) {
+		if (val != null && val.isJsonPrimitive()) {
 			return val.getAsBoolean();
 		}
 		return false;
@@ -53,7 +53,7 @@ public class GsonMapper implements Mapper {
 	@Override
 	public int getInt(String key) {
 		JsonElement val = json.get(key);
-		if (val != null) {
+		if (val != null && val.isJsonPrimitive()) {
 			return val.getAsInt();
 		}
 		return 0;
@@ -62,7 +62,7 @@ public class GsonMapper implements Mapper {
 	@Override
 	public long getLong(String key) {
 		JsonElement val = json.get(key);
-		if (val != null) {
+		if (val != null && val.isJsonPrimitive()) {
 			return val.getAsLong();
 		}
 		return 0;
@@ -71,7 +71,7 @@ public class GsonMapper implements Mapper {
 	@Override
 	public float getFloat(String key) {
 		JsonElement val = json.get(key);
-		if (val != null) {
+		if (val != null && val.isJsonPrimitive()) {
 			return val.getAsFloat();
 		}
 		return 0;
@@ -80,7 +80,7 @@ public class GsonMapper implements Mapper {
 	@Override
 	public double getDouble(String key) {
 		JsonElement val = json.get(key);
-		if (val != null) {
+		if (val != null && val.isJsonPrimitive()) {
 			return val.getAsDouble();
 		}
 		return 0;
@@ -89,7 +89,7 @@ public class GsonMapper implements Mapper {
 	@Override
 	public String getString(String key) {
 		JsonElement val = json.get(key);
-		if (val != null) {
+		if (val != null && val.isJsonPrimitive()) {
 			return val.getAsString();
 		}
 		return null;
