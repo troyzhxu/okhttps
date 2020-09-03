@@ -28,7 +28,7 @@ public class Stomp {
 
     private OnCallback<Stomp> onConnected;
     private OnCallback<WebSocket.Close> onDisconnected;
-
+    private OnCallback<Message> onError;
 
     private Stomp(WebSocketTask task, boolean autoAck) {
         this.task = task;
@@ -82,7 +82,12 @@ public class Stomp {
                 }
                 send(new Message(Commands.CONNECT, cHeaders, null));
             });
-        task.setOnMessage((ws, msg) -> receive(Message.from(msg.toString())));
+        task.setOnMessage((ws, msg) -> {
+        		Message message = Message.from(msg.toString());
+        		if (message != null) {
+        			receive(message);
+        		}
+        	});
         task.setOnClosed((ws, close) -> {
                 if (onDisconnected != null) {
                     onDisconnected.on(close);
@@ -117,8 +122,18 @@ public class Stomp {
         this.onDisconnected = onDisconnected;
         return this;
     }
-
+    
     /**
+     * 错误回调（服务器返回的错误信息）
+     * @param onError 错误回调
+     * @return Stomp
+     */
+    public Stomp setOnError(OnCallback<Message> onError) {
+		this.onError = onError;
+		return this;
+	}
+
+	/**
      * 发送消息到指定目的地
      * @param destination 目的地
      * @param data 消息
@@ -265,9 +280,7 @@ public class Stomp {
             if (onConnected != null) {
                 onConnected.on(this);
             }
-            return;
-        }
-        if (Commands.MESSAGE.equals(command)) {
+        } else if (Commands.MESSAGE.equals(command)) {
             String id = msg.headerValue(Header.SUBSCRIPTION);
             String destination = msg.headerValue(Header.DESTINATION);
             if (id == null || destination == null) {
@@ -277,6 +290,10 @@ public class Stomp {
             if (subscriber != null && id.equals(subscriber.id)) {
                 subscriber.callback.on(msg);
             }
+        } else if (Commands.ERROR.equals(command)) {
+        	if (onError != null) {
+        		onError.on(msg);
+        	}
         }
     }
 

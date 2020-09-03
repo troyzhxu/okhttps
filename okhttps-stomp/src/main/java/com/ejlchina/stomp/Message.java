@@ -1,21 +1,12 @@
 package com.ejlchina.stomp;
 
-import com.ejlchina.okhttps.Platform;
-
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import com.ejlchina.okhttps.Platform;
 
 public class Message {
 
-
-    public static final String TERMINATE_MESSAGE_SYMBOL = "\u0000";
-
-    private static final Pattern PATTERN_HEADER = Pattern.compile("([^:\\s]+)\\s*:\\s*([^:\\s]+)");
 
     private final String command;
     private final List<Header> headers;
@@ -69,7 +60,7 @@ public class Message {
             builder.append(payload);
             if (legacyWhitespace) builder.append("\n\n");
         }
-        builder.append(TERMINATE_MESSAGE_SYMBOL);
+        builder.append("\u0000");
         return builder.toString();
     }
 
@@ -77,35 +68,39 @@ public class Message {
         if (data == null || data.trim().isEmpty()) {
             return new Message(Commands.UNKNOWN, null, data);
         }
-        Scanner reader = new Scanner(new StringReader(data));
-        reader.useDelimiter("\\n");
-        String command = reader.next();
-        List<Header> headers = new ArrayList<>();
-
-        while (reader.hasNext(PATTERN_HEADER)) {
-            Matcher matcher = PATTERN_HEADER.matcher(reader.next());
-            if (matcher.find()) {
-                headers.add(new Header(matcher.group(1), matcher.group(2)));
-            }
+        int cmdIndex = data.indexOf("\n");
+        int mhIndex = data.indexOf("\n\n");
+        
+        if (cmdIndex >= mhIndex) {
+        	Platform.logError("非法的 STOMP 消息：" + data);
+        	return null;
         }
-        try {
-            reader.skip("\n\n");
-        } catch (NoSuchElementException e) {
-            Platform.logError("没有找到指定的模式", e);
+        String command = data.substring(0, cmdIndex);
+        String[] headers = data.substring(cmdIndex + 1, mhIndex).split("\n");
+        
+        List<Header> headerList = new ArrayList<>(headers.length);
+        for (String header : headers) {
+        	String[] hv = header.split(":");
+        	if (hv.length == 2) {
+        		headerList.add(new Header(hv[0], hv[1]));
+        	}
         }
-        reader.useDelimiter(TERMINATE_MESSAGE_SYMBOL);
-        String payload = reader.hasNext() ? reader.next() : null;
-
-        return new Message(command, headers, payload);
+        String payload = null;
+        if (data.length() > mhIndex + 2) {
+        	if (data.endsWith("\u0000\n") && data.length() > mhIndex + 4) {
+        		payload = data.substring(mhIndex + 2, data.length() - 2);
+        	} else if (data.endsWith("\n") && data.length() > mhIndex + 3) {
+        		payload = data.substring(mhIndex + 2, data.length() - 1);
+        	} else {
+        		payload = data.substring(mhIndex + 2);
+        	}
+        }
+        return new Message(command, headerList, payload);
     }
 
     @Override
     public String toString() {
-        return "Message {" +
-                "command='" + command + '\'' +
-                ", headers=" + headers +
-                ", payload='" + payload + '\'' +
-                '}';
+        return "Message {command='" + command + "\', headers=" + headers +", payload='" + payload + "\'}";
     }
 
 }
