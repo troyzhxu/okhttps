@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.ejlchina.okhttps.Platform;
 
-public class Message {
 
+public class Message {
 
     private final String command;
     private final List<Header> headers;
@@ -68,6 +68,7 @@ public class Message {
         if (data == null || data.trim().isEmpty()) {
             return new Message(Commands.UNKNOWN, null, data);
         }
+        
         int cmdIndex = data.indexOf("\n");
         int mhIndex = data.indexOf("\n\n");
         
@@ -89,10 +90,8 @@ public class Message {
         if (data.length() > mhIndex + 2) {
         	if (data.endsWith("\u0000\n") && data.length() > mhIndex + 4) {
         		payload = data.substring(mhIndex + 2, data.length() - 2);
-        	} else if (data.endsWith("\n") && data.length() > mhIndex + 3) {
+        	} else if (data.endsWith("\u0000") && data.length() > mhIndex + 3) {
         		payload = data.substring(mhIndex + 2, data.length() - 1);
-        	} else {
-        		payload = data.substring(mhIndex + 2);
         	}
         }
         return new Message(command, headerList, payload);
