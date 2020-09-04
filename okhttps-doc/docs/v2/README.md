@@ -37,6 +37,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 1. 全面兼容 OkHttp 4.x 版本
 2. HttpTask 新增 `getPathParas()`、`getUrlParas()`、`getBodyParas()`、`getFileParas()`、`getRequestBody()` 方法
 3. 优化`HttpTask#addFilePara(String name, String type, byte[] content)`方法，添加自动生成文件名逻辑，兼容某些必须要提供文件名才能接受到文件的后端接口
+4. Stomp 新增`setOnError`方法，可监听处理处理服务器发出的 ERROR 帧
 
 ## v2.3 的新特性
 
