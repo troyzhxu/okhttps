@@ -26,11 +26,11 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 
 项目 | 最新版本 | 描述
 -|-|-
-[okhttps](https://gitee.com/ejlchina-zhxu/okhttps) | 2.4.0 | OkHttps 核心模块
-[okhttps-fastjson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-fastjson) | 2.4.0 | 与 fastjson 集成
-[okhttps-gson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-gson) | 2.4.0 | 与 gson 集成
-[okhttps-jackson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-jackson) | 2.4.0 | 与 jackson 集成
-[okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps-stomp) | 2.4.0 | 超级轻量的 Stomp 客户端
+[okhttps](https://gitee.com/ejlchina-zhxu/okhttps) | 2.4.1 | OkHttps 核心模块
+[okhttps-fastjson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-fastjson) | 2.4.1 | 与 fastjson 集成
+[okhttps-gson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-gson) | 2.4.1 | 与 gson 集成
+[okhttps-jackson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-jackson) | 2.4.1 | 与 jackson 集成
+[okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps-stomp) | 2.4.1 | 超级轻量的 Stomp 客户端
 
 ## v2.4 的新特性
 
@@ -46,6 +46,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 1. 客户端发送的任何消息都具有一次客户端心跳作用
 2. 服务器发送的任何消息都具有一次服务器心跳作用
 3. 若服务器超过 3 * pongSeconds 秒没有回复心跳，才判断心跳超时
+4. 可指定心跳的具体内容（默认为空）
 
 ## v2.2 的新特性
 

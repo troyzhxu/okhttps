@@ -52,7 +52,7 @@ HTTP http = HTTP.builder()
 http.webSocket("/chat") 
         .heatbeat(10, 10)
         .setOnMessage((WebSocket ws，Message msg) -> {
-
+            // ...
         })
         .listen();                     // 启动监听
 ```
@@ -64,6 +64,18 @@ http.webSocket("/chat")
 * 服务器发送的任何消息都具有一次心跳作用
 * 若服务器超过 3 * pongSeconds 秒没有回复心跳，才触发心跳超时
 :::
+
+另外，还可以使用`pingSupplier(Supplier<ByteString> pingSupplier)`方法来指定心跳时发送的具体内容：
+
+```java
+http.webSocket("/chat") 
+        .heatbeat(10, 10)
+        .pingSupplier(() -> {
+            // 每次心跳发送一个换行符
+            return ByteString.encodeUtf8("\n");
+        })
+        .listen();
+```
 
 ## 消息收发
 
