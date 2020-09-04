@@ -64,6 +64,18 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * 1、客户端发送的任何消息都具有一次心跳作用
 	 * 2、服务器发送的任何消息都具有一次心跳作用
 	 * 3、若服务器超过 3 * pongSeconds 秒没有回复心跳，才判断心跳超时
+	 * 4、可指定心跳的具体内容（默认为空）
+	 *
+	 * 由于 OkHttp 底层并未暴露 websocket 协议里 opcode 的接口，所以该心跳的 opcode 始终是 2，并不是 websocket 协议里定义的 9
+	 * 所以如果服务器要求客户端心跳的 opcode 必须是 9 的话，请使用 OkHttp 的原生心跳：
+	 *
+	 *    HTTP http = HTTP.builder()
+	 *        .config(b -> {
+	 *            b.pingInterval(10, TimeUnit.SECONDS);
+	 *        })
+	 *        .build();
+	 *
+	 * 若需要 可使用 {@link #pingSupplier(Supplier)} 方法指定心跳发送的具体内容
 	 *
 	 * @since v2.3.0
 	 * @param pingSeconds 客户端心跳间隔秒数（0 表示不需要心跳）
@@ -88,6 +100,10 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		return this;
 	}
 
+	public Supplier<ByteString> pingSupplier() {
+		return pingSupplier;
+	}
+	
 	/**
 	 * 启动 WebSocket 监听
 	 * @return WebSocket

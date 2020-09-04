@@ -16,14 +16,14 @@ description: OkHttps WebSocket Stomp OkHttp
 <dependency>
      <groupId>com.ejlchina</groupId>
      <artifactId>okhttps-stomp</artifactId>
-     <version>2.4.0</version>
+     <version>2.4.1</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-implementation 'com.ejlchina:okhttps-stomp:2.4.0'
+implementation 'com.ejlchina:okhttps-stomp:2.4.1'
 ```
 
 ## 构建 Stomp 实例
@@ -82,6 +82,10 @@ Stomp.over(OkHttps.webSocket("wss://...").heatbeat(20, 20))
     })
     .setOnDisconnected(close -> {
         // 连接已断开回调
+    })
+    .setOnError(msg -> {
+        // 错误监听（v2.4.1 新增）
+        // 处理服务器发出的 ERROR 帧
     })
     .connect();
 ```
