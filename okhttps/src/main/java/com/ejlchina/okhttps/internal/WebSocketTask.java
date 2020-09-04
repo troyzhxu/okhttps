@@ -68,14 +68,9 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 *
 	 * 由于 OkHttp 底层并未暴露 websocket 协议里 opcode 的接口，所以该心跳的 opcode 始终是 2，并不是 websocket 协议里定义的 9
 	 * 所以如果服务器要求客户端心跳的 opcode 必须是 9 的话，请使用 OkHttp 的原生心跳：
-	 * <pre>
-	 *    HTTP http = HTTP.builder()
-	 *        .config(b -> {
-	 *            b.pingInterval(10, TimeUnit.SECONDS);
-	 *        })
-	 *        .build();
-	 * </pre>
-	 * 若需要 可使用 {@link #pingSupplier(Supplier)} 方法指定心跳发送的具体内容
+	 * [http://okhttps.ejlchina.com/v2/websocket.html#%E5%85%A8%E5%B1%80%E5%BF%83%E8%B7%B3%E9%85%8D%E7%BD%AE]
+	 *
+	 * 另若需要 可使用 {@link #pingSupplier(Supplier)} 方法指定心跳发送的具体内容
 	 *
 	 * @since v2.3.0
 	 * @param pingSeconds 客户端心跳间隔秒数（0 表示不需要心跳）
