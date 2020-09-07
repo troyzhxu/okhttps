@@ -2,8 +2,15 @@ package com.ejlchina.okhttps.xml;
 
 import com.ejlchina.okhttps.Array;
 import com.ejlchina.okhttps.Mapper;
+import org.w3c.dom.NodeList;
 
 public class XmlArray implements Array {
+
+    private NodeList list;
+
+    public XmlArray(NodeList list) {
+        this.list = list;
+    }
 
     @Override
     public int size() {

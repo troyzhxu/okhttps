@@ -2,23 +2,31 @@ package com.ejlchina.okhttps.xml;
 
 import com.ejlchina.okhttps.Array;
 import com.ejlchina.okhttps.Mapper;
+import org.w3c.dom.Element;
 
 import java.util.Set;
 
 public class XmlMapper implements Mapper {
 
+    private Element element;
+
+    public XmlMapper(Element element) {
+        this.element = element;
+    }
+
     @Override
     public int size() {
-        return 0;
+        return element.getChildNodes().getLength();
     }
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return element.getChildNodes().getLength() == 0;
     }
 
     @Override
     public Mapper getMapper(String key) {
+
         return null;
     }
 
