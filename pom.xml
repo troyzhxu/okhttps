@@ -10,10 +10,11 @@
  
 	<modules>
 		<module>okhttps</module>
-		<module>okhttps-fastjson</module>
+		<module>okhttps-stomp</module>
 		<module>okhttps-gson</module>
 		<module>okhttps-jackson</module>
-		<module>okhttps-stomp</module>
+		<module>okhttps-fastjson</module>
+		<module>okhttps-xml</module>
 		<module>okhttps-test</module>
 	</modules>
 
