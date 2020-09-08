@@ -9,11 +9,15 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -22,6 +26,8 @@ public class XmlMsgConvertor implements MsgConvertor, ConvertProvider {
 
     private String[] nameKeys = {"name", "key"};
     private String[] valueKeys = {"value"};
+
+    private boolean serializeFormatted = false;
 
     private DocumentBuilderFactory dbFactory;
 
@@ -69,16 +75,53 @@ public class XmlMsgConvertor implements MsgConvertor, ConvertProvider {
 
     @Override
     public byte[] serialize(Object object, Charset charset) {
-        return new byte[0];
+        try {
+            JAXBContext context = JAXBContext.newInstance(object.getClass());
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, serializeFormatted);
+            marshaller.setProperty(Marshaller.JAXB_ENCODING, charset.name());
+            StringWriter writer = new StringWriter();
+            marshaller.marshal(object, writer);
+            return writer.toString().getBytes(charset);
+        } catch (JAXBException e) {
+            throw new HttpException("XML 序列化异常：", e);
+        }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T toBean(Type type, InputStream in, Charset charset) {
-        return null;
+        Class<?> clazz = toClass(type);
+        if (clazz == null) {
+            throw new IllegalStateException("无法获取类型：" + type);
+        }
+        try {
+            JAXBContext context = JAXBContext.newInstance(clazz);
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            InputSource source = new InputSource(in);
+            source.setEncoding(charset.name());
+            return (T) unmarshaller.unmarshal(source);
+        } catch (Exception e) {
+            throw new IllegalStateException("反序列化异常：" + type);
+        }
     }
 
     @Override
     public <T> List<T> toList(Class<T> type, InputStream in, Charset charset) {
+
+        return null;
+    }
+
+    private Class<?> toClass(Type type) {
+        if (type instanceof Class) {
+            return (Class<?>) type;
+        }
+        if (type instanceof ParameterizedType) {
+            Type rawType = ((ParameterizedType) type).getRawType();
+            if (rawType instanceof Class) {
+                return (Class<?>) rawType;
+            }
+        }
         return null;
     }
 
@@ -109,6 +152,14 @@ public class XmlMsgConvertor implements MsgConvertor, ConvertProvider {
 
     public void setDbFactory(DocumentBuilderFactory dbFactory) {
         this.dbFactory = dbFactory;
+    }
+
+    public boolean isSerializeFormatted() {
+        return serializeFormatted;
+    }
+
+    public void setSerializeFormatted(boolean serializeFormatted) {
+        this.serializeFormatted = serializeFormatted;
     }
 
 }
