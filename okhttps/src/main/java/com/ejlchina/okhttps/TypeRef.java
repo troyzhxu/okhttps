@@ -3,7 +3,7 @@ package com.ejlchina.okhttps;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-public class TypeRef<T> {
+public abstract class TypeRef<T> {
 
     final Type type;
 
