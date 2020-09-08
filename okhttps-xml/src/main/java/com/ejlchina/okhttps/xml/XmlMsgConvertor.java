@@ -20,6 +20,7 @@ import java.io.*;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 
 public class XmlMsgConvertor implements MsgConvertor, ConvertProvider {
@@ -102,14 +103,33 @@ public class XmlMsgConvertor implements MsgConvertor, ConvertProvider {
             source.setEncoding(charset.name());
             return (T) unmarshaller.unmarshal(source);
         } catch (Exception e) {
-            throw new IllegalStateException("反序列化异常：" + type);
+            throw new IllegalStateException("反序列化异常：", e);
         }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> List<T> toList(Class<T> type, InputStream in, Charset charset) {
-
-        return null;
+        Array array = toArray(in, charset);
+        List<T> list = new ArrayList<>();
+        JAXBContext context;
+        try {
+            context = JAXBContext.newInstance(type);
+        } catch (JAXBException e) {
+            throw new IllegalStateException("反序列化异常：", e);
+        }
+        for (int i = 0; i < array.size(); i++) {
+            Mapper mapper = array.getMapper(i);
+            try {
+                Unmarshaller unmarshaller = context.createUnmarshaller();
+                InputSource source = new InputSource(mapper.toString());
+                source.setEncoding(charset.name());
+                list.add((T) unmarshaller.unmarshal(source));
+            } catch (Exception e) {
+                throw new IllegalStateException("反序列化异常：" + type);
+            }
+        }
+        return list;
     }
 
     private Class<?> toClass(Type type) {
