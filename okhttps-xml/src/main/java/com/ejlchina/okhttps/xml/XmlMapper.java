@@ -4,6 +4,10 @@ import com.ejlchina.okhttps.Array;
 import com.ejlchina.okhttps.Mapper;
 import org.w3c.dom.*;
 
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayOutputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -127,6 +131,18 @@ public class XmlMapper implements Mapper {
             }
         }
         return set;
+    }
+
+    @Override
+    public String toString() {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            TransformerFactory.newInstance().newTransformer()
+                    .transform(new DOMSource(element), new StreamResult(baos));
+            return baos.toString();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
 }

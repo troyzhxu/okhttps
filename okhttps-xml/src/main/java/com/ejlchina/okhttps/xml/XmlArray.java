@@ -6,6 +6,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayOutputStream;
+
 public class XmlArray implements Array {
 
     private String[] nameKeys;
@@ -100,4 +105,22 @@ public class XmlArray implements Array {
         }
         return null;
     }
+
+    @Override
+    public String toString() {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            for (int i = 0; i < list.getLength(); i++) {
+                TransformerFactory.newInstance().newTransformer()
+                        .transform(new DOMSource(list.item(i)), new StreamResult(baos));
+                if (i < list.getLength() - 1) {
+                    baos.write('\n');
+                }
+            }
+            return baos.toString();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
 }
