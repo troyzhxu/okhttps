@@ -26,7 +26,7 @@ public abstract class BaseMsgConvertorTest {
         testToMapper();
         testToArray();
         testSerializeBean();
-        testSerializeList();
+//        testSerializeList();
         testToBean();
         testToResult();
         testToList();

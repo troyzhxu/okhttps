@@ -11,17 +11,23 @@ public class XmlMsgConvertorTest extends BaseMsgConvertorTest {
 
 	@Override
 	String getUserObjectStr() {
-		return "<User><id>1</id><name>Jack</name></User>";
+		return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><user><id>1</id><name>Jack</name></user>";
 	}
 
 	@Override
 	String getResultUserObjectStr() {
-		return null;
+		return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><result>\n" +
+				"\t<code>200</code>\n" +
+				"\t<msg>ok</msg>\n" +
+				"\t<data>\n" +
+				"\t\t<id>1</id><name>Jack</name>\n" +
+				"\t</data>\n" +
+				"</result>";
 	}
 
 	@Override
 	String getUserListStr() {
-		return "<ArrayList><item><id>1</id><name>Jack</name></item><item><id>2</id><name>Tom</name></item></ArrayList>";
+		return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><list><user><id>1</id><name>Jack</name></user><user><id>2</id><name>Tom</name></user></list>";
 	}
     
 }
