@@ -6,9 +6,11 @@ import org.w3c.dom.NodeList;
 
 public class XmlArray implements Array {
 
+    private String[] nameKeys;
     private NodeList list;
 
-    public XmlArray(NodeList list) {
+    public XmlArray(String[] nameKeys, NodeList list) {
+        this.nameKeys = nameKeys;
         this.list = list;
     }
 
