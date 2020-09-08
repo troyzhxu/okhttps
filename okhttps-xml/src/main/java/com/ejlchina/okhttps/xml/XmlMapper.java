@@ -11,10 +11,12 @@ import java.util.Set;
 public class XmlMapper implements Mapper {
 
     private String[] nameKeys;
+    private String[] valueKeys;
     private Element element;
 
-    public XmlMapper(String[] nameKeys, Element element) {
+    public XmlMapper(String[] nameKeys, String[] valueKeys, Element element) {
         this.nameKeys = nameKeys;
+        this.valueKeys = valueKeys;
         this.element = element;
     }
 
@@ -35,7 +37,7 @@ public class XmlMapper implements Mapper {
         NodeList nodes = element.getChildNodes();
         Element child = XmlUtils.findElement(nodes, nameKeys, key);
         if (child != null) {
-            return new XmlMapper(nameKeys, child);
+            return new XmlMapper(nameKeys, valueKeys, child);
         }
         return null;
     }
@@ -45,7 +47,7 @@ public class XmlMapper implements Mapper {
         NodeList nodes = element.getChildNodes();
         List<Element> children = XmlUtils.findElements(nodes, nameKeys, key);
         if (children.size() > 1) {
-            return new XmlArray(nameKeys, new NodeList() {
+            return new XmlArray(nameKeys, valueKeys, new NodeList() {
                 @Override
                 public Node item(int index) {
                     return children.get(index);
@@ -57,49 +59,49 @@ public class XmlMapper implements Mapper {
             });
         } else if (children.size() == 1) {
             Element element = children.get(0);
-            return new XmlArray(nameKeys, element.getChildNodes());
+            return new XmlArray(nameKeys, valueKeys, element.getChildNodes());
         }
         return null;
     }
 
     @Override
     public boolean getBool(String key) {
-        String value = XmlUtils.getNodeValue(element, nameKeys, key);
+        String value = XmlUtils.getNodeValue(element, nameKeys, valueKeys, key);
         return XmlUtils.toBoolean(value);
     }
 
     @Override
     public int getInt(String key) {
-        String value = XmlUtils.getNodeValue(element, nameKeys, key);
+        String value = XmlUtils.getNodeValue(element, nameKeys, valueKeys, key);
         return XmlUtils.toInt(value);
     }
 
     @Override
     public long getLong(String key) {
-        String value = XmlUtils.getNodeValue(element, nameKeys, key);
+        String value = XmlUtils.getNodeValue(element, nameKeys, valueKeys, key);
         return XmlUtils.toLong(value);
     }
 
     @Override
     public float getFloat(String key) {
-        String value = XmlUtils.getNodeValue(element, nameKeys, key);
+        String value = XmlUtils.getNodeValue(element, nameKeys, valueKeys, key);
         return XmlUtils.toFloat(value);
     }
 
     @Override
     public double getDouble(String key) {
-        String value = XmlUtils.getNodeValue(element, nameKeys, key);
+        String value = XmlUtils.getNodeValue(element, nameKeys, valueKeys, key);
         return XmlUtils.toDouble(value);
     }
 
     @Override
     public String getString(String key) {
-        return XmlUtils.getNodeValue(element, nameKeys, key);
+        return XmlUtils.getNodeValue(element, nameKeys, valueKeys, key);
     }
 
     @Override
     public boolean has(String key) {
-        return XmlUtils.getNodeValue(element, nameKeys, key) != null;
+        return XmlUtils.getNodeValue(element, nameKeys, valueKeys, key) != null;
     }
 
     @Override

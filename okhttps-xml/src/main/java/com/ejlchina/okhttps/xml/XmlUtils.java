@@ -62,7 +62,7 @@ public class XmlUtils {
         return elements;
     }
 
-    public static String getNodeValue(Element element, String[] nameKeys, String key) {
+    public static String getNodeValue(Element element, String[] nameKeys, String[] valueKeys, String key) {
         String value = element.getAttribute(key);
         if (!isBlank(value)) {
             return value;
@@ -70,15 +70,20 @@ public class XmlUtils {
         NodeList children = element.getChildNodes();
         Element ele = findElement(children, nameKeys, key);
         if (ele != null) {
-            return value(ele);
+            return value(ele, valueKeys);
         }
         return null;
     }
 
-    private static String value(Node node) {
-        String value = ((Element) node).getAttribute("value");
-        if (!isBlank(value)) {
-            return value;
+    public static String value(Node node, String[] valueKeys) {
+        if (node instanceof Element) {
+            Element ele = (Element) node;
+            for (String valueKey : valueKeys) {
+                String value = ele.getAttribute(valueKey);
+                if (!isBlank(value)) {
+                    return value;
+                }
+            }
         }
         return node.getTextContent();
     }

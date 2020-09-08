@@ -21,6 +21,7 @@ import java.util.List;
 public class XmlMsgConvertor implements MsgConvertor, ConvertProvider {
 
     private String[] nameKeys = {"name", "key"};
+    private String[] valueKeys = {"value"};
 
     private DocumentBuilderFactory dbFactory;
 
@@ -57,13 +58,13 @@ public class XmlMsgConvertor implements MsgConvertor, ConvertProvider {
     @Override
     public Mapper toMapper(InputStream in, Charset charset) {
         Element root = parseElement(in, charset);
-        return new XmlMapper(nameKeys, root);
+        return new XmlMapper(nameKeys, valueKeys, root);
     }
 
     @Override
     public Array toArray(InputStream in, Charset charset) {
         Element root = parseElement(in, charset);
-        return new XmlArray(nameKeys, root.getChildNodes());
+        return new XmlArray(nameKeys, valueKeys, root.getChildNodes());
     }
 
     @Override
@@ -92,6 +93,14 @@ public class XmlMsgConvertor implements MsgConvertor, ConvertProvider {
 
     public void setNameKeys(String[] nameKeys) {
         this.nameKeys = nameKeys;
+    }
+
+    public String[] getValueKeys() {
+        return valueKeys;
+    }
+
+    public void setValueKeys(String[] valueKeys) {
+        this.valueKeys = valueKeys;
     }
 
     public DocumentBuilderFactory getDbFactory() {
