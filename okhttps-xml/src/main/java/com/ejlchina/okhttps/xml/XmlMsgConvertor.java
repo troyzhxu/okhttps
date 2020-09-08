@@ -106,7 +106,7 @@ public class XmlMsgConvertor implements MsgConvertor, ConvertProvider {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T toBean(Type type, Mapper mapper) {
+    protected <T> T toBean(Type type, Mapper mapper) {
         Type[] typeArgs = null;
         if (type instanceof ParameterizedType) {
             typeArgs = ((ParameterizedType) type).getActualTypeArguments();
@@ -116,7 +116,7 @@ public class XmlMsgConvertor implements MsgConvertor, ConvertProvider {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T toBean(Class<T> clazz, Type[] typeArgs, Mapper mapper) {
+    protected <T> T toBean(Class<T> clazz, Type[] typeArgs, Mapper mapper) {
         if (clazz == Map.class || clazz == HashMap.class) {
             Map<String, Object> map = new HashMap<>();
             for (String key : mapper.keySet()) {
@@ -160,7 +160,7 @@ public class XmlMsgConvertor implements MsgConvertor, ConvertProvider {
         return bean;
     }
 
-    private Object fieldValue(Mapper mapper, String field, Type type) {
+    protected Object fieldValue(Mapper mapper, String field, Type type) {
         if (type == int.class || type == Integer.class) {
             return mapper.getInt(field);
         }
@@ -204,7 +204,7 @@ public class XmlMsgConvertor implements MsgConvertor, ConvertProvider {
         return null;
     }
 
-    private Map<String, Method> getSetMehthods(Class<?> clazz) {
+    protected Map<String, Method> getSetMehthods(Class<?> clazz) {
         Map<String, Method> methods = new HashMap<>();
         for (Method method: clazz.getMethods()) {
             String methodName = method.getName();
@@ -219,7 +219,7 @@ public class XmlMsgConvertor implements MsgConvertor, ConvertProvider {
         return methods;
     }
 
-    private Class<?> toClass(Type type) {
+    protected Class<?> toClass(Type type) {
         if (type instanceof Class) {
             return (Class<?>) type;
         }
