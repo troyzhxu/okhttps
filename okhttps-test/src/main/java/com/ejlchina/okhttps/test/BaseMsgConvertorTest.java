@@ -9,8 +9,6 @@ import org.junit.Assert;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Set;
 
