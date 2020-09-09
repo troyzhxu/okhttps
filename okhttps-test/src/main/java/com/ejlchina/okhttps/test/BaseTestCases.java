@@ -12,11 +12,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 
-public abstract class BaseMsgConvertorTest {
+public abstract class BaseTestCases {
 
     MsgConvertor msgConvertor;
 
-    public BaseMsgConvertorTest(MsgConvertor msgConvertor) {
+    public BaseTestCases(MsgConvertor msgConvertor) {
         this.msgConvertor = msgConvertor;
     }
 
@@ -24,7 +24,6 @@ public abstract class BaseMsgConvertorTest {
         testToMapper();
         testToArray();
         testSerializeBean();
-//        testSerializeList();
         testToBean();
         testToResult();
         testToList();
@@ -73,16 +72,6 @@ public abstract class BaseMsgConvertorTest {
         String json = new String(data, StandardCharsets.UTF_8);
         Assert.assertEquals(getUserObjectStr(), json);
         System.out.println("case 3 passed!");
-    }
-
-    void testSerializeList() {
-        User u1 = new User(1, "Jack");
-        User u2 = new User(2, "Tom");
-        User[] list = new User[] {u1, u2};
-        byte[] data = msgConvertor.serialize(list, StandardCharsets.UTF_8);
-        String json = new String(data, StandardCharsets.UTF_8);
-        Assert.assertEquals(getUserListStr(), json);
-        System.out.println("case 4 passed!");
     }
 
     void testToBean() {

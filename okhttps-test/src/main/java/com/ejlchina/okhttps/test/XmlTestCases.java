@@ -3,9 +3,9 @@ package com.ejlchina.okhttps.test;
 import com.ejlchina.okhttps.MsgConvertor;
 
 
-public class XmlMsgConvertorTest extends BaseMsgConvertorTest {
+public class XmlTestCases extends BaseTestCases {
 
-	public XmlMsgConvertorTest(MsgConvertor msgConvertor) {
+	public XmlTestCases(MsgConvertor msgConvertor) {
 		super(msgConvertor);
 	}
 

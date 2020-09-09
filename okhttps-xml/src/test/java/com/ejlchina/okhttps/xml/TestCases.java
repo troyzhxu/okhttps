@@ -4,7 +4,7 @@ import com.ejlchina.okhttps.Array;
 import com.ejlchina.okhttps.HTTP;
 import com.ejlchina.okhttps.Mapper;
 import com.ejlchina.okhttps.MsgConvertor;
-import com.ejlchina.okhttps.test.XmlMsgConvertorTest;
+import com.ejlchina.okhttps.test.XmlTestCases;
 import org.junit.Test;
 
 public class TestCases {
@@ -12,7 +12,7 @@ public class TestCases {
     @Test
     public void doTest() throws Exception {
         MsgConvertor msgConvertor = new XmlMsgConvertor();
-        new XmlMsgConvertorTest(msgConvertor).run();
+        new XmlTestCases(msgConvertor).run();
     }
 
     @Test
