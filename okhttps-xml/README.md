@@ -21,8 +21,4 @@
 implementation 'com.ejlchina:okhttps-xml:2.4.1'
 ```
 
-##### 注意
-
-尚不支持复合泛型
-
 #### 更多请参阅 [http://okhttps.ejlchina.com/](http://okhttps.ejlchina.com/)
