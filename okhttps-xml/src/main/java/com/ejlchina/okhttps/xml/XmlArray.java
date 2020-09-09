@@ -10,14 +10,15 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 public class XmlArray implements Array {
 
     private String[] nameKeys;
     private String[] valueKeys;
-    private NodeList list;
+    private List<Element> list;
 
-    public XmlArray(String[] nameKeys, String[] valueKeys, NodeList list) {
+    public XmlArray(String[] nameKeys, String[] valueKeys, List<Element> list) {
         this.nameKeys = nameKeys;
         this.valueKeys = valueKeys;
         this.list = list;
@@ -25,38 +26,35 @@ public class XmlArray implements Array {
 
     @Override
     public int size() {
-        return list.getLength();
+        return list.size();
     }
 
     @Override
     public boolean isEmpty() {
-        return list.getLength() == 0;
+        return list.isEmpty();
     }
 
     @Override
     public Mapper getMapper(int index) {
-        if (index < list.getLength()) {
-            Node node = list.item(index);
-            if (node instanceof Element) {
-                return new XmlMapper(nameKeys, valueKeys, (Element) node);
-            }
+        if (index < list.size()) {
+            return new XmlMapper(nameKeys, valueKeys, list.get(index));
         }
         return null;
     }
 
     @Override
     public Array getArray(int index) {
-        if (index < list.getLength()) {
-            Node node = list.item(index);
-            return new XmlArray(nameKeys, valueKeys, node.getChildNodes());
+        if (index < list.size()) {
+            Element node = list.get(index);
+            return new XmlArray(nameKeys, valueKeys, XmlUtils.children(node));
         }
         return null;
     }
 
     @Override
     public boolean getBool(int index) {
-        if (index < list.getLength()) {
-            String value = XmlUtils.value(list.item(index), valueKeys);
+        if (index < list.size()) {
+            String value = XmlUtils.value(list.get(index), valueKeys);
             return XmlUtils.toBoolean(value);
         }
         return false;
@@ -64,8 +62,8 @@ public class XmlArray implements Array {
 
     @Override
     public int getInt(int index) {
-        if (index < list.getLength()) {
-            String value = XmlUtils.value(list.item(index), valueKeys);
+        if (index < list.size()) {
+            String value = XmlUtils.value(list.get(index), valueKeys);
             return XmlUtils.toInt(value);
         }
         return 0;
@@ -73,8 +71,8 @@ public class XmlArray implements Array {
 
     @Override
     public long getLong(int index) {
-        if (index < list.getLength()) {
-            String value = XmlUtils.value(list.item(index), valueKeys);
+        if (index < list.size()) {
+            String value = XmlUtils.value(list.get(index), valueKeys);
             return XmlUtils.toLong(value);
         }
         return 0;
@@ -82,8 +80,8 @@ public class XmlArray implements Array {
 
     @Override
     public float getFloat(int index) {
-        if (index < list.getLength()) {
-            String value = XmlUtils.value(list.item(index), valueKeys);
+        if (index < list.size()) {
+            String value = XmlUtils.value(list.get(index), valueKeys);
             return XmlUtils.toFloat(value);
         }
         return 0;
@@ -91,8 +89,8 @@ public class XmlArray implements Array {
 
     @Override
     public double getDouble(int index) {
-        if (index < list.getLength()) {
-            String value = XmlUtils.value(list.item(index), valueKeys);
+        if (index < list.size()) {
+            String value = XmlUtils.value(list.get(index), valueKeys);
             return XmlUtils.toDouble(value);
         }
         return 0;
@@ -100,8 +98,8 @@ public class XmlArray implements Array {
 
     @Override
     public String getString(int index) {
-        if (index < list.getLength()) {
-            return XmlUtils.value(list.item(index), valueKeys);
+        if (index < list.size()) {
+            return XmlUtils.value(list.get(index), valueKeys);
         }
         return null;
     }
@@ -110,10 +108,10 @@ public class XmlArray implements Array {
     public String toString() {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            for (int i = 0; i < list.getLength(); i++) {
+            for (int i = 0; i < list.size(); i++) {
                 TransformerFactory.newInstance().newTransformer()
-                        .transform(new DOMSource(list.item(i)), new StreamResult(baos));
-                if (i < list.getLength() - 1) {
+                        .transform(new DOMSource(list.get(i)), new StreamResult(baos));
+                if (i < list.size() - 1) {
                     baos.write('\n');
                 }
             }

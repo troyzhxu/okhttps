@@ -11,40 +11,48 @@ import java.util.List;
 public class XmlUtils {
 
 
-    public static Element findElement(NodeList nodes, String[] nameKeys, String key) {
+    public static List<Element> children(Element element) {
+        NodeList nodes = element.getChildNodes();
+        List<Element> list = new ArrayList<>();
         for (int i = 0; i < nodes.getLength(); i++) {
             Node node = nodes.item(i);
-            if (node instanceof Element && nodeNameEquals(node, key)) {
-                return (Element) node;
+            if (node instanceof Element)  {
+                list.add((Element) node);
+            }
+        }
+        return list;
+    }
+
+    public static Element findElement(List<Element> nodes, String[] nameKeys, String key) {
+        for (Element node : nodes) {
+            if (nodeNameEquals(node, key)) {
+                return node;
             }
         }
         for (String nameKey : nameKeys) {
-            for (int i = 0; i < nodes.getLength(); i++) {
-                Node node = nodes.item(i);
-                if (node instanceof Element && elementKeyEquals((Element) node, nameKey, key)) {
-                    return (Element) node;
+            for (Element node : nodes) {
+                if (elementKeyEquals(node, nameKey, key)) {
+                    return node;
                 }
             }
         }
         return null;
     }
 
-    public static List<Element> findElements(NodeList nodes, String[] nameKeys, String key) {
+    public static List<Element> findElements(List<Element> nodes, String[] nameKeys, String key) {
         List<Element> elements = new ArrayList<>();
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Node node = nodes.item(i);
-            if (node instanceof Element && nodeNameEquals(node, key)) {
-                elements.add((Element) node);
+        for (Element node : nodes) {
+            if (nodeNameEquals(node, key)) {
+                elements.add(node);
             }
         }
         if (elements.size() > 0) {
             return elements;
         }
         for (String nameKey : nameKeys) {
-            for (int i = 0; i < nodes.getLength(); i++) {
-                Node node = nodes.item(i);
-                if (node instanceof Element && elementKeyEquals((Element) node, nameKey, key)) {
-                    elements.add((Element) node);
+            for (Element node : nodes) {
+                if (elementKeyEquals(node, nameKey, key)) {
+                    elements.add(node);
                 }
             }
             if (elements.size() > 0) {
@@ -54,27 +62,11 @@ public class XmlUtils {
         return elements;
     }
 
-    public static String getNodeValue(Element element, String[] nameKeys, String[] valueKeys, String key) {
-        String value = element.getAttribute(key);
-        if (!isBlank(value)) {
-            return value;
-        }
-        NodeList children = element.getChildNodes();
-        Element ele = findElement(children, nameKeys, key);
-        if (ele != null) {
-            return value(ele, valueKeys);
-        }
-        return null;
-    }
-
-    public static String value(Node node, String[] valueKeys) {
-        if (node instanceof Element) {
-            Element ele = (Element) node;
-            for (String valueKey : valueKeys) {
-                String value = ele.getAttribute(valueKey);
-                if (!isBlank(value)) {
-                    return value;
-                }
+    public static String value(Element node, String[] valueKeys) {
+        for (String valueKey : valueKeys) {
+            String value = node.getAttribute(valueKey);
+            if (!isBlank(value)) {
+                return value;
             }
         }
         return node.getTextContent();
