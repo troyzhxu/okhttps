@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -24,13 +25,19 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 
 	private final Map<Type, TypeReference<?>> cache = new HashMap<>();
 
+	private boolean typeCached;
 
 	public JacksonMsgConvertor() {
 		this(new ObjectMapper());
 	}
 	
 	public JacksonMsgConvertor(ObjectMapper objectMapper) {
+		this(objectMapper, false);
+	}
+
+	public JacksonMsgConvertor(ObjectMapper objectMapper, boolean typeCached) {
 		this.objectMapper = objectMapper;
+		this.typeCached = typeCached;
 	}
 
 	@Override
@@ -41,7 +48,7 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 	@Override
 	public Mapper toMapper(InputStream in, Charset charset) {
 		try {
-			JsonNode json = objectMapper.readTree(in);
+			JsonNode json = objectMapper.readTree(new InputStreamReader(in, charset));
 			if (json.isObject()) {
 				return new JacksonMapper((ObjectNode) json);
 			}
@@ -57,7 +64,7 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 	@Override
 	public Array toArray(InputStream in, Charset charset) {
 		try {
-			JsonNode json = objectMapper.readTree(in);
+			JsonNode json = objectMapper.readTree(new InputStreamReader(in, charset));
 			if (json.isArray()) {
 				return new JacksonArray((ArrayNode) json);
 			}
@@ -91,7 +98,9 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 						return type;
 					}
 				};
-				cache.put(type, typeRef);
+				if (typeCached) {
+					cache.put(type, typeRef);
+				}
 			}
 		}
 		return typeRef;
@@ -100,7 +109,7 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 	@Override
 	public <T> T toBean(Type type, InputStream in, Charset charset) {
 		try {
-			return objectMapper.readValue(in, toTypeRef(type));
+			return objectMapper.readValue(new InputStreamReader(in, charset), toTypeRef(type));
 		} catch (IOException e) {
 			throw new HttpException("Jackson 解析异常", e);
 		}
@@ -110,7 +119,7 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 	public <T> List<T> toList(Class<T> type, InputStream in, Charset charset) {
 		CollectionType javaType = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, type);
 		try {
-			return objectMapper.readValue(in, javaType);
+			return objectMapper.readValue(new InputStreamReader(in, charset), javaType);
 		} catch (IOException e) {
 			throw new HttpException("Jackson 解析异常", e);
 		}
@@ -127,6 +136,14 @@ public class JacksonMsgConvertor implements MsgConvertor, ConvertProvider {
 
 	public void setObjectMapper(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
+	}
+
+	public boolean isTypeCached() {
+		return typeCached;
+	}
+
+	public void setTypeCached(boolean typeCached) {
+		this.typeCached = typeCached;
 	}
 
 }
