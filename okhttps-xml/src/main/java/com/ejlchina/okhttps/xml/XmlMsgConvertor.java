@@ -75,7 +75,7 @@ public class XmlMsgConvertor implements MsgConvertor, ConvertProvider {
     @Override
     public Array toArray(InputStream in, Charset charset) {
         Element root = parseElement(in, charset);
-        return new XmlArray(nameKeys, valueKeys, root.getChildNodes());
+        return new XmlArray(nameKeys, valueKeys, XmlUtils.children(root));
     }
 
     @Override
