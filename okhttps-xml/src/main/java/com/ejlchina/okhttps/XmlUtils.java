@@ -1,4 +1,4 @@
-package com.ejlchina.okhttps.xml;
+package com.ejlchina.okhttps;
 
 import com.ejlchina.okhttps.Platform;
 import org.w3c.dom.Element;

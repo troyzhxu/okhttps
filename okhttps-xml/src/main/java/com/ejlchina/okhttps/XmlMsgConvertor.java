@@ -1,9 +1,5 @@
-package com.ejlchina.okhttps.xml;
+package com.ejlchina.okhttps;
 
-import com.ejlchina.okhttps.Array;
-import com.ejlchina.okhttps.ConvertProvider;
-import com.ejlchina.okhttps.Mapper;
-import com.ejlchina.okhttps.MsgConvertor;
 import com.ejlchina.okhttps.internal.HttpException;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;

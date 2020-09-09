@@ -1,9 +1,5 @@
-package com.ejlchina.okhttps.xml;
+package com.ejlchina.okhttps;
 
-import com.ejlchina.okhttps.Array;
-import com.ejlchina.okhttps.HTTP;
-import com.ejlchina.okhttps.Mapper;
-import com.ejlchina.okhttps.MsgConvertor;
 import com.ejlchina.okhttps.test.XmlTestCases;
 import org.junit.Test;
 

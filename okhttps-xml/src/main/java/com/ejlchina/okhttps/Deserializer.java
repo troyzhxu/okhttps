@@ -1,7 +1,4 @@
-package com.ejlchina.okhttps.xml;
-
-import com.ejlchina.okhttps.Array;
-import com.ejlchina.okhttps.Mapper;
+package com.ejlchina.okhttps;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;

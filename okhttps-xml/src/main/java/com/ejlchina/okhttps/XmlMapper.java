@@ -1,7 +1,5 @@
-package com.ejlchina.okhttps.xml;
+package com.ejlchina.okhttps;
 
-import com.ejlchina.okhttps.Array;
-import com.ejlchina.okhttps.Mapper;
 import org.w3c.dom.*;
 
 import javax.xml.transform.TransformerFactory;
