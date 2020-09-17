@@ -64,6 +64,8 @@ public final class TaskExecutor {
             }
         } else if (onResponse != null) {
             execute(() -> onResponse.on(result), onIo);
+        } else {
+            result.close();
         }
     }
 

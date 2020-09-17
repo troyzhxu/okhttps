@@ -1,5 +1,8 @@
 package com.ejlchina.okhttps.test;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class Result<T> {
 
     int code;

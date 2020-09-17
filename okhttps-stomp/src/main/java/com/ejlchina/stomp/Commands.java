@@ -15,5 +15,7 @@ public class Commands {
     public static final String ACK = "ACK";
 
     public static final String UNKNOWN = "UNKNOWN";
+    
+    public static final String ERROR = "ERROR";
 
 }

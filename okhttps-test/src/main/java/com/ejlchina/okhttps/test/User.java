@@ -1,10 +1,13 @@
 package com.ejlchina.okhttps.test;
 
+
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class User {
 
     private int id;
     private String name;
-
     
     public User() {
 	}
@@ -31,9 +34,12 @@ public class User {
 	}
 
 	@Override
-    public String toString() {
-        return "User [id=" + id + ", name=" + name + "]";
-    }
+	public String toString() {
+		return "User{" +
+				"id=" + id +
+				", name='" + name + '\'' +
+				'}';
+	}
 
 	@Override
 	public int hashCode() {
