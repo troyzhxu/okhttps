@@ -18,7 +18,7 @@ public class TestCases {
                 .addMsgConvertor(new XmlMsgConvertor())
                 .build();
 
-        Mapper mapper = http.sync("https://repo1.maven.org/maven2/com/ejlchina/okhttps/2.4.1/okhttps-2.4.1.pom")
+        Mapper mapper = http.sync("https://repo1.maven.org/maven2/com/ejlchina/okhttps/2.4.2/okhttps-2.4.2.pom")
                 .get().getBody().toMapper();
 
         System.out.println(mapper + "\n\n---------\n");
