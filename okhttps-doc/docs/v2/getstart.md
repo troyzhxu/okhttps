@@ -54,6 +54,16 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 以上依赖四选一即可
 :::
 
+#### 集成 XML 扩展（since v2.4.2）
+
+```xml
+<dependency>
+     <groupId>com.ejlchina</groupId>
+     <artifactId>okhttps-xml</artifactId>
+     <version>2.4.2</version>
+</dependency>
+```
+
 #### 使用 Stomp 客户端
 
 ```xml
@@ -95,6 +105,12 @@ implementation 'com.ejlchina:okhttps-jackson:2.4.2'
 ::: tip
 以上依赖四选一即可
 :::
+
+#### 集成 XML 扩展（since v2.4.2）
+
+```groovy
+implementation 'com.ejlchina:okhttps-xml:2.4.2'
+```
 
 #### 使用 Stomp 客户端
 

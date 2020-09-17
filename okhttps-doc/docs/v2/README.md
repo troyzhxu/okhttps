@@ -27,10 +27,11 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 项目 | 最新版本 | 描述
 -|-|-
 [okhttps](https://gitee.com/ejlchina-zhxu/okhttps) | 2.4.2 | OkHttps 核心模块
-[okhttps-fastjson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-fastjson) | 2.4.2 | 与 fastjson 集成
-[okhttps-gson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-gson) | 2.4.2 | 与 gson 集成
-[okhttps-jackson](https://gitee.com/ejlchina-zhxu/okhttps/tree/master/okhttps-jackson) | 2.4.2 | 与 jackson 集成
-[okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps-stomp) | 2.4.2 | 超级轻量的 Stomp 客户端
+[okhttps-fastjson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-fastjson) | 2.4.2 | 与 fastjson 集成
+[okhttps-gson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-gson) | 2.4.2 | 与 gson 集成
+[okhttps-jackson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-jackson) | 2.4.2 | 与 jackson 集成
+[okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-stomp) | 2.4.2 | 超轻量的 Stomp 客户端（无第三方依赖）
+[okhttps-xml](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-xml) | 2.4.2 | 超轻量 XML 解析扩展（无第三方依赖，但仅支持 Java 8）
 
 ## v2.4 的新特性
 
@@ -38,6 +39,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 2. HttpTask 新增 `getPathParas()`、`getUrlParas()`、`getBodyParas()`、`getFileParas()`、`getRequestBody()` 方法
 3. 优化`HttpTask#addFilePara(String name, String type, byte[] content)`方法，添加自动生成文件名逻辑，兼容某些必须要提供文件名才能接受到文件的后端接口
 4. Stomp 新增`setOnError`方法，可监听处理处理服务器发出的 ERROR 帧
+5. 新增超轻量无第三方依赖的 XML 解析扩展（v2.4.2 起）
 
 ## v2.3 的新特性
 
