@@ -102,6 +102,8 @@ Websocket 方法：
 ## 联系方式
 
 * 微信：<img src="https://images.gitee.com/uploads/images/2020/0718/142637_87d27a5c_1393412.png" width="700px">
+* 由于近期交流群的二维码被爬，扫码入群方式已被关闭
+库的使用上若有疑问，可先加微信【18556739726】（请备注 OkHttps）再入群交流
 * 邮箱：zhou.xu@ejlchina.com
 
 ## 后续计划
