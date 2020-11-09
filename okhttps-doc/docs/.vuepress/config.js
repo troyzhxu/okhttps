@@ -47,7 +47,8 @@ module.exports = {
             'updownload',
             'websocket',
             'stomp',
-            'android'
+            'android',
+            'questions'
           ]
         },
         lastUpdated: '上次更新',
