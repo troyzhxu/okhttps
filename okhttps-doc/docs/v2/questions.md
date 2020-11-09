@@ -83,9 +83,9 @@ HTTP http = HTTP.builder()
     .build();
 ```
 
-## 有失败重试机制吗？要怎么配置？
+## OkHttps 有失败重试机制吗？要怎么配置？
 
-答：很简单，比如以下配置就可实现请求超时重试：
+答：很简单，比如以下配置就可实现请求超时重试三次：
 
 ```java
 HTTP http = HTTP.builder()
@@ -107,7 +107,7 @@ HTTP http = HTTP.builder()
     }).build();
 ```
 
-以下代码实现服务器状态码为 500 时，自动重试：
+以下代码实现服务器状态码为 500 时，自动重试三次：
 
 ```java
 HTTP http = HTTP.builder()
@@ -219,3 +219,5 @@ OkHttps.sync("/api/...")
     .setBodyPara(paraMap)
     .post();
 ```
+
+## 若还有其它问题，可先加微信：18556739726（请备注 OkHttps）再入群讨论
