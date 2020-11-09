@@ -83,11 +83,81 @@ HTTP http = HTTP.builder()
     .build();
 ```
 
+## 有失败重试机制吗？要怎么配置？
+
+答：很简单，比如以下配置就可实现请求超时重试：
+
+```java
+HTTP http = HTTP.builder()
+    .config(b -> {
+        b.addInterceptor(chain -> {
+            int retryTimes = 0;	
+            while (true) {
+                try {
+                    return chain.proceed(chain.request());
+                } catch (SocketTimeoutException e) {
+                    if (retryTimes >= 3) {
+                        throw e;
+                    }
+                    retryTimes++;
+                    System.out.println("超时重试第" + retryTimes + "次！");
+                }
+            }
+        });
+    }).build();
+```
+
+以下代码实现服务器状态码为 500 时，自动重试：
+
+```java
+HTTP http = HTTP.builder()
+    .config(b -> {
+        b.addInterceptor(chain -> {
+            int retryTimes = 0;	
+            while (true) {
+                Response response = chain.proceed(chain.request());
+                if (response.code() == 500 && retryTimes < 3) {
+                    retryTimes++;
+                    System.out.println("失败重试第" + retryTimes + "次！");
+                }
+                return response;
+            }
+        });
+    }).build();
+```
+
+当然也可以把两者结合起来：
+
+```java
+HTTP http = HTTP.builder()
+    .config(b -> {
+        b.addInterceptor(chain -> {
+            int retryTimes = 0;	
+            while (true) {
+                Response response = null;
+                Exception exception = null;
+                try {
+                    response = chain.proceed(chain.request());
+                } catch (Exception e) {
+                    exception = e;
+                }
+                if ((exception != null || response.code() == 500) && retryTimes < 3) {
+                    retryTimes++;
+                    System.out.println("失败重试第" + retryTimes + "次！");
+                } else if (exception != null) {
+                    throw exception;
+                }
+                return response;
+            }
+        });
+    }).build();
+```
+
 ## HttpException：没有匹配[null]类型的转换器！
 
-当出现这个异常是，一般是让 OkHttps 去自动解析 JSON 却没有给它配置`MsgConvertor`导致的，当遇到这个异常是，可按如下步骤检查：
+当出现这个异常时，一般是让 OkHttps 去自动解析 JSON 却没有给它配置`MsgConvertor`导致的，当遇到这个异常，可按如下步骤检查：
 
-**1、** 项目依赖中是否添加了 json 扩展包：`okhttps-fastjson`、`okhttps-gson`、`okhttps-jackson`，添加一个即可
+**1、** 项目依赖中是否添加了 json 扩展包：`okhttps-fastjson`、`okhttps-gson`、`okhttps-jackson`，添加一个即可；
 
 **2、** 发起请求时，使用的是 OkHttps 提供的工具类（`OkHttps`或`HttpUtils`）还是 自己构建的`HTTP`实例，如果是前者，框架会自动配置`MsgConvertor`，若是后者，得自己手动配置`MsgConvertor`：
 
@@ -99,7 +169,7 @@ HTTP http = HTTP.builder()
     .build();
 ```
 
-**3、** 项目依赖中已经添加了 json 扩展包，并且使用的是 OkHttps 提供的工具类（`OkHttps`或`HttpUtils`），但还是有这个异常，这个时候一般是 IDE 的编译器的 BUG 导致的，请 clean 一下项目，重新运行即可。
+**3、** 项目依赖中已经添加了 json 扩展包，并且使用的是 OkHttps 提供的工具类（`OkHttps`或`HttpUtils`），但还是有这个异常（罕见），这个时候一般是 IDE 的编译器的 BUG 导致的，请 clean 一下项目，重新运行即可。
 
 ## JSON 请求后端收不到数据，JSON 被加上双引号当做字符串了？
 
