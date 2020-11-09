@@ -1,8 +1,8 @@
 # 常见问题
 
-## OkHttps 支持 SSL（HTTPS）吗？需要额外配置吗？
+## 支持 SSL（HTTPS）吗？
 
-答：**支持，并不需要额外配置**，比如以下请求百度的网址，不需要任何配置就可以正常运行：
+答：**支持**，比如以下请求百度的带 https 的网址，不需要任何配置就可以正常运行：
 
 ```java
 HTTP http = HTTP.builder().build();
@@ -56,7 +56,7 @@ sslCtx.init(null, new TrustManager[] { myTrustManager }, new SecureRandom());
 SSLSocketFactory mySSLSocketFactory = sslCtx.getSocketFactory();
 ```
 
-## OkHttps 支持 Cookie 吗？要怎么配置？
+## 支持 Cookie 吗？
 
 答：**支持**，配置方和 OkHttp 完全一样，只需要配置一个 CookieJar 即可：
 
@@ -83,7 +83,7 @@ HTTP http = HTTP.builder()
     .build();
 ```
 
-## OkHttps 有失败重试机制吗？要怎么配置？
+## 有失败重试机制吗？
 
 答：很简单，比如以下配置就可实现请求超时重试三次：
 
@@ -153,6 +153,30 @@ HTTP http = HTTP.builder()
     }).build();
 ```
 
+## 支持代理（Proxy）吗？
+
+答：**支持**，只需配置 Proxy 即可，例如：
+
+```java
+HTTP http = HTTP.builder()
+    .config(b -> {
+        b.proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("www.your-proxy.com", 8080)));
+    })
+    .build();
+```
+
+## 支持缓存（Cache）吗？
+
+答：**支持**，只需配置 Cache 即可，例如：
+
+```java
+HTTP http = HTTP.builder()
+    .config(b -> {
+        b.cache(new Cache("/path-to-cache", 10 * 1024 * 1024));
+    })
+    .build();
+```
+
 ## HttpException：没有匹配[null]类型的转换器！
 
 当出现这个异常时，一般是让 OkHttps 去自动解析 JSON 却没有给它配置`MsgConvertor`导致的，当遇到这个异常，可按如下步骤检查：
@@ -220,4 +244,10 @@ OkHttps.sync("/api/...")
     .post();
 ```
 
-## 若还有其它问题，可先加微信：18556739726（请备注 OkHttps）再入群讨论
+## 还有其它问题，怎么解决？
+
+1. 到 GitHub 的 issue 里看看有没有人提过类似的问题：https://github.com/ejlchina/okhttps/issues?q=is%3Aissue+is%3Aclosed
+
+2. 到 Gitee 的 issue 里看看有没有人提过类似的问题：https://gitee.com/ejlchina-zhxu/okhttps/issues?assignee_id=&author_id=&branch=&issue_search=&label_name=&milestone_id=&program_id=&scope=&sort=&state=closed
+
+3. 若问题还没得到解决，可先加微信：18556739726（请备注 OkHttps）再入群交流讨论。
