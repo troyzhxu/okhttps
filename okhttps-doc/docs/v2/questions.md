@@ -99,4 +99,4 @@ HTTP http = HTTP.builder()
     .build();
 ```
 
-**3、** 项目依赖中是否添加了 json 扩展包，并且使用的是 OkHttps 提供的工具类（`OkHttps`或`HttpUtils`），但还是有这个异常，这个时候一般是 IDE 的编译器的 BUG 导致的，请 clean 一下项目，重新运行即可。
+**3、** 项目依赖中已经添加了 json 扩展包，并且使用的是 OkHttps 提供的工具类（`OkHttps`或`HttpUtils`），但还是有这个异常，这个时候一般是 IDE 的编译器的 BUG 导致的，请 clean 一下项目，重新运行即可。
