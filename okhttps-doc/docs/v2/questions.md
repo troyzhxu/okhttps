@@ -100,3 +100,52 @@ HTTP http = HTTP.builder()
 ```
 
 **3、** 项目依赖中已经添加了 json 扩展包，并且使用的是 OkHttps 提供的工具类（`OkHttps`或`HttpUtils`），但还是有这个异常，这个时候一般是 IDE 的编译器的 BUG 导致的，请 clean 一下项目，重新运行即可。
+
+## JSON 请求后端收不到数据，JSON 被加上双引号当做字符串了？
+
+```java
+List<String> values = new ArrayList<>();
+values.add("value1");
+values.add("value2");
+
+OkHttps.sync("/api/...")
+    .bodyType(OkHttps.JSON)
+    .addBodyPara("name", "Test")
+    .addBodyPara("values", values)
+    .post();
+```
+
+如上，用户可能期望发送这样的 JSON 给服务器：
+
+```json
+{
+    "name": "Test",
+    "values": [ "value1", "value2" ]
+}
+```
+
+但实际上服务器收到的却是这样：
+
+```json
+{
+    "name": "Test",
+    "values": "[\"value1\", \"value2\"]"
+}
+```
+
+这是因为`addBodyPara`方法添加的参数**只支持单层数据结构**，若要支持多层数据结构，必须使用`setBodyPara`方法，如下：
+
+```java
+List<String> values = new ArrayList<>();
+values.add("value1");
+values.add("value2");
+
+Map<String, Object> paraMap = new HashMap<>();
+paraMap.put("name", "Test");
+paraMap.put("values", values);
+
+OkHttps.sync("/api/...")
+    .bodyType(OkHttps.JSON)
+    .setBodyPara(paraMap)
+    .post();
+```
