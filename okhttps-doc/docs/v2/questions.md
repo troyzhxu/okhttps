@@ -246,8 +246,8 @@ OkHttps.sync("/api/...")
 
 ## 还有其它问题，怎么解决？
 
-1. 到 GitHub 的 issue 里看看有没有人提过类似的问题：https://github.com/ejlchina/okhttps/issues?q=is%3Aissue+is%3Aclosed
+1. 到 GitHub 的 issue 里看看有没有人提过类似的问题：[https://github.com/ejlchina/okhttps/issues?q=is%3Aissue+is%3Aclosed](https://github.com/ejlchina/okhttps/issues?q=is%3Aissue+is%3Aclosed)
 
-2. 到 Gitee 的 issue 里看看有没有人提过类似的问题：https://gitee.com/ejlchina-zhxu/okhttps/issues?assignee_id=&author_id=&branch=&issue_search=&label_name=&milestone_id=&program_id=&scope=&sort=&state=closed
+2. 到 Gitee 的 issue 里看看有没有人提过类似的问题：[https://gitee.com/ejlchina-zhxu/okhttps/issues?assignee_id=&author_id=&branch=&issue_search=&label_name=&milestone_id=&program_id=&scope=&sort=&state=closed](https://gitee.com/ejlchina-zhxu/okhttps/issues?assignee_id=&author_id=&branch=&issue_search=&label_name=&milestone_id=&program_id=&scope=&sort=&state=closed)
 
 3. 若问题还没得到解决，可先加微信：18556739726（请备注 OkHttps）再入群交流讨论。
