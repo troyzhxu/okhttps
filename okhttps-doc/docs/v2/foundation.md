@@ -382,14 +382,14 @@ http.async(BOOKS_QUERY_URL)     // /authors/1/books?bookType=2
 
 OkHttps 信仰统一与一致更加优雅，所以自 v2.0.0.RC 开始、它便统一了报文体参数的 API，无论是表单、还是 JSON、XML 或是 protobuf 等等，只要这些参数是放在请求报文体中，那么就可以通过一套 API 轻松搞定！
 
-* `addBodyPara(String name, Object value)` 添加 Body 参数
-* `addBodyPara(Map<String, ?> params)`     添加 Body 参数
-* `setBodyPara(Object object)`             设置 Body 参数体  
+* `addBodyPara(String name, Object value)` 添加 Body 参数（**只支持单层结构**）
+* `addBodyPara(Map<String, ?> params)`     添加 Body 参数（**只支持单层结构**）
+* `setBodyPara(Object object)`             设置 Body 参数体（**支持多层结构**）
 
 ::: warning 注意
 添加报文体参数后，不可使用 GET、HEAD 请求方法
 
-方法`setBodyPara`在 v2.0.0.RC 之前名为`setRequestJson`, v2.0.0.RC 之后推荐使用统一 API，老方法将在 v2.1.0 中移除。
+方法`setBodyPara`在 v2.0.0.RC 之前名为`setRequestJson`, v2.0.0.RC 之后推荐使用统一 API，老方法已在 v2.1.0 中移除。
 :::
 
 #### 表单请求
