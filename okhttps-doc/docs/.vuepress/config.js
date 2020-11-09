@@ -22,11 +22,11 @@ module.exports = {
             text: '教程',
             ariaLabel: '版本',
             items: [
-              { text: 'v1.x', link: '/v1/' },
-              { text: 'v2.x', link: '/v2/' }
+              { text: 'v2.x', link: '/v2/' },
+              { text: 'v1.x', link: '/v1/' }
             ]
           },
-          { text: '历史版本', link: 'https://gitee.com/ejlchina-zhxu/okhttps/releases' },
+          { text: 'Q&A', link: '/v2/questions.html' },
           { text: 'Grails 中文', link: 'http://grails.ejlchina.com' },
           { text: '码云', link: 'https://gitee.com/ejlchina-zhxu/okhttps' }
         ],
