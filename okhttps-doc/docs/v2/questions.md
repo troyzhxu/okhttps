@@ -83,6 +83,30 @@ HTTP http = HTTP.builder()
     .build();
 ```
 
+## 支持代理（Proxy）吗？
+
+答：**支持**，只需配置 Proxy 即可，例如：
+
+```java
+HTTP http = HTTP.builder()
+    .config(b -> {
+        b.proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("www.your-proxy.com", 8080)));
+    })
+    .build();
+```
+
+## 支持缓存（Cache）吗？
+
+答：**支持**，只需配置 Cache 即可，例如：
+
+```java
+HTTP http = HTTP.builder()
+    .config(b -> {
+        b.cache(new Cache("/path-to-cache", 10 * 1024 * 1024));
+    })
+    .build();
+```
+
 ## 有失败重试机制吗？
 
 答：很简单，比如以下配置就可实现请求超时重试三次：
@@ -153,30 +177,6 @@ HTTP http = HTTP.builder()
     }).build();
 ```
 
-## 支持代理（Proxy）吗？
-
-答：**支持**，只需配置 Proxy 即可，例如：
-
-```java
-HTTP http = HTTP.builder()
-    .config(b -> {
-        b.proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("www.your-proxy.com", 8080)));
-    })
-    .build();
-```
-
-## 支持缓存（Cache）吗？
-
-答：**支持**，只需配置 Cache 即可，例如：
-
-```java
-HTTP http = HTTP.builder()
-    .config(b -> {
-        b.cache(new Cache("/path-to-cache", 10 * 1024 * 1024));
-    })
-    .build();
-```
-
 ## HttpException：没有匹配[null]类型的转换器！
 
 当出现这个异常时，一般是让 OkHttps 去自动解析 JSON 却没有给它配置`MsgConvertor`导致的，当遇到这个异常，可按如下步骤检查：
@@ -194,6 +194,30 @@ HTTP http = HTTP.builder()
 ```
 
 **3、** 项目依赖中已经添加了 json 扩展包，并且使用的是 OkHttps 提供的工具类（`OkHttps`或`HttpUtils`），但还是有这个异常（罕见），这个时候一般是 IDE 的编译器的 BUG 导致的，请 clean 一下项目，重新运行即可。
+
+## HttpException: 转换失败 Caused by IOException: closed
+
+当出现这个异常时，很可能是对报文体重复消费（多次调用 toXXX 方法）造成的，类似以下代码：
+
+```java
+Body body = OkHttps.sync("/api/users/1").get().getBody();
+
+log.info("body = " + body);             // 这里隐式的调用了 body 的 toString 消费方法
+
+User user = body.toBean(User.class);    // 这里又调用了一次 toBean，将会抛出异常
+```
+
+以上代码，由于多次调用报文体的消费方法，则会导致此异常，如果确实需要多次消费时，可以先使用`cache`方法，如下：
+
+```java
+Body body = OkHttps.sync("/api/users/1").get().getBody()
+        .cache();                       // 先调用 cache 方法，就可以多次消费了
+
+log.info("body = " + body);             // 这里隐式的调用了 body 的 toString 消费方法
+
+User user = body.toBean(User.class);    // 又调用了一次 toBean，则不会再有问题
+Mapper mapper = body.toMapper();        // 再调用一次，依然没问题
+```
 
 ## JSON 请求后端收不到数据，JSON 被加上双引号当做字符串了？
 
