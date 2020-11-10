@@ -177,7 +177,7 @@ HTTP http = HTTP.builder()
     }).build();
 ```
 
-## HttpException：没有匹配[null]类型的转换器！
+## HttpException: 没有匹配[null/json]类型的转换器！
 
 当出现这个异常时，一般是让 OkHttps 去自动解析 JSON 却没有给它配置`MsgConvertor`导致的，当遇到这个异常，可按如下步骤检查：
 
