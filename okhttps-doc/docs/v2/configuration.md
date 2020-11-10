@@ -308,21 +308,21 @@ HTTP http = builder.build();
 ```java
 HTTP http = HTTP.builder()
         .responseListener((HttpTask<?> task, HttpResult result) -> {
-            // 所有请求响应后都会走这里
+            // 所有异步请求（包括 WebSocket）响应后都会走这里
 
             // 返回 true 表示继续执行 task 的 OnResponse 回调，
             // 返回 false 则表示不再执行，即 阻断
             return true; 
         })
         .completeListener((HttpTask<?> task, State state) -> {
-            // 所有请求执行完都会走这里
+            // 所有异步请求（包括 WebSocket）执行完都会走这里
 
             // 返回 true 表示继续执行 task 的 OnComplete 回调，
             // 返回 false 则表示不再执行，即 阻断
             return true;
         })
         .exceptionListener((HttpTask<?> task, IOException error) -> {
-            // 所有请求发生异常都会走这里
+            // 所有异步请求（包括 WebSocket）发生异常都会走这里
 
             // 返回 true 表示继续执行 task 的 OnException 回调，
             // 返回 false 则表示不再执行，即 阻断
