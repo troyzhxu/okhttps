@@ -143,6 +143,7 @@ HTTP http = HTTP.builder()
                 if (response.code() == 500 && retryTimes < 3) {
                     retryTimes++;
                     System.out.println("失败重试第" + retryTimes + "次！");
+                    continue;
                 }
                 return response;
             }
@@ -168,6 +169,7 @@ HTTP http = HTTP.builder()
                 if ((exception != null || response.code() == 500) && retryTimes < 3) {
                     retryTimes++;
                     System.out.println("失败重试第" + retryTimes + "次！");
+                    continue;
                 } else if (exception != null) {
                     throw exception;
                 }
