@@ -221,6 +221,42 @@ User user = body.toBean(User.class);    // 又调用了一次 toBean，则不会
 Mapper mapper = body.toMapper();        // 再调用一次，依然没问题
 ```
 
+## HttpException: 报文体转换字符串出错 Caused by IOException: Content-Length (xxx) and stream length (0) disagree
+
+当出现这个异常，同样很可能是多次消费报文体的问题（同上），再类似以下的代码：
+
+```java
+HttpResult.Body body1 = OkHttps.async("/api/...")
+        .setOnResponse(res -> {
+            HttpResult.Body body2 = res.getBody();
+            String str2 = body2.toString();     // 这里消费了一次报文体
+            // ...
+        })
+        .get()
+        .getResult()
+        .getBody();
+
+String str1 = body1.toString();                 // 这里又消费了一次报文体
+```
+
+以上的代码，在第 4、11 行都消费了报文体，但是没有提前使用`cache()`方法，所以会报错，如下修改即可：
+
+```java
+HttpResult.Body body1 = OkHttps.async("/api/...")
+        .setOnResponse(res -> {
+            HttpResult.Body body2 = res.getBody()
+                    .cache();                   // 使用 cache
+            String str2 = body2.toString();
+            // ...
+        })
+        .get()
+        .getResult()
+        .getBody()
+        .cache();                               // 使用 cache
+
+String str1 = body1.toString();
+```
+
 ## JSON 请求后端收不到数据，JSON 被加上双引号当做字符串了？
 
 ```java
