@@ -6,7 +6,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 
 ## OkHttps 简介
 
-　　OkHttps 是近期开源的对 OkHttp3 轻量封装的框架，它独创的异步预处理器，特色的标签，灵活的上传下载进度监听与过程控制功能，在轻松解决很多原本另人头疼问题的同时，设计上也力求纯粹与优雅。
+　　OkHttps 是 2020 年开源的对 OkHttp3 轻量封装的框架，它独创的异步预处理器，特色的标签，灵活的上传下载进度监听与过程控制功能，在轻松解决很多原本另人头疼问题的同时，设计上也力求纯粹与优雅。
 
  * 链式调用，一点到底
  * BaseURL、URL占位符、HTTP、WebSocket
@@ -17,7 +17,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
  * TCP连接池、Http2
 
 ::: tip
-* OkHttps 非常轻量（77Kb，Retrofit：124Kb），除 Okhttp 无第三方依赖，并且更加的开箱即用，API 也更加自然和语义化。
+* OkHttps 非常轻量（最新版仅 90KB），除 Okhttp 无第三方依赖，并且更加的开箱即用，API 也更加自然和语义化。
 * OkHttps 是一个纯粹的 Java 网络开发包，并不依赖 Android，这一点和 Retrofit 不同
 * OkHttps 用起来很优美，可以像 RxJava 那样链式用，却比 RxJava 更简单。
 :::
@@ -33,7 +33,13 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 [okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-stomp) | 2.4.2 | 超轻量 Stomp 客户端（无第三方依赖）
 [okhttps-xml](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-xml) | 2.4.2 | 超轻量 XML 解析扩展（无第三方依赖，但仅支持 Java 8）
 
-## v2.4 的新特性
+## 版本迭代
+
+OkHttps 从最初的 [httputils](https://gitee.com/ejlchina-zhxu/httputils) 演变而来，期间共经历了二十多个版本迭代 以及 上百个前后端项目的生产检验，目前已非常稳定。详细的版本可参见 [httputils 版本演变](https://gitee.com/ejlchina-zhxu/httputils/releases) 和 [okhttps 版本演变](https://gitee.com/ejlchina-zhxu/okhttps/releases)。
+
+虽然目前 OkHttps 已非常稳定，所有暴露的 ISSUE 均已解决，但难免新手在使用的过程中会遇到各种各样的问题（这是学习任何一门框架必不可少的采坑过程），所以我们从 OKhttps 交流群里把一些高频问题整理成了一份 [常见问题列表](/v2/questions.html)，可供大家在遇到问题时参考。
+
+### v2.4 的新特性
 
 1. 全面兼容 OkHttp 4.x 版本
 2. HttpTask 新增 `getPathParas()`、`getUrlParas()`、`getBodyParas()`、`getFileParas()`、`getRequestBody()` 方法
@@ -41,7 +47,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 4. Stomp 新增`setOnError`方法，可监听处理处理服务器发出的 ERROR 帧
 5. 新增超轻量无第三方依赖的 XML 解析扩展（v2.4.2 起）
 
-## v2.3 的新特性
+### v2.3 的新特性
 
 重新实现 WebSocket 心跳机制
 使用者可以选择使用 OkHttp 自带的新桃模式，也可以选择使用 OkHttps 提供的增强型新增机制，它具有如下特性
@@ -51,7 +57,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 3. 若服务器超过 3 * pongSeconds 秒没有回复心跳，才判断心跳超时
 4. 可指定心跳的具体内容（默认为空）
 
-## v2.2 的新特性
+### v2.2 的新特性
 
 1. 增强泛型反序列化，支持复合泛型
 2. HttpCall 接口新增 getTask 方法，可获取当前任务
@@ -59,7 +65,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 4. HttpTask 类 新增 isAsyncHttp 和 isSyncHttp 方法（v2.1.0 新增了 isWebsocket 方法）可用于判断 HttpTask 的任务类型
 5. 优化在 Android 端的异步请求性能
 
-## v2.1 的新特性
+### v2.1 的新特性
 
 * 对异步请求的响应提供了 6 种便捷回调方法，在不关心具体状态时（与全局响应监听组合使用），使用非常方便；
   - `setOnResBody` 在回调里直接取得`Body`对象，无需再使用`res.getBody()`
@@ -72,7 +78,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 * 优化性能：使用`HTTP#newBuilder()`方法克隆`HTTP`实例时，新实例与旧实例之间资源共享最大化。
 
 
-## v2.0 的新特性
+### v2.0 的新特性
 
 * HTTP 任务新增`patch()`和`head()`方法，可发起 PATCH 和 HEAD 请求，目前直接支持的 HTTP 方法有：GET、POST、PUT、PATCH、DELETE，并且暴露了`request(String method)`方法，可自定义发起任何请求，如：HEAD、OPTIONS、TRACE、CONNECT 等；
 
@@ -87,6 +93,10 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 * 新增`OkHttps`工具类，支持 SPI 方式注入配置，`OkHttps`和`HttpUtils`默认自动以 SPI 方式寻找依赖中的`MsgConvertor`；
 
 * 新增可自定义默认编码（不自定义依然默认为 utf-8）、具体请求可指定特殊编码功能。
+
+## 
+
+
 
 <br/>
 

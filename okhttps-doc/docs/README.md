@@ -4,7 +4,7 @@ heroImage: /logo.png
 heroText: OkHttps V2
 tagline: 强大轻量 且 前后端通用的 HTTP 客户端，同时支持 WebSocket 以及 Stomp 协议
 actionText: 极速上手 →
-actionLink: /v2/getstart.html
+actionLink: /v2/
 features:
 - title: 轻量纯粹优雅
   details: OkHttps 非常轻量，体积仅是 Retrofit 的一半不到，并且不依赖于特定平台，API 语义简洁舒适。
