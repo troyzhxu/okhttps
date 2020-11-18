@@ -257,6 +257,29 @@ HttpResult.Body body1 = OkHttps.async("/api/...")
 String str1 = body1.toString();
 ```
 
+若使用的 OkHttps 版本是 v2.4.2 及以前版本，上面的代码得考虑线程安全问题，加一个锁即可：
+
+```java
+Object lock = new Object();
+
+HttpResult res1 = OkHttps.async("/api/...")
+        .setOnResponse(res2 -> {
+
+            synchronized(lock) {
+            	String str2 = res2.getBody().cache().toString();
+            	// ...
+            }
+
+        })
+        .get()
+        .getResult()
+
+synchronized(lock) {
+	String str1 = res1.getBody().cache().toString();
+	// ...
+}
+```
+
 ## JSON 请求后端收不到数据，JSON 被加上双引号当做字符串了？
 
 ```java
