@@ -106,7 +106,7 @@ public class RealHttpResult implements HttpResult {
     }
 
     @Override
-    public Body getBody() {
+    public synchronized Body getBody() {
         if (body == null && response != null) {
             body = new ResultBody(httpTask, response, taskExecutor);
         }
