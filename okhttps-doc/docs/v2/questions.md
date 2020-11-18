@@ -257,7 +257,7 @@ HttpResult.Body body1 = OkHttps.async("/api/...")
 String str1 = body1.toString();
 ```
 
-若使用的 OkHttps 版本是 v2.4.2 及以前版本，上面的代码得考虑线程安全问题，加一个锁即可：
+若使用的 OkHttps 版本是 v2.4.2 及以前版本，上面的代码还得考虑线程安全问题，加一个锁即可：
 
 ```java
 Object lock = new Object();
@@ -279,6 +279,8 @@ synchronized(lock) {
 	// ...
 }
 ```
+
+OkHttps v2.4.3 及以后版本则不必如此。
 
 ## JSON 请求后端收不到数据，JSON 被加上双引号当做字符串了？
 
