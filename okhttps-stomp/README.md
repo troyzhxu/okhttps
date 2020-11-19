@@ -11,14 +11,14 @@
 <dependency>
      <groupId>com.ejlchina</groupId>
      <artifactId>okhttps-stomp</artifactId>
-     <version>2.4.2</version>
+     <version>2.4.3</version>
 </dependency>
 ```
 
 ##### Gradle
 
 ```groovy
-implementation 'com.ejlchina:okhttps-stomp:2.4.2'
+implementation 'com.ejlchina:okhttps-stomp:2.4.3'
 ```
 
 #### 更多请参阅 [http://okhttps.ejlchina.com/v2/stomp.html](http://okhttps.ejlchina.com/v2/stomp.html)

@@ -26,12 +26,12 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 
 项目 | 最新版本 | 描述
 -|-|-
-[okhttps](https://gitee.com/ejlchina-zhxu/okhttps) | 2.4.2 | OkHttps 核心模块
-[okhttps-fastjson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-fastjson) | 2.4.2 | 与 fastjson 集成
-[okhttps-gson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-gson) | 2.4.2 | 与 gson 集成
-[okhttps-jackson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-jackson) | 2.4.2 | 与 jackson 集成
-[okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-stomp) | 2.4.2 | 超轻量 Stomp 客户端（无第三方依赖）
-[okhttps-xml](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-xml) | 2.4.2 | 超轻量 XML 解析扩展（无第三方依赖，但仅支持 Java 8）
+[okhttps](https://gitee.com/ejlchina-zhxu/okhttps) | 2.4.3 | OkHttps 核心模块
+[okhttps-fastjson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-fastjson) | 2.4.3 | 与 fastjson 集成
+[okhttps-gson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-gson) | 2.4.3 | 与 gson 集成
+[okhttps-jackson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-jackson) | 2.4.3 | 与 jackson 集成
+[okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-stomp) | 2.4.3 | 超轻量 Stomp 客户端（无第三方依赖）
+[okhttps-xml](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-xml) | 2.4.3 | 超轻量 XML 解析扩展（无第三方依赖，但仅支持 Java 8）
 
 ## 版本迭代
 
