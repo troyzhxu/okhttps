@@ -37,7 +37,7 @@ description: OkHttps 安装 构建实例 HTTP build 同步请求 异步请求 sy
 
 OkHttps 从最初的 [httputils](https://gitee.com/ejlchina-zhxu/httputils) 演变而来，期间共经历了二十多个版本迭代 以及 上百个前后端项目的生产检验，目前已非常稳定。详细的版本可参见 [httputils 版本演变](https://gitee.com/ejlchina-zhxu/httputils/releases) 和 [okhttps 版本演变](https://gitee.com/ejlchina-zhxu/okhttps/releases)。
 
-虽然目前 OkHttps 已非常稳定，所有暴露的 ISSUE 均已解决，但难免新手在使用的过程中会遇到各种各样的问题（这是学习任何一门框架必不可少的采坑过程），所以我们从 OKhttps 交流群里把一些高频问题整理成了一份 [常见问题列表](/v2/questions.html)，可供大家在遇到问题时参考。
+虽然目前 OkHttps 已非常稳定，所有暴露的 ISSUE 均已解决，但难免新手在使用的过程中会遇到各种各样的问题（这是学习任何一门框架必不可少的采坑过程），所以我们从 OkHttps 技术交流群里把一些高频问题整理成了一份 [常见问题列表](/v2/questions.html)，可供大家在遇到困难时参考。
 
 ### v2.4 的新特性
 
