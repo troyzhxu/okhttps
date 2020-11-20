@@ -46,7 +46,7 @@ HTTP http = HTTP.builder()
 
 ### 单次心跳配置（since V2.3.0）
 
-自 V2.3.0 起 OkHttps 提供了另外一种心跳机制，它在发起具体的 WebSocket 连接时通过方法`heatbeat(int pingSeconds, int pongSeconds)`分别指定客户端与服务器的心跳时间间隔：
+自 V2.3.0 起 OkHttps 提供了另外一种增强型心跳机制，它在发起具体的 WebSocket 连接时通过方法`heatbeat(int pingSeconds, int pongSeconds)`分别指定客户端与服务器的心跳时间间隔：
 
 ```java
 http.webSocket("/chat") 
@@ -59,13 +59,13 @@ http.webSocket("/chat")
 
 如上配置，客户端仍会每隔 10秒 向服务器发送一次 PING 消息，并期望服务器回复 PONG 消息的间隔也是 10 秒一次，但如果服务器或网络由于某些未知原因导致客户端未能正确收到 PONG 消息，客户端还会容忍两次失败，当第三个 10 秒后还未收到服务器的任何消息时，则会触发`SocketTimeoutException`异常
 
-::: tip OkHttps 的心跳机制相对于 OkHttp 主要有以下特点
+::: tip OkHttps 的增强型心跳机制（单次心跳配置）相对于 OkHttp 的全局心跳配置 主要有以下特点
 * 客户端发送的任何消息都具有一次心跳作用
 * 服务器发送的任何消息都具有一次心跳作用
 * 若服务器超过 3 * pongSeconds 秒没有回复心跳，才触发心跳超时
 :::
 
-另外，还可以使用`pingSupplier(Supplier<ByteString> pingSupplier)`方法来指定心跳时发送的具体内容：
+另外，在使用 OkHttps 的增强型心跳机制时，还可以同时使用`pingSupplier(Supplier<ByteString> pingSupplier)`方法来指定心跳时发送的具体内容：
 
 ```java
 http.webSocket("/chat") 
