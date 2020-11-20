@@ -123,8 +123,8 @@ HTTP http = HTTP.builder()
                     if (retryTimes >= 3) {
                         throw e;
                     }
-                    retryTimes++;
                     System.out.println("超时重试第" + retryTimes + "次！");
+                    retryTimes++;
                 }
             }
         });
@@ -141,8 +141,10 @@ HTTP http = HTTP.builder()
             while (true) {
                 Response response = chain.proceed(chain.request());
                 if (response.code() == 500 && retryTimes < 3) {
-                    retryTimes++;
                     System.out.println("失败重试第" + retryTimes + "次！");
+                    // 注意，这里一定要 close 掉失败的 Response
+                    response.close();
+                    retryTimes++;
                     continue;
                 }
                 return response;
@@ -167,8 +169,12 @@ HTTP http = HTTP.builder()
                     exception = e;
                 }
                 if ((exception != null || response.code() == 500) && retryTimes < 3) {
-                    retryTimes++;
                     System.out.println("失败重试第" + retryTimes + "次！");
+                    if (response != null) {
+                        // 注意，这里一定要 close 掉失败的 Response
+                        response.close();
+                    }
+                    retryTimes++;
                     continue;
                 } else if (exception != null) {
                     throw exception;
