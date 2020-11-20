@@ -46,6 +46,7 @@ OkHttps 从最初的 [httputils](https://gitee.com/ejlchina-zhxu/httputils) 演�
 3. 优化`HttpTask#addFilePara(String name, String type, byte[] content)`方法，添加自动生成文件名逻辑，兼容某些必须要提供文件名才能接受到文件的后端接口
 4. Stomp 新增`setOnError`方法，可监听处理处理服务器发出的 ERROR 帧
 5. 新增超轻量无第三方依赖的 XML 解析扩展（v2.4.2 起）
+6. 同一个 HttpResult 和 HttpBody 可以多线程并发访问（v2.4.3 起）
 
 ### v2.3 的新特性
 
