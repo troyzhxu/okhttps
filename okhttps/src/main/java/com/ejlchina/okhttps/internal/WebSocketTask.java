@@ -1,23 +1,21 @@
 package com.ejlchina.okhttps.internal;
 
+import com.ejlchina.okhttps.*;
+import com.ejlchina.okhttps.WebSocket.Close;
+import com.ejlchina.okhttps.WebSocket.Listener;
+import com.ejlchina.okhttps.WebSocket.Message;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.WebSocketListener;
+import okhttp3.internal.ws.RealWebSocket;
+import okio.ByteString;
+
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-
-import com.ejlchina.okhttps.*;
-import com.ejlchina.okhttps.WebSocket.Close;
-import com.ejlchina.okhttps.WebSocket.Listener;
-import com.ejlchina.okhttps.WebSocket.Message;
-
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.WebSocketListener;
-import okhttp3.internal.ws.RealWebSocket;
-import okio.ByteString;
 
 
 public class WebSocketTask extends HttpTask<WebSocketTask> {
@@ -41,7 +39,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	private long lastPongSecs = 0;
 
 	// 心跳数据提供者
-	private Supplier<ByteString> pingSupplier;
+	private PingSupplier pingSupplier;
 
 	private boolean opened = true;
 
@@ -70,7 +68,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * 所以如果服务器要求客户端心跳的 opcode 必须是 9 的话，请使用 OkHttp 的原生心跳：
 	 * [http://okhttps.ejlchina.com/v2/websocket.html#%E5%85%A8%E5%B1%80%E5%BF%83%E8%B7%B3%E9%85%8D%E7%BD%AE]
 	 *
-	 * 另若需要 可使用 {@link #pingSupplier(Supplier)} 方法指定心跳发送的具体内容
+	 * 另若需要 可使用 {@link #pingSupplier(PingSupplier)} 方法指定心跳发送的具体内容
 	 *
 	 * @since v2.3.0
 	 * @param pingSeconds 客户端心跳间隔秒数（0 表示不需要心跳）
@@ -90,12 +88,12 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * @param pingSupplier 心跳数据提供者
 	 * @return WebSocketTask
 	 */
-	public WebSocketTask pingSupplier(Supplier<ByteString> pingSupplier) {
+	public WebSocketTask pingSupplier(PingSupplier pingSupplier) {
 		this.pingSupplier = pingSupplier;
 		return this;
 	}
 
-	public Supplier<ByteString> pingSupplier() {
+	public PingSupplier pingSupplier() {
 		return pingSupplier;
 	}
 	
@@ -253,7 +251,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 				return;
 			}
 			if (nowSeconds() - lastPingSecs >= pingSeconds) {
-				ByteString ping = pingSupplier != null ? pingSupplier.get() : ByteString.EMPTY;
+				ByteString ping = pingSupplier != null ? pingSupplier.getPing() : ByteString.EMPTY;
 				webSocket.send(ping);
 				Platform.logInfo("PING >>> " + ping.utf8());
 				lastPingSecs = nowSeconds();
