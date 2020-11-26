@@ -367,7 +367,7 @@ http.async(BOOKS_QUERY_URL)     // /authors/1/books?bookType=2
 * `addUrlPara(Map<String, ?> params)`      添加 URL 参数：拼接在 URL 的`?`之后（查询参数）
 
 ::: warning
-方法`addXxxPara`在 v2.0.0.RC 之前名为`addXxxParam`, v2.0.0.RC 之后推荐使用简洁版的方法，老方法将在 v2.1.0 中移除。
+方法`addXxxPara`在 v2.0.0.RC 之前名为`addXxxParam`, v2.0.0.RC 之后推荐使用简洁版的方法，老方法已在 v2.1.0 中移除。
 :::
 
 ### 报文体类型
