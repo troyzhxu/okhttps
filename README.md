@@ -99,8 +99,9 @@ Websocket 方法：
 
 ## 超详细教程，请查看：http://okhttps.ejlchina.com/
 
-## 优秀项目链接
-[**sa-token** —— 一个 JavaWeb 轻量级权限认证框架，功能全面，上手简单](https://gitee.com/sz6/sa-token)
+## 友情链接
+
+[**sa-token** 一个 JavaWeb 轻量级权限认证框架，功能全面，上手简单](https://gitee.com/sz6/sa-token)
 
 ## 联系方式
 
