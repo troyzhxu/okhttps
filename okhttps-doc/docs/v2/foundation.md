@@ -597,7 +597,7 @@ http.async("/users")    //（3）
         
 http.async("/users")    //（4）
         .tag("B")
-        .tag("C")       // 从 v1.0.4 标签将以追加模式添加，等效于 setTag("B.C")
+        .tag("C")       // 从 v1.0.4 标签将以追加模式添加，等效于 tag("B.C")
         .get();
         
 http.async("/users")    //（5）
