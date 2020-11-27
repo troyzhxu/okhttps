@@ -273,14 +273,16 @@ public class Download {
             }
         } catch (IOException e) {
             synchronized (lock) {
-                status = Ctrl.STATUS__ERROR;
+                if (status != Ctrl.STATUS__CANCELED) {
+                    status = Ctrl.STATUS__ERROR;
+                }
             }
-            if (onFailure != null) {
-                taskExecutor.execute(() -> {
-                    onFailure.on(new Failure(e));
-                }, fOnIO);
-            } else {
-                throw new HttpException("流传输失败", e);
+            if (status == Ctrl.STATUS__ERROR) {
+                if (onFailure != null) {
+                    taskExecutor.execute(() -> onFailure.on(new Failure(e)), fOnIO);
+                } else {
+                    throw new HttpException("流传输失败", e);
+                }
             }
         } finally {
             closeQuietly(raFile);
@@ -289,11 +291,8 @@ public class Download {
                 file.delete();
             }
         }
-        if (status == Ctrl.STATUS__DONE
-                && onSuccess != null) {
-            taskExecutor.execute(() -> {
-                onSuccess.on(file);
-            }, sOnIO);
+        if (status == Ctrl.STATUS__DONE && onSuccess != null) {
+            taskExecutor.execute(() -> onSuccess.on(file), sOnIO);
         }
     }
 
