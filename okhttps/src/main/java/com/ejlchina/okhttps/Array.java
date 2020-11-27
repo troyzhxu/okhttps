@@ -1,22 +1,14 @@
 package com.ejlchina.okhttps;
 
 /**
+ * 列表结构的只读数据集
+ *
  * @since 2.0.0
  * Array 接口 类似于 JsonArray
  * 但为什么不取名为 json 呢，因它不止是 json，它还可以是 xml、yml、protobuf 等任何一种格式的数据
  */
-public interface Array {
+public interface Array extends DataSet {
 
-	/**
-	 * @return JSON 的键值对数量
-	 */
-	int size();
-	
-	/**
-	 * @return 是否为空
-	 */
-	boolean isEmpty();
-	
 	/**
 	 * @param index 元素下标
 	 * @return 子 JsonObj

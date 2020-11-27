@@ -3,23 +3,15 @@ package com.ejlchina.okhttps;
 import java.util.Set;
 
 /**
+ * 映射结构的只读数据集
+ *
  * @since 2.0.0
  * Mapper 接口，类似于 json
  * 但为什么不取名为 json 呢，因它不止是 json，它还可以是 xml、yml、protobuf 等任何一种格式的数据
  * @author 15735
  */
-public interface Mapper {
+public interface Mapper extends DataSet {
 
-	/**
-	 * @return JSON 的键值对数量
-	 */
-	int size();
-	
-	/**
-	 * @return 是否为空
-	 */
-	boolean isEmpty();
-	
 	/**
 	 * @param key 键名
 	 * @return 子 JsonObj
