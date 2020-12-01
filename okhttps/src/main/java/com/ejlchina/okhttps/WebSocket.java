@@ -2,6 +2,15 @@ package com.ejlchina.okhttps;
 
 public interface WebSocket extends Cancelable {
 
+	int STATUS_CANCELED = 0;		// 	WebSocket 连接状态：已取消
+	int STATUS_CONNECTING = 2;		// 	WebSocket 连接状态：正在连接
+	int STATUS_CONNECTED = 1;		// 	WebSocket 连接状态：已连接
+	int STATUS_DISCONNECTED = 3;	// 	WebSocket 连接状态：已断开连接
+	int STATUS_EXCEPTION = -1;		// 	WebSocket 连接状态：发生异常
+	int STATUS_NETWORK_ERROR = -2;	// 	WebSocket 连接状态：网络错误
+	int STATUS_TIMEOUT = -3;		// 	WebSocket 连接状态：连接超时
+
+
 	/**
 	 * WebSocket 消息
 	 */
@@ -112,5 +121,17 @@ public interface WebSocket extends Cancelable {
 	 * @param type 消息类型，如 json、xml、protobuf 等
 	 */
 	void msgType(String type);
+
+	/**
+	 * WebSocket 当前的连接状态
+	 * @since v2.4.5
+	 * @see #STATUS_CANCELED
+	 * @see #STATUS_CONNECTED
+	 * @see #STATUS_DISCONNECTED
+	 * @see #STATUS_NETWORK_ERROR
+	 * @see #STATUS_TIMEOUT
+	 * @return 连接状态标识
+	 */
+	int status();
 
 }

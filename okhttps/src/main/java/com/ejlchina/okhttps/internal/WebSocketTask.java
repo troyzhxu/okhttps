@@ -41,8 +41,6 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	// 心跳数据提供者
 	private PingSupplier pingSupplier;
 
-	private boolean opened = true;
-
 	private WebSocketImpl webSocket;
 
 
@@ -135,6 +133,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			this.charset = charset(response);
 			this.webSocket.setCharset(charset);
 			this.webSocket.setWebSocket(webSocket);
+			this.webSocket.setStatus(WebSocket.STATUS_CONNECTED);
 			TaskListener<HttpResult> listener = httpClient.executor.getResponseListener();
 			HttpResult result = new RealHttpResult(WebSocketTask.this, response, httpClient.executor);
 			if (listener != null) {
@@ -144,7 +143,6 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			} else if (onOpen != null) {
 				execute(() -> onOpen.on(this.webSocket, result), openOnIO);
 			}
-			opened = true;
 			if (pingSeconds > 0) {
 				lastPingSecs = nowSeconds();
 				schedulePing();
@@ -181,7 +179,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 		@Override
 		public void onClosing(okhttp3.WebSocket webSocket, int code, String reason) {
-			opened = false;
+			this.webSocket.setStatus(WebSocket.STATUS_DISCONNECTED);
 			if (onClosing != null) {
 				execute(() -> onClosing.on(this.webSocket, new Close(code, reason)), closingOnIO);
 			}
@@ -193,30 +191,35 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		}
 
 		private void doOnClose(HttpResult.State state, int code, String reason) {
-			opened = false;
 			TaskListener<HttpResult.State> listener = httpClient.executor.getCompleteListener();
+			Close close = updateStatus(state, code, reason);
 			if (listener != null) {
 				if (listener.listen(WebSocketTask.this, state) && onClosed != null) {
-					execute(() -> onClosed.on(this.webSocket, toClose(state, code, reason)), closedOnIO);
+					execute(() -> onClosed.on(this.webSocket, close), closedOnIO);
 				}
 			} else if (onClosed != null) {
-				execute(() -> onClosed.on(this.webSocket, toClose(state, code, reason)), closedOnIO);
+				execute(() -> onClosed.on(this.webSocket, close), closedOnIO);
 			}
 		}
 
-		private Close toClose(HttpResult.State state, int code, String reason) {
+		private Close updateStatus(HttpResult.State state, int code, String reason) {
 			if (state == HttpResult.State.CANCELED) {
+				webSocket.setStatus(WebSocket.STATUS_CANCELED);
 				return new Close(Close.CANCELED, "Canceled");
 			}
 			if (state == HttpResult.State.EXCEPTION) {
+				webSocket.setStatus(WebSocket.STATUS_EXCEPTION);
 				return new Close(Close.CANCELED, reason);
 			}
 			if (state == HttpResult.State.NETWORK_ERROR) {
+				webSocket.setStatus(WebSocket.STATUS_NETWORK_ERROR);
 				return new Close(Close.NETWORK_ERROR, reason);
 			}
 			if (state == HttpResult.State.TIMEOUT) {
+				webSocket.setStatus(WebSocket.STATUS_TIMEOUT);
 				return new Close(Close.TIMEOUT, reason);
 			}
+			webSocket.setStatus(WebSocket.STATUS_DISCONNECTED);
 			return new Close(code, reason);
 		}
 
@@ -239,15 +242,22 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	}
 
 	/**
+	 * @return 连接是否已建立
+	 */
+	public boolean isConnected() {
+		return webSocket != null && webSocket.status == WebSocket.STATUS_CONNECTED;
+	}
+
+	/**
 	 * 间隔发送心跳
 	 */
 	private void schedulePing() {
-		if (!opened) {
+		if (!isConnected()) {
 			return;
 		}
 		int delay = (int) (pingSeconds + lastPingSecs - nowSeconds());
 		httpClient.executor.requireScheduler().schedule(() -> {
-			if (!opened) {
+			if (!isConnected()) {
 				return;
 			}
 			if (nowSeconds() - lastPingSecs >= pingSeconds) {
@@ -264,12 +274,12 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * 检测服务器的心跳响应
 	 */
 	private void schedulePong() {
-		if (!opened) {
+		if (!isConnected()) {
 			return;
 		}
 		int delay = (int) (pongSeconds + lastPongSecs - nowSeconds());
 		httpClient.executor.requireScheduler().schedule(() -> {
-			if (!opened) {
+			if (!isConnected()) {
 				return;
 			}
 			long noPongSeconds = nowSeconds() - lastPongSecs;
@@ -300,6 +310,8 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		private Charset charset;
 
 		private String msgType;
+
+		private int status = STATUS_CONNECTING;		// 当前的连接状态
 
 		public WebSocketImpl() {
 			String bodyType = getBodyType();
@@ -336,6 +348,11 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		}
 
 		@Override
+		public int status() {
+			return status;
+		}
+
+		@Override
 		public long queueSize() {
 			if (webSocket != null) {
 				return webSocket.queueSize();
@@ -367,7 +384,11 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 				queues.clear();
 			}
 		}
-		
+
+		public void setStatus(int status) {
+			this.status = status;
+		}
+
 		boolean send(okhttp3.WebSocket webSocket, Object msg) {
 			if (msg == null) {
 				return false;
