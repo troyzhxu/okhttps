@@ -47,6 +47,8 @@ OkHttps 从最初的 [httputils](https://gitee.com/ejlchina-zhxu/httputils) 演�
 4. Stomp 新增`setOnError`方法，可监听处理处理服务器发出的 ERROR 帧
 5. 新增超轻量无第三方依赖的 XML 解析扩展（v2.4.2 起）
 6. 同一个 HttpResult 和 HttpBody 可以多线程并发访问（v2.4.3 起）
+7. Websocket 新增 status() 方法，可查看当前连接的状态，WebSocketTask 新增 isConnected() 方法，可以判断是否已连接（v2.4.5 起）
+8. 抽象 DataSet（只读数据集）接口，Mapper 和 Array 为其子接口（v2.4.5 起）
 
 ### v2.3 的新特性
 
