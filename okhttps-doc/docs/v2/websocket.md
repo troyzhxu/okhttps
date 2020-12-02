@@ -125,6 +125,7 @@ WebSocket ws = http.webSocket("/chat").listen();  // 启动监听，并返回一
 * `send(Object object)` 发送消息，参数是待发送的对象，可以是 String | ByteString | byte[] | Java Bean
 * `close(int code, String reason)` 关闭连接（连接成功后可以关闭）
 * `msgType(String type)` 设置消息传输类型，类似于`bodyType`
+* `status()` 获取当前的连接状态（v2.4.5 起）
 
 一个发送消息的例子
 
@@ -172,6 +173,47 @@ http.webSocket("/websocket-endpoint")
 如果设置了 [全局回调监听](/v2/configuration.html#全局回调监听), 它们对 WebSocket 连接 同样起作用
 :::
 
+## 连接状态
+
+除了可以在 [回调方法](/v2/websocket.html#回调方法) 中获取当前的链接状态，当我们拿到一个`WebSocket`实例后，也可以直接取其中的状态（v2.4.5 起），例如：
+
+```java
+WebSocket ws = http.webSocket("/websocket-endpoint")
+        // ...
+        .listen();
+
+int status = ws.status();   // 获取当前的连接状态
+
+if (status == WebSocket.STATUS_CONNECTING) {
+    // 正在连接
+}
+if (status == WebSocket.STATUS_CONNECTED) {
+    // 已建立连接
+}
+if (status == WebSocket.STATUS_DISCONNECTED) {
+    // 已断开连接（正常断开）
+}
+if (status == WebSocket.STATUS_CANCELED) {
+    // 已取消连接
+}
+if (status == WebSocket.STATUS_TIMEOUT) {
+    // 已连接超时
+}
+if (status == WebSocket.STATUS_NETWORK_ERROR) {
+    // 连接网络错误
+}
+if (status == WebSocket.STATUS_EXCEPTION) {
+    // 连接发生异常
+}
+```
+
+另外，当我或拿到`WebSocketTask`时，也可以用它判断连接是否已建立，例如：
+
+```java
+WebSocketTask task = http.webSocket("/websocket-endpoint");
+
+boolean connected = task.isConnected()  // 连接是否已建立
+```
 
 <br/>
 
