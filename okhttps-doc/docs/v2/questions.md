@@ -83,6 +83,16 @@ HTTP http = HTTP.builder()
     .build();
 ```
 
+以上配置后，OkHttps 便具有了自动管理 Cookie 的功能，具体请求用户便不用操心 Cookie 了，但如果想手动自己添加一个 Cookie 的话，那只需要添加一个请求头即可，如下：
+
+```java
+http.async("https://...")
+    // 添加两个 Cookie
+    .addHeader("Cookie", "cname1=cvalue1; cname2=cvalue2")
+    // ...
+    .post();
+```
+
 ## 支持代理（Proxy）吗？
 
 答：**支持**，只需配置 Proxy 即可，例如：
