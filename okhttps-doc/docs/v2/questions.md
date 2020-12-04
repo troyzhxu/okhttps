@@ -1,6 +1,8 @@
-# 常见问题
+# 有疑必看
 
-## 支持 SSL（HTTPS）吗？
+## 功能支持
+
+### 支持 SSL（HTTPS）吗？
 
 答：**支持**，比如以下请求百度的带 https 的网址，不需要任何配置就可以正常运行：
 
@@ -56,7 +58,7 @@ sslCtx.init(null, new TrustManager[] { myTrustManager }, new SecureRandom());
 SSLSocketFactory mySSLSocketFactory = sslCtx.getSocketFactory();
 ```
 
-## 支持 Cookie 吗？
+### 支持 Cookie 吗？
 
 答：**支持**，配置方和 OkHttp 完全一样，只需要配置一个 CookieJar 即可：
 
@@ -93,7 +95,7 @@ http.async("https://...")
     .post();
 ```
 
-## 支持代理（Proxy）吗？
+### 支持代理（Proxy）吗？
 
 答：**支持**，只需配置 Proxy 即可，例如：
 
@@ -105,7 +107,7 @@ HTTP http = HTTP.builder()
     .build();
 ```
 
-## 支持缓存（Cache）吗？
+### 支持缓存（Cache）吗？
 
 答：**支持**，只需配置 Cache 即可，例如：
 
@@ -117,7 +119,7 @@ HTTP http = HTTP.builder()
     .build();
 ```
 
-## 有失败重试机制吗？
+### 有失败重试机制吗？
 
 答：很简单，比如以下配置就可实现请求超时重试三次：
 
@@ -195,7 +197,9 @@ HTTP http = HTTP.builder()
     }).build();
 ```
 
-## HttpException: 没有匹配[null/json]类型的转换器！
+## 常见异常
+
+### HttpException: 没有匹配[null/json]类型的转换器！
 
 当出现这个异常时，一般是让 OkHttps 去自动解析 JSON 却没有给它配置`MsgConvertor`导致的，当遇到这个异常，可按如下步骤检查：
 
@@ -213,7 +217,7 @@ HTTP http = HTTP.builder()
 
 **3、** 项目依赖中已经添加了 json 扩展包，并且使用的是 OkHttps 提供的工具类（`OkHttps`或`HttpUtils`），但还是有这个异常（罕见），这个时候一般是 IDE 的编译器的 BUG 导致的，请 clean 一下项目，重新运行即可。
 
-## HttpException: 转换失败 Caused by IOException: closed
+### HttpException: 转换失败 Caused by IOException: closed
 
 当出现这个异常时，很可能是对报文体重复消费（多次调用 toXXX 方法）造成的，类似以下代码：
 
@@ -237,7 +241,7 @@ User user = body.toBean(User.class);    // 又调用了一次 toBean，则不会
 Mapper mapper = body.toMapper();        // 再调用一次，依然没问题
 ```
 
-## HttpException: 报文体转换字符串出错 Caused by IOException: Content-Length (xxx) and stream length (0) disagree
+### HttpException: 报文体转换字符串出错 Caused by IOException: Content-Length (xxx) and stream length (0) disagree
 
 当出现这个异常，同样很可能是多次消费报文体的问题（同上），再类似以下的代码：
 
@@ -298,7 +302,14 @@ synchronized(lock) {
 
 OkHttps v2.4.3 及以后版本则不必如此。
 
-## JSON 请求后端收不到数据，JSON 被加上双引号当做字符串了？
+### NoSuchMethodError: kotlin.collections.ArraysKt.copyInto([B[BIII)[B
+
+一般出现这个问题，是因为依赖了 v4.x 的 OkHttp, 而你的项目是纯 Java 项目，没有添加 kotlin 的依赖导致（由于 OkHttp v4.x 是用 kotlin 重写）。
+
+解决办法：依赖换成 v3.x 的 OkHttp 即可。
+
+
+### JSON 请求后端收不到数据，JSON 被加上双引号当做字符串了？
 
 ```java
 List<String> values = new ArrayList<>();
@@ -347,10 +358,28 @@ OkHttps.sync("/api/...")
     .post();
 ```
 
+
+
 ## 还有其它问题，怎么解决？
+
+### 查看已有 ISSUE
 
 1. 到 GitHub 的 issue 里看看有没有人提过类似的问题：[https://github.com/ejlchina/okhttps/issues?q=is%3Aissue+is%3Aclosed](https://github.com/ejlchina/okhttps/issues?q=is%3Aissue+is%3Aclosed)
 
 2. 到 Gitee 的 issue 里看看有没有人提过类似的问题：[https://gitee.com/ejlchina-zhxu/okhttps/issues?assignee_id=&author_id=&branch=&issue_search=&label_name=&milestone_id=&program_id=&scope=&sort=&state=closed](https://gitee.com/ejlchina-zhxu/okhttps/issues?assignee_id=&author_id=&branch=&issue_search=&label_name=&milestone_id=&program_id=&scope=&sort=&state=closed)
 
-3. 若问题还没得到解决，可先加微信：18556739726（请备注 OkHttps）再入群交流讨论。
+### 利用搜索引擎
+
+例如当遇到如下异常时：
+
+![](/exception.png)
+
+检索关键字一定要输入上图中的 Cause by 部分，如下：
+
+![](/exception_search.png)
+
+这样便很容易检索到问题的答案，其它异常也是类似。
+
+### 进入有问必答群
+
+若通过以上几步，问题还没有得到解决，可先加微信：18556739726（请备注 OkHttps）再入群交流，**有问必答！！！**。
