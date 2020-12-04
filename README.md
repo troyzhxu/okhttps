@@ -99,16 +99,16 @@ Websocket 方法：
 
 ## 超详细教程，请查看：http://okhttps.ejlchina.com/
 
-## 友情链接
-
-[**[ sa-token ]** 一个 JavaWeb 轻量级权限认证框架，功能全面，上手简单](https://gitee.com/sz6/sa-token)
-
 ## 联系方式
 
 * 微信：<img src="https://images.gitee.com/uploads/images/2020/0718/142637_87d27a5c_1393412.png" width="700px">
 * 由于近期交流群的二维码被爬，扫码入群方式已被关闭
 库的使用上若有疑问，可先加微信【18556739726】（请备注 OkHttps）再入群交流
 * 邮箱：zhou.xu@ejlchina.com
+
+## 友情链接
+
+[**[ sa-token ]** 一个 JavaWeb 轻量级权限认证框架，功能全面，上手简单](https://gitee.com/sz6/sa-token)
 
 ## 参与贡献
 
