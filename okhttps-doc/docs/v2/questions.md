@@ -205,9 +205,9 @@ HTTP http = HTTP.builder()
 
 ```java
 HTTP http = HTTP.builder()
-    .addMsgConvertor(new FastjsonMsgConvertor());   // okhttps-gson
-    .addMsgConvertor(new GsonMsgConvertor());       // okhttps-fastjson
+    .addMsgConvertor(new GsonMsgConvertor());       // okhttps-gson
     .addMsgConvertor(new JacksonMsgConvertor());    // okhttps-jackson
+    .addMsgConvertor(new FastjsonMsgConvertor());   // okhttps-fastjson
     .build();
 ```
 

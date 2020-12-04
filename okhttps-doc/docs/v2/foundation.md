@@ -443,7 +443,7 @@ http.async("/projects")
         ...
 ```
 
-或使用`OkHttps.FORM`常量
+或使用`OkHttps.FORM`常量：
 
 ```java
 http.async("/projects") 
@@ -455,7 +455,7 @@ http.async("/projects")
 
 JSON 请求要求默认的请求`bodyType`为`json` 或者 在具体请求中显式指明`bodyType`为`json`，其它用法和表单请求一模一样。
 
-单个添加
+单个添加（[需要配置解析 JSON 的 MsgConvertor](/v2/configuration.html#消息转换器)）:
 
 ```java
 http.async("/projects") 
@@ -464,7 +464,7 @@ http.async("/projects")
         .post();
 ```
 
-Map 方式：
+Map 方式（[需要配置解析 JSON 的 MsgConvertor](/v2/configuration.html#消息转换器)）:
 
 ```java
 Map<String, Object> params = new HashMap<>();
@@ -476,7 +476,7 @@ http.async("/projects")
         .post();  
 ```
 
-POJO 方式：
+POJO 方式（[需要配置解析 JSON 的 MsgConvertor](/v2/configuration.html#消息转换器)）:
 
 ```java
 Proejct project = new Proejct();
@@ -488,7 +488,7 @@ http.async("/projects")
         .post();   
 ```
 
-字符串方式：
+字符串方式（v2.4.5 及之前版本 [需要配置解析 JSON 的 MsgConvertor](/v2/configuration.html#消息转换器)）:
 
 ```java
 http.async("/projects") 
@@ -504,7 +504,7 @@ http.async("/projects")
         ...
 ```
 
-或使用`OkHttps.JSON`常量
+或使用`OkHttps.JSON`常量：
 
 ```java
 http.async("/projects") 
@@ -514,7 +514,7 @@ http.async("/projects")
 
 #### XML 请求
 
-若默认不是 XML，则显式指定当前请求的报文体类型
+若默认不是 XML，则显式指定当前请求的报文体类型：
 
 ```java
 http.async("/projects") 
@@ -522,7 +522,7 @@ http.async("/projects")
         ...
 ```
 
-或使用`OkHttps.XML`常量
+或使用`OkHttps.XML`常量：
 
 ```java
 http.async("/projects") 

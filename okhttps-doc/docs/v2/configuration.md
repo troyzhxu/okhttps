@@ -159,7 +159,7 @@ http.async("/oauth/refresh-token")
 
 ## 消息转换器
 
-OkHttps 自 2.0 版本器支持自定义消息转换器，并且可以添加多个，例如：
+OkHttps 自 v2.0 后开始支持自定义消息转换器，并且可以添加多个，例如：
 
 ```java
 HTTP http = HTTP.builder()
@@ -169,6 +169,11 @@ HTTP http = HTTP.builder()
 ```
 
 配置了消息转换器后，`HTTP`实例便具有了序列化和反序列化这些格式数据的能力。
+
+* `okhttps-gson`里提供了`GsonMsgConvertor`
+* `okhttps-jackson`里提供了`JacksonMsgConvertor`
+* `okhttps-fastjson`里提供了`FastjsonMsgConvertor`
+* `okhttps-xml`里提供了`XmlMsgConvertor`
 
 ### 反序列化
 
