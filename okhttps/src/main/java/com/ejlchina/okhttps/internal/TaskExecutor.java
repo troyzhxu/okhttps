@@ -136,12 +136,11 @@ public final class TaskExecutor {
             }
         }
         if (callable == null) {
-            return new Data<>(null, "application/x-www-form-urlencoded");
+        	return new Data<>(null, toMediaType(type));
         }
         if (cause != null) {
             throw new HttpException("转换失败", cause);
         }
-
         throw new HttpException("没有匹配[" + type + "]类型的转换器！");
     }
 
@@ -152,6 +151,22 @@ public final class TaskExecutor {
         } else {
             throwable.initCause(cause);
         }
+    }
+    
+    private String toMediaType(String type) {
+    	if (type != null) {
+    		String lower = type.toLowerCase();
+    		if (lower.contains(OkHttps.JSON)) {
+    			return "application/json";
+    		}
+    		if (lower.contains(OkHttps.XML)) {
+    			return "application/xml";
+    		}
+    		if (lower.contains(OkHttps.PROTOBUF)) {
+    			return "application/x-protobuf";
+    		}
+    	}
+    	return "application/x-www-form-urlencoded";
     }
 
     private ScheduledExecutorService scheduledService;
