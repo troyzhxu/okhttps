@@ -110,11 +110,6 @@ Websocket 方法：
 库的使用上若有疑问，可先加微信【18556739726】（请备注 OkHttps）再入群交流
 * 邮箱：zhou.xu@ejlchina.com
 
-## 后续计划
-
-* 在 WebSocket 基础上扩展支持 Stomp 协议【已发布 v1.0.1】
-* 在 Android 上通过 Kotlin 扩展使异步请求与 LiveData 集成（即将发布、敬请期待）
-
 ## 参与贡献
 
 1.  Fork 本仓库
