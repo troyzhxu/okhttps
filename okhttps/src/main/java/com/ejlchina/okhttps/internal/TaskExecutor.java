@@ -19,19 +19,18 @@ public final class TaskExecutor {
     private TaskListener<IOException> exceptionListener;
     private TaskListener<State> completeListener;
     private MsgConvertor[] msgConvertors;
+    private String[] contentTypes;
     
-    public TaskExecutor(Executor ioExecutor, Executor mainExecutor, DownListener downloadListener,
-            TaskListener<HttpResult> responseListener, TaskListener<IOException> exceptionListener, 
-            TaskListener<State> completeListener, MsgConvertor[] msgConvertors,
-                        Scheduler taskScheduler) {
+    public TaskExecutor(HTTP.Builder builder, Executor ioExecutor) {
+        this.downloadListener = builder.downloadListener();
+        this.responseListener = builder.responseListener();
+        this.exceptionListener = builder.exceptionListener();
+        this.completeListener = builder.completeListener();
+        this.msgConvertors = builder.msgConvertors();
+        this.taskScheduler = builder.taskScheduler();
+        this.contentTypes = builder.contentTypes();
+        this.mainExecutor = builder.mainExecutor();
         this.ioExecutor = ioExecutor;
-        this.mainExecutor = mainExecutor;
-        this.downloadListener = downloadListener;
-        this.responseListener = responseListener;
-        this.exceptionListener = exceptionListener;
-        this.completeListener = completeListener;
-        this.msgConvertors = msgConvertors;
-        this.taskScheduler = taskScheduler;
     }
 
     public Executor getExecutor(boolean onIo) {
@@ -102,11 +101,11 @@ public final class TaskExecutor {
     public static class Data<T> {
 
         public T data;
-        public String mediaType;
+        public String contentType;
 
-        public Data(T data, String mediaType) {
+        public Data(T data, String contentType) {
             this.data = data;
-            this.mediaType = mediaType;
+            this.contentType = contentType;
         }
     }
 
@@ -136,7 +135,7 @@ public final class TaskExecutor {
             }
         }
         if (callable == null) {
-        	return new Data<>(null, toMediaType(type));
+        	return new Data<>(null, toContentType(type));
         }
         if (cause != null) {
             throw new HttpException("转换失败", cause);
@@ -153,20 +152,15 @@ public final class TaskExecutor {
         }
     }
     
-    private String toMediaType(String type) {
+    private String toContentType(String type) {
     	if (type != null) {
-    		String lower = type.toLowerCase();
-    		if (lower.contains(OkHttps.JSON)) {
-    			return "application/json";
-    		}
-    		if (lower.contains(OkHttps.XML)) {
-    			return "application/xml";
-    		}
-    		if (lower.contains(OkHttps.PROTOBUF)) {
-    			return "application/x-protobuf";
-    		}
+    		for (String contentType : contentTypes) {
+    		    if (contentType.contains(type)) {
+    		        return contentType;
+                }
+            }
     	}
-    	return "application/x-www-form-urlencoded";
+    	return type;
     }
 
     private ScheduledExecutorService scheduledService;
@@ -225,6 +219,10 @@ public final class TaskExecutor {
 
     public Scheduler getTaskScheduler() {
         return taskScheduler;
+    }
+
+    public String[] getContentTypes() {
+        return contentTypes;
     }
 
 }

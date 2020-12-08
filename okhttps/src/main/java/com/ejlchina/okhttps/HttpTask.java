@@ -691,13 +691,13 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
 
     private RequestBody toRequestBody(Object object) {
         if (object instanceof byte[] || object instanceof String) {
-            String mediaType = httpClient.executor().doMsgConvert(bodyType, null).mediaType;
+            String mediaType = httpClient.executor().doMsgConvert(bodyType, null).contentType;
             byte[] body = object instanceof byte[] ? (byte[]) object : ((String) object).getBytes(charset);
             return RequestBody.create(MediaType.parse(mediaType + "; charset=" + charset.name()), body);
         }
         TaskExecutor.Data<byte[]> data = httpClient.executor()
                 .doMsgConvert(bodyType, (MsgConvertor c) -> c.serialize(object, charset));
-        return RequestBody.create(MediaType.parse(data.mediaType + "; charset=" + charset.name()), data.data);
+        return RequestBody.create(MediaType.parse(data.contentType + "; charset=" + charset.name()), data.data);
     }
 
     private String buildUrlPath() {

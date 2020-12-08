@@ -33,11 +33,7 @@ public class HttpClient implements HTTP {
         this.okClient = builder.okClient();
         this.baseUrl = builder.baseUrl();
         this.mediaTypes = builder.getMediaTypes();
-        this.executor = new TaskExecutor(okClient.dispatcher().executorService(),
-                builder.mainExecutor(), builder.downloadListener(),
-                builder.responseListener(), builder.exceptionListener(),
-                builder.completeListener(), builder.msgConvertors(),
-                builder.taskScheduler());
+        this.executor = new TaskExecutor(builder, okClient.dispatcher().executorService());
         this.preprocessors = builder.preprocessors();
         this.preprocTimeoutTimes = builder.preprocTimeoutTimes();
         this.charset = builder.charset();

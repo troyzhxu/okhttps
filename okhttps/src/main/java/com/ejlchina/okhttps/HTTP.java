@@ -120,6 +120,8 @@ public interface HTTP {
 
         private Map<String, String> mediaTypes;
 
+        private List<String> contentTypes;
+
         private OkConfig config;
 
         private Executor mainExecutor;
@@ -160,6 +162,11 @@ public interface HTTP {
             mediaTypes.put("doc", "application/msword");
             mediaTypes.put("pdf", "application/pdf");
             mediaTypes.put("html", "text/html");
+            contentTypes = new ArrayList<>();
+            contentTypes.add("application/x-www-form-urlencoded");
+            contentTypes.add("application/json");
+            contentTypes.add("application/xml");
+            contentTypes.add("application/x-protobuf");
             preprocessors = new ArrayList<>();
             msgConvertors = new ArrayList<>();
         }
@@ -171,6 +178,8 @@ public interface HTTP {
             this.preprocessors = new ArrayList<>();
             Collections.addAll(this.preprocessors, hc.preprocessors());
             TaskExecutor executor = hc.executor();
+            this.contentTypes = new ArrayList<>();
+            Collections.addAll(this.contentTypes, executor.getContentTypes());
             this.mainExecutor = executor.getMainExecutor();
             this.taskScheduler = executor.getTaskScheduler();
             this.downloadListener = executor.getDownloadListener();
@@ -229,6 +238,30 @@ public interface HTTP {
         public Builder mediaTypes(String key, String value) {
             if (key != null && value != null) {
                 this.mediaTypes.put(key, value);
+            }
+            return this;
+        }
+
+        /**
+         * 配置支持的报文体类型
+         * @param contentTypes 报文体类型列表
+         * @return Builder
+         */
+        public Builder contentTypes(List<String> contentTypes) {
+            if (contentTypes != null) {
+                this.contentTypes.addAll(contentTypes);
+            }
+            return this;
+        }
+
+        /**
+         * 配置支持的报文体类型
+         * @param contentType 报文体类型
+         * @return Builder
+         */
+        public Builder contentTypes(String contentType) {
+            if (contentType != null) {
+                this.contentTypes.add(contentType);
             }
             return this;
         }
@@ -452,6 +485,10 @@ public interface HTTP {
 
         public Scheduler taskScheduler() {
             return taskScheduler;
+        }
+
+        public String[] contentTypes() {
+            return contentTypes.toArray(new String[0]);
         }
 
         public int preprocTimeoutTimes() {
