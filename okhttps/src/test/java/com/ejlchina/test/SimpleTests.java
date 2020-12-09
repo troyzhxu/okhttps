@@ -2,6 +2,7 @@ package com.ejlchina.test;
 
 import com.ejlchina.okhttps.HTTP;
 
+import com.ejlchina.okhttps.test.BaseTest;
 import okhttp3.mockwebserver.MockWebServer;
 
 public class SimpleTests extends BaseTest {

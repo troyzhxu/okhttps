@@ -3,6 +3,7 @@ package com.ejlchina.test;
 import com.ejlchina.okhttps.HTTP;
 import com.ejlchina.okhttps.HttpResult;
 import com.ejlchina.okhttps.internal.HttpException;
+import com.ejlchina.okhttps.test.BaseTest;
 import okhttp3.OkHttpClient;
 import org.junit.Test;
 

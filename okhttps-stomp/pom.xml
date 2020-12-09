@@ -17,8 +17,14 @@
 			<artifactId>okhttps</artifactId>
 			<version>${okhttps.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.ejlchina</groupId>
+			<artifactId>okhttps-test</artifactId>
+			<version>${okhttps.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
-
+        
 	<build>
 		<finalName>okhttps-stomp</finalName>
 	</build>

@@ -4,6 +4,7 @@ import com.ejlchina.okhttps.HTTP;
 import com.ejlchina.okhttps.HttpResult;
 import com.ejlchina.okhttps.HttpResult.State;
 import com.ejlchina.okhttps.internal.HttpClient;
+import com.ejlchina.okhttps.test.BaseTest;
 import org.junit.Test;
 
 import java.io.IOException;

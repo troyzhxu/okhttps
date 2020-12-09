@@ -2,6 +2,7 @@ package com.ejlchina.test;
 
 import com.ejlchina.okhttps.HTTP;
 import com.ejlchina.okhttps.Process;
+import com.ejlchina.okhttps.test.BaseTest;
 import org.junit.Test;
 
 public class UploadTests extends BaseTest {

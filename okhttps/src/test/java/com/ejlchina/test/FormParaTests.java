@@ -2,6 +2,7 @@ package com.ejlchina.test;
 
 import java.math.BigDecimal;
 
+import com.ejlchina.okhttps.test.BaseTest;
 import org.junit.Assert;
 import org.junit.Test;
 
