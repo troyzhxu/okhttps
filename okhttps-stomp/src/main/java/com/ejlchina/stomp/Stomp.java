@@ -8,6 +8,7 @@ import com.ejlchina.okhttps.internal.WebSocketTask;
 import okio.ByteString;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 基于 OkHttps websockt 的 Stomp 客户端
@@ -35,7 +36,7 @@ public class Stomp {
     private Stomp(WebSocketTask task, boolean autoAck) {
         this.task = task;
         this.autoAck = autoAck;
-        this.subscribers = new HashMap<>();
+        this.subscribers = new ConcurrentHashMap<>();
     }
 
     /**
