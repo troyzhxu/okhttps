@@ -5,7 +5,6 @@ import com.ejlchina.okhttps.HttpResult;
 import com.ejlchina.okhttps.OnCallback;
 import com.ejlchina.okhttps.HttpResult.State;
 
-import com.ejlchina.okhttps.test.BaseTest;
 import org.junit.Test;
 
 public class CacheTests extends BaseTest {

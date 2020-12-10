@@ -18,17 +18,11 @@
 			<version>${okhttp.version}</version>
 		</dependency>
 		<dependency>
-	        <groupId>com.ejlchina</groupId>
-	        <artifactId>okhttps-test</artifactId>
-	        <version>${okhttps.version}</version>
-	        <scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>com.ejlchina</groupId>
-					<artifactId>okhttps</artifactId>
-				</exclusion>
-			</exclusions>
-	    </dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>mockwebserver</artifactId>
+			<version>${okhttp.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
   
 	<build>

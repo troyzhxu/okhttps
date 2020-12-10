@@ -2,7 +2,6 @@ package com.ejlchina.test;
 
 import com.ejlchina.okhttps.HTTP;
 import com.ejlchina.okhttps.Preprocessor;
-import com.ejlchina.okhttps.test.BaseTest;
 import org.junit.Test;
 
 public class PreprocessorTests extends BaseTest {

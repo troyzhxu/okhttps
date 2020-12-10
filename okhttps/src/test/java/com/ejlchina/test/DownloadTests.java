@@ -1,8 +1,7 @@
 package com.ejlchina.test;
 
-import com.ejlchina.okhttps.*;
 import com.ejlchina.okhttps.Process;
-import com.ejlchina.okhttps.test.BaseTest;
+import com.ejlchina.okhttps.*;
 import okhttp3.OkHttpClient;
 import org.junit.Test;
 

@@ -1,11 +1,7 @@
 package com.ejlchina.test;
 
-import com.ejlchina.okhttps.Download;
-import com.ejlchina.okhttps.HTTP;
-import com.ejlchina.okhttps.HttpResult;
-import com.ejlchina.okhttps.HttpTask;
 import com.ejlchina.okhttps.Process;
-import com.ejlchina.okhttps.test.BaseTest;
+import com.ejlchina.okhttps.*;
 import org.junit.Test;
 
 import java.io.File;
