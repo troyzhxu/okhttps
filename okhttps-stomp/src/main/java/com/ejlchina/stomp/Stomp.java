@@ -100,9 +100,18 @@ public class Stomp {
                 if (onDisconnected != null) {
                     onDisconnected.on(close);
                 }
+                connected = false;
             })
             .listen();
         return this;
+    }
+
+    /**
+     * @since 2.5.0
+     * @return 是否已连接
+     */
+    public boolean isConnected() {
+        return connected;
     }
 
     /**
