@@ -12,6 +12,10 @@ public class Message {
     private final List<Header> headers;
     private final String payload;
 
+    public Message(String command, List<Header> headers) {
+        this(command, headers, null);
+    }
+
     public Message(String command, List<Header> headers, String payload) {
         this.command = command;
         this.headers = headers;
