@@ -145,6 +145,7 @@ public class Stomp {
 	}
 
     /**
+     * @since 2.5.0
      * 发送消息到主题
      * @param destination 目的地
      * @param data 消息
@@ -154,6 +155,7 @@ public class Stomp {
     }
 
     /**
+     * @since 2.5.0
      * 发送消息到队列
      * @param destination 目的地
      * @param data 消息
