@@ -256,8 +256,7 @@ public class Stomp {
         }
         for (Subscriber s: subscribers) {
             if (s.destinationEqual(destination)) {
-                Platform.logError("Attempted subscribe to already-subscribed path!");
-                return this;
+                throw new IllegalStateException("The destination [" + destination + "] has already been subscribed!");
             }
         }
         Subscriber subscriber = new Subscriber(this, destination, callback, headers);
