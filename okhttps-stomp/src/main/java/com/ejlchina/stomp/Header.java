@@ -33,6 +33,11 @@ public class Header {
     public static final String MESSAGE_ID = "message-id";
 
     /**
+     * 凭据
+     */
+    public static final String RECEIPT = "receipt";
+
+    /**
      * 凭据 ID
      */
     public static final String RECEIPT_ID = "receipt-id";
