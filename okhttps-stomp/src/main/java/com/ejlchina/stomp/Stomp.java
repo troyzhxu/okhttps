@@ -136,6 +136,24 @@ public class Stomp {
 		return this;
 	}
 
+    /**
+     * 发送消息到主题
+     * @param destination 目的地
+     * @param data 消息
+     */
+    public void sendToTopic(String destination, String data) {
+        sendTo(TOPIC + destination, data);
+    }
+
+    /**
+     * 发送消息到队列
+     * @param destination 目的地
+     * @param data 消息
+     */
+    public void sendToQueue(String destination, String data) {
+        sendTo(QUEUE + destination, data);
+    }
+
 	/**
      * 发送消息到指定目的地
      * @param destination 目的地
