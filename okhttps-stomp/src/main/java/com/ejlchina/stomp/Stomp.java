@@ -7,8 +7,11 @@ import com.ejlchina.okhttps.internal.WebSocketTask;
 
 import okio.ByteString;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * 基于 OkHttps websockt 的 Stomp 客户端
@@ -22,21 +25,23 @@ public class Stomp {
     public static final String AUTO_ACK = "auto";
     public static final String CLIENT_ACK = "client";
 
-    private boolean autoAck;
+    private final boolean autoAck;
     private boolean connected;
-    private WebSocketTask task;
+    private final WebSocketTask task;
     private WebSocket websocket;
     private boolean legacyWhitespace = false;
-    private Map<String, Subscriber> subscribers;
+    private final List<Subscriber> subscribers;
+
 
     private OnCallback<Stomp> onConnected;
     private OnCallback<WebSocket.Close> onDisconnected;
     private OnCallback<Message> onError;
 
+
     private Stomp(WebSocketTask task, boolean autoAck) {
         this.task = task;
         this.autoAck = autoAck;
-        this.subscribers = new ConcurrentHashMap<>();
+        this.subscribers = Collections.synchronizedList(new ArrayList<>());
     }
 
     /**
@@ -75,7 +80,7 @@ public class Stomp {
         if (connected) {
             return this;
         }
-        task.setOnOpen((ws, res) -> {
+        websocket = task.setOnOpen((ws, res) -> {
                 List<Header> cHeaders = new ArrayList<>();
                 cHeaders.add(new Header(Header.VERSION, SUPPORTED_VERSIONS));
                 cHeaders.add(new Header(Header.HEART_BEAT,
@@ -84,22 +89,25 @@ public class Stomp {
                     cHeaders.addAll(headers);
                 }
                 send(new Message(Commands.CONNECT, cHeaders, null));
-            });
-        task.setOnMessage((ws, msg) -> {
+            })
+            .setOnMessage((ws, msg) -> {
         		Message message = Message.from(msg.toString());
         		if (message != null) {
         			receive(message);
         		}
-        	});
-        task.setOnClosed((ws, close) -> {
+        	})
+            .setOnClosed((ws, close) -> {
                 if (onDisconnected != null) {
                     onDisconnected.on(close);
                 }
-            });
-        websocket = task.listen();
+            })
+            .listen();
         return this;
     }
 
+    /**
+     * 断开连接
+     */
     public void disconnect() {
         if (websocket != null) {
             websocket.close(1000, "disconnect by user");
@@ -160,9 +168,7 @@ public class Stomp {
      * @param data 消息
      */
     public void sendTo(String destination, String data) {
-        send(new Message(Commands.SEND,
-                Collections.singletonList(new Header(Header.DESTINATION, destination)),
-                data));
+        send(new Message(Commands.SEND, Collections.singletonList(new Header(Header.DESTINATION, destination)), data));
     }
 
     /**
@@ -226,13 +232,17 @@ public class Stomp {
      * @return Stomp
      */
     public synchronized Stomp subscribe(String destination, List<Header> headers, OnCallback<Message> callback) {
-        if (subscribers.containsKey(destination)) {
-            Platform.logError("Attempted to subscribe to already-subscribed path!");
-            return this;
+        if (destination == null || destination.isEmpty()) {
+            throw new IllegalArgumentException("destination can not be empty!");
         }
-        Subscriber subscriber = new Subscriber(UUID.randomUUID().toString(),
-                destination, callback, headers);
-        subscribers.put(destination, subscriber);
+        for (Subscriber s: subscribers) {
+            if (destination.equals(s.destination)) {
+                Platform.logError("Attempted subscribe to already-subscribed path!");
+                return this;
+            }
+        }
+        Subscriber subscriber = new Subscriber(destination, callback, headers);
+        subscribers.add(subscriber);
         subscriber.subscribe();
         return this;
     }
@@ -275,9 +285,14 @@ public class Stomp {
      * @param destination 订阅地址
      */
     public synchronized void unsubscribe(String destination) {
-        Subscriber subscriber = subscribers.remove(destination);
-        if (subscriber != null) {
-            subscriber.unsubscribe();
+        Iterator<Subscriber> it = subscribers.iterator();
+        while (it.hasNext()) {
+            Subscriber s = it.next();
+            if (s.destination.equals(destination)) {
+                s.unsubscribe();
+                it.remove();
+                break;
+            }
         }
     }
 
@@ -297,7 +312,7 @@ public class Stomp {
             }
             synchronized (this) {
                 connected = true;
-                for (Subscriber s: subscribers.values()) {
+                for (Subscriber s: subscribers) {
                     s.subscribe();
                 }
             }
@@ -306,13 +321,13 @@ public class Stomp {
             }
         } else if (Commands.MESSAGE.equals(command)) {
             String id = msg.headerValue(Header.SUBSCRIPTION);
-            String destination = msg.headerValue(Header.DESTINATION);
-            if (id == null || destination == null) {
+            if (id == null) {
                 return;
             }
-            Subscriber subscriber = subscribers.get(destination);
-            if (subscriber != null && id.equals(subscriber.id)) {
-                subscriber.callback.on(msg);
+            for (Subscriber s: subscribers) {
+                if (id.equals(s.id)) {
+                    s.callback.on(msg);
+                }
             }
         } else if (Commands.ERROR.equals(command)) {
         	if (onError != null) {
@@ -323,14 +338,14 @@ public class Stomp {
 
     class Subscriber {
 
-        private String id;
-        private String destination;
-        private OnCallback<Message> callback;
-        private List<Header> headers;
+        private final String id;
+        private final String destination;
+        private final OnCallback<Message> callback;
+        private final List<Header> headers;
         private boolean subscribed;
 
-        Subscriber(String id, String destination, OnCallback<Message> callback, List<Header> headers) {
-            this.id = id;
+        Subscriber(String destination, OnCallback<Message> callback, List<Header> headers) {
+            this.id = UUID.randomUUID().toString();
             this.destination = destination;
             this.callback = callback;
             this.headers = headers;
