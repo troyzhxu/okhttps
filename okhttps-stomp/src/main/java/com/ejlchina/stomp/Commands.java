@@ -31,6 +31,11 @@ public class Commands {
     public static final String MESSAGE = "MESSAGE";
 
     /**
+     * 收到凭据
+     */
+    public static final String RECEIPT = "RECEIPT";
+
+    /**
      * 发起订阅
      */
     public static final String SUBSCRIBE = "SUBSCRIBE";
