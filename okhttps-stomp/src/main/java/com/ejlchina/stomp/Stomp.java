@@ -125,6 +125,7 @@ public class Stomp {
      * 断开连接
      */
     public void disconnect() {
+        // TODO: 这里应先发送一个 DISCONNECT 帧，然后等待服务器的回应，然后在关闭连接，这样可避免尚未到达 server 的帧由于连接被直接 close 而丢失
         if (websocket != null) {
             websocket.close(1000, "disconnect by user");
         }
