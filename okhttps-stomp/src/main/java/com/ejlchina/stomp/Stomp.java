@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * 基于 OkHttps websockt 的 Stomp 客户端
@@ -61,6 +60,14 @@ public class Stomp {
      */
     public static Stomp over(WebSocketTask task, boolean autoAck) {
         return new Stomp(task, autoAck);
+    }
+
+    /**
+     * @since 2.5.0
+     * @return 是否自动确认消息
+     */
+    public boolean isAutoAck() {
+        return autoAck;
     }
 
     /**
@@ -247,12 +254,12 @@ public class Stomp {
             throw new IllegalArgumentException("destination can not be empty!");
         }
         for (Subscriber s: subscribers) {
-            if (destination.equals(s.destination)) {
+            if (s.destinationEqual(destination)) {
                 Platform.logError("Attempted subscribe to already-subscribed path!");
                 return this;
             }
         }
-        Subscriber subscriber = new Subscriber(destination, callback, headers);
+        Subscriber subscriber = new Subscriber(this, destination, callback, headers);
         subscribers.add(subscriber);
         subscriber.subscribe();
         return this;
@@ -299,7 +306,7 @@ public class Stomp {
         Iterator<Subscriber> it = subscribers.iterator();
         while (it.hasNext()) {
             Subscriber s = it.next();
-            if (s.destination.equals(destination)) {
+            if (s.destinationEqual(destination)) {
                 s.unsubscribe();
                 it.remove();
                 break;
@@ -336,8 +343,8 @@ public class Stomp {
                 return;
             }
             for (Subscriber s: subscribers) {
-                if (id.equals(s.id)) {
-                    s.callback.on(msg);
+                if (s.tryCallback(id, msg)) {
+                    break;
                 }
             }
         } else if (Commands.ERROR.equals(command)) {
@@ -345,54 +352,6 @@ public class Stomp {
         		onError.on(msg);
         	}
         }
-    }
-
-    class Subscriber {
-
-        private final String id;
-        private final String destination;
-        private final OnCallback<Message> callback;
-        private final List<Header> headers;
-        private boolean subscribed;
-
-        Subscriber(String destination, OnCallback<Message> callback, List<Header> headers) {
-            this.id = UUID.randomUUID().toString();
-            this.destination = destination;
-            this.callback = callback;
-            this.headers = headers;
-        }
-
-        void subscribe() {
-            if (connected && !subscribed) {
-                List<Header> headers = new ArrayList<>();
-                headers.add(new Header(Header.ID, id));
-                headers.add(new Header(Header.DESTINATION, destination));
-                boolean ackNotAdded = true;
-                if (this.headers != null) {
-                    for (Header header : this.headers) {
-                        if (Header.ACK.equals(header.getKey())) {
-                            ackNotAdded = false;
-                        }
-                        String key = header.getKey();
-                        if (!Header.ID.equals(key) && !Header.DESTINATION.equals(key)) {
-                            headers.add(header);
-                        }
-                    }
-                }
-                if (ackNotAdded) {
-                    headers.add(new Header(Header.ACK, autoAck ? AUTO_ACK : CLIENT_ACK));
-                }
-                send(new Message(Commands.SUBSCRIBE, headers, null));
-                subscribed = true;
-            }
-        }
-
-        void unsubscribe() {
-            List<Header> headers = Collections.singletonList(new Header(Header.ID, id));
-            send(new Message(Commands.UNSUBSCRIBE, headers, null));
-            subscribed = false;
-        }
-
     }
 
     public void setLegacyWhitespace(boolean legacyWhitespace) {
