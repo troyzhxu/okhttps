@@ -90,12 +90,12 @@ Websocket 方法：
 
 项目 | 最新版本 | 描述
 -|-|-
-[okhttps](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps) | 2.4.5 | OkHttps 核心模块
-[okhttps-fastjson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-fastjson) | 2.4.5 | 与 fastjson 集成
-[okhttps-gson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-gson) | 2.4.5 | 与 gson 集成
-[okhttps-jackson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-jackson) | 2.4.5 | 与 jackson 集成
-[okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-stomp) | 2.4.5 | 超级轻量的 Stomp 客户端
-[okhttps-xml](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-xml) | 2.4.5 | XML 解析扩展
+[okhttps](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps) | 2.5.0 | OkHttps 核心模块
+[okhttps-fastjson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-fastjson) | 2.5.0 | 与 fastjson 集成
+[okhttps-gson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-gson) | 2.5.0 | 与 gson 集成
+[okhttps-jackson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-jackson) | 2.5.0 | 与 jackson 集成
+[okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-stomp) | 2.5.0 | 超级轻量的 Stomp 客户端
+[okhttps-xml](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-xml) | 2.5.0 | XML 解析扩展
 
 ## 超详细教程，请查看：http://okhttps.ejlchina.com/
 

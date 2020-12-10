@@ -201,7 +201,7 @@ http.webSocket("/redpacket/status") // 监听红包的领取状态
 另外，如果要在请求发出阶段正向序列化参数，则需要指定`bodyType`参数告诉 OkHttps 你想使用哪一个消息转换器，如：
 
 ```java
-Order order = newOrder();
+Order order = createOrder();
 http.async('/orders')           // 提交订单
         .bodyType("json")
         .setBodyPara(order)     // 以 JSON 格式序列化 Order 对象
@@ -211,7 +211,7 @@ http.async('/orders')           // 提交订单
 或者 XML：
 
 ```java
-Order order = newOrder();
+Order order = createOrder();
 http.async('/orders')           // 提交订单
         .bodyType("xml")
         .setBodyPara(order)     // 以 XML 格式序列化 Order 对象
@@ -277,7 +277,7 @@ HTTP http = HTTP.builder()
 这样，你再做表单请求时，就可以直接扔进一个对象，它将自动完成序列化的事情：
 
 ```java
-Order order = newOrder();
+Order order = createOrder();
 http.async('/orders')           // 提交订单
         .bodyType("form")
         .setBodyPara(order)     // 以 表单 格式序列化 Order 对象
@@ -361,7 +361,7 @@ HTTP http = HTTP.builder()
 然后具体的请求，就可以专注于业务处理，而不需担心接口的状态出错，比如：
 
 ```java
-Order order = newOrder();   // 订单信息
+Order order = createOrder();   // 订单信息
 
 http.async('/orders')       // 提交订单
         .setBodyPara(order)

@@ -16,14 +16,14 @@ description: OkHttps WebSocket Stomp OkHttp
 <dependency>
      <groupId>com.ejlchina</groupId>
      <artifactId>okhttps-stomp</artifactId>
-     <version>2.4.5</version>
+     <version>2.5.0</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-implementation 'com.ejlchina:okhttps-stomp:2.4.5'
+implementation 'com.ejlchina:okhttps-stomp:2.5.0'
 ```
 
 ## 构建 Stomp 实例
