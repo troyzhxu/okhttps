@@ -7,10 +7,7 @@ import com.ejlchina.okhttps.internal.WebSocketTask;
 
 import okio.ByteString;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * 基于 OkHttps websockt 的 Stomp 客户端
@@ -36,11 +33,14 @@ public class Stomp {
     private OnCallback<WebSocket.Close> onDisconnected;
     private OnCallback<Message> onError;
 
+    private final String disReceipt;
+
 
     private Stomp(WebSocketTask task, boolean autoAck) {
         this.task = task;
         this.autoAck = autoAck;
         this.subscribers = Collections.synchronizedList(new ArrayList<>());
+        this.disReceipt = UUID.randomUUID().toString();
     }
 
     /**
@@ -118,17 +118,14 @@ public class Stomp {
      * @return 是否已连接
      */
     public boolean isConnected() {
-        return connected;
+        return connected && websocket.status() == WebSocket.STATUS_CONNECTED;
     }
 
     /**
      * 断开连接
      */
     public void disconnect() {
-        // TODO: 这里应先发送一个 DISCONNECT 帧，然后等待服务器的回应，然后在关闭连接，这样可避免尚未到达 server 的帧由于连接被直接 close 而丢失
-        if (websocket != null) {
-            websocket.close(1000, "disconnect by user");
-        }
+        send(new Message(Commands.DISCONNECT, Collections.singletonList(new Header(Header.RECEIPT, disReceipt))));
     }
 
     /**
@@ -339,12 +336,18 @@ public class Stomp {
             }
         } else if (Commands.MESSAGE.equals(command)) {
             String id = msg.headerValue(Header.SUBSCRIPTION);
-            if (id == null) {
-                return;
+            if (id != null) {
+                for (Subscriber s: subscribers) {
+                    if (s.tryCallback(id, msg)) {
+                        break;
+                    }
+                }
             }
-            for (Subscriber s: subscribers) {
-                if (s.tryCallback(id, msg)) {
-                    break;
+        } else if (Commands.RECEIPT.equals(command)) {
+            if (disReceipt.equals(msg.headerValue(Header.RECEIPT_ID))) {
+                // 断开连接
+                if (websocket != null) {
+                    websocket.close(1000, "disconnect by user");
                 }
             }
         } else if (Commands.ERROR.equals(command)) {
