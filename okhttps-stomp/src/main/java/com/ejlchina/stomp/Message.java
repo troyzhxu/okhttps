@@ -99,7 +99,7 @@ public class Message {
 
     @Override
     public String toString() {
-        return "Message {command='" + command + "\', headers=" + headers +", payload='" + payload + "\'}";
+        return "Message {command='" + command + "', headers=" + headers +", payload='" + payload + "'}";
     }
 
 }
