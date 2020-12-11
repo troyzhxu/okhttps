@@ -88,10 +88,13 @@ public class Stomp {
             return this;
         }
         websocket = task.setOnOpen((ws, res) -> {
+                int pingSecs = task.pingSeconds();
+                int pongSecs = task.pongSeconds();
                 List<Header> cHeaders = new ArrayList<>();
                 cHeaders.add(new Header(Header.VERSION, SUPPORTED_VERSIONS));
-                cHeaders.add(new Header(Header.HEART_BEAT,
-                        task.pingSeconds() * 1000 + "," + task.pongSeconds() * 1000));
+                if (pingSecs > 0 && pongSecs > 0) {
+                    cHeaders.add(new Header(Header.HEART_BEAT, pingSecs * 1000 + "," + pongSecs * 1000));
+                }
                 if (headers != null) {
                     cHeaders.addAll(headers);
                 }
@@ -315,14 +318,17 @@ public class Stomp {
         String command = msg.getCommand();
         if (Commands.CONNECTED.equals(command)) {
             String hbHeader = msg.headerValue(Header.HEART_BEAT);
-            if (hbHeader != null) {
+            int pingSecs = task.pingSeconds();
+            int pongSecs = task.pongSeconds();
+            if (hbHeader != null && (pingSecs > 0 || pongSecs > 0)) {
                 String[] heartbeats = hbHeader.split(",");
                 int pingSeconds = Integer.parseInt(heartbeats[1]) / 1000;
                 int pongSeconds = Integer.parseInt(heartbeats[0]) / 1000;
-                task.heatbeat(Math.max(pingSeconds, task.pingSeconds()),
-                        Math.max(pongSeconds, task.pongSeconds()));
-                if (task.pingSupplier() == null) {
-                	task.pingSupplier(() -> ByteString.of((byte) 0x0A));
+                if (pingSeconds > 0 || pongSeconds > 0) {
+                    if (task.pingSupplier() == null) {
+                        task.pingSupplier(() -> ByteString.of((byte) 0x0A));
+                    }
+                    task.heatbeat(Math.max(pingSeconds, pingSecs), Math.max(pongSeconds, pongSecs));
                 }
             }
             synchronized (this) {
