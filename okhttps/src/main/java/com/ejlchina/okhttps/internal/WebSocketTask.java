@@ -43,6 +43,9 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 	private WebSocketImpl webSocket;
 
+	// Ping 的间隔是否灵活可变
+	private boolean flexiblePing = true;
+
 
 	public WebSocketTask(HttpClient httpClient, String url) {
 		super(httpClient, url);
@@ -80,6 +83,19 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		this.pingSeconds = pingSeconds;
 		this.pongSeconds = pongSeconds;
 		return this;
+	}
+
+	/**
+	 * 用于兼容某些强制客户端必须以固定的时间间隔发送心跳的服务器
+	 * @since v2.5.0
+	 * @param pingSeconds 客户端心跳间隔秒数（0 表示不需要心跳）
+	 * @param pongSeconds 服务器心跳间隔秒数（0 表示不需要心跳）
+	 * @param flexiblePing Ping 的间隔是否灵活可变（为 false 时客户端 Ping 的间隔固定，普通的消息不做为 Ping）
+	 * @return WebSocketTask
+	 */
+	public WebSocketTask heatbeat(int pingSeconds, int pongSeconds, boolean flexiblePing) {
+		this.flexiblePing = flexiblePing;
+		return heatbeat(pingSeconds, pongSeconds);
 	}
 
 	/**
@@ -393,7 +409,9 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			if (msg == null) {
 				return false;
 			}
-			lastPingSecs = nowSeconds();
+			if (pingSeconds > 0 && flexiblePing) {
+				lastPingSecs = nowSeconds();
+			}
 			if (msg instanceof String) {
 				return webSocket.send((String) msg);
 			}
@@ -403,7 +421,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			if (msg instanceof byte[]) {
 				return webSocket.send(ByteString.of((byte[]) msg));
 			}
-			byte[] bytes = httpClient.executor.doMsgConvert(msgType, (MsgConvertor c) -> c.serialize(msg, charset)).data;
+			byte[] bytes = httpClient.executor.doMsgConvert(msgType, c -> c.serialize(msg, charset)).data;
 			return webSocket.send(new String(bytes, charset));
 		}
 		
