@@ -41,7 +41,9 @@ public interface HttpResult {
 		throw new IllegalArgumentException("response 不能为空");
 	}
 
-	
+	/**
+	 * HTTP 任务执行状态
+	 */
 	enum State {
 		
 		/**
