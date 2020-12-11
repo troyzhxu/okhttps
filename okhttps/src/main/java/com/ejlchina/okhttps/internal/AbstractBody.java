@@ -21,7 +21,7 @@ public abstract class AbstractBody implements Toable {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Mapper 转换！");
 		}
-		return taskExecutor.doMsgConvert((MsgConvertor c) -> c.toMapper(toByteStream(), charset));
+		return taskExecutor.doMsgConvert(c -> c.toMapper(toByteStream(), charset));
 	}
 
 	@Override
@@ -29,7 +29,7 @@ public abstract class AbstractBody implements Toable {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Array 转换！");
 		}
-		return taskExecutor.doMsgConvert((MsgConvertor c) -> c.toArray(toByteStream(), charset));
+		return taskExecutor.doMsgConvert(c -> c.toArray(toByteStream(), charset));
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public abstract class AbstractBody implements Toable {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Bean 转换！");
 		}
-		return taskExecutor.doMsgConvert((MsgConvertor c) -> c.toBean(type, toByteStream(), charset));
+		return taskExecutor.doMsgConvert(c -> c.toBean(type, toByteStream(), charset));
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public abstract class AbstractBody implements Toable {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 List 转换！");
 		}
-		return taskExecutor.doMsgConvert((MsgConvertor c) -> c.toList(type, toByteStream(), charset));
+		return taskExecutor.doMsgConvert(c -> c.toList(type, toByteStream(), charset));
 	}
 	
 }
