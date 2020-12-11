@@ -30,7 +30,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     protected boolean nothrow;
     protected boolean nextOnIO = false;
     
-    private String urlPath;
+    private final String urlPath;
     private String tag;
     private Map<String, String> headers;
     private Map<String, String> pathParams;
