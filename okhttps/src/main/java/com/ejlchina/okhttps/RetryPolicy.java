@@ -54,14 +54,14 @@ public interface RetryPolicy {
     interface TryOpt {
 
         /**
-         * 重试
+         * 再试一次
          */
-        void tryIt();
+        void tryAgain();
 
         /**
-         * 放弃
+         * 完成，不再重试
          */
-        void giveUp();
+        void justDone();
 
     }
 
