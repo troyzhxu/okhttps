@@ -55,11 +55,11 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
 
     protected RetryPolicy retryPolicy;
 
-    public HttpTask(HttpClient httpClient, String url) {
-        this.urlPath = url;
+    public HttpTask(HttpClient httpClient, String urlPath) {
         this.httpClient = httpClient;
         this.charset = httpClient.charset();
         this.bodyType = httpClient.bodyType();
+        this.urlPath = urlPath;
     }
 
     /**
