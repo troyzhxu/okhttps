@@ -213,7 +213,14 @@ public interface HttpResult {
 	 * @return 响应报文体
 	 */
 	Body getBody();
-	
+
+	/**
+	 * 获取所属的请求任务
+	 * @since 2.5.0
+	 * @return HttpTask
+	 */
+	HttpTask<?> getTask();
+
 	/**
 	 * @return 执行中发生的异常
 	 */

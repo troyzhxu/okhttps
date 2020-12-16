@@ -16,7 +16,7 @@ public class RealHttpResult implements HttpResult {
     private Response response;
     private IOException error;
     private TaskExecutor taskExecutor;
-    private HttpTask<?> httpTask;
+    private final HttpTask<?> httpTask;
     private Body body;
     
     public RealHttpResult(HttpTask<?> httpTask, State state) {
@@ -112,7 +112,12 @@ public class RealHttpResult implements HttpResult {
         }
         return body;
     }
-    
+
+    @Override
+    public HttpTask<?> getTask() {
+        return httpTask;
+    }
+
     @Override
     public IOException getError() {
         return error;
