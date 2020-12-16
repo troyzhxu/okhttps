@@ -42,6 +42,19 @@ public interface HttpResult {
 	}
 
 	/**
+	 * 构造一个 HttpResult
+	 * @param task HttpTask
+	 * @param response Response
+	 * @return HttpResult
+	 */
+	static HttpResult of(HttpTask<?> task, Response response) {
+		if (task != null && response != null) {
+			return new RealHttpResult(task, response, task.httpClient.executor());
+		}
+		throw new IllegalArgumentException("task 与 response 不能为空");
+	}
+
+	/**
 	 * HTTP 任务执行状态
 	 */
 	enum State {
