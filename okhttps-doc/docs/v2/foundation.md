@@ -571,10 +571,10 @@ http.async("/upload")
 ### 其它
 
 * `tag(String tag)` 为 HTTP 任务添加标签
-* `setRange(long rangeStart)` 设置 Range 头信息，`addHeader`的便捷方法，用于[断点续传](/v1/updown.html#实现断点续传)
-* `setRange(long rangeStart, long rangeEnd)` 设置 Range 头信息，可用于[分块下载](/v1/updown.html#实现分块下载)
-* `bind(Object object)` 绑定一个对象，可用于实现 Android 里的[生命周期绑定](/v1/android.html#生命周期绑定)
-* `nothrow()` 一种发生异常时的处理方式，请参考 [异常处理](/v2/features.html#异常处理) 章节
+* `setRange(long rangeStart)` 设置 Range 头信息，`addHeader`的便捷方法，用于[断点续传](/v1/updownload.html#实现断点续传)
+* `setRange(long rangeStart, long rangeEnd)` 设置 Range 头信息，可用于[分块下载](/v1/updownload.html#实现分块下载)
+* `bind(Object object)` 绑定一个对象，可用于实现 Android 里的[生命周期绑定](/v1/updownload.html#生命周期绑定)
+* `nothrow()` 一种发生异常时的处理方式，请参考 [异常处理](/v2/foundation.html#异常处理) 章节
 * `skipPreproc()` 设置本次请求跳过所有预处理器，请参考 [预处理器](/v2/configuration.html#并行预处理器) 章节
 * `skipSerialPreproc()` 设置本次请求只跳过所有串行预处理器，请参考 [串行预处理器](/v2/configuration.html#串行预处理器（token问题最佳解决方案）) 章节
 
