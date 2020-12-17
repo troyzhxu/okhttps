@@ -14,6 +14,7 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -605,7 +606,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     protected Call prepareCall(String method) {
-        Request request = prepareRequest(method);
+        Request request = prepareRequest(method.toUpperCase(Locale.ROOT));
 		return httpClient.request(request);
     }
 

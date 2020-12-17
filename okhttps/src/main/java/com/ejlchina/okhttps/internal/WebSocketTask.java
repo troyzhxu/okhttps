@@ -123,7 +123,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
     			if (socket.cancelOrClosed) {
 					removeTagTask();
         		} else {
-					Request request = prepareRequest("GET");
+					Request request = prepareRequest(HTTP.GET);
 					MessageListener listener = new MessageListener(socket);
 					httpClient.webSocket(request, listener);
 				}
