@@ -118,7 +118,7 @@ public final class TaskExecutor {
         for (int i = msgConvertors.length - 1; i >= 0; i--) {
             MsgConvertor convertor = msgConvertors[i];
             String mediaType = convertor.mediaType();
-            if (type != null && (mediaType == null || !mediaType.contains(type))) {
+            if (type != null && (mediaType == null || !mediaType.toLowerCase().contains(type))) {
                 continue;
             }
             if (callable == null && mediaType != null) {

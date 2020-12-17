@@ -242,7 +242,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      */
     public C bodyType(String type) {
         if (type != null) {
-            this.bodyType = type;
+            this.bodyType = type.toLowerCase();
         }
         return (C) this;
     }
@@ -606,7 +606,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     protected Call prepareCall(String method) {
-        Request request = prepareRequest(method.toUpperCase(Locale.ROOT));
+        Request request = prepareRequest(method.toUpperCase());
 		return httpClient.request(request);
     }
 

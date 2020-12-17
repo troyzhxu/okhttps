@@ -360,7 +360,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			if (type == null || type.equalsIgnoreCase(OkHttps.FORM)) {
 				throw new IllegalArgumentException("msgType 不可为空 或 form");
 			}
-			this.msgType = type;
+			this.msgType = type.toLowerCase();
 		}
 
 		@Override

@@ -417,7 +417,7 @@ public interface HTTP {
          */
         public Builder bodyType(String bodyType) {
             if (bodyType != null) {
-                this.bodyType = bodyType;
+                this.bodyType = bodyType.toLowerCase();
             }
             return this;
         }
