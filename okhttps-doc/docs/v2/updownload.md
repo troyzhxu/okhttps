@@ -147,7 +147,7 @@ static String url = "http://api.demo.com/download/test.zip"
 public static void main(String[] args) {
     long totalSize = OkHttps.sync(url).get().getBody()
             .close()             // 因为这次请求只是为了获得文件大小，不消费报文体，所以直接关闭
-            .getContentLength(); // 获得待下载文件的大小（由于未消费报文体，所以该请求不会消耗下载报文体的时间和网络流量）
+            .getLength();        // 获得待下载文件的大小（由于未消费报文体，所以该请求不会消耗下载报文体的时间和网络流量）
     download(totalSize, 0);      // 从第 0 块开始下载
     sleep(50000);                // 等待下载完成（不然本例的主线程就结束啦）
 }
