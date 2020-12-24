@@ -28,8 +28,6 @@ public class HttpClient implements HTTP {
     final Charset charset;
     // 默认的请求体类型
     final String bodyType;
-    // 重试策略池
-    final Map<String, RetryPolicy> retryPolicys;
 
 
     public HttpClient(Builder builder) {
@@ -41,7 +39,6 @@ public class HttpClient implements HTTP {
         this.preprocTimeoutTimes = builder.preprocTimeoutTimes();
         this.charset = builder.charset();
         this.bodyType = builder.bodyType();
-        this.retryPolicys = builder.retryPolicys();
         this.tagTasks = new LinkedList<>();
     }
 
@@ -178,18 +175,6 @@ public class HttpClient implements HTTP {
         return executor;
     }
 
-    /**
-     * 查找策略
-     * @param policyName 策略名
-     * @return RetryPolicy
-     */
-    public RetryPolicy requirePolicy(String policyName) {
-        RetryPolicy policy = retryPolicys.get(policyName);
-        if (policy != null) {
-            return policy;
-        }
-        throw new IllegalStateException("No such RetryPolicy named: " + policyName);
-    }
 
     public void preprocess(HttpTask<?> httpTask, Runnable request, 
     		boolean skipPreproc, boolean skipSerialPreproc) {
@@ -377,8 +362,5 @@ public class HttpClient implements HTTP {
         return bodyType;
     }
 
-    public Map<String, RetryPolicy> retryPolicys() {
-        return retryPolicys;
-    }
 
 }
