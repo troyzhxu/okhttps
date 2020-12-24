@@ -299,7 +299,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 				return;
 			}
 			long noPongSeconds = nowSeconds() - lastPongSecs;
-			if (noPongSeconds > 3 * pongSeconds) {
+			if (noPongSeconds > 3L * pongSeconds) {
 				Exception e = new SocketTimeoutException("Server didn't pong heart-beat on time. Last received at " + noPongSeconds + " seconds ago.");
 				((RealWebSocket) webSocket.webSocket).failWebSocket(e, null);
 			} else {

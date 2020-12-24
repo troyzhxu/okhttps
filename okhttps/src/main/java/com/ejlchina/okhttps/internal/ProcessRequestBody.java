@@ -15,13 +15,13 @@ import okio.Okio;
 
 public class ProcessRequestBody extends RequestBody {
 
-	private RequestBody requestBody;
-	private OnCallback<Process> onProcess;
-	private Executor callbackExecutor;
-	private long stepBytes;
-	private long step = 0;
-	private RealProcess process;
+	private final RequestBody requestBody;
+	private final OnCallback<Process> onProcess;
+	private final Executor callbackExecutor;
+	private final RealProcess process;
+	private final long stepBytes;
 	private boolean doneCalled = false;
+	private long step = 0;
 	
 	public ProcessRequestBody(RequestBody requestBody, OnCallback<Process> onProcess, Executor callbackExecutor,
 			long contentLength, long stepBytes) {
@@ -74,9 +74,7 @@ public class ProcessRequestBody extends RequestBody {
             			doneCalled = true;
             		}
             		step++;
-            		callbackExecutor.execute(() -> {
-            			onProcess.on(process);
-            		});
+            		callbackExecutor.execute(() -> onProcess.on(process));
                 }
                 
             });

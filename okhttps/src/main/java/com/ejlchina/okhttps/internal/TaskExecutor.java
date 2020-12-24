@@ -11,15 +11,15 @@ import okhttp3.internal.Util;
 
 public final class TaskExecutor {
 
-    private Executor ioExecutor;
-    private Executor mainExecutor;
+    private final Executor ioExecutor;
+    private final Executor mainExecutor;
+    private final DownListener downloadListener;
+    private final TaskListener<HttpResult> responseListener;
+    private final TaskListener<IOException> exceptionListener;
+    private final TaskListener<State> completeListener;
+    private final MsgConvertor[] msgConvertors;
+    private final String[] contentTypes;
     private Scheduler taskScheduler;
-    private DownListener downloadListener;
-    private TaskListener<HttpResult> responseListener;
-    private TaskListener<IOException> exceptionListener;
-    private TaskListener<State> completeListener;
-    private MsgConvertor[] msgConvertors;
-    private String[] contentTypes;
     
     public TaskExecutor(HTTP.Builder builder, Executor ioExecutor) {
         this.downloadListener = builder.downloadListener();

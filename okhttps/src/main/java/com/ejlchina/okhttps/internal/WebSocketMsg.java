@@ -1,7 +1,6 @@
 package com.ejlchina.okhttps.internal;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -13,11 +12,11 @@ import com.ejlchina.okhttps.WebSocket.Message;
 
 import okio.ByteString;
 
+
 public class WebSocketMsg extends AbstractBody implements Message {
 
 	private String text;
 	private ByteString bytes;
-	
 	
 	public WebSocketMsg(String text, TaskExecutor taskExecutor, Charset charset) {
 		super(taskExecutor, charset);
@@ -79,7 +78,7 @@ public class WebSocketMsg extends AbstractBody implements Message {
 			return new InputStream() {
 				
 				@Override
-				public int read() throws IOException {
+				public int read() {
 					if (buffer.hasRemaining()) {
 						return buffer.get();
 					}

@@ -156,7 +156,7 @@ public class HttpClient implements HTTP {
 
         boolean isExpired() {
             // 生存时间大于10倍的总超时限值
-            return System.nanoTime() - createAt > 1_000_000 * preprocTimeoutMillis();
+            return System.nanoTime() - createAt > 1_000_000L * preprocTimeoutMillis();
         }
 
 		public void setTag(String tag) {
@@ -221,11 +221,11 @@ public class HttpClient implements HTTP {
     public static class SerialPreprocessor implements Preprocessor {
 
         // 预处理器
-        private Preprocessor preprocessor;
+        final Preprocessor preprocessor;
         // 待处理的任务队列
-        private Queue<PreChain> pendings;
+        final Queue<PreChain> pendings;
         // 是否有任务正在执行
-        private boolean running = false;
+        boolean running = false;
 
         public SerialPreprocessor(Preprocessor preprocessor) {
             this.preprocessor = preprocessor;
@@ -268,14 +268,10 @@ public class HttpClient implements HTTP {
     class RealPreChain implements Preprocessor.PreChain {
 
         private int index;
-
-        private Preprocessor[] preprocessors;
-
-        private HttpTask<?> httpTask;
-
-        private Runnable request;
-
-        private boolean noSerialPreprocess;
+        final Preprocessor[] preprocessors;
+        final HttpTask<?> httpTask;
+        final Runnable request;
+        final boolean noSerialPreprocess;
         
         public RealPreChain(Preprocessor[] preprocessors, HttpTask<?> httpTask, Runnable request, 
         		int index, boolean noSerialPreprocess) {
