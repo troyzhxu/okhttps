@@ -88,14 +88,12 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	/**
 	 * 用于兼容某些强制客户端必须以固定的时间间隔发送心跳的服务器
 	 * @since v2.5.0
-	 * @param pingSeconds 客户端心跳间隔秒数（0 表示不需要心跳）
-	 * @param pongSeconds 服务器心跳间隔秒数（0 表示不需要心跳）
 	 * @param flexiblePing Ping 的间隔是否灵活可变（默认为 true, 为 false 时客户端 Ping 的间隔固定，普通的消息不做为 Ping）
 	 * @return WebSocketTask
 	 */
-	public WebSocketTask heatbeat(int pingSeconds, int pongSeconds, boolean flexiblePing) {
+	public WebSocketTask flexiblePing(boolean flexiblePing) {
 		this.flexiblePing = flexiblePing;
-		return heatbeat(pingSeconds, pongSeconds);
+		return this;
 	}
 
 	/**
