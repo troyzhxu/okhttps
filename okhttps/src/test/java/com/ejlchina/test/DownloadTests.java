@@ -85,7 +85,7 @@ public class DownloadTests extends BaseTest {
                 })
                 .stepRate(0.1)
                 .toFolder("D:/WorkSpace/download/")
-//				.toFile("D:\\WorkSpace\\download\\CocosDashboard-v1.0.1-win32-031816(9).exe")
+//				.toFile("D:/WorkSpace/test/README.md")
 //				.setAppended() // 启用 断点续传
                 .nextOnIO()
                 .setOnSuccess((File file) -> {
