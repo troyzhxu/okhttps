@@ -5,7 +5,7 @@ import com.ejlchina.okhttps.Process;
 public class RealProcess implements Process {
 
 	// 总字节数
-	private long totalBytes;
+	private final long totalBytes;
 	// 已经完成字节数
 	private long doneBytes;
 	
