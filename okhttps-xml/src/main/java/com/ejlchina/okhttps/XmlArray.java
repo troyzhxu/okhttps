@@ -10,9 +10,9 @@ import java.util.List;
 
 public class XmlArray implements Array {
 
-    private String[] nameKeys;
-    private String[] valueKeys;
-    private List<Element> list;
+    private final String[] nameKeys;
+    private final String[] valueKeys;
+    private final List<Element> list;
 
     public XmlArray(String[] nameKeys, String[] valueKeys, List<Element> list) {
         this.nameKeys = nameKeys;

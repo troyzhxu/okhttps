@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JacksonArray implements Array {
 
-	private ArrayNode json;
+	private final ArrayNode json;
 	
 	public JacksonArray(ArrayNode json) {
 		this.json = json;

@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 
 public class FastjsonArray implements Array {
 
-	private JSONArray json;
+	private final JSONArray json;
 	
 	public FastjsonArray(JSONArray json) {
 		this.json = json;

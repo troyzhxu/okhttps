@@ -152,8 +152,6 @@ public class XmlUtils {
                 case '\t':
                 case '\n':
                 case '\r':
-                    // case '\b':
-                    // case '\f':
                     break;
                 default:
                     return false;

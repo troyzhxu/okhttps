@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class JacksonMapper implements Mapper {
 
-	private ObjectNode json;
+	private final ObjectNode json;
 	
 	public JacksonMapper(ObjectNode json) {
 		this.json = json;

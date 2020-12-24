@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class FastjsonMapper implements Mapper {
 
-	private JSONObject json;
+	private final JSONObject json;
 	
 	public FastjsonMapper(JSONObject json) {
 		this.json = json;
