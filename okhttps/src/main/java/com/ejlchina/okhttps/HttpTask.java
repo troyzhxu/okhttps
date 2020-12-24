@@ -546,42 +546,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         return false;
     }
 
-    public static class FilePara {
-
-        String type;
-        String fileName;
-        byte[] content;
-        File file;
-
-        FilePara(String type, String fileName, byte[] content) {
-            this.type = type;
-            this.fileName = fileName;
-            this.content = content;
-        }
-
-        FilePara(String type, String fileName, File file) {
-            this.type = type;
-            this.fileName = fileName;
-            this.file = file;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public String getFileName() {
-            return fileName;
-        }
-
-        public byte[] getContent() {
-            return content;
-        }
-
-        public File getFile() {
-            return file;
-        }
-    }
-    
     protected void registeTagTask(Cancelable canceler) {
         if (tag != null && tagTask == null) {
             tagTask = httpClient.addTagTask(tag, canceler, this);
