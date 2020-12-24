@@ -53,6 +53,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     protected boolean skipPreproc = false;
     protected boolean skipSerialPreproc = false;
 
+    protected RetryPolicy retryPolicy;
 
     public HttpTask(HttpClient httpClient, String urlPath) {
         this.httpClient = httpClient;
@@ -242,6 +243,28 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         if (type != null) {
             this.bodyType = type.toLowerCase();
         }
+        return (C) this;
+    }
+
+    /**
+     * 使用重试机制
+     * @since 2.5.0
+     * @param policy 重试策略
+     * @return HttpTask 实例
+     */
+    public C retryPolicy(RetryPolicy policy) {
+        this.retryPolicy = policy;
+        return (C) this;
+    }
+
+    /**
+     * 使用重试机制
+     * @since 2.5.0
+     * @param policyName 重试策略名（从 HTTP 实例中获取，在构建时注入）
+     * @return HttpTask 实例
+     */
+    public C retryPolicy(String policyName) {
+        retryPolicy = httpClient.requirePolicy(policyName);
         return (C) this;
     }
 
