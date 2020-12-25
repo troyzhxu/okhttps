@@ -249,7 +249,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			} else if (onException != null) {
 				execute(() -> onException.on(this.webSocket,  t), exceptionOnIO);
 			} else if (!nothrow) {
-				throw new HttpException("WebSockt 异常", t);
+				throw new HttpException("WebSockt 连接异常: " + getUrl(), t);
 			}
 		}
 		

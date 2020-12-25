@@ -762,7 +762,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             return latch.await(httpClient.preprocTimeoutMillis(),
                     TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            throw new HttpException("超时", e);
+            throw new HttpException("执行超时: " + urlPath, e);
         }
     }
 
@@ -770,7 +770,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         if (nothrow) {
             return new RealHttpResult(this, State.TIMEOUT);
         }
-        throw new HttpException(State.TIMEOUT, "执行超时");
+        throw new HttpException(State.TIMEOUT, "执行超时: " + urlPath);
     }
 
     public Charset charset(Response response) {
