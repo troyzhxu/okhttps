@@ -124,7 +124,7 @@ public class SyncHttpTask extends HttpTask<SyncHttpTask> {
 		State state = result.getState();
     	if (e != null && state != State.CANCELED
     			&& !nothrow) {
-    		throw new HttpException(state, "执行异常", e);
+    		throw new HttpException(state, "执行异常 " + getUrl(), e);
     	}
         return result;
     }
