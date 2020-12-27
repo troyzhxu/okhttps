@@ -1,5 +1,6 @@
 package com.ejlchina.okhttps.internal;
 
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -21,7 +22,7 @@ public abstract class AbstractBody implements Toable {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Mapper 转换！");
 		}
-		return taskExecutor.doMsgConvert(c -> c.toMapper(toByteStream(), charset));
+		return taskExecutor.doMsgConvert(c -> c.toMapper(convertingStream(), charset));
 	}
 
 	@Override
@@ -29,7 +30,7 @@ public abstract class AbstractBody implements Toable {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Array 转换！");
 		}
-		return taskExecutor.doMsgConvert(c -> c.toArray(toByteStream(), charset));
+		return taskExecutor.doMsgConvert(c -> c.toArray(convertingStream(), charset));
 	}
 
 	@Override
@@ -51,7 +52,7 @@ public abstract class AbstractBody implements Toable {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 Bean 转换！");
 		}
-		return taskExecutor.doMsgConvert(c -> c.toBean(type, toByteStream(), charset));
+		return taskExecutor.doMsgConvert(c -> c.toBean(type, convertingStream(), charset));
 	}
 
 	@Override
@@ -59,7 +60,14 @@ public abstract class AbstractBody implements Toable {
 		if (taskExecutor == null) {
 			throw new IllegalStateException("没有 taskExecutor，不可做 List 转换！");
 		}
-		return taskExecutor.doMsgConvert(c -> c.toList(type, toByteStream(), charset));
+		return taskExecutor.doMsgConvert(c -> c.toList(type, convertingStream(), charset));
 	}
-	
+
+	/**
+	 * @return 待转换的输入流
+	 */
+	protected InputStream convertingStream() {
+		return toByteStream();
+	}
+
 }
