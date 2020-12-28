@@ -11,7 +11,7 @@
 
 ## 文档
 
-官网 http://okhttps.ejlchina.com/
+官网 https://okhttps.ejlchina.com/
 
 ## 为什么用
 
@@ -97,7 +97,7 @@ Websocket 方法：
 [okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-stomp) | 2.5.0 | 超级轻量的 Stomp 客户端
 [okhttps-xml](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-xml) | 2.5.0 | XML 解析扩展
 
-## 超详细教程，请查看：http://okhttps.ejlchina.com/
+## 超详细教程，请查看：https://okhttps.ejlchina.com/
 
 ## 联系方式
 
