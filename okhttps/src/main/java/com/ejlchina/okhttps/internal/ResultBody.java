@@ -90,7 +90,16 @@ public class ResultBody extends AbstractBody implements Body {
 		this.rangeIgnored =true;
 		return this;
 	}
-	
+
+	@Override
+	protected InputStream convertingStream() {
+		if (taskExecutor.isMulitMsgConvertor()) {
+			// 多个 MsgConvertor 时，自动开启缓存
+			cache();
+		}
+		return toByteStream();
+	}
+
 	@Override
 	public InputStream toByteStream() {
 		InputStream input;

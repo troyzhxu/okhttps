@@ -225,4 +225,8 @@ public final class TaskExecutor {
         return contentTypes;
     }
 
+    boolean isMulitMsgConvertor() {
+        return msgConvertors.length > 1;
+    }
+
 }

@@ -383,7 +383,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 					executor.executeOnComplete(AsyncHttpTask.this, onComplete, state, completeOnIO);
 					if (!executor.executeOnException(AsyncHttpTask.this, onException, error, exceptionOnIO)
 							&& !nothrow) {
-						throw new HttpException(state, error.getMessage(), error);
+						throw new HttpException(state, "异步请求异常：" + getUrl(), error);
 					}
 				});
             }

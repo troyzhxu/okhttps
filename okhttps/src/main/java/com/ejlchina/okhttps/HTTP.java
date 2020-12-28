@@ -143,6 +143,8 @@ public interface HTTP {
 
         private String bodyType = OkHttps.FORM;
 
+        private Map<String, RetryPolicy> retryPolicys;
+
 
         public Builder() {
             mediaTypes = new HashMap<>();
@@ -167,6 +169,7 @@ public interface HTTP {
             contentTypes.add("application/x-protobuf");
             preprocessors = new ArrayList<>();
             msgConvertors = new ArrayList<>();
+            retryPolicys = new HashMap<>();
         }
 
         public Builder(HttpClient hc) {
@@ -187,6 +190,8 @@ public interface HTTP {
             msgConvertors = new ArrayList<>();
             Collections.addAll(msgConvertors, executor.getMsgConvertors());
             preprocTimeoutTimes = hc.preprocTimeoutTimes();
+            retryPolicys = new HashMap<>();
+            retryPolicys.putAll(hc.retryPolicys());
             bodyType = hc.bodyType();
             charset = hc.charset();
         }
@@ -418,6 +423,31 @@ public interface HTTP {
         }
 
         /**
+         * 添加重试策略
+         * @since v2.5.0
+         * @param name 策略名
+         * @param policy 策略
+         * @return Builder
+         */
+        public Builder addRetryPolicy(String name, RetryPolicy policy) {
+            if (retryPolicys.containsKey(name)) {
+                throw new IllegalStateException("RetryPolicy[" + name + "] already exists!");
+            }
+            retryPolicys.put(name, policy);
+            return this;
+        }
+
+        /**
+         * 清空重试策略
+         * @since v2.5.0
+         * @return Builder
+         */
+        public Builder clearRetryPolicys() {
+            retryPolicys.clear();
+            return this;
+        }
+
+        /**
          * 构建 HTTP 实例
          * @return HTTP
          */
@@ -507,6 +537,10 @@ public interface HTTP {
 
         public String bodyType() {
             return bodyType;
+        }
+
+        public Map<String, RetryPolicy> retryPolicys() {
+            return retryPolicys;
         }
 
     }
