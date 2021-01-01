@@ -108,6 +108,8 @@ Websocket 方法：
 
 ## 友情链接
 
+[**[ bean-searcher ]** 超轻量级 Web 条件检索引擎，使一行代码实现复杂列表检索成为可能！](https://gitee.com/ejlchina-zhxu/bean-searcher)
+
 [**[ sa-token ]** 一个 JavaWeb 轻量级权限认证框架，功能全面，上手简单](https://gitee.com/sz6/sa-token)
 
 ## 参与贡献
