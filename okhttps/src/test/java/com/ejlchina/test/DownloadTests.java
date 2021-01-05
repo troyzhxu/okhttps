@@ -61,6 +61,12 @@ public class DownloadTests extends BaseTest {
 
     /**
      * 多线程并行下载到同一个文件
+     * 这种下载方法不一定高效，因为多线程向同一个文件内写入数据存在竞争，下载时间反而会更长
+     * 分 1 块: 7736 毫秒
+     * 分 2 块: 15103 毫秒
+     * 分 3 块: 22678 毫秒
+     * 分 5 块: 36986 毫秒
+     * 分 9 块: 67826 毫秒
      */
     @Test
     public void parallel() throws InterruptedException {
