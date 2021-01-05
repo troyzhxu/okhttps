@@ -75,7 +75,7 @@ public class DownloadTests extends BaseTest {
         String url = "https://download.cocos.com/CocosDashboard/v1.0.1/CocosDashboard-v1.0.1-win32-031816.exe";
 
         long totalLength = OkHttps.sync(url).head().getContentLength();
-        long size = 90 * 1024 * 1024;   // 每块最多下载 10 M
+        long size = 30 * 1024 * 1024;   // 每块最多下载 10 M
 
         int count = new BigDecimal(totalLength).divide(new BigDecimal(size), RoundingMode.UP).intValue();
 
@@ -85,8 +85,10 @@ public class DownloadTests extends BaseTest {
 
         for (int i = 0; i < count; i++) {
             int index = i;
+            long start = index * size;
             new Thread(() -> {
                 OkHttps.sync(url)
+                        .setRange(start, start + size)
                         .get()
                         .getBody()
                         .stepRate(0.1)
