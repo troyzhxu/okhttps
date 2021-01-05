@@ -60,7 +60,7 @@ public class DownloadTests extends BaseTest {
     }
 
     /**
-     * 并行下载
+     * 多线程并行下载到同一个文件
      */
     @Test
     public void parallel() throws InterruptedException {
