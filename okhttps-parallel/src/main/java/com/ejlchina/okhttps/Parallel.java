@@ -2,6 +2,7 @@ package com.ejlchina.okhttps;
 
 /**
  * 并行下载
+ * 把同一个文件用多线程下载到不同的临时文件内，最后合并
  */
 public class Parallel {
 
