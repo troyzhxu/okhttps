@@ -21,7 +21,7 @@ public class Download {
     private long doneBytes;
     private int buffSize = 0;
     private long seekBytes = 0;
-
+    private boolean appended;
     private volatile int status;
     private final Object lock = new Object();
     
@@ -54,13 +54,14 @@ public class Download {
      * 用预断点续传和分块下载
      * @return Download
      */
-    @Deprecated
     public Download setAppended() {
+        this.appended = true;
         return this;
     }
     
     /**
      * 设置文件指针，从文件的 seekBytes 位置追加内容
+     * 只有配合 setAppended() 方法一起才会有作用
      * @param seekBytes 跨越的字节数
      * @return Download
      */
@@ -240,7 +241,7 @@ public class Download {
     
     private void doDownload(RandomAccessFile raFile) {
         try {
-            if (seekBytes > 0) {
+            if (appended && seekBytes > 0) {
                 // 使支持并行下载到同一个文件
                 raFile.seek(seekBytes);
             }
