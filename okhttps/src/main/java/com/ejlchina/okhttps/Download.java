@@ -199,7 +199,7 @@ public class Download {
     
     public class Failure {
 
-        private IOException exception;
+        private final IOException exception;
 
         Failure(IOException exception) {
             this.exception = exception;
