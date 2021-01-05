@@ -5,7 +5,10 @@ import com.ejlchina.okhttps.*;
 import okhttp3.OkHttpClient;
 import org.junit.Test;
 
-import java.io.File;
+import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.concurrent.CountDownLatch;
 
 public class DownloadTests extends BaseTest {
 
@@ -55,6 +58,95 @@ public class DownloadTests extends BaseTest {
                 .head();
         sleep(5000);
     }
+
+    /**
+     * 并行下载
+     */
+    @Test
+    public void parallel() throws InterruptedException {
+        long t0 = System.currentTimeMillis();
+
+        String url = "https://download.cocos.com/CocosDashboard/v1.0.1/CocosDashboard-v1.0.1-win32-031816.exe";
+
+        long totalLength = OkHttps.sync(url).head().getContentLength();
+        long size = 90 * 1024 * 1024;   // 每块最多下载 10 M
+
+        int count = new BigDecimal(totalLength).divide(new BigDecimal(size), RoundingMode.UP).intValue();
+
+        println("共需下载 " + count + "块");
+
+        CountDownLatch latch = new CountDownLatch(count);
+
+        for (int i = 0; i < count; i++) {
+            int index = i;
+            new Thread(() -> {
+                OkHttps.sync(url)
+                        .get()
+                        .getBody()
+                        .stepRate(0.1)
+                        .setOnProcess(p -> println("下载进度 [" + index + "]: " + p))
+                        .toFile("D:/CocosDashboard.exe")
+                        .setOnSuccess((f) -> latch.countDown())
+                        .start();
+                println("已开始下载第 " + index + "块");
+            }).start();
+        }
+        latch.await();
+
+        long t1 = System.currentTimeMillis();
+
+        println("共耗时：" + (t1 - t0) + " 毫秒");
+    }
+
+
+    @Test
+    public void testRandomAccessFile() throws IOException {
+        String inputFile = "G:/1.jpg";
+        String outputFile = "G:/2.jpg";
+
+        FileInputStream input = new FileInputStream(inputFile);
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        byte[] buff = new byte[1024];
+        int len;
+        while ((len = input.read(buff)) != -1) {
+            output.write(buff, 0, len);
+        }
+        input.close();
+        byte[] data = output.toByteArray();
+        output.close();
+        System.out.println("data length = " + data.length);
+
+        File outFile = new File(outputFile);
+        if (!outFile.exists()) {
+            outFile.createNewFile();
+        }
+        int size = data.length / 3;
+
+        for (int i = 2; i >= 0; i--) {
+            final int index = i;
+            new Thread(() -> {
+                try {
+                    int start = index * size;
+                    RandomAccessFile raf = new RandomAccessFile(outFile, "rw");
+                    raf.seek(start);
+                    if (index < 2) {
+                        raf.write(data, start, size);
+                    } else {
+                        raf.write(data, start, data.length - start);
+                    }
+                    raf.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("第 " + index + " 块写入完成！");
+            }).start();
+        }
+
+        sleep(5000);
+
+    }
+
+
 
     @Test
     public void testDownload() {

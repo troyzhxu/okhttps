@@ -47,4 +47,8 @@ public class RealProcess implements Process {
 		return doneBytes < bytes && doneBytes < totalBytes;
 	}
 
+	@Override
+	public String toString() {
+		return "Process[" + doneBytes + " / " + totalBytes + " | " + getRate() + ']';
+	}
 }

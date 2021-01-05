@@ -213,7 +213,7 @@ public class Download {
         }
         
         /**
-         * @return 已下载字节数
+         * @return 本次已下载字节数
          */
         public long getDoneBytes() {
             return doneBytes;
@@ -241,14 +241,16 @@ public class Download {
     private void doDownload(RandomAccessFile raFile) {
         try {
             if (appended && seekBytes > 0) {
-                long length = raFile.length();
-                if (seekBytes <= length) {
-                    raFile.seek(seekBytes);
-                    doneBytes = seekBytes;
-                } else {
-                    raFile.seek(length);
-                    doneBytes = length;
-                }
+                // 使支持并行下载到同一个文件
+                raFile.seek(seekBytes);
+//                long length = raFile.length();
+//                if (seekBytes <= length) {
+//                    raFile.seek(seekBytes);
+//                    doneBytes = seekBytes;
+//                } else {
+//                    raFile.seek(length);
+//                    doneBytes = length;
+//                }
             }
             while (status != Ctrl.STATUS__CANCELED && status != Ctrl.STATUS__DONE) {
                 if (status == Ctrl.STATUS__DOWNLOADING) {
