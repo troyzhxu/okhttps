@@ -11,23 +11,23 @@ import java.io.*;
  */
 public class Download {
     
-    private File file;
-    private InputStream input;
+    private final File file;
+    private final InputStream input;
+    private final TaskExecutor taskExecutor;
+    private final Ctrl ctrl;
+
     private OnCallback<File> onSuccess;
     private OnCallback<Failure> onFailure;
-    private TaskExecutor taskExecutor;
     private long doneBytes;
     private int buffSize = 0;
     private long seekBytes = 0;
-    private boolean appended;
+
     private volatile int status;
     private final Object lock = new Object();
     
     protected boolean nextOnIO = false;
     private boolean sOnIO;
     private boolean fOnIO;
-    
-    private Ctrl ctrl;
     
     public Download(File file, InputStream input, TaskExecutor taskExecutor, long skipBytes) {
         this.file = file;
@@ -54,8 +54,8 @@ public class Download {
      * 用预断点续传和分块下载
      * @return Download
      */
+    @Deprecated
     public Download setAppended() {
-        this.appended = true;
         return this;
     }
     
@@ -240,17 +240,9 @@ public class Download {
     
     private void doDownload(RandomAccessFile raFile) {
         try {
-            if (appended && seekBytes > 0) {
+            if (seekBytes > 0) {
                 // 使支持并行下载到同一个文件
                 raFile.seek(seekBytes);
-//                long length = raFile.length();
-//                if (seekBytes <= length) {
-//                    raFile.seek(seekBytes);
-//                    doneBytes = seekBytes;
-//                } else {
-//                    raFile.seek(length);
-//                    doneBytes = length;
-//                }
             }
             while (status != Ctrl.STATUS__CANCELED && status != Ctrl.STATUS__DONE) {
                 if (status == Ctrl.STATUS__DOWNLOADING) {
