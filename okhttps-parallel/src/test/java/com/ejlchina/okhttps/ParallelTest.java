@@ -10,7 +10,7 @@ public class ParallelTest {
     @Test
     public void test() throws InterruptedException {
 
-        int size = 10 * 1024 * 1024;   // 每块最多下载 30 M
+        int size = 10 * 1024 * 1024;   // 每个连接下载 30 M
 
         CountDownLatch latch = new CountDownLatch(1);
 
