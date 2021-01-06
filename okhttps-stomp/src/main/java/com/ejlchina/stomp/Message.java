@@ -12,6 +12,10 @@ public class Message {
     private final List<Header> headers;
     private final String payload;
 
+    public Message(String command, List<Header> headers) {
+        this(command, headers, null);
+    }
+
     public Message(String command, List<Header> headers, String payload) {
         this.command = command;
         this.headers = headers;
@@ -99,7 +103,7 @@ public class Message {
 
     @Override
     public String toString() {
-        return "Message {command='" + command + "\', headers=" + headers +", payload='" + payload + "\'}";
+        return "Message {command='" + command + "', headers=" + headers +", payload='" + payload + "'}";
     }
 
 }

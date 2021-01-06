@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 
 public class GsonArray implements Array {
 
-	private JsonArray json;
+	private final JsonArray json;
 	
 	public GsonArray(JsonArray json) {
 		this.json = json;

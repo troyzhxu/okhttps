@@ -21,21 +21,26 @@ public class Stomp {
     public static final String AUTO_ACK = "auto";
     public static final String CLIENT_ACK = "client";
 
-    private boolean autoAck;
+    private final boolean autoAck;
     private boolean connected;
-    private WebSocketTask task;
+    private final WebSocketTask task;
     private WebSocket websocket;
     private boolean legacyWhitespace = false;
-    private Map<String, Subscriber> subscribers;
+    private final List<Subscriber> subscribers;
+
 
     private OnCallback<Stomp> onConnected;
     private OnCallback<WebSocket.Close> onDisconnected;
     private OnCallback<Message> onError;
 
+    private final String disReceipt;
+
+
     private Stomp(WebSocketTask task, boolean autoAck) {
         this.task = task;
         this.autoAck = autoAck;
-        this.subscribers = new HashMap<>();
+        this.subscribers = Collections.synchronizedList(new ArrayList<>());
+        this.disReceipt = UUID.randomUUID().toString();
     }
 
     /**
@@ -58,6 +63,14 @@ public class Stomp {
     }
 
     /**
+     * @since 2.5.0
+     * @return 是否自动确认消息
+     */
+    public boolean isAutoAck() {
+        return autoAck;
+    }
+
+    /**
      * 连接 Stomp 服务器
      * @return Stomp
      */
@@ -74,35 +87,48 @@ public class Stomp {
         if (connected) {
             return this;
         }
-        task.setOnOpen((ws, res) -> {
+        websocket = task.setOnOpen((ws, res) -> {
+                int pingSecs = task.pingSeconds();
+                int pongSecs = task.pongSeconds();
                 List<Header> cHeaders = new ArrayList<>();
                 cHeaders.add(new Header(Header.VERSION, SUPPORTED_VERSIONS));
-                cHeaders.add(new Header(Header.HEART_BEAT,
-                        task.pingSeconds() * 1000 + "," + task.pongSeconds() * 1000));
+                if (pingSecs > 0 && pongSecs > 0) {
+                    cHeaders.add(new Header(Header.HEART_BEAT, pingSecs * 1000 + "," + pongSecs * 1000));
+                }
                 if (headers != null) {
                     cHeaders.addAll(headers);
                 }
                 send(new Message(Commands.CONNECT, cHeaders, null));
-            });
-        task.setOnMessage((ws, msg) -> {
+            })
+            .setOnMessage((ws, msg) -> {
         		Message message = Message.from(msg.toString());
         		if (message != null) {
         			receive(message);
         		}
-        	});
-        task.setOnClosed((ws, close) -> {
+        	})
+            .setOnClosed((ws, close) -> {
                 if (onDisconnected != null) {
                     onDisconnected.on(close);
                 }
-            });
-        websocket = task.listen();
+                connected = false;
+            })
+            .listen();
         return this;
     }
 
+    /**
+     * @since 2.5.0
+     * @return 是否已连接
+     */
+    public boolean isConnected() {
+        return connected && websocket.status() == WebSocket.STATUS_CONNECTED;
+    }
+
+    /**
+     * 断开连接
+     */
     public void disconnect() {
-        if (websocket != null) {
-            websocket.close(1000, "disconnect by user");
-        }
+        send(new Message(Commands.DISCONNECT, Collections.singletonList(new Header(Header.RECEIPT, disReceipt))));
     }
 
     /**
@@ -135,15 +161,33 @@ public class Stomp {
 		return this;
 	}
 
+    /**
+     * @since 2.5.0
+     * 发送消息到主题
+     * @param destination 目的地
+     * @param data 消息
+     */
+    public void sendToTopic(String destination, String data) {
+        sendTo(TOPIC + destination, data);
+    }
+
+    /**
+     * @since 2.5.0
+     * 发送消息到队列
+     * @param destination 目的地
+     * @param data 消息
+     */
+    public void sendToQueue(String destination, String data) {
+        sendTo(QUEUE + destination, data);
+    }
+
 	/**
      * 发送消息到指定目的地
      * @param destination 目的地
      * @param data 消息
      */
     public void sendTo(String destination, String data) {
-        send(new Message(Commands.SEND,
-                Collections.singletonList(new Header(Header.DESTINATION, destination)),
-                data));
+        send(new Message(Commands.SEND, Collections.singletonList(new Header(Header.DESTINATION, destination)), data));
     }
 
     /**
@@ -207,13 +251,16 @@ public class Stomp {
      * @return Stomp
      */
     public synchronized Stomp subscribe(String destination, List<Header> headers, OnCallback<Message> callback) {
-        if (subscribers.containsKey(destination)) {
-            Platform.logError("Attempted to subscribe to already-subscribed path!");
-            return this;
+        if (destination == null || destination.isEmpty()) {
+            throw new IllegalArgumentException("destination can not be empty!");
         }
-        Subscriber subscriber = new Subscriber(UUID.randomUUID().toString(),
-                destination, callback, headers);
-        subscribers.put(destination, subscriber);
+        for (Subscriber s: subscribers) {
+            if (s.destinationEqual(destination)) {
+                throw new IllegalStateException("The destination [" + destination + "] has already been subscribed!");
+            }
+        }
+        Subscriber subscriber = new Subscriber(this, destination, callback, headers);
+        subscribers.add(subscriber);
         subscriber.subscribe();
         return this;
     }
@@ -256,9 +303,14 @@ public class Stomp {
      * @param destination 订阅地址
      */
     public synchronized void unsubscribe(String destination) {
-        Subscriber subscriber = subscribers.remove(destination);
-        if (subscriber != null) {
-            subscriber.unsubscribe();
+        Iterator<Subscriber> it = subscribers.iterator();
+        while (it.hasNext()) {
+            Subscriber s = it.next();
+            if (s.destinationEqual(destination)) {
+                s.unsubscribe();
+                it.remove();
+                break;
+            }
         }
     }
 
@@ -266,19 +318,22 @@ public class Stomp {
         String command = msg.getCommand();
         if (Commands.CONNECTED.equals(command)) {
             String hbHeader = msg.headerValue(Header.HEART_BEAT);
-            if (hbHeader != null) {
+            int pingSecs = task.pingSeconds();
+            int pongSecs = task.pongSeconds();
+            if (hbHeader != null && (pingSecs > 0 || pongSecs > 0)) {
                 String[] heartbeats = hbHeader.split(",");
                 int pingSeconds = Integer.parseInt(heartbeats[1]) / 1000;
                 int pongSeconds = Integer.parseInt(heartbeats[0]) / 1000;
-                task.heatbeat(Math.max(pingSeconds, task.pingSeconds()),
-                        Math.max(pongSeconds, task.pongSeconds()));
-                if (task.pingSupplier() == null) {
-                	task.pingSupplier(() -> ByteString.of((byte) 0x0A));
+                if (pingSeconds > 0 || pongSeconds > 0) {
+                    if (task.pingSupplier() == null) {
+                        task.pingSupplier(() -> ByteString.of((byte) 0x0A));
+                    }
+                    task.heatbeat(Math.max(pingSeconds, pingSecs), Math.max(pongSeconds, pongSecs));
                 }
             }
             synchronized (this) {
                 connected = true;
-                for (Subscriber s: subscribers.values()) {
+                for (Subscriber s: subscribers) {
                     s.subscribe();
                 }
             }
@@ -287,67 +342,25 @@ public class Stomp {
             }
         } else if (Commands.MESSAGE.equals(command)) {
             String id = msg.headerValue(Header.SUBSCRIPTION);
-            String destination = msg.headerValue(Header.DESTINATION);
-            if (id == null || destination == null) {
-                return;
+            if (id != null) {
+                for (Subscriber s: subscribers) {
+                    if (s.tryCallback(id, msg)) {
+                        break;
+                    }
+                }
             }
-            Subscriber subscriber = subscribers.get(destination);
-            if (subscriber != null && id.equals(subscriber.id)) {
-                subscriber.callback.on(msg);
+        } else if (Commands.RECEIPT.equals(command)) {
+            if (disReceipt.equals(msg.headerValue(Header.RECEIPT_ID))) {
+                // 断开连接
+                if (websocket != null) {
+                    websocket.close(1000, "disconnect by user");
+                }
             }
         } else if (Commands.ERROR.equals(command)) {
         	if (onError != null) {
         		onError.on(msg);
         	}
         }
-    }
-
-    class Subscriber {
-
-        private String id;
-        private String destination;
-        private OnCallback<Message> callback;
-        private List<Header> headers;
-        private boolean subscribed;
-
-        Subscriber(String id, String destination, OnCallback<Message> callback, List<Header> headers) {
-            this.id = id;
-            this.destination = destination;
-            this.callback = callback;
-            this.headers = headers;
-        }
-
-        void subscribe() {
-            if (connected && !subscribed) {
-                List<Header> headers = new ArrayList<>();
-                headers.add(new Header(Header.ID, id));
-                headers.add(new Header(Header.DESTINATION, destination));
-                boolean ackNotAdded = true;
-                if (this.headers != null) {
-                    for (Header header : this.headers) {
-                        if (Header.ACK.equals(header.getKey())) {
-                            ackNotAdded = false;
-                        }
-                        String key = header.getKey();
-                        if (!Header.ID.equals(key) && !Header.DESTINATION.equals(key)) {
-                            headers.add(header);
-                        }
-                    }
-                }
-                if (ackNotAdded) {
-                    headers.add(new Header(Header.ACK, autoAck ? AUTO_ACK : CLIENT_ACK));
-                }
-                send(new Message(Commands.SUBSCRIBE, headers, null));
-                subscribed = true;
-            }
-        }
-
-        void unsubscribe() {
-            List<Header> headers = Collections.singletonList(new Header(Header.ID, id));
-            send(new Message(Commands.UNSUBSCRIBE, headers, null));
-            subscribed = false;
-        }
-
     }
 
     public void setLegacyWhitespace(boolean legacyWhitespace) {

@@ -30,7 +30,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     protected boolean nothrow;
     protected boolean nextOnIO = false;
     
-    private String urlPath;
+    private final String urlPath;
     private String tag;
     private Map<String, String> headers;
     private Map<String, String> pathParams;
@@ -53,12 +53,13 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     protected boolean skipPreproc = false;
     protected boolean skipSerialPreproc = false;
 
+    protected RetryPolicy retryPolicy;
 
-    public HttpTask(HttpClient httpClient, String url) {
-        this.urlPath = url;
+    public HttpTask(HttpClient httpClient, String urlPath) {
         this.httpClient = httpClient;
         this.charset = httpClient.charset();
         this.bodyType = httpClient.bodyType();
+        this.urlPath = urlPath;
     }
 
     /**
@@ -240,8 +241,30 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      */
     public C bodyType(String type) {
         if (type != null) {
-            this.bodyType = type;
+            this.bodyType = type.toLowerCase();
         }
+        return (C) this;
+    }
+
+    /**
+     * 使用重试机制
+     * @since 2.5.0
+     * @param policy 重试策略
+     * @return HttpTask 实例
+     */
+    public C retryPolicy(RetryPolicy policy) {
+        this.retryPolicy = policy;
+        return (C) this;
+    }
+
+    /**
+     * 使用重试机制
+     * @since 2.5.0
+     * @param policyName 重试策略名（从 HTTP 实例中获取，在构建时注入）
+     * @return HttpTask 实例
+     */
+    public C retryPolicy(String policyName) {
+        retryPolicy = httpClient.requirePolicy(policyName);
         return (C) this;
     }
 
@@ -523,42 +546,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         return false;
     }
 
-    public static class FilePara {
-
-        String type;
-        String fileName;
-        byte[] content;
-        File file;
-
-        FilePara(String type, String fileName, byte[] content) {
-            this.type = type;
-            this.fileName = fileName;
-            this.content = content;
-        }
-
-        FilePara(String type, String fileName, File file) {
-            this.type = type;
-            this.fileName = fileName;
-            this.file = file;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public String getFileName() {
-            return fileName;
-        }
-
-        public byte[] getContent() {
-            return content;
-        }
-
-        public File getFile() {
-            return file;
-        }
-    }
-    
     protected void registeTagTask(Cancelable canceler) {
         if (tag != null && tagTask == null) {
             tagTask = httpClient.addTagTask(tag, canceler, this);
@@ -582,7 +569,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     protected Call prepareCall(String method) {
-        Request request = prepareRequest(method);
+        Request request = prepareRequest(method.toUpperCase());
 		return httpClient.request(request);
     }
 
@@ -691,13 +678,12 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
 
     private RequestBody toRequestBody(Object object) {
         if (object instanceof byte[] || object instanceof String) {
-            String mediaType = httpClient.executor().doMsgConvert(bodyType, null).mediaType;
+            String mediaType = httpClient.executor().doMsgConvert(bodyType, null).contentType;
             byte[] body = object instanceof byte[] ? (byte[]) object : ((String) object).getBytes(charset);
             return RequestBody.create(MediaType.parse(mediaType + "; charset=" + charset.name()), body);
         }
-        TaskExecutor.Data<byte[]> data = httpClient.executor()
-                .doMsgConvert(bodyType, (MsgConvertor c) -> c.serialize(object, charset));
-        return RequestBody.create(MediaType.parse(data.mediaType + "; charset=" + charset.name()), data.data);
+        TaskExecutor.Data<byte[]> data = httpClient.executor().doMsgConvert(bodyType, c -> c.serialize(object, charset));
+        return RequestBody.create(MediaType.parse(data.contentType + "; charset=" + charset.name()), data.data);
     }
 
     private String buildUrlPath() {
@@ -776,7 +762,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             return latch.await(httpClient.preprocTimeoutMillis(),
                     TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            throw new HttpException("超时", e);
+            throw new HttpException("执行超时: " + urlPath, e);
         }
     }
 
@@ -784,7 +770,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         if (nothrow) {
             return new RealHttpResult(this, State.TIMEOUT);
         }
-        throw new HttpException(State.TIMEOUT, "执行超时");
+        throw new HttpException(State.TIMEOUT, "执行超时: " + urlPath);
     }
 
     public Charset charset(Response response) {

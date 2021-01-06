@@ -41,7 +41,22 @@ public interface HttpResult {
 		throw new IllegalArgumentException("response 不能为空");
 	}
 
-	
+	/**
+	 * 构造一个 HttpResult
+	 * @param task HttpTask
+	 * @param response Response
+	 * @return HttpResult
+	 */
+	static HttpResult of(HttpTask<?> task, Response response) {
+		if (task != null && response != null) {
+			return new RealHttpResult(task, response, task.httpClient.executor());
+		}
+		throw new IllegalArgumentException("task 与 response 不能为空");
+	}
+
+	/**
+	 * HTTP 任务执行状态
+	 */
 	enum State {
 		
 		/**
@@ -211,7 +226,14 @@ public interface HttpResult {
 	 * @return 响应报文体
 	 */
 	Body getBody();
-	
+
+	/**
+	 * 获取所属的请求任务
+	 * @since 2.5.0
+	 * @return HttpTask
+	 */
+	HttpTask<?> getTask();
+
 	/**
 	 * @return 执行中发生的异常
 	 */

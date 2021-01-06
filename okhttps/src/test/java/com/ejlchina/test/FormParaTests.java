@@ -1,14 +1,12 @@
 package com.ejlchina.test;
 
-import java.math.BigDecimal;
-
+import com.ejlchina.okhttps.HTTP;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.ejlchina.okhttps.HTTP;
-
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.RecordedRequest;
+import java.math.BigDecimal;
 
 public class FormParaTests extends BaseTest {
 

@@ -28,20 +28,20 @@ public class HttpClient implements HTTP {
     final Charset charset;
     // 默认的请求体类型
     final String bodyType;
+    // 重试策略池
+    final Map<String, RetryPolicy> retryPolicys;
+
 
     public HttpClient(Builder builder) {
         this.okClient = builder.okClient();
         this.baseUrl = builder.baseUrl();
         this.mediaTypes = builder.getMediaTypes();
-        this.executor = new TaskExecutor(okClient.dispatcher().executorService(),
-                builder.mainExecutor(), builder.downloadListener(),
-                builder.responseListener(), builder.exceptionListener(),
-                builder.completeListener(), builder.msgConvertors(),
-                builder.taskScheduler());
+        this.executor = new TaskExecutor(builder, okClient.dispatcher().executorService());
         this.preprocessors = builder.preprocessors();
         this.preprocTimeoutTimes = builder.preprocTimeoutTimes();
         this.charset = builder.charset();
         this.bodyType = builder.bodyType();
+        this.retryPolicys = builder.retryPolicys();
         this.tagTasks = new LinkedList<>();
     }
 
@@ -156,7 +156,7 @@ public class HttpClient implements HTTP {
 
         boolean isExpired() {
             // 生存时间大于10倍的总超时限值
-            return System.nanoTime() - createAt > 1_000_000 * preprocTimeoutMillis();
+            return System.nanoTime() - createAt > 1_000_000L * preprocTimeoutMillis();
         }
 
 		public void setTag(String tag) {
@@ -176,6 +176,19 @@ public class HttpClient implements HTTP {
     @Override
     public TaskExecutor executor() {
         return executor;
+    }
+
+    /**
+     * 查找策略
+     * @param policyName 策略名
+     * @return RetryPolicy
+     */
+    public RetryPolicy requirePolicy(String policyName) {
+        RetryPolicy policy = retryPolicys.get(policyName);
+        if (policy != null) {
+            return policy;
+        }
+        throw new IllegalStateException("No such RetryPolicy named: " + policyName);
     }
 
     public void preprocess(HttpTask<?> httpTask, Runnable request, 
@@ -208,11 +221,11 @@ public class HttpClient implements HTTP {
     public static class SerialPreprocessor implements Preprocessor {
 
         // 预处理器
-        private Preprocessor preprocessor;
+        final Preprocessor preprocessor;
         // 待处理的任务队列
-        private Queue<PreChain> pendings;
+        final Queue<PreChain> pendings;
         // 是否有任务正在执行
-        private boolean running = false;
+        boolean running = false;
 
         public SerialPreprocessor(Preprocessor preprocessor) {
             this.preprocessor = preprocessor;
@@ -255,14 +268,10 @@ public class HttpClient implements HTTP {
     class RealPreChain implements Preprocessor.PreChain {
 
         private int index;
-
-        private Preprocessor[] preprocessors;
-
-        private HttpTask<?> httpTask;
-
-        private Runnable request;
-
-        private boolean noSerialPreprocess;
+        final Preprocessor[] preprocessors;
+        final HttpTask<?> httpTask;
+        final Runnable request;
+        final boolean noSerialPreprocess;
         
         public RealPreChain(Preprocessor[] preprocessors, HttpTask<?> httpTask, Runnable request, 
         		int index, boolean noSerialPreprocess) {
@@ -368,5 +377,8 @@ public class HttpClient implements HTTP {
         return bodyType;
     }
 
+    public Map<String, RetryPolicy> retryPolicys() {
+        return retryPolicys;
+    }
 
 }

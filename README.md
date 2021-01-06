@@ -11,7 +11,7 @@
 
 ## 文档
 
-官网 http://okhttps.ejlchina.com/
+官网 https://okhttps.ejlchina.com/
 
 ## 为什么用
 
@@ -90,24 +90,27 @@ Websocket 方法：
 
 项目 | 最新版本 | 描述
 -|-|-
-[okhttps](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps) | 2.4.2 | OkHttps 核心模块
-[okhttps-fastjson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-fastjson) | 2.4.2 | 与 fastjson 集成
-[okhttps-gson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-gson) | 2.4.2 | 与 gson 集成
-[okhttps-jackson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-jackson) | 2.4.2 | 与 jackson 集成
-[okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-stomp) | 2.4.2 | 超级轻量的 Stomp 客户端
-[okhttps-xml](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-xml) | 2.4.2 | XML 解析扩展
+[okhttps](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps) | 2.5.0 | OkHttps 核心模块
+[okhttps-fastjson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-fastjson) | 2.5.0 | 与 fastjson 集成
+[okhttps-gson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-gson) | 2.5.0 | 与 gson 集成
+[okhttps-jackson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-jackson) | 2.5.0 | 与 jackson 集成
+[okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-stomp) | 2.5.0 | 超级轻量的 Stomp 客户端
+[okhttps-xml](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-xml) | 2.5.0 | XML 解析扩展
 
-## 超详细教程，请查看：http://okhttps.ejlchina.com/
+## 超详细教程，请查看：https://okhttps.ejlchina.com/
 
 ## 联系方式
 
 * 微信：<img src="https://images.gitee.com/uploads/images/2020/0718/142637_87d27a5c_1393412.png" width="700px">
+* 由于近期交流群的二维码被爬，扫码入群方式已被关闭
+库的使用上若有疑问，可先加微信【18556739726】（请备注 OkHttps）再入群交流
 * 邮箱：zhou.xu@ejlchina.com
 
-## 后续计划
+## 友情链接
 
-* 在 WebSocket 基础上扩展支持 Stomp 协议【已发布 v1.0.1】
-* 在 Android 上通过 Kotlin 扩展使异步请求与 LiveData 集成（即将发布、敬请期待）
+[**[ bean-searcher ]** 超轻量级 Web 条件检索引擎，一行代码实现复杂条件列表检索！](https://gitee.com/ejlchina-zhxu/bean-searcher)
+
+[**[ sa-token ]** 一个 JavaWeb 轻量级权限认证框架，功能全面，上手简单](https://gitee.com/sz6/sa-token)
 
 ## 参与贡献
 

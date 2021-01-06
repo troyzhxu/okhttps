@@ -1,23 +1,21 @@
 package com.ejlchina.okhttps.internal;
 
+import com.ejlchina.okhttps.*;
+import com.ejlchina.okhttps.WebSocket.Close;
+import com.ejlchina.okhttps.WebSocket.Listener;
+import com.ejlchina.okhttps.WebSocket.Message;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.WebSocketListener;
+import okhttp3.internal.ws.RealWebSocket;
+import okio.ByteString;
+
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-
-import com.ejlchina.okhttps.*;
-import com.ejlchina.okhttps.WebSocket.Close;
-import com.ejlchina.okhttps.WebSocket.Listener;
-import com.ejlchina.okhttps.WebSocket.Message;
-
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.WebSocketListener;
-import okhttp3.internal.ws.RealWebSocket;
-import okio.ByteString;
 
 
 public class WebSocketTask extends HttpTask<WebSocketTask> {
@@ -41,11 +39,12 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	private long lastPongSecs = 0;
 
 	// 心跳数据提供者
-	private Supplier<ByteString> pingSupplier;
-
-	private boolean opened = true;
+	private PingSupplier pingSupplier;
 
 	private WebSocketImpl webSocket;
+
+	// Ping 的间隔是否灵活可变
+	private boolean flexiblePing = true;
 
 
 	public WebSocketTask(HttpClient httpClient, String url) {
@@ -70,7 +69,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * 所以如果服务器要求客户端心跳的 opcode 必须是 9 的话，请使用 OkHttp 的原生心跳：
 	 * [http://okhttps.ejlchina.com/v2/websocket.html#%E5%85%A8%E5%B1%80%E5%BF%83%E8%B7%B3%E9%85%8D%E7%BD%AE]
 	 *
-	 * 另若需要 可使用 {@link #pingSupplier(Supplier)} 方法指定心跳发送的具体内容
+	 * 另若需要 可使用 {@link #pingSupplier(PingSupplier)} 方法指定心跳发送的具体内容
 	 *
 	 * @since v2.3.0
 	 * @param pingSeconds 客户端心跳间隔秒数（0 表示不需要心跳）
@@ -87,15 +86,26 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	}
 
 	/**
+	 * 用于兼容某些强制客户端必须以固定的时间间隔发送心跳的服务器
+	 * @since v2.5.0
+	 * @param flexiblePing Ping 的间隔是否灵活可变（默认为 true, 为 false 时客户端 Ping 的间隔固定，普通的消息不做为 Ping）
+	 * @return WebSocketTask
+	 */
+	public WebSocketTask flexiblePing(boolean flexiblePing) {
+		this.flexiblePing = flexiblePing;
+		return this;
+	}
+
+	/**
 	 * @param pingSupplier 心跳数据提供者
 	 * @return WebSocketTask
 	 */
-	public WebSocketTask pingSupplier(Supplier<ByteString> pingSupplier) {
+	public WebSocketTask pingSupplier(PingSupplier pingSupplier) {
 		this.pingSupplier = pingSupplier;
 		return this;
 	}
 
-	public Supplier<ByteString> pingSupplier() {
+	public PingSupplier pingSupplier() {
 		return pingSupplier;
 	}
 	
@@ -111,7 +121,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
     			if (socket.cancelOrClosed) {
 					removeTagTask();
         		} else {
-					Request request = prepareRequest("GET");
+					Request request = prepareRequest(HTTP.GET);
 					MessageListener listener = new MessageListener(socket);
 					httpClient.webSocket(request, listener);
 				}
@@ -137,6 +147,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			this.charset = charset(response);
 			this.webSocket.setCharset(charset);
 			this.webSocket.setWebSocket(webSocket);
+			this.webSocket.setStatus(WebSocket.STATUS_CONNECTED);
 			TaskListener<HttpResult> listener = httpClient.executor.getResponseListener();
 			HttpResult result = new RealHttpResult(WebSocketTask.this, response, httpClient.executor);
 			if (listener != null) {
@@ -146,7 +157,6 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			} else if (onOpen != null) {
 				execute(() -> onOpen.on(this.webSocket, result), openOnIO);
 			}
-			opened = true;
 			if (pingSeconds > 0) {
 				lastPingSecs = nowSeconds();
 				schedulePing();
@@ -183,7 +193,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 		@Override
 		public void onClosing(okhttp3.WebSocket webSocket, int code, String reason) {
-			opened = false;
+			this.webSocket.setStatus(WebSocket.STATUS_DISCONNECTED);
 			if (onClosing != null) {
 				execute(() -> onClosing.on(this.webSocket, new Close(code, reason)), closingOnIO);
 			}
@@ -195,30 +205,35 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		}
 
 		private void doOnClose(HttpResult.State state, int code, String reason) {
-			opened = false;
 			TaskListener<HttpResult.State> listener = httpClient.executor.getCompleteListener();
+			Close close = updateStatus(state, code, reason);
 			if (listener != null) {
 				if (listener.listen(WebSocketTask.this, state) && onClosed != null) {
-					execute(() -> onClosed.on(this.webSocket, toClose(state, code, reason)), closedOnIO);
+					execute(() -> onClosed.on(this.webSocket, close), closedOnIO);
 				}
 			} else if (onClosed != null) {
-				execute(() -> onClosed.on(this.webSocket, toClose(state, code, reason)), closedOnIO);
+				execute(() -> onClosed.on(this.webSocket, close), closedOnIO);
 			}
 		}
 
-		private Close toClose(HttpResult.State state, int code, String reason) {
+		private Close updateStatus(HttpResult.State state, int code, String reason) {
 			if (state == HttpResult.State.CANCELED) {
+				webSocket.setStatus(WebSocket.STATUS_CANCELED);
 				return new Close(Close.CANCELED, "Canceled");
 			}
 			if (state == HttpResult.State.EXCEPTION) {
+				webSocket.setStatus(WebSocket.STATUS_EXCEPTION);
 				return new Close(Close.CANCELED, reason);
 			}
 			if (state == HttpResult.State.NETWORK_ERROR) {
+				webSocket.setStatus(WebSocket.STATUS_NETWORK_ERROR);
 				return new Close(Close.NETWORK_ERROR, reason);
 			}
 			if (state == HttpResult.State.TIMEOUT) {
+				webSocket.setStatus(WebSocket.STATUS_TIMEOUT);
 				return new Close(Close.TIMEOUT, reason);
 			}
+			webSocket.setStatus(WebSocket.STATUS_DISCONNECTED);
 			return new Close(code, reason);
 		}
 
@@ -234,26 +249,33 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			} else if (onException != null) {
 				execute(() -> onException.on(this.webSocket,  t), exceptionOnIO);
 			} else if (!nothrow) {
-				throw new HttpException("WebSockt 异常", t);
+				throw new HttpException("WebSockt 连接异常: " + getUrl(), t);
 			}
 		}
 		
 	}
 
 	/**
+	 * @return 连接是否已建立
+	 */
+	public boolean isConnected() {
+		return webSocket != null && webSocket.status == WebSocket.STATUS_CONNECTED;
+	}
+
+	/**
 	 * 间隔发送心跳
 	 */
 	private void schedulePing() {
-		if (!opened) {
+		if (!isConnected()) {
 			return;
 		}
 		int delay = (int) (pingSeconds + lastPingSecs - nowSeconds());
 		httpClient.executor.requireScheduler().schedule(() -> {
-			if (!opened) {
+			if (!isConnected()) {
 				return;
 			}
 			if (nowSeconds() - lastPingSecs >= pingSeconds) {
-				ByteString ping = pingSupplier != null ? pingSupplier.get() : ByteString.EMPTY;
+				ByteString ping = pingSupplier != null ? pingSupplier.getPing() : ByteString.EMPTY;
 				webSocket.send(ping);
 				Platform.logInfo("PING >>> " + ping.utf8());
 				lastPingSecs = nowSeconds();
@@ -266,16 +288,16 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * 检测服务器的心跳响应
 	 */
 	private void schedulePong() {
-		if (!opened) {
+		if (!isConnected()) {
 			return;
 		}
 		int delay = (int) (pongSeconds + lastPongSecs - nowSeconds());
 		httpClient.executor.requireScheduler().schedule(() -> {
-			if (!opened) {
+			if (!isConnected()) {
 				return;
 			}
 			long noPongSeconds = nowSeconds() - lastPongSecs;
-			if (noPongSeconds > 3 * pongSeconds) {
+			if (noPongSeconds > 3L * pongSeconds) {
 				Exception e = new SocketTimeoutException("Server didn't pong heart-beat on time. Last received at " + noPongSeconds + " seconds ago.");
 				((RealWebSocket) webSocket.webSocket).failWebSocket(e, null);
 			} else {
@@ -302,6 +324,8 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		private Charset charset;
 
 		private String msgType;
+
+		private int status = STATUS_CONNECTING;		// 当前的连接状态
 
 		public WebSocketImpl() {
 			String bodyType = getBodyType();
@@ -334,7 +358,12 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			if (type == null || type.equalsIgnoreCase(OkHttps.FORM)) {
 				throw new IllegalArgumentException("msgType 不可为空 或 form");
 			}
-			this.msgType = type;
+			this.msgType = type.toLowerCase();
+		}
+
+		@Override
+		public int status() {
+			return status;
 		}
 
 		@Override
@@ -369,12 +398,18 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 				queues.clear();
 			}
 		}
-		
+
+		public void setStatus(int status) {
+			this.status = status;
+		}
+
 		boolean send(okhttp3.WebSocket webSocket, Object msg) {
 			if (msg == null) {
 				return false;
 			}
-			lastPingSecs = nowSeconds();
+			if (pingSeconds > 0 && flexiblePing) {
+				lastPingSecs = nowSeconds();
+			}
 			if (msg instanceof String) {
 				return webSocket.send((String) msg);
 			}
@@ -384,7 +419,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			if (msg instanceof byte[]) {
 				return webSocket.send(ByteString.of((byte[]) msg));
 			}
-			byte[] bytes = httpClient.executor.doMsgConvert(msgType, (MsgConvertor c) -> c.serialize(msg, charset)).data;
+			byte[] bytes = httpClient.executor.doMsgConvert(msgType, c -> c.serialize(msg, charset)).data;
 			return webSocket.send(new String(bytes, charset));
 		}
 		

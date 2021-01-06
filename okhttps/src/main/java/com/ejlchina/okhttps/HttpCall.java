@@ -22,6 +22,7 @@ public interface HttpCall extends Cancelable {
 	HttpResult getResult();
 
 	/**
+	 * 获取所属的请求任务
 	 * @since 2.2.0
 	 * @return 当前的异步请求任务
 	 */

@@ -47,10 +47,10 @@ public class Deserializer {
         for (String field : methods.keySet()) {
             Method method = methods.get(field);
             Type fieldType = method.getParameterTypes()[0];
-            if (fieldType == Object.class && typeParas != null && typeParas.length > 0) {
-                Type[] gpts = method.getGenericParameterTypes();
-                if (gpts != null && gpts.length > 0) {
-                    Type gType = gpts[0];
+            if (fieldType == Object.class && typeParas.length > 0) {
+                Type[] gTypes = method.getGenericParameterTypes();
+                if (gTypes.length > 0) {
+                    Type gType = gTypes[0];
                     for (int i = 0; i < typeParas.length; i++) {
                         if (typeParas[i] == gType) {
                             fieldType = typeArgs[i];

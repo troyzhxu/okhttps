@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class GsonMapper implements Mapper {
 
-	private JsonObject json;
+	private final JsonObject json;
 	
 	public GsonMapper(JsonObject json) {
 		this.json = json;

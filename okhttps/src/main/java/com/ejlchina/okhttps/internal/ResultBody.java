@@ -18,13 +18,13 @@ import okio.ByteString;
 
 public class ResultBody extends AbstractBody implements Body {
 	
-	private Response response;
+	private final Response response;
 	private boolean onIO = false;
 	private OnCallback<Process> onProcess;
 	private long stepBytes = 0;
 	private double stepRate = -1;
 	private boolean rangeIgnored = false;
-	private HttpTask<?> httpTask;
+	private final HttpTask<?> httpTask;
 	private boolean cached = false;
 	private byte[] data;
 
@@ -62,9 +62,11 @@ public class ResultBody extends AbstractBody implements Body {
 	@Override
 	public Body setOnProcess(OnCallback<Process> onProcess) {
 		if (taskExecutor == null) {
+			response.close();
 			throw new IllegalStateException("没有 taskExecutor，不可设置下载进度回调！");
 		}
 		if (cached) {
+			response.close();
 			throw new IllegalStateException("开启缓存后，不可设置下载进度回调！");
 		}
 		this.onProcess = onProcess;
@@ -88,7 +90,16 @@ public class ResultBody extends AbstractBody implements Body {
 		this.rangeIgnored =true;
 		return this;
 	}
-	
+
+	@Override
+	protected InputStream convertingStream() {
+		if (taskExecutor.isMulitMsgConvertor()) {
+			// 多个 MsgConvertor 时，自动开启缓存
+			cache();
+		}
+		return toByteStream();
+	}
+
 	@Override
 	public InputStream toByteStream() {
 		InputStream input;
@@ -151,6 +162,7 @@ public class ResultBody extends AbstractBody implements Body {
 				return new String(body.bytes(), charset);
 			}
 		} catch (IOException e) {
+			response.close();
 			throw new HttpException("报文体转化字符串出错", e);
 		}
 		return null;
@@ -168,24 +180,27 @@ public class ResultBody extends AbstractBody implements Body {
 
 	@Override
 	public Download toFile(File file) {
-		if (taskExecutor == null) {
-			throw new IllegalStateException("没有 taskExecutor， 不可进行下载操作！");
-		}
-		if (!file.exists()) {
-			try {
-				File parent = file.getParentFile();
-				if (!parent.exists()) {
-					parent.mkdirs();
-				}
-				file.createNewFile();
-			} catch (IOException e) {
-				response.close();
-				throw new HttpException(
-						"Cannot create file [" + file.getAbsolutePath() + "]", e);
+		try {
+			if (taskExecutor == null) {
+				throw new IllegalStateException("没有 taskExecutor， 不可进行下载操作！");
 			}
+			if (!file.exists()) {
+				File parent = file.getParentFile();
+				if (parent == null) {
+					throw new IllegalStateException("不正确的下载路径：" + file.getPath());
+				}
+				if (!parent.exists() && !parent.mkdirs()) {
+					throw new IllegalStateException("不能创建父目录：" + parent.getPath());
+				}
+				if (!file.createNewFile()) {
+					throw new IllegalStateException("文件刚被其它线程占用：" + parent.getPath());
+				}
+			}
+		} catch (Exception e) {
+			response.close();
+			throw new HttpException("文件下载失败", e);
 		}
-		return taskExecutor.download(httpTask, file, toByteStream(), 
-				getRangeStart());
+		return taskExecutor.download(httpTask, file, toByteStream(), getRangeStart());
 	}
 	
 	@Override
@@ -204,12 +219,16 @@ public class ResultBody extends AbstractBody implements Body {
 
 	@Override
 	public Download toFolder(File dir) {
-		if (dir.exists() && !dir.isDirectory()) {
+		try {
+			if (dir.exists() && !dir.isDirectory()) {
+				throw new IllegalStateException("文件[" + dir.getPath() + "]已存在，并且不是一个目录！");
+			}
+			if (!dir.exists() && !dir.mkdirs()) {
+				throw new IllegalStateException("不能创建目录：" + dir.getPath());
+			}
+		} catch (Exception e) {
 			response.close();
-			throw new HttpException("文件下载失败：文件[" + dir.getAbsolutePath() + "]已存在，并且不是一个目录！");
-		}
-		if (!dir.exists()) {
-			dir.mkdirs();
+			throw new HttpException("目录创建失败", e);
 		}
 		return toFolder(dir.getAbsolutePath());
 	}
@@ -217,6 +236,7 @@ public class ResultBody extends AbstractBody implements Body {
 	@Override
 	public Body cache() {
 		if (onProcess != null) {
+			response.close();
 			throw new IllegalStateException("设置了下载进度回调，不可再开启缓存！");
 		}
 		cached = true;
@@ -231,8 +251,10 @@ public class ResultBody extends AbstractBody implements Body {
 	}
 	
 	private byte[] cacheBytes() {
-		if (data == null) {
-			data = bodyToBytes();
+		synchronized (response) {
+			if (data == null) {
+				data = bodyToBytes();
+			}
 		}
 		return data;
 	}
@@ -252,6 +274,7 @@ public class ResultBody extends AbstractBody implements Body {
 			try {
 				return body.bytes();
 			} catch (IOException e) {
+				body.close();
 				throw new HttpException("报文体转化字节数组出错", e);
 			}
 		}
@@ -307,6 +330,7 @@ public class ResultBody extends AbstractBody implements Body {
 				fileName = URLDecoder.decode(fileName.substring(
 				    fileName.indexOf("filename=") + 9), "UTF-8");
 			} catch (UnsupportedEncodingException e) {
+            	response.close();
 				throw new HttpException("解码文件名失败", e);
 			}
             // 有些文件名会被包含在""里面，所以要去掉，不然无法读取文件后缀

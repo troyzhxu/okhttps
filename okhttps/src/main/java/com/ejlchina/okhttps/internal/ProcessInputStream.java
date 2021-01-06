@@ -9,13 +9,13 @@ import com.ejlchina.okhttps.Process;
 
 public class ProcessInputStream extends InputStream {
 
-	private InputStream input;
-	private OnCallback<Process> onProcess;
-	private Executor callbackExecutor;
-	private long stepBytes;
-	private long step = 0;
-	private RealProcess process;
+	private final InputStream input;
+	private final OnCallback<Process> onProcess;
+	private final Executor callbackExecutor;
+	private final long stepBytes;
+	private final RealProcess process;
 	private boolean doneCalled = false;
+	private long step = 0;
 	
 	public ProcessInputStream(InputStream input, OnCallback<Process> onProcess, long totalBytes, long stepBytes,
 			long doneBytes, Executor callbackExecutor) {

@@ -48,9 +48,7 @@ public class Platform {
                     logMethod = platform.getClass().getMethod("log", String.class, int.class, Throwable.class);
                 }
             }
-            if (logMethod != null) {
-                logMethod.invoke(platform, message, level, t);
-            }
+            logMethod.invoke(platform, message, level, t);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }

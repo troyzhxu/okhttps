@@ -4,8 +4,6 @@ import com.ejlchina.okhttps.HTTP;
 import com.ejlchina.okhttps.HttpResult;
 import com.ejlchina.okhttps.OnCallback;
 import com.ejlchina.okhttps.HttpResult.State;
-import com.ejlchina.okhttps.HttpTask;
-import com.ejlchina.okhttps.Mapper;
 
 import org.junit.Test;
 

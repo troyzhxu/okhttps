@@ -1,67 +1,52 @@
 package com.ejlchina.stomp;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import com.ejlchina.okhttps.test.BaseTest;
+import org.junit.Test;
 
-import com.ejlchina.okhttps.HTTP;
-import com.ejlchina.okhttps.internal.WebSocketTask;
+import com.ejlchina.okhttps.OkHttps;
 
-import okio.ByteString;
-
-public class TestCases {
+import java.util.concurrent.CountDownLatch;
 
 
-    public static void main(String[] args) {
+public class TestCases extends BaseTest {
 
-    	HTTP http = HTTP.builder()
-//    			.config(b -> {
-//    				b.pingInterval(10, TimeUnit.SECONDS);
-//    			})
-    			.build();
 
-        WebSocketTask websocket = http.webSocket("ws://localhost:8080/ws")
-        		.heatbeat(10, 10)
-        		.pingSupplier(() -> {
-        			return ByteString.encodeUtf8("\n");
-        		});
+	static final int COUNT = 100000;
+	static final int INTERVAL = 1;
 
-        Stomp stomp = Stomp.over(websocket)
-                .setOnConnected(s -> {
-                    System.out.println("已连接");
+	@Test
+    public void testA() throws InterruptedException {
+		CountDownLatch latch = new CountDownLatch(COUNT);
+        Stomp.over(OkHttps.webSocket("ws://localhost:8080/ws").heatbeat(10, 10))
+                .setOnConnected(stomp -> {
+                    log("A 已连接");
+                    for (int i = 0; i < COUNT; i++) {
+                    	String message = "Hello : " + i;
+                    	stomp.sendTo("/queue/test", message);
+						log("A 发送：" + message);
+						latch.countDown();
+						sleep(INTERVAL);
+                    }
                 })
-                .setOnDisconnected(c -> {
-                    System.out.println("已断开：" + c);
-                })
-                .setOnError(msg -> {
-                	System.out.println("错误：" + msg);
-                })
+                .setOnDisconnected(c -> log("A 已断开：" + c))
+                .setOnError(msg -> log("A 错误：" + msg))
                 .connect();
-
-        stomp.topic("/test", msg -> {
-        	System.out.println("收到：" + msg);
-        });
-        
-        
-        new Timer().schedule(new TimerTask() {
-			
-			@Override
-			public void run() {
-				
-				stomp.sendTo("/topic/test", "Hello World!");
-				
-			}
-		}, 5000);
-        
-        new Timer().schedule(new TimerTask() {
-			
-			@Override
-			public void run() {
-				
-				stomp.disconnect();
-				
-			}
-		}, 10000);
+		latch.await();
     }
 
+	@Test
+    public void testB() throws InterruptedException {
+		CountDownLatch latch = new CountDownLatch(COUNT);
+		Stomp stomp = Stomp.over(OkHttps.webSocket("ws://localhost:8080/ws").heatbeat(10, 10))
+		        .setOnConnected(s -> log("B 已连接"))
+		        .setOnDisconnected(c -> log("B 已断开：" + c))
+		        .setOnError(msg -> log("B 错误：" + msg))
+		        .connect();
+		stomp.queue("/test", msg -> {
+			log("B 接收：" + msg.getPayload());
+			latch.countDown();
+		});
+		latch.await();
+    }
 
 }
