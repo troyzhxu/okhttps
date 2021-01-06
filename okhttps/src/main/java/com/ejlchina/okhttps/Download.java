@@ -282,8 +282,8 @@ public class Download {
         } finally {
             closeQuietly(raFile);
             closeQuietly(input);
-            if (status == Ctrl.STATUS__CANCELED) {
-                file.delete();
+            if (status == Ctrl.STATUS__CANCELED && !file.delete()) {
+                Platform.logError("can not delete canceled file: " + file);
             }
         }
         if (status == Ctrl.STATUS__DONE && onSuccess != null) {
