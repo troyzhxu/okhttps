@@ -212,7 +212,9 @@ public interface HTTP {
          * @return Builder
          */
         public Builder baseUrl(String baseUrl) {
-            this.baseUrl = baseUrl;
+            if (baseUrl != null) {
+                this.baseUrl = baseUrl.trim();
+            }
             return this;
         }
 

@@ -328,6 +328,7 @@ public class HttpClient implements HTTP {
                 throw new HttpException("在设置 BaseUrl 之前，您必须指定具体路径才能发起请求！");
             }
         } else {
+            urlPath = urlPath.trim();
             boolean isFullPath = urlPath.startsWith("https://")
                     || urlPath.startsWith("http://")
                     || urlPath.startsWith("wss://")
@@ -337,7 +338,7 @@ public class HttpClient implements HTTP {
             } else if (baseUrl != null) {
                 fullUrl = baseUrl + urlPath;
             } else {
-                throw new HttpException("在设置 BaseUrl 之前，您必须使用全路径URL发起请求，当前URL为：" + urlPath);
+                throw new HttpException("在设置 BaseUrl 之前，您必须使用全路径URL发起请求，当前URL为：'" + urlPath + "'");
             }
         }
         if (websocket && fullUrl.startsWith("http")) {
