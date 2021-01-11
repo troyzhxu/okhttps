@@ -71,4 +71,63 @@ public interface Mapper extends DataSet {
 	 */
 	Set<String> keySet();
 
+
+	/**
+	 * 遍历 Mapper
+	 * @since 2.5.1
+	 * @param consumer 消费者
+	 */
+	default void forEach(Consumer consumer) {
+		for (String key: keySet()) {
+			consumer.accept(key, new Data() {
+				@Override
+				public Mapper toMapper() {
+					return getMapper(key);
+				}
+
+				@Override
+				public Array toArray() {
+					return getArray(key);
+				}
+
+				@Override
+				public boolean toBool() {
+					return getBool(key);
+				}
+
+				@Override
+				public int toInt() {
+					return getInt(key);
+				}
+
+				@Override
+				public long toLong() {
+					return getLong(key);
+				}
+
+				@Override
+				public float toFloat() {
+					return getFloat(key);
+				}
+
+				@Override
+				public double toDouble() {
+					return getDouble(key);
+				}
+
+				@Override
+				public String toString() {
+					return getString(key);
+				}
+
+			});
+		}
+	}
+
+	interface Consumer {
+
+		void accept(String key, Data data);
+
+	}
+
 }

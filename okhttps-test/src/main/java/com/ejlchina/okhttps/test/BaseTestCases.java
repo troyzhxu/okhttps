@@ -39,6 +39,16 @@ public abstract class BaseTestCases {
         String json = getUserObjectStr();
         InputStream in = new ByteArrayInputStream(json.getBytes());
         Mapper mapper = msgConvertor.toMapper(in, StandardCharsets.UTF_8);
+
+        mapper.forEach((key, data) -> {
+            if ("id".equals(key)) {
+                Assert.assertEquals(1, data.toInt());
+            }
+            if ("name".equals(key)) {
+                Assert.assertEquals("Jack", data.toString());
+            }
+        });
+
         Set<String> keys = mapper.keySet();
         Assert.assertEquals(2, keys.size());
         Assert.assertTrue(keys.contains("id"));
@@ -55,15 +65,23 @@ public abstract class BaseTestCases {
     void testToArray() {
         String json = getUserListStr();
         InputStream in = new ByteArrayInputStream(json.getBytes());
-        Array jsonObj = msgConvertor.toArray(in, StandardCharsets.UTF_8);
-        Assert.assertFalse(jsonObj.isEmpty());
-        Assert.assertEquals(2, jsonObj.size());
-        Mapper json1 = jsonObj.getMapper(0);
-        Mapper json2 = jsonObj.getMapper(1);
+
+        Array array = msgConvertor.toArray(in, StandardCharsets.UTF_8);
+
+        array.forEach((index, data) -> {
+            System.out.println("index = " + index);
+            System.out.println("data = " + data.toMapper());
+        });
+
+        Assert.assertFalse(array.isEmpty());
+        Assert.assertEquals(2, array.size());
+        Mapper json1 = array.getMapper(0);
+        Mapper json2 = array.getMapper(1);
         Assert.assertEquals(1, json1.getInt("id"));
         Assert.assertEquals("Jack", json1.getString("name"));
         Assert.assertEquals(2, json2.getInt("id"));
         Assert.assertEquals("Tom", json2.getString("name"));
+
         System.out.println("case 2 passed!");
     }
 

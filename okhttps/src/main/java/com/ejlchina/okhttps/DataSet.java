@@ -16,4 +16,28 @@ public interface DataSet {
      */
     boolean isEmpty();
 
+    /**
+     * 只读数据
+     * @since 2.5.1
+     */
+    interface Data {
+
+        Mapper toMapper();
+
+        Array toArray();
+
+        boolean toBool();
+
+        int toInt();
+
+        long toLong();
+
+        float toFloat();
+
+        double toDouble();
+
+        String toString();
+
+    }
+
 }

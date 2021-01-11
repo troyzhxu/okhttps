@@ -57,4 +57,63 @@ public interface Array extends DataSet {
 	 */
 	String getString(int index);
 
+	/**
+	 * 遍历 Array
+	 * @since 2.5.1
+	 * @param consumer 消费者
+	 */
+	default void forEach(Consumer consumer) {
+		for (int i = 0; i < size(); i++) {
+			int index = i;
+			consumer.accept(i, new Data() {
+				@Override
+				public Mapper toMapper() {
+					return getMapper(index);
+				}
+
+				@Override
+				public Array toArray() {
+					return getArray(index);
+				}
+
+				@Override
+				public boolean toBool() {
+					return getBool(index);
+				}
+
+				@Override
+				public int toInt() {
+					return getInt(index);
+				}
+
+				@Override
+				public long toLong() {
+					return getLong(index);
+				}
+
+				@Override
+				public float toFloat() {
+					return getFloat(index);
+				}
+
+				@Override
+				public double toDouble() {
+					return getDouble(index);
+				}
+
+				@Override
+				public String toString() {
+					return getString(index);
+				}
+
+			});
+		}
+	}
+
+	interface Consumer {
+
+		void accept(int index, Data data);
+
+	}
+
 }
