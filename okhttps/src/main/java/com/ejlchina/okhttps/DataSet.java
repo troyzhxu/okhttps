@@ -40,4 +40,22 @@ public interface DataSet {
 
     }
 
+    /**
+     * 消费者，用于 DataSet 的遍历
+     * @since 2.5.1
+     * @see Array#forEach(Consumer)
+     * @see Mapper#forEach(Consumer)
+     * @param <T>
+     */
+    interface Consumer<T> {
+
+        /**
+         * 消费方法
+         * @param indexKey Array 的下标 或 Mapper 的键值
+         * @param data 数据元素
+         */
+        void accept(T indexKey, Data data);
+
+    }
+
 }

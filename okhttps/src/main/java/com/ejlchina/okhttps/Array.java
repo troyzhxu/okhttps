@@ -62,7 +62,7 @@ public interface Array extends DataSet {
 	 * @since 2.5.1
 	 * @param consumer 消费者
 	 */
-	default void forEach(Consumer consumer) {
+	default void forEach(Consumer<Integer> consumer) {
 		for (int i = 0; i < size(); i++) {
 			int index = i;
 			consumer.accept(i, new Data() {
@@ -108,12 +108,6 @@ public interface Array extends DataSet {
 
 			});
 		}
-	}
-
-	interface Consumer {
-
-		void accept(int index, Data data);
-
 	}
 
 }
