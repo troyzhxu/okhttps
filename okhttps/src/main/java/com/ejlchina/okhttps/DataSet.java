@@ -45,7 +45,7 @@ public interface DataSet {
      * @since 2.5.1
      * @see Array#forEach(Consumer)
      * @see Mapper#forEach(Consumer)
-     * @param <T>
+     * @param <T> 下标或键值的类型
      */
     interface Consumer<T> {
 
