@@ -182,7 +182,7 @@ public class XmlUtils {
                 }
                 return Integer.parseInt(s);
             } catch (NumberFormatException e) {
-                Platform.logError("无法将字符串\"" + s + "\"转换为 Int 数字");
+                throw new IllegalStateException("无法将字符串\"" + s + "\"转换为 Int 数字", e);
             }
         }
         return 0;
@@ -203,7 +203,7 @@ public class XmlUtils {
                 }
                 return Long.parseLong(s);
             } catch (NumberFormatException e) {
-                Platform.logError("无法将字符串\"" + s + "\"转换为 Long 数字");
+                throw new IllegalStateException("无法将字符串\"" + s + "\"转换为 Long 数字", e);
             }
         }
         return 0;
@@ -214,7 +214,7 @@ public class XmlUtils {
             try {
                 return Float.parseFloat(s.replace(",", ""));
             } catch (NumberFormatException e) {
-                Platform.logError("无法将字符串\"" + s + "\"转换为 Float 数字");
+                throw new IllegalStateException("无法将字符串\"" + s + "\"转换为 Float 数字", e);
             }
         }
         return 0;
@@ -225,7 +225,7 @@ public class XmlUtils {
             try {
                 return Double.parseDouble(s.replace(",", ""));
             } catch (NumberFormatException e) {
-                Platform.logError("无法将字符串\"" + s + "\"转换为 Float 数字");
+                throw new IllegalStateException("无法将字符串\"" + s + "\"转换为 Float 数字", e);
             }
         }
         return 0;
