@@ -12,10 +12,10 @@
 		<module>okhttps</module>
 		<module>okhttps-data</module>
 		<module>okhttps-stomp</module>
-		<module>okhttps-gson</module>
-		<module>okhttps-jackson</module>
-		<module>okhttps-fastjson</module>
-		<module>okhttps-xml</module>
+		<module>okhttps-convertors/okhttps-gson</module>
+		<module>okhttps-convertors/okhttps-jackson</module>
+		<module>okhttps-convertors/okhttps-fastjson</module>
+		<module>okhttps-convertors/okhttps-xml</module>
 		<module>okhttps-parallel</module>
 		<module>okhttps-test</module>
 	</modules>
