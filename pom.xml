@@ -11,15 +11,8 @@
 	<modules>
 		<module>okhttps</module>
 		<module>okhttps-stomp</module>
-		<module>okhttps-datas/okhttps-data</module>
-		<module>okhttps-datas/okhttps-data-gson</module>
-		<module>okhttps-datas/okhttps-data-jackson</module>
-		<module>okhttps-datas/okhttps-data-fastjson</module>
-		<module>okhttps-datas/okhttps-data-xml</module>
-		<module>okhttps-convertors/okhttps-gson</module>
-		<module>okhttps-convertors/okhttps-jackson</module>
-		<module>okhttps-convertors/okhttps-fastjson</module>
-		<module>okhttps-convertors/okhttps-xml</module>
+		<module>okhttps-datas</module>
+		<module>okhttps-convertors</module>
 		<module>okhttps-parallel</module>
 		<module>okhttps-test</module>
 	</modules>
