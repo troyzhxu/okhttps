@@ -1,7 +1,5 @@
 package com.ejlchina.okhttps.test;
 
-import com.ejlchina.okhttps.Array;
-import com.ejlchina.okhttps.Mapper;
 import com.ejlchina.okhttps.MsgConvertor;
 import com.ejlchina.okhttps.TypeRef;
 import org.junit.Assert;
