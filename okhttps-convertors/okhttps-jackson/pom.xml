@@ -17,11 +17,11 @@
             <artifactId>okhttps</artifactId>
             <version>${okhttps.version}</version>
         </dependency>
-		<dependency>
-		    <groupId>com.fasterxml.jackson.core</groupId>
-		    <artifactId>jackson-databind</artifactId>
-		    <version>${jackson.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>com.ejlchina</groupId>
+            <artifactId>okhttps-data-jackson</artifactId>
+            <version>${okhttps.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.ejlchina</groupId>
             <artifactId>okhttps-test</artifactId>

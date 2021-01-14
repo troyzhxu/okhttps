@@ -18,9 +18,9 @@
             <version>${okhttps.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>${fastjson.version}</version>
+            <groupId>com.ejlchina</groupId>
+            <artifactId>okhttps-data-fastjson</artifactId>
+            <version>${okhttps.version}</version>
         </dependency>
         <dependency>
             <groupId>com.ejlchina</groupId>

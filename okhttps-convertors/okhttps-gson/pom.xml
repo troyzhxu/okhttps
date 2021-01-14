@@ -17,11 +17,11 @@
             <artifactId>okhttps</artifactId>
             <version>${okhttps.version}</version>
         </dependency>
-	    <dependency>
-		    <groupId>com.google.code.gson</groupId>
-		    <artifactId>gson</artifactId>
-		    <version>${gson.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>com.ejlchina</groupId>
+            <artifactId>okhttps-data-gson</artifactId>
+            <version>${okhttps.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.ejlchina</groupId>
             <artifactId>okhttps-test</artifactId>

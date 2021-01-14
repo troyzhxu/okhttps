@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>okhttps-data-gson</artifactId>
+	<name>OkHttps Data Gson</name>
+  	<packaging>jar</packaging>
+
+	<parent>
+		<groupId>com.ejlchina</groupId>
+		<artifactId>okhttps-parent</artifactId>
+		<version>2.5.1</version>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.ejlchina</groupId>
+			<artifactId>okhttps-data</artifactId>
+			<version>${okhttps.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>${gson.version}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>okhttps-data-gson</finalName>
+	</build>
+
+</project>
