@@ -10,8 +10,8 @@
  
 	<modules>
 		<module>okhttps</module>
-		<module>okhttps-data</module>
 		<module>okhttps-stomp</module>
+		<module>okhttps-datas/okhttps-data</module>
 		<module>okhttps-convertors/okhttps-gson</module>
 		<module>okhttps-convertors/okhttps-jackson</module>
 		<module>okhttps-convertors/okhttps-fastjson</module>
