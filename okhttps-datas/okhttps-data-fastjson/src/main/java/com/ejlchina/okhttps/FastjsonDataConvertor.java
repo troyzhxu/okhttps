@@ -24,6 +24,9 @@ public class FastjsonDataConvertor implements DataConvertor {
 
 	@Override
 	public byte[] serialize(Object object, Charset charset) {
+		if (object instanceof FastjsonMapper || object instanceof FastjsonArray) {
+			return object.toString().getBytes(charset);
+		}
 		return JSON.toJSONString(object).getBytes(charset);
 	}
 

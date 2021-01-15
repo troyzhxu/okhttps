@@ -73,6 +73,9 @@ public class JacksonDataConvertor implements DataConvertor {
 
 	@Override
 	public byte[] serialize(Object object, Charset charset) {
+		if (object instanceof JacksonMapper || object instanceof JacksonArray) {
+			return object.toString().getBytes(charset);
+		}
 		try {
 			return objectMapper.writeValueAsString(object).getBytes(charset);
 		} catch (JsonProcessingException e) {

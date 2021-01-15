@@ -70,6 +70,9 @@ public class XmlDataConvertor implements DataConvertor {
 
     @Override
     public byte[] serialize(Object object, Charset charset) {
+        if (object instanceof XmlMapper || object instanceof XmlArray) {
+            return object.toString().getBytes(charset);
+        }
         try {
             JAXBContext context = JAXBContext.newInstance(object.getClass());
             Marshaller marshaller = context.createMarshaller();

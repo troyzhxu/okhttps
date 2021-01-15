@@ -37,6 +37,9 @@ public class GsonDataConvertor implements DataConvertor {
 
 	@Override
 	public byte[] serialize(Object object, Charset charset) {
+		if (object instanceof GsonMapper || object instanceof GsonArray) {
+			return object.toString().getBytes(charset);
+		}
 		return gson.toJson(object).getBytes(charset);
 	}
 
