@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * 消息转换器接口
  */
-public interface MsgConvertor {
+public interface MsgConvertor extends DataConvertor {
 
 	/**
 	 * 消息的媒体类型
@@ -18,57 +18,13 @@ public interface MsgConvertor {
 	String mediaType();
 
 	/**
-	 * 解析 Mapper
-	 * @param in JSON 输入流
-	 * @param charset 编码格式
-	 * @return Mapper
-	 */
-	Mapper toMapper(InputStream in, Charset charset);
-	
-	/**
-	 * 解析 Array
-	 * @param in JSON 输入流
-	 * @param charset 编码格式
-	 * @return Array
-	 */
-	Array toArray(InputStream in, Charset charset);
-	
-	/**
-	 * 将 Java 对象序列化为字节数组
-	 * @param object Java 对象
-	 * @param charset 编码格式
-	 * @return 字节数组
-	 */
-	byte[] serialize(Object object, Charset charset);
-	
-	/**
-	 * 解析 Java Bean
-	 * @param <T> 目标泛型
-	 * @param type 目标类型
-	 * @param in JSON 输入流
-	 * @param charset 编码格式
-	 * @return Java Bean
-	 */
-	<T> T toBean(Type type, InputStream in, Charset charset);
-
-	/**
-	 * 解析为 Java List
-	 * @param <T> 目标泛型
-	 * @param type 目标类型
-	 * @param in JSON 输入流
-	 * @param charset 编码格式
-	 * @return Java List
-	 */
-	<T> List<T> toList(Class<T> type, InputStream in, Charset charset);
-
-	/**
 	 * 表单转换器，可用于自动系列化表单参数
 	 */
 	class FormConvertor implements MsgConvertor {
 
-		private MsgConvertor convertor;
+		private final DataConvertor convertor;
 
-		public FormConvertor(MsgConvertor convertor) {
+		public FormConvertor(DataConvertor convertor) {
 			this.convertor = convertor;
 		}
 
