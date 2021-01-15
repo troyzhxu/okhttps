@@ -3,11 +3,9 @@ package com.ejlchina.okhttps;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
-public class FastjsonMapper implements Mapper, Map<String, Object> {
+public class FastjsonMapper implements Mapper {
 
 	private final JSONObject json;
 	
@@ -81,51 +79,6 @@ public class FastjsonMapper implements Mapper, Map<String, Object> {
 	@Override
 	public Set<String> keySet() {
 		return json.keySet();
-	}
-
-	@Override
-	public boolean containsKey(Object key) {
-		return json.containsKey(key);
-	}
-
-	@Override
-	public boolean containsValue(Object value) {
-		return json.containsValue(value);
-	}
-
-	@Override
-	public Object get(Object key) {
-		return json.get(key);
-	}
-
-	@Override
-	public Object put(String key, Object value) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Object remove(Object key) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void putAll(Map<? extends String, ?> m) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void clear() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Collection<Object> values() {
-		return json.values();
-	}
-
-	@Override
-	public Set<Entry<String, Object>> entrySet() {
-		return json.entrySet();
 	}
 
 	@Override
