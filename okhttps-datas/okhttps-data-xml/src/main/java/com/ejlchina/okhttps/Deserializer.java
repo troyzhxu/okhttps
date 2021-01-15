@@ -13,7 +13,6 @@ import java.util.Map;
 
 public class Deserializer {
 
-
     public Object deserialize(Mapper mapper, Type type) {
         Type[] typeArgs = null;
         if (type instanceof ParameterizedType) {
@@ -22,7 +21,6 @@ public class Deserializer {
         Class<?> clazz = toClass(type);
         return toBean(clazz, typeArgs, mapper);
     }
-
 
     protected Object toBean(Class<?> clazz, Type[] typeArgs, Mapper mapper) {
         if (clazz == Map.class || clazz == HashMap.class) {
@@ -139,6 +137,5 @@ public class Deserializer {
         }
         return null;
     }
-
 
 }
