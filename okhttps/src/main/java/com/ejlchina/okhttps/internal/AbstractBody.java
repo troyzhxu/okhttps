@@ -5,6 +5,9 @@ import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.List;
 
+import com.ejlchina.data.Array;
+import com.ejlchina.data.Mapper;
+import com.ejlchina.data.TypeRef;
 import com.ejlchina.okhttps.*;
 
 public abstract class AbstractBody implements Toable {

@@ -1,5 +1,8 @@
 package com.ejlchina.okhttps;
 
+import com.ejlchina.data.Array;
+import com.ejlchina.data.Mapper;
+import com.ejlchina.data.TypeRef;
 import okio.ByteString;
 
 import java.io.InputStream;

@@ -7,6 +7,9 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import com.ejlchina.data.Array;
+import com.ejlchina.data.Mapper;
+import com.ejlchina.data.TypeRef;
 import com.ejlchina.okhttps.*;
 import com.ejlchina.okhttps.HttpResult.State;
 
