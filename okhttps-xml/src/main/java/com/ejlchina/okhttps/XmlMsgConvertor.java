@@ -1,5 +1,8 @@
 package com.ejlchina.okhttps;
 
+import com.ejlchina.data.Deserializer;
+import com.ejlchina.data.XmlDataConvertor;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 
 public class XmlMsgConvertor extends XmlDataConvertor implements MsgConvertor, ConvertProvider {

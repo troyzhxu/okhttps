@@ -1,5 +1,6 @@
 package com.ejlchina.okhttps;
 
+import com.ejlchina.data.JacksonDataConvertor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JacksonMsgConvertor extends JacksonDataConvertor implements MsgConvertor, ConvertProvider {

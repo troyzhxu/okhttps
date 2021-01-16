@@ -1,6 +1,7 @@
 package com.ejlchina.okhttps;
 
 import com.alibaba.fastjson.JSON;
+import com.ejlchina.data.FastjsonDataConvertor;
 import com.ejlchina.okhttps.internal.HttpException;
 import okio.Okio;
 
