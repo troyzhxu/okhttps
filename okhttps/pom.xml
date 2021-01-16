@@ -14,8 +14,8 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.ejlchina</groupId>
-			<artifactId>okhttps-data</artifactId>
-			<version>${okhttps.version}</version>
+			<artifactId>data-core</artifactId>
+			<version>${data.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>

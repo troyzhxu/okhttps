@@ -1,13 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	
-	<artifactId>okhttps-fastjson</artifactId>
-	<name>OkHttps Fastjson</name>
+	<artifactId>okhttps-gson</artifactId>
+	<name>OkHttps Gson</name>
    	<packaging>jar</packaging>
    	
     <parent>
         <groupId>com.ejlchina</groupId>
-        <artifactId>okhttps-convertors</artifactId>
+        <artifactId>okhttps-parent</artifactId>
         <version>2.5.2</version>
     </parent>
 
@@ -19,8 +19,8 @@
         </dependency>
         <dependency>
             <groupId>com.ejlchina</groupId>
-            <artifactId>okhttps-data-fastjson</artifactId>
-            <version>${okhttps.version}</version>
+            <artifactId>data-gson</artifactId>
+            <version>${data.version}</version>
         </dependency>
         <dependency>
             <groupId>com.ejlchina</groupId>
@@ -30,8 +30,7 @@
         </dependency>
     </dependencies>
 
-
 	<build>
-		<finalName>okhttps-fastjson</finalName>
+		<finalName>okhttps-gson</finalName>
 	</build>
 </project>

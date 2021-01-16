@@ -7,7 +7,7 @@
    	
     <parent>
         <groupId>com.ejlchina</groupId>
-        <artifactId>okhttps-convertors</artifactId>
+        <artifactId>okhttps-parent</artifactId>
         <version>2.5.2</version>
     </parent>
 
@@ -19,8 +19,8 @@
         </dependency>
         <dependency>
             <groupId>com.ejlchina</groupId>
-            <artifactId>okhttps-data-jackson</artifactId>
-            <version>${okhttps.version}</version>
+            <artifactId>data-jackson</artifactId>
+            <version>${data.version}</version>
         </dependency>
         <dependency>
             <groupId>com.ejlchina</groupId>

@@ -1,5 +1,9 @@
 package com.ejlchina.okhttps;
 
+import com.ejlchina.data.Array;
+import com.ejlchina.data.DataConvertor;
+import com.ejlchina.data.Mapper;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Type;
