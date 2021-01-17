@@ -15,7 +15,7 @@
         <dependency>
             <groupId>com.ejlchina</groupId>
             <artifactId>okhttps</artifactId>
-            <version>${okhttps.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
