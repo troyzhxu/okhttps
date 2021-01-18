@@ -96,7 +96,7 @@ Websocket 方法：
 [okhttps-jackson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-jackson) | 3.0.0 | 与 jackson 集成
 [okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-stomp) | 3.0.0 | 超级轻量的 Stomp 客户端
 [okhttps-xml](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-xml) | 3.0.0 | XML 解析扩展
-[okhttps-parallel](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-parallel) | 3.0.0 | 同文件多任务并行下载
+[okhttps-parallel](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-parallel) | 2.5.1 | 同文件多任务并行下载
 
 ## 超详细教程，请查看：https://okhttps.ejlchina.com/
 
