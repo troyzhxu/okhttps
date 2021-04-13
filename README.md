@@ -13,6 +13,8 @@
 
 官网 https://okhttps.ejlchina.com/
 
+若以上地址不可用，请访问：http://okhttps.ejlchina-app.com/
+
 ## 为什么用
 
 　　OkHttps 是近期开源的对 OkHttp3 轻量封装的框架，它独创的异步预处理器，特色的标签，灵活的上传下载进度监听与过程控制功能，在轻松解决很多问题的同时，设计上也力求纯粹与优雅。
@@ -99,6 +101,7 @@ Websocket 方法：
 [okhttps-parallel](https://gitee.com/ejlchina-zhxu/okhttps-parallel) | 2.5.1 | 同文件多任务并行下载
 
 ## 超详细教程，请查看：https://okhttps.ejlchina.com/
+若以上地址不可用，请访问：http://okhttps.ejlchina-app.com/
 
 ## 联系方式
 
