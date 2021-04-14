@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
 
     private static final String PATH_PARAM_REGEX = "[A-Za-z0-9_\\-/]*\\{[A-Za-z0-9_\\-]+\\}[A-Za-z0-9_\\-/]*";
+    private static final String DOT = ".";
 
     protected HttpClient httpClient;
     protected boolean nothrow;
@@ -53,7 +54,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     protected boolean skipPreproc = false;
     protected boolean skipSerialPreproc = false;
 
-    protected RetryPolicy retryPolicy;
 
     public HttpTask(HttpClient httpClient, String urlPath) {
         this.httpClient = httpClient;
@@ -112,8 +112,10 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      * @return 是否匹配
      */
     public boolean isTagged(String tag) {
-        if (this.tag != null && tag != null) {
-            return this.tag.contains(tag);
+        String theTag = this.tag;
+        if (theTag != null && tag != null) {
+            return theTag.equals(tag) || theTag.startsWith(tag + DOT) || theTag.endsWith(DOT + tag)
+                || theTag.contains(DOT + tag + DOT);
         }
         return false;
     }
@@ -211,7 +213,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     public C tag(String tag) {
         if (tag != null) {
             if (this.tag != null) {
-                this.tag = this.tag + "." + tag;
+                this.tag = this.tag + DOT + tag;
             } else {
                 this.tag = tag;
             }
@@ -243,28 +245,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         if (type != null) {
             this.bodyType = type.toLowerCase();
         }
-        return (C) this;
-    }
-
-    /**
-     * 使用重试机制
-     * @since 2.5.0
-     * @param policy 重试策略
-     * @return HttpTask 实例
-     */
-    public C retryPolicy(RetryPolicy policy) {
-        this.retryPolicy = policy;
-        return (C) this;
-    }
-
-    /**
-     * 使用重试机制
-     * @since 2.5.0
-     * @param policyName 重试策略名（从 HTTP 实例中获取，在构建时注入）
-     * @return HttpTask 实例
-     */
-    public C retryPolicy(String policyName) {
-        retryPolicy = httpClient.requirePolicy(policyName);
         return (C) this;
     }
 
@@ -500,7 +480,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     public C addFilePara(String name, File file) {
         if (name != null && file != null && file.exists()) {
             String fileName = file.getName();
-            String type = fileName.substring(fileName.lastIndexOf(".") + 1);
+            String type = fileName.substring(fileName.lastIndexOf(DOT) + 1);
             if (files == null) {
                 files = new HashMap<>();
             }
@@ -517,7 +497,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      * @return HttpTask 实例
      */
     public C addFilePara(String name, String type, byte[] content) {
-        return addFilePara(name, type, name + "." + type, content);
+        return addFilePara(name, type, name + DOT + type, content);
     }
 
     /**

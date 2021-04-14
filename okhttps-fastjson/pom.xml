@@ -8,24 +8,24 @@
     <parent>
         <groupId>com.ejlchina</groupId>
         <artifactId>okhttps-parent</artifactId>
-        <version>2.5.0</version>
+        <version>3.0.1</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>com.ejlchina</groupId>
             <artifactId>okhttps</artifactId>
-            <version>${okhttps.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>${fastjson.version}</version>
+            <groupId>com.ejlchina</groupId>
+            <artifactId>data-fastjson</artifactId>
+            <version>${data.version}</version>
         </dependency>
         <dependency>
             <groupId>com.ejlchina</groupId>
             <artifactId>okhttps-test</artifactId>
-            <version>${okhttps.version}</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

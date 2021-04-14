@@ -13,6 +13,8 @@
 
 官网 https://okhttps.ejlchina.com/
 
+若以上地址不可用，请访问：http://okhttps.ejlchina-app.com/
+
 ## 为什么用
 
 　　OkHttps 是近期开源的对 OkHttp3 轻量封装的框架，它独创的异步预处理器，特色的标签，灵活的上传下载进度监听与过程控制功能，在轻松解决很多问题的同时，设计上也力求纯粹与优雅。
@@ -90,14 +92,16 @@ Websocket 方法：
 
 项目 | 最新版本 | 描述
 -|-|-
-[okhttps](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps) | 2.5.0 | OkHttps 核心模块
-[okhttps-fastjson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-fastjson) | 2.5.0 | 与 fastjson 集成
-[okhttps-gson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-gson) | 2.5.0 | 与 gson 集成
-[okhttps-jackson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-jackson) | 2.5.0 | 与 jackson 集成
-[okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-stomp) | 2.5.0 | 超级轻量的 Stomp 客户端
-[okhttps-xml](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-xml) | 2.5.0 | XML 解析扩展
+[okhttps](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps) | 3.0.1 | OkHttps 核心模块
+[okhttps-fastjson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-fastjson) | 3.0.1 | 与 fastjson 集成
+[okhttps-gson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-gson) | 3.0.1 | 与 gson 集成
+[okhttps-jackson](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-jackson) | 3.0.1 | 与 jackson 集成
+[okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-stomp) | 3.0.1 | 超级轻量的 Stomp 客户端
+[okhttps-xml](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-xml) | 3.0.1 | XML 解析扩展
+[okhttps-parallel](https://gitee.com/ejlchina-zhxu/okhttps-parallel) | 2.5.1 | 同文件多任务并行下载
 
 ## 超详细教程，请查看：https://okhttps.ejlchina.com/
+若以上地址不可用，请访问：http://okhttps.ejlchina-app.com/
 
 ## 联系方式
 
@@ -108,9 +112,11 @@ Websocket 方法：
 
 ## 友情链接
 
-[**[ bean-searcher ]** 超轻量级 Web 条件检索引擎，一行代码实现复杂条件列表检索！](https://gitee.com/ejlchina-zhxu/bean-searcher)
+[**[ Bean Searcher ]** 轻量级数据库条件检索引擎，一行代码实现复杂条件列表检索！](https://gitee.com/ejlchina-zhxu/bean-searcher)
 
-[**[ sa-token ]** 一个 JavaWeb 轻量级权限认证框架，功能全面，上手简单](https://gitee.com/sz6/sa-token)
+[**[ Json Kit ]** 超轻量级 JSON 门面工具，用法简单，不依赖具体实现，让业务代码与 Jackson、Gson、Fastjson 等解耦！](https://gitee.com/ejlchina-zhxu/jsonkit)
+
+[**[ SA Token ]** 一个 JavaWeb 轻量级权限认证框架，功能全面，上手简单](https://gitee.com/dromara/sa-token)
 
 ## 参与贡献
 

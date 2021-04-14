@@ -8,14 +8,14 @@
     <parent>
         <groupId>com.ejlchina</groupId>
         <artifactId>okhttps-parent</artifactId>
-        <version>2.5.0</version>
+        <version>3.0.1</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>com.ejlchina</groupId>
             <artifactId>okhttps</artifactId>
-            <version>${okhttps.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
