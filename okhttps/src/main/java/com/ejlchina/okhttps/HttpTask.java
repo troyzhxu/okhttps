@@ -617,7 +617,8 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     private RequestBody buildRequestBody() {
-        if (files != null) {
+        if (bodyParams != null && OkHttps.FORM_DATA.equalsIgnoreCase(bodyType)
+                || files != null) {
             MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
             if (bodyParams != null) {
                 for (String name : bodyParams.keySet()) {
