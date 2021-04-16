@@ -627,16 +627,18 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
                     builder.addPart(MultipartBody.Part.createFormData(name, null, body));
                 }
             }
-            for (String name : files.keySet()) {
-                FilePara file = files.get(name);
-                MediaType type = httpClient.mediaType(file.type);
-                RequestBody bodyPart;
-                if (file.file != null) {
-                    bodyPart = RequestBody.create(type, file.file);
-                } else {
-                    bodyPart = RequestBody.create(type, file.content);
+            if (files != null) {
+                for (String name : files.keySet()) {
+                    FilePara file = files.get(name);
+                    MediaType type = httpClient.mediaType(file.type);
+                    RequestBody bodyPart;
+                    if (file.file != null) {
+                        bodyPart = RequestBody.create(type, file.file);
+                    } else {
+                        bodyPart = RequestBody.create(type, file.content);
+                    }
+                    builder.addFormDataPart(name, file.fileName, bodyPart);
                 }
-                builder.addFormDataPart(name, file.fileName, bodyPart);
             }
             return builder.build();
         }
