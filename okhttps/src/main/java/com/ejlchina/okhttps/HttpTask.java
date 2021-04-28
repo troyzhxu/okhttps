@@ -646,7 +646,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             return toRequestBody(requestBody);
         }
         if (bodyParams == null) {
-            return new FormBody.Builder(charset).build();
+            return emptyRequestBody();
         }
         if (OkHttps.FORM.equalsIgnoreCase(bodyType)) {
             FormBody.Builder builder = new FormBody.Builder(charset);
@@ -659,11 +659,22 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         return toRequestBody(bodyParams);
     }
 
+    private RequestBody emptyRequestBody() {
+        if (OkHttps.FORM_DATA.equalsIgnoreCase(bodyType)) {
+            return new MultipartBody.Builder().setType(MultipartBody.FORM).build();
+        }
+        return RequestBody.create(mediaType(), new byte[]{});
+    }
+
+    private MediaType mediaType() {
+        String mediaType = httpClient.executor().doMsgConvert(bodyType, null).contentType;
+        return MediaType.parse(mediaType + "; charset=" + charset.name());
+    }
+
     private RequestBody toRequestBody(Object object) {
         if (object instanceof byte[] || object instanceof String) {
-            String mediaType = httpClient.executor().doMsgConvert(bodyType, null).contentType;
             byte[] body = object instanceof byte[] ? (byte[]) object : ((String) object).getBytes(charset);
-            return RequestBody.create(MediaType.parse(mediaType + "; charset=" + charset.name()), body);
+            return RequestBody.create(mediaType(), body);
         }
         TaskExecutor.Data<byte[]> data = httpClient.executor().doMsgConvert(bodyType, c -> c.serialize(object, charset));
         return RequestBody.create(MediaType.parse(data.contentType + "; charset=" + charset.name()), data.data);
