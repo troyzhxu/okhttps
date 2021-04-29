@@ -1,7 +1,11 @@
 package com.ejlchina.test;
 
 import com.ejlchina.okhttps.HTTP;
+import com.ejlchina.okhttps.OkHttps;
+import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class SimpleTests extends BaseTest {
 
@@ -12,22 +16,31 @@ public class SimpleTests extends BaseTest {
             .baseUrl("http://" + server.getHostName() + ":" + server.getPort())
             .build();
 
+    @Test
+    public void testSyncPost() throws InterruptedException {
+        http.async("/").bodyType(OkHttps.JSON).post();
+        Assert.assertEquals(server.takeRequest().getHeader("Content-Type"), "application/json; charset=UTF-8");
+        http.async("/").bodyType(OkHttps.FORM).post();
+        Assert.assertEquals(server.takeRequest().getHeader("Content-Type"), "application/x-www-form-urlencoded; charset=UTF-8");
+    }
+
+
     /**
      * 同步请求示例
      * 同步请求直接得到结果，无需设置回调
      */
-//    @Test
-//    public void testSyncToBean() {
-//    	server.enqueue(new MockResponse().setBody("Hello World!"));
-//
-//        JsonObj hello = http.sync("/users")  // http://localhost:8080/users
-//                .get()                              // GET请求
-//                .getBody()                          // 获取响应报文体
-//                .toJsonObj();                // 得到目标数据
-//
-//        System.out.println("hello = " + hello);
-//    }
-    
+    @Test
+    public void testSyncToBean() {
+    	server.enqueue(new MockResponse().setBody("Hello World!"));
+
+        String hello = http.sync("/users")  // http://localhost:8080/users
+                .get()                              // GET请求
+                .getBody()                          // 获取响应报文体
+                .toString();                // 得到目标数据
+
+        Assert.assertEquals(hello, "Hello World!");
+    }
+
     /**
      * 同步请求示例
      * 同步请求直接得到结果，无需设置回调
@@ -38,12 +51,12 @@ public class SimpleTests extends BaseTest {
 //    	User u2 = new User(2, "Tom");
 //    	List<User> list = Arrays.asList(u1, u2);
 //    	server.enqueue(new MockResponse().setBody(JSON.toJSONString(list)));
-//    	
+//
 //        List<User> users = http.sync("/users")  // http://localhost:8080/users
 //                .get()                              // GET请求
 //                .getBody()                          // 获取响应报文体
 //                .toList(User.class);                // 得到目标数据
-//        
+//
 //        assertEquals(u1, users.get(0));
 //        assertEquals(u2, users.get(1));
 //    }
@@ -97,7 +110,6 @@ public class SimpleTests extends BaseTest {
 //        System.out.println("耗时：" + t + " 毫秒");
 //        System.out.println("size = " + (size / 1024) + " KB");
 //    }
-
 
 }
 
