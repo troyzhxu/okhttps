@@ -667,8 +667,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     private MediaType mediaType() {
-        String mediaType = httpClient.executor().doMsgConvert(bodyType, null).contentType;
-        return MediaType.parse(mediaType + "; charset=" + charset.name());
+        return httpClient.executor().doMsgConvert(bodyType, null).mediaType(charset);
     }
 
     private RequestBody toRequestBody(Object object) {
@@ -677,7 +676,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             return RequestBody.create(mediaType(), body);
         }
         TaskExecutor.Data<byte[]> data = httpClient.executor().doMsgConvert(bodyType, c -> c.serialize(object, charset));
-        return RequestBody.create(MediaType.parse(data.contentType + "; charset=" + charset.name()), data.data);
+        return RequestBody.create(data.mediaType(charset), data.data);
     }
 
     private String buildUrlPath() {

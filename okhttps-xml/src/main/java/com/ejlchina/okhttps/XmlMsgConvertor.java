@@ -17,7 +17,7 @@ public class XmlMsgConvertor extends XmlDataConvertor implements MsgConvertor, C
 
     @Override
     public String mediaType() {
-        return "application/xml";
+        return "application/xml; charset={charset}";
     }
 
     @Override

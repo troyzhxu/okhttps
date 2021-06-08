@@ -161,9 +161,9 @@ public interface HTTP {
             mediaTypes.put("pdf", "application/pdf");
             mediaTypes.put("html", "text/html");
             contentTypes = new ArrayList<>();
-            contentTypes.add("application/x-www-form-urlencoded");
-            contentTypes.add("application/json");
-            contentTypes.add("application/xml");
+            contentTypes.add("application/x-www-form-urlencoded; charset={charset}");
+            contentTypes.add("application/json; charset={charset}");
+            contentTypes.add("application/xml; charset={charset}");
             contentTypes.add("application/x-protobuf");
             preprocessors = new ArrayList<>();
             msgConvertors = new ArrayList<>();
