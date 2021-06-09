@@ -11,14 +11,14 @@
 <dependency>
      <groupId>com.ejlchina</groupId>
      <artifactId>okhttps-gson</artifactId>
-     <version>3.0.2</version>
+     <version>3.0.3</version>
 </dependency>
 ```
 
 ##### Gradle
 
 ```groovy
-implementation 'com.ejlchina:okhttps-gson:3.0.2'
+implementation 'com.ejlchina:okhttps-gson:3.0.3'
 ```
 
 #### 更多请参阅 [http://okhttps.ejlchina.com/](http://okhttps.ejlchina.com/)
