@@ -35,6 +35,9 @@ public class Stomp {
 
     private final String disReceipt;
 
+    private MsgDecoder msgDecoder = new MsgDecoder();
+
+    private MsgEncoder msgEncoder = new MsgEncoder();
 
     private Stomp(WebSocketTask task, boolean autoAck) {
         this.task = task;
@@ -101,7 +104,7 @@ public class Stomp {
                 send(new Message(Commands.CONNECT, cHeaders, null));
             })
             .setOnMessage((ws, msg) -> {
-        		Message message = Message.from(msg.toString());
+        		Message message = msgDecoder.decode(msg.toString());
         		if (message != null) {
         			receive(message);
         		}
@@ -199,7 +202,7 @@ public class Stomp {
         if (websocket == null) {
             throw new IllegalArgumentException("You must call connect before send");
         }
-        websocket.send(message.compile(legacyWhitespace));
+        websocket.send(msgEncoder.encode(message));
     }
 
     /**
@@ -366,6 +369,22 @@ public class Stomp {
 
     public void setLegacyWhitespace(boolean legacyWhitespace) {
         this.legacyWhitespace = legacyWhitespace;
+    }
+
+    public MsgDecoder getMsgDecoder() {
+        return msgDecoder;
+    }
+
+    public void setMsgDecoder(MsgDecoder msgDecoder) {
+        this.msgDecoder = msgDecoder;
+    }
+
+    public MsgEncoder getMsgEncoder() {
+        return msgEncoder;
+    }
+
+    public void setMsgEncoder(MsgEncoder msgEncoder) {
+        this.msgEncoder = msgEncoder;
     }
 
 }
