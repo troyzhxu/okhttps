@@ -25,7 +25,7 @@ public class Stomp {
     private boolean connected;
     private final WebSocketTask task;
     private WebSocket websocket;
-    private boolean legacyWhitespace = false;
+
     private final List<Subscriber> subscribers;
 
 
@@ -365,10 +365,6 @@ public class Stomp {
         		onError.on(msg);
         	}
         }
-    }
-
-    public void setLegacyWhitespace(boolean legacyWhitespace) {
-        this.legacyWhitespace = legacyWhitespace;
     }
 
     public MsgDecoder getMsgDecoder() {
