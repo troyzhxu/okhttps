@@ -129,10 +129,26 @@ public class Stomp {
     }
 
     /**
-     * 断开连接
+     * 断开连接，将先发送 DISCONNECT 消息给服务器，服务器回复后断开连接
      */
     public void disconnect() {
-        send(new Message(Commands.DISCONNECT, Collections.singletonList(new Header(Header.RECEIPT, disReceipt))));
+        disconnect(false);
+    }
+
+    /**
+     * 断开连接
+     * @param immediate 是否立即断开
+     */
+    public void disconnect(boolean immediate) {
+        if (immediate) {
+            WebSocket ws = websocket;
+            if (ws != null) {
+                ws.close(1000, "disconnect by user");
+                websocket = null;
+            }
+        } else {
+            send(new Message(Commands.DISCONNECT, Collections.singletonList(new Header(Header.RECEIPT, disReceipt))));
+        }
     }
 
     /**
@@ -356,9 +372,7 @@ public class Stomp {
         } else if (Commands.RECEIPT.equals(command)) {
             if (disReceipt.equals(msg.headerValue(Header.RECEIPT_ID))) {
                 // 断开连接
-                if (websocket != null) {
-                    websocket.close(1000, "disconnect by user");
-                }
+                disconnect(true);
             }
         } else if (Commands.ERROR.equals(command)) {
         	if (onError != null) {
