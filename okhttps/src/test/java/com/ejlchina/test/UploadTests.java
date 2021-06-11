@@ -1,6 +1,8 @@
 package com.ejlchina.test;
 
 import com.ejlchina.okhttps.HTTP;
+import com.ejlchina.okhttps.HttpResult;
+import com.ejlchina.okhttps.OkHttps;
 import com.ejlchina.okhttps.Process;
 import org.junit.Test;
 
@@ -32,5 +34,27 @@ public class UploadTests extends BaseTest {
         println("响应：" + res);
     }
 
+
+
+    @Test
+    public void test() {
+        HttpResult res = OkHttps.sync("http://305cb8a0.cpolar.io/biz/location/impor")
+            .addBodyPara("type", "MACHINE")
+            .addFilePara("excel", "H:\\课程.xlsx")
+            .stepBytes(1024)
+            .setOnProcess((process -> {
+                long doneBytes = process.getDoneBytes();   // 已发送字节数
+                println("已发送字节数: " + doneBytes);
+                long totalBytes = process.getTotalBytes(); // 总共的字节数
+                println("总字节数: " + totalBytes);
+                double rate = process.getRate();           // 已发送的比例
+                println("已发送的比例: " + rate);
+                boolean isDone = process.isDone();
+                println("是否发送完成: " + isDone);
+            }))
+            .post();
+        System.out.println(res);
+        System.out.println(res.getBody().toString());
+    }
 
 }
