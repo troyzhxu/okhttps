@@ -22,7 +22,9 @@ public class Stomp {
     public static final String CLIENT_ACK = "client";
 
     private final boolean autoAck;
-    private boolean connected;
+    private boolean connected = false;      // 是否已连接
+    private boolean connecting = false;     // 是否连接中
+    private boolean disconnecting = false;  // 是否断开连接中
     private final WebSocketTask task;
     private WebSocket websocket;
 
@@ -90,6 +92,7 @@ public class Stomp {
         if (connected) {
             return this;
         }
+        connecting = true;
         websocket = task.setOnOpen((ws, res) -> {
                 int pingSecs = task.pingSeconds();
                 int pongSecs = task.pongSeconds();
@@ -115,6 +118,8 @@ public class Stomp {
                     onDisconnected.on(close);
                 }
                 connected = false;
+                connecting = false;
+                disconnecting = false;
             })
             .listen();
         return this;
@@ -125,7 +130,23 @@ public class Stomp {
      * @return 是否已连接
      */
     public boolean isConnected() {
-        return connected && websocket.status() == WebSocket.STATUS_CONNECTED;
+        return connected;
+    }
+
+    /**
+     * @since 3.1.0
+     * @return 是否正在连接
+     */
+    public boolean isConnecting() {
+        return connecting;
+    }
+
+    /**
+     * @since 3.1.0
+     * @return 是否正在断开连接
+     */
+    public boolean isDisconnecting() {
+        return disconnecting;
     }
 
     /**
@@ -137,6 +158,7 @@ public class Stomp {
     }
 
     /**
+     * @since v3.1.0
      * 断开连接，将先发送 DISCONNECT 消息给服务器，服务器回复后断开连接
      * @param maxWaitSeconds 最大等待服务器回复时间，超出后自动关闭
      */
@@ -147,12 +169,16 @@ public class Stomp {
                 disconnect(true);
             }
         }, 1000L * maxWaitSeconds);
-        send(new Message(Commands.DISCONNECT, Collections.singletonList(new Header(Header.RECEIPT, disReceipt))));
+        Header header = new Header(Header.RECEIPT, disReceipt);
+        List<Header> headers = Collections.singletonList(header);
+        send(new Message(Commands.DISCONNECT, headers));
+        disconnecting = true;
     }
 
     /**
      * 断开连接
      * @param immediate 是否立即断开
+     * @since v3.1.0
      */
     public void disconnect(boolean immediate) {
         if (immediate) {
@@ -230,10 +256,11 @@ public class Stomp {
      * @param message 消息
      */
     public void send(Message message) {
-        if (websocket == null) {
+        WebSocket ws = websocket;
+        if (ws == null) {
             throw new IllegalArgumentException("You must call connect before send");
         }
-        websocket.send(msgEncoder.encode(message));
+        ws.send(msgEncoder.encode(message));
     }
 
     /**
@@ -373,6 +400,7 @@ public class Stomp {
                 }
             }
             if (onConnected != null) {
+                connecting = false;
                 onConnected.on(this);
             }
         } else if (Commands.MESSAGE.equals(command)) {
