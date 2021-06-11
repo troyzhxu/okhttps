@@ -114,6 +114,10 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * @return WebSocket
 	 */
 	public WebSocket listen() {
+		if (webSocket != null) {
+			// 如果连接已建立，直接返回
+			return webSocket;
+		}
 		WebSocketImpl socket = new WebSocketImpl();
 		registeTagTask(socket);
 		httpClient.preprocess(this, () -> {
@@ -229,6 +233,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			} else if (onClosed != null) {
 				execute(() -> onClosed.on(this.webSocket, close), closedOnIO);
 			}
+			WebSocketTask.this.webSocket = null;
 		}
 
 		private Close updateStatus(HttpResult.State state, int code, String reason) {
@@ -274,7 +279,8 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * @return 连接是否已建立
 	 */
 	public boolean isConnected() {
-		return webSocket != null && webSocket.status == WebSocket.STATUS_CONNECTED;
+		WebSocketImpl ws = webSocket;
+		return ws != null && ws.status == WebSocket.STATUS_CONNECTED;
 	}
 
 	/**
@@ -289,10 +295,10 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			if (!isConnected()) {
 				return;
 			}
-			if (nowSeconds() - lastPingSecs >= pingSeconds) {
+			WebSocket ws = webSocket;
+			if (nowSeconds() - lastPingSecs >= pingSeconds && ws != null) {
 				ByteString ping = pingSupplier != null ? pingSupplier.getPing() : ByteString.EMPTY;
-				webSocket.send(ping);
-				Platform.logInfo("PING >>> " + ping.utf8());
+				ws.send(ping);
 				lastPingSecs = nowSeconds();
 			}
 			schedulePing();
@@ -313,8 +319,11 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			}
 			long noPongSeconds = nowSeconds() - lastPongSecs;
 			if (noPongSeconds > 3L * pongSeconds) {
-				Exception e = new SocketTimeoutException("Server didn't pong heart-beat on time. Last received at " + noPongSeconds + " seconds ago.");
-				((RealWebSocket) webSocket.webSocket).failWebSocket(e, null);
+				WebSocketImpl ws = webSocket;
+				if (ws != null) {
+					Exception e = new SocketTimeoutException("Server didn't pong heart-beat on time. Last received at " + noPongSeconds + " seconds ago.");
+					((RealWebSocket) ws.webSocket).failWebSocket(e, null);
+				}
 			} else {
 				schedulePong();
 			}
