@@ -130,8 +130,23 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		webSocket = socket;
 		return socket;
 	}
-	
-	
+
+	/**
+	 * @since v3.1.0
+	 * @param code 状态码
+	 * @param reason 原因
+	 * @return true: 被关闭, false: 当前尚未建立连接
+	 */
+	public boolean close(int code, String reason) {
+		WebSocket ws = webSocket;
+		if (ws != null) {
+			ws.close(code, reason);
+			webSocket = null;
+			return true;
+		}
+		return false;
+	}
+
 	class MessageListener extends WebSocketListener {
 
 		WebSocketImpl webSocket;
