@@ -130,9 +130,24 @@ public class Stomp {
 
     /**
      * 断开连接，将先发送 DISCONNECT 消息给服务器，服务器回复后断开连接
+     * 默认等待服务器为 10 秒，10秒后自动关闭
      */
     public void disconnect() {
-        disconnect(false);
+        disconnect(10);
+    }
+
+    /**
+     * 断开连接，将先发送 DISCONNECT 消息给服务器，服务器回复后断开连接
+     * @param maxWaitSeconds 最大等待服务器回复时间，超出后自动关闭
+     */
+    public void disconnect(int maxWaitSeconds) {
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                disconnect(true);
+            }
+        }, 1000L * maxWaitSeconds);
+        send(new Message(Commands.DISCONNECT, Collections.singletonList(new Header(Header.RECEIPT, disReceipt))));
     }
 
     /**
@@ -147,7 +162,7 @@ public class Stomp {
                 websocket = null;
             }
         } else {
-            send(new Message(Commands.DISCONNECT, Collections.singletonList(new Header(Header.RECEIPT, disReceipt))));
+            disconnect(10);
         }
     }
 
