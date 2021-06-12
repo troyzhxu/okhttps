@@ -37,7 +37,7 @@ public class Stomp {
 
     private final String disReceipt;
 
-    private MsgCodec msgCodec = new MsgCodec();
+    private MsgCodec msgCodec = new MsgCodecImpl();
 
 
     private Stomp(WebSocketTask task, boolean autoAck) {
