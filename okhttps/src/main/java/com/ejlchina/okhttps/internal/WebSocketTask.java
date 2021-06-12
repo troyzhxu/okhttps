@@ -153,7 +153,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 
 	class MessageListener extends WebSocketListener {
 
-		WebSocketImpl webSocket;
+		final WebSocketImpl webSocket;
 
 		Charset charset;
 
