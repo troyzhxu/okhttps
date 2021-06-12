@@ -158,18 +158,14 @@ public class MsgCodec {
         return new Message(command, headers, payload);
     }
 
-
-    public static void main(String[] args) {
-        String s = "AA";
-        System.out.println(new MsgCodec().isCommand(s));
-    }
-
     public String getCommandEnd() {
         return commandEnd;
     }
 
     public void setCommandEnd(String commandEnd) {
-        this.commandEnd = commandEnd;
+        if (commandEnd != null) {
+            this.commandEnd = commandEnd;
+        }
     }
 
     public String getHeadersEnd() {
@@ -177,7 +173,9 @@ public class MsgCodec {
     }
 
     public void setHeadersEnd(String headersEnd) {
-        this.headersEnd = headersEnd;
+        if (headersEnd != null) {
+            this.headersEnd = headersEnd;
+        }
     }
 
     public String getBodyEnd() {
@@ -185,7 +183,9 @@ public class MsgCodec {
     }
 
     public void setBodyEnd(String bodyEnd) {
-        this.bodyEnd = bodyEnd;
+        if (bodyEnd != null) {
+            this.bodyEnd = bodyEnd;
+        }
     }
 
     public String getHeaderDelimiter() {
@@ -193,7 +193,9 @@ public class MsgCodec {
     }
 
     public void setHeaderDelimiter(String headerDelimiter) {
-        this.headerDelimiter = headerDelimiter;
+        if (headerDelimiter != null) {
+            this.headerDelimiter = headerDelimiter;
+        }
     }
 
     public String getHeaderKvDelimiter() {
@@ -201,7 +203,9 @@ public class MsgCodec {
     }
 
     public void setHeaderKvDelimiter(String headerKvDelimiter) {
-        this.headerKvDelimiter = headerKvDelimiter;
+        if (headerKvDelimiter != null) {
+            this.headerKvDelimiter = headerKvDelimiter;
+        }
     }
 
 }
