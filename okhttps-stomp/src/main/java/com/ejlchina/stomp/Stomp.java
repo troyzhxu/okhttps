@@ -37,9 +37,8 @@ public class Stomp {
 
     private final String disReceipt;
 
-    private MsgDecoder msgDecoder = new MsgDecoder();
+    private MsgCodec msgCodec = new MsgCodec();
 
-    private MsgEncoder msgEncoder = new MsgEncoder();
 
     private Stomp(WebSocketTask task, boolean autoAck) {
         this.task = task;
@@ -106,23 +105,23 @@ public class Stomp {
                 }
                 send(new Message(Commands.CONNECT, cHeaders, null));
             })
-            .setOnMessage((ws, msg) -> {
-        		Message message = msgDecoder.decode(msg.toString());
-        		if (message != null) {
-        			receive(message);
-        		}
-        	})
+            .setOnMessage((ws, msg) -> msgCodec.decode(msg.toString(), this::receive))
             .setOnClosed((ws, close) -> {
                 subscribers.forEach(Subscriber::resetStatus);
                 if (onDisconnected != null) {
                     onDisconnected.on(close);
                 }
-                connected = false;
-                connecting = false;
-                disconnecting = false;
+                resetStatus();
             })
             .listen();
         return this;
+    }
+
+    private void resetStatus() {
+        connected = false;
+        connecting = false;
+        disconnecting = false;
+        websocket = null;
     }
 
     /**
@@ -260,7 +259,7 @@ public class Stomp {
         if (ws == null) {
             throw new IllegalArgumentException("You must call connect before send");
         }
-        ws.send(msgEncoder.encode(message));
+        ws.send(msgCodec.encode(message));
     }
 
     /**
@@ -424,20 +423,12 @@ public class Stomp {
         }
     }
 
-    public MsgDecoder getMsgDecoder() {
-        return msgDecoder;
+    public MsgCodec getMsgCodec() {
+        return msgCodec;
     }
 
-    public void setMsgDecoder(MsgDecoder msgDecoder) {
-        this.msgDecoder = msgDecoder;
-    }
-
-    public MsgEncoder getMsgEncoder() {
-        return msgEncoder;
-    }
-
-    public void setMsgEncoder(MsgEncoder msgEncoder) {
-        this.msgEncoder = msgEncoder;
+    public void setMsgCodec(MsgCodec msgCodec) {
+        this.msgCodec = msgCodec;
     }
 
 }
