@@ -164,7 +164,8 @@ public interface HTTP {
             contentTypes.add("application/x-www-form-urlencoded; charset={charset}");
             contentTypes.add("application/json; charset={charset}");
             contentTypes.add("application/xml; charset={charset}");
-            contentTypes.add("application/x-protobuf");
+            contentTypes.add("application/protobuf");
+            contentTypes.add("application/msgpack");
             preprocessors = new ArrayList<>();
             msgConvertors = new ArrayList<>();
         }
