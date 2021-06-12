@@ -24,7 +24,7 @@ public final class OkHttps {
 
     private OkHttps() {}
 
-    static synchronized HTTP getHttp() {
+    public static synchronized HTTP getHttp() {
         if (http != null) {
             return http;
         }
