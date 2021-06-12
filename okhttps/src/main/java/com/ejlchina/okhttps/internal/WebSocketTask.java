@@ -224,8 +224,9 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		}
 
 		private void doOnClose(HttpResult.State state, int code, String reason) {
-			TaskListener<HttpResult.State> listener = httpClient.executor.getCompleteListener();
+			WebSocketTask.this.webSocket = null;
 			Close close = updateStatus(state, code, reason);
+			TaskListener<HttpResult.State> listener = httpClient.executor.getCompleteListener();
 			if (listener != null) {
 				if (listener.listen(WebSocketTask.this, state) && onClosed != null) {
 					execute(() -> onClosed.on(this.webSocket, close), closedOnIO);
@@ -233,7 +234,6 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			} else if (onClosed != null) {
 				execute(() -> onClosed.on(this.webSocket, close), closedOnIO);
 			}
-			WebSocketTask.this.webSocket = null;
 		}
 
 		private Close updateStatus(HttpResult.State state, int code, String reason) {
