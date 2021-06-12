@@ -3,7 +3,6 @@ package com.ejlchina.stomp;
 import com.ejlchina.okhttps.OnCallback;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -46,7 +45,7 @@ public class MsgCodecImpl implements MsgCodec {
     public String encode(Message input) {
         StringBuilder sb = new StringBuilder();
         sb.append(input.getCommand()).append(commandEnd);
-        List<Header> headers = cloneHeaders(input);
+        List<Header> headers = msgHeaders(input);
         int hCnt = headers.size();
         for (int index = 0; index < hCnt; index++) {
             Header header = headers.get(index);
@@ -66,11 +65,9 @@ public class MsgCodecImpl implements MsgCodec {
         return sb.toString();
     }
 
-    protected List<Header> cloneHeaders(Message input) {
+    protected List<Header> msgHeaders(Message input) {
         List<Header> headers = input.getHeaders();
-        List<Header> list = new ArrayList<>(headers.size());
-        Collections.copy(list, headers);
-        return list;
+        return new ArrayList<>(headers);
     }
 
     @Override
