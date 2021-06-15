@@ -88,7 +88,7 @@ public class Stomp {
      * @return Stomp
      */
     public synchronized Stomp connect(List<Header> headers) {
-        if (connected) {
+        if (connected || connecting) {
             return this;
         }
         websocket = task.setOnOpen((ws, res) -> {
@@ -105,6 +105,7 @@ public class Stomp {
                 send(new Message(Commands.CONNECT, cHeaders, null));
             })
             .setOnMessage((ws, msg) -> msgCodec.decode(msg.toString(), this::receive))
+            .setOnException((ws, e) -> connecting = false)
             .setOnClosed((ws, close) -> {
                 subscribers.forEach(Subscriber::resetStatus);
                 if (onDisconnected != null) {
@@ -393,13 +394,13 @@ public class Stomp {
                 }
             }
             synchronized (this) {
-                connected = true;
                 for (Subscriber s: subscribers) {
                     s.subscribe();
                 }
+                connected = true;
+                connecting = false;
             }
             if (onConnected != null) {
-                connecting = false;
                 onConnected.on(this);
             }
         } else if (Commands.MESSAGE.equals(command)) {
