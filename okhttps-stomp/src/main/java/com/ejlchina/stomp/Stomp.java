@@ -87,11 +87,10 @@ public class Stomp {
      * @param headers Stomp 头信息
      * @return Stomp
      */
-    public Stomp connect(List<Header> headers) {
+    public synchronized Stomp connect(List<Header> headers) {
         if (connected) {
             return this;
         }
-        connecting = true;
         websocket = task.setOnOpen((ws, res) -> {
                 int pingSecs = task.pingSeconds();
                 int pongSecs = task.pongSeconds();
@@ -114,6 +113,7 @@ public class Stomp {
                 resetStatus();
             })
             .listen();
+        connecting = true;
         return this;
     }
 

@@ -113,7 +113,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * 启动 WebSocket 监听
 	 * @return WebSocket
 	 */
-	public WebSocket listen() {
+	public synchronized WebSocket listen() {
 		if (webSocket != null) {
 			// 如果连接已建立，直接返回
 			return webSocket;
