@@ -380,29 +380,7 @@ public class Stomp {
         String command = msg.getCommand();
         if (Commands.CONNECTED.equals(command)) {
             String hbHeader = msg.headerValue(Header.HEART_BEAT);
-            int pingSecs = task.pingSeconds();
-            int pongSecs = task.pongSeconds();
-            if (hbHeader != null && (pingSecs > 0 || pongSecs > 0)) {
-                String[] heartbeats = hbHeader.split(",");
-                int pingSeconds = Integer.parseInt(heartbeats[1]) / 1000;
-                int pongSeconds = Integer.parseInt(heartbeats[0]) / 1000;
-                if (pingSeconds > 0 || pongSeconds > 0) {
-                    if (task.pingSupplier() == null) {
-                        task.pingSupplier(() -> ByteString.of((byte) 0x0A));
-                    }
-                    task.heatbeat(Math.max(pingSeconds, pingSecs), Math.max(pongSeconds, pongSecs));
-                }
-            }
-            synchronized (this) {
-                for (Subscriber s: subscribers) {
-                    s.subscribe();
-                }
-                connected = true;
-                connecting = false;
-            }
-            if (onConnected != null) {
-                onConnected.on(this);
-            }
+            onConnectedFrameReceived(hbHeader);
         } else if (Commands.MESSAGE.equals(command)) {
             String id = msg.headerValue(Header.SUBSCRIPTION);
             if (id != null) {
@@ -421,6 +399,32 @@ public class Stomp {
         	if (onError != null) {
         		onError.on(msg);
         	}
+        }
+    }
+
+    private void onConnectedFrameReceived(String hbHeader) {
+        int pingSecs = task.pingSeconds();
+        int pongSecs = task.pongSeconds();
+        if (hbHeader != null && (pingSecs > 0 || pongSecs > 0)) {
+            String[] heartbeats = hbHeader.split(",");
+            int pingSeconds = Integer.parseInt(heartbeats[1]) / 1000;
+            int pongSeconds = Integer.parseInt(heartbeats[0]) / 1000;
+            if (pingSeconds > 0 || pongSeconds > 0) {
+                if (task.pingSupplier() == null) {
+                    task.pingSupplier(() -> ByteString.of((byte) 0x0A));
+                }
+                task.heatbeat(Math.max(pingSeconds, pingSecs), Math.max(pongSeconds, pongSecs));
+            }
+        }
+        synchronized (this) {
+            for (Subscriber s: subscribers) {
+                s.subscribe();
+            }
+            connected = true;
+            connecting = false;
+        }
+        if (onConnected != null) {
+            onConnected.on(this);
         }
     }
 
