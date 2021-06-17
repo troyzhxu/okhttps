@@ -91,7 +91,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 	 * @param onResponse 请求响应回调
 	 * @return HttpTask 实例
 	 */
-    public AsyncHttpTask setOnResponse(OnCallback<HttpResult> onResponse) {
+    public synchronized AsyncHttpTask setOnResponse(OnCallback<HttpResult> onResponse) {
         this.onResponse = onResponse;
         responseOnIO = nextOnIO;
         nextOnIO = false;
@@ -103,7 +103,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 	 * @param onResBody 响应报文体回调
 	 * @return HttpTask 实例
 	 */
-    public AsyncHttpTask setOnResBody(OnCallback<HttpResult.Body> onResBody) {
+    public synchronized AsyncHttpTask setOnResBody(OnCallback<HttpResult.Body> onResBody) {
     	this.onResBody = onResBody;
     	resBodyOnIO = nextOnIO;
         nextOnIO = false;
@@ -117,7 +117,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 	 * @param onResBean 响应 Bean 回调
 	 * @return HttpTask 实例
 	 */
-    public <T> AsyncHttpTask setOnResBean(Class<T> type, OnCallback<T> onResBean) {
+    public synchronized <T> AsyncHttpTask setOnResBean(Class<T> type, OnCallback<T> onResBean) {
     	initBeanType(type);
     	this.onResBean = onResBean;
     	resBeanOnIO = nextOnIO;
@@ -132,7 +132,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 	 * @param onResBean 响应 Bean 回调
 	 * @return HttpTask 实例
 	 */
-	public <T> AsyncHttpTask setOnResBean(TypeRef<T> type, OnCallback<T> onResBean) {
+	public synchronized <T> AsyncHttpTask setOnResBean(TypeRef<T> type, OnCallback<T> onResBean) {
 		initBeanType(type.getType());
 		this.onResBean = onResBean;
 		resBeanOnIO = nextOnIO;
@@ -147,7 +147,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 	 * @param onResList 请求响应回调
 	 * @return HttpTask 实例
 	 */
-    public <T> AsyncHttpTask setOnResList(Class<T> type, OnCallback<List<T>> onResList) {
+    public synchronized <T> AsyncHttpTask setOnResList(Class<T> type, OnCallback<List<T>> onResList) {
 		if (type == null) {
 			throw new IllegalArgumentException(" list type can not be null!");
 		}
@@ -165,7 +165,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 	 * @param onResMapper 请求响应回调
 	 * @return HttpTask 实例
 	 */
-    public AsyncHttpTask setOnResMapper(OnCallback<Mapper> onResMapper) {
+    public synchronized AsyncHttpTask setOnResMapper(OnCallback<Mapper> onResMapper) {
     	this.onResMapper = onResMapper;
     	resMapperOnIO = nextOnIO;
         nextOnIO = false;
@@ -177,7 +177,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 	 * @param onResArray 请求响应回调
 	 * @return HttpTask 实例
 	 */
-    public AsyncHttpTask setOnResArray(OnCallback<Array> onResArray) {
+    public synchronized AsyncHttpTask setOnResArray(OnCallback<Array> onResArray) {
     	this.onResArray = onResArray;
     	resArrayOnIO = nextOnIO;
         nextOnIO = false;
@@ -189,7 +189,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 	 * @param onResString 请求响应回调
 	 * @return HttpTask 实例
 	 */
-    public AsyncHttpTask setOnResString(OnCallback<String> onResString) {
+    public synchronized AsyncHttpTask setOnResString(OnCallback<String> onResString) {
     	this.onResString = onResString;
     	resStringOnIO = nextOnIO;
         nextOnIO = false;
@@ -405,50 +405,57 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 		return httpCall;
     }
 
-    private OnCallback<HttpResult> complexOnResponse() {
+    private synchronized OnCallback<HttpResult> complexOnResponse() {
 		return res -> {
 			int count = responseCallbackCount();
 			HttpResult.Body body = res.getBody();
 			if (count > 1) {
 				body.cache();
 			}
-			if (onResponse != null) {
-				execute(() -> onResponse.on(res), responseOnIO);
+			OnCallback<HttpResult> listener1 = onResponse;
+			if (listener1 != null) {
+				execute(() -> listener1.on(res), responseOnIO);
 			}
-			if (onResBody != null) {
-				execute(() -> onResBody.on(body), resBodyOnIO);
+			OnCallback<HttpResult.Body> listener2 = onResBody;
+			if (listener2 != null) {
+				execute(() -> listener2.on(body), resBodyOnIO);
 			}
-			if (onResMapper != null) {
+			OnCallback<Mapper> listener3 = onResMapper;
+			if (listener3 != null) {
 				Mapper mapper = body.toMapper();
-				execute(() -> onResMapper.on(mapper), resMapperOnIO);
+				execute(() -> listener3.on(mapper), resMapperOnIO);
 			}
-			if (onResArray != null) {
+			OnCallback<Array> listener4 = onResArray;
+			if (listener4 != null) {
 				Array array = body.toArray();
-				execute(() -> onResArray.on(array), resArrayOnIO);
+				execute(() -> listener4.on(array), resArrayOnIO);
 			}
-			if (onResBean != null) {
+			OnCallback<?> listener5 = onResBean;
+			if (listener5 != null) {
 				Object bean = body.toBean(beanType);
 				execute(() -> {
 					try {
-						callbackMethod(onResBean.getClass(), bean.getClass()).invoke(onResBean, bean);
+						callbackMethod(listener5.getClass(), bean.getClass()).invoke(listener5, bean);
 					} catch (IllegalAccessException | InvocationTargetException e) {
 						throw new HttpException("回调方法调用失败！", e);
 					}
 				}, resBeanOnIO);
 			}
-			if (onResList != null) {
+			OnCallback<?> listener6 = onResList;
+			if (listener6 != null) {
 				List<?> list = body.toList(listType);
 				execute(() -> {
 					try {
-						callbackMethod(onResList.getClass(), list.getClass()).invoke(onResList, list);
+						callbackMethod(listener6.getClass(), list.getClass()).invoke(listener6, list);
 					} catch (IllegalAccessException | InvocationTargetException e) {
 						throw new HttpException("回调方法调用失败！", e);
 					}
 				}, resListOnIO);
 			}
-			if (onResString != null) {
+			OnCallback<String> listener7 = onResString;
+			if (listener7 != null) {
 				String string = body.toString();
-				execute(() -> onResString.on(string), resStringOnIO);
+				execute(() -> listener7.on(string), resStringOnIO);
 			}
 		};
 	}
