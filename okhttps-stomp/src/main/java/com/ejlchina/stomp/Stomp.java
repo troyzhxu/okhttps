@@ -30,9 +30,9 @@ public class Stomp {
 
     private final List<Subscriber> subscribers;
 
-
     private OnCallback<Stomp> onConnected;
     private OnCallback<WebSocket.Close> onDisconnected;
+    private OnCallback<Throwable> onException;
     private OnCallback<Message> onError;
 
     private final String disReceipt;
@@ -94,7 +94,7 @@ public class Stomp {
         websocket = task
             .setOnOpen((ws, res) -> doOnOpened(headers))
             .setOnMessage((ws, msg) -> msgCodec.decode(msg.toString(), this::receive))
-            .setOnException((ws, e) -> connecting = false)
+            .setOnException((ws, e) -> doOnException(e))
             .setOnClosed((ws, close) -> doOnClosed(close))
             .listen();
         connecting = true;
@@ -113,6 +113,14 @@ public class Stomp {
             cHeaders.addAll(headers);
         }
         send(new Message(Commands.CONNECT, cHeaders, null));
+    }
+
+    private void doOnException(Throwable throwable) {
+        OnCallback<Throwable> listener = onException;
+        if (listener != null) {
+            listener.on(throwable);
+        }
+        connecting = false;
     }
 
     private void doOnClosed(WebSocket.Close close) {
@@ -214,7 +222,18 @@ public class Stomp {
         this.onDisconnected = onDisconnected;
         return this;
     }
-    
+
+    /**
+     * 错误回调（底层连接异常）
+     * @since v3.1.1
+     * @param onException 异常回调
+     * @return Stomp
+     */
+    public Stomp setOnException(OnCallback<Throwable> onException) {
+        this.onException = onException;
+        return this;
+    }
+
     /**
      * 错误回调（服务器返回的错误信息）
      * @param onError 错误回调
