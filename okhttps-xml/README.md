@@ -11,14 +11,14 @@
 <dependency>
      <groupId>com.ejlchina</groupId>
      <artifactId>okhttps-xml</artifactId>
-     <version>3.0.3</version>
+     <version>3.0.4</version>
 </dependency>
 ```
 
 ##### Gradle
 
 ```groovy
-implementation 'com.ejlchina:okhttps-xml:3.0.3'
+implementation 'com.ejlchina:okhttps-xml:3.0.4'
 ```
 
 #### 更多请参阅 [http://okhttps.ejlchina.com/](http://okhttps.ejlchina.com/)
