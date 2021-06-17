@@ -91,40 +91,41 @@ public class Stomp {
         if (connected || connecting) {
             return this;
         }
-        websocket = task.setOnOpen((ws, res) -> {
-                int pingSecs = task.pingSeconds();
-                int pongSecs = task.pongSeconds();
-                List<Header> cHeaders = new ArrayList<>();
-                cHeaders.add(new Header(Header.VERSION, SUPPORTED_VERSIONS));
-                if (pingSecs > 0 && pongSecs > 0) {
-                    cHeaders.add(new Header(Header.HEART_BEAT, pingSecs * 1000 + "," + pongSecs * 1000));
-                }
-                if (headers != null) {
-                    cHeaders.addAll(headers);
-                }
-                send(new Message(Commands.CONNECT, cHeaders, null));
-            })
+        websocket = task
+            .setOnOpen((ws, res) -> doOnOpened(headers))
             .setOnMessage((ws, msg) -> msgCodec.decode(msg.toString(), this::receive))
             .setOnException((ws, e) -> connecting = false)
-            .setOnClosed((ws, close) -> {
-                for (Subscriber subscriber : subscribers) {
-                    subscriber.resetStatus();
-                }
-                if (onDisconnected != null) {
-                    onDisconnected.on(close);
-                }
-                resetStatus();
-            })
+            .setOnClosed((ws, close) -> doOnClosed(close))
             .listen();
         connecting = true;
         return this;
     }
 
-    private void resetStatus() {
+    private void doOnOpened(List<Header> headers) {
+        int pingSecs = task.pingSeconds();
+        int pongSecs = task.pongSeconds();
+        List<Header> cHeaders = new ArrayList<>();
+        cHeaders.add(new Header(Header.VERSION, SUPPORTED_VERSIONS));
+        if (pingSecs > 0 && pongSecs > 0) {
+            cHeaders.add(new Header(Header.HEART_BEAT, pingSecs * 1000 + "," + pongSecs * 1000));
+        }
+        if (headers != null) {
+            cHeaders.addAll(headers);
+        }
+        send(new Message(Commands.CONNECT, cHeaders, null));
+    }
+
+    private void doOnClosed(WebSocket.Close close) {
         connected = false;
         connecting = false;
         disconnecting = false;
         websocket = null;
+        for (Subscriber subscriber : subscribers) {
+            subscriber.resetStatus();
+        }
+        if (onDisconnected != null) {
+            onDisconnected.on(close);
+        }
     }
 
     /**
