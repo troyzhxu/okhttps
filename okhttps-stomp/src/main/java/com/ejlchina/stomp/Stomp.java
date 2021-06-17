@@ -107,7 +107,9 @@ public class Stomp {
             .setOnMessage((ws, msg) -> msgCodec.decode(msg.toString(), this::receive))
             .setOnException((ws, e) -> connecting = false)
             .setOnClosed((ws, close) -> {
-                subscribers.forEach(Subscriber::resetStatus);
+                for (Subscriber subscriber : subscribers) {
+                    subscriber.resetStatus();
+                }
                 if (onDisconnected != null) {
                     onDisconnected.on(close);
                 }
