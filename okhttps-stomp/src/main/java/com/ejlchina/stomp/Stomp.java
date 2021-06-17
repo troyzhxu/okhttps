@@ -131,8 +131,9 @@ public class Stomp {
         for (Subscriber subscriber : subscribers) {
             subscriber.resetStatus();
         }
-        if (onDisconnected != null) {
-            onDisconnected.on(close);
+        OnCallback<WebSocket.Close> listener = onDisconnected;
+        if (listener != null) {
+            listener.on(close);
         }
     }
 
@@ -418,8 +419,9 @@ public class Stomp {
                 disconnect(true);
             }
         } else if (Commands.ERROR.equals(command)) {
-        	if (onError != null) {
-        		onError.on(msg);
+            OnCallback<Message> listener = onError;
+        	if (listener != null) {
+                listener.on(msg);
         	}
         }
     }
@@ -445,8 +447,9 @@ public class Stomp {
             connected = true;
             connecting = false;
         }
-        if (onConnected != null) {
-            onConnected.on(this);
+        OnCallback<Stomp> listener = onConnected;
+        if (listener != null) {
+            listener.on(this);
         }
     }
 
