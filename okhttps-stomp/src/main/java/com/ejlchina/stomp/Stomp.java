@@ -107,7 +107,9 @@ public class Stomp {
         		}
         	})
             .setOnClosed((ws, close) -> {
-                subscribers.forEach(Subscriber::resetStatus);
+                for (Subscriber subscriber : subscribers) {
+                    subscriber.resetStatus();
+                }
                 if (onDisconnected != null) {
                     onDisconnected.on(close);
                 }
