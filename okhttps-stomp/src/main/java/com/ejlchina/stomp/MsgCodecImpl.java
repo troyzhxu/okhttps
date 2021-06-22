@@ -86,10 +86,7 @@ public class MsgCodecImpl implements MsgCodec {
      * @param start 开始解析的问题
      */
     protected void decode(OnCallback<Message> out, int start) {
-        if (start > 0) {
-            // 清空 start 之前的数据
-            pending.delete(0, start);
-        }
+        cleanPendingStartData(start);
         // Body 结尾符下标
         int bEndIdx = pending.indexOf(bodyEnd);
         if (bEndIdx < 0) {
@@ -122,13 +119,32 @@ public class MsgCodecImpl implements MsgCodec {
         decode(out, bEndIdx + bodyEnd.length());
     }
 
+    protected void cleanPendingStartData(int start) {
+        if (start > 0) {
+            // 清空 start 之前的数据
+            pending.delete(0, start);
+        }
+        // Command 开始符下标
+        int index = 0;
+        for (int i = 0; i < pending.length(); i++) {
+            char c = pending.charAt(i);
+            if (isCommandChar(c)) {
+                index = i;
+            }
+        }
+        if (index > 0) {
+            // 清空 Command 之前的数据
+            pending.delete(0, index);
+        }
+    }
+
     /**
      * 解析 Headers
      * @param cEndIdx Command 结尾符下标
      * @param hEndIdx Headers 结尾符下标
      * @return Headers
      */
-    private List<Header> decodeHeaders(int cEndIdx, int hEndIdx) {
+    protected List<Header> decodeHeaders(int cEndIdx, int hEndIdx) {
         String[] strHeaders = pending.substring(cEndIdx + commandEnd.length(), hEndIdx)
                 .split(headerDelimiter);
         List<Header> headers = new ArrayList<>(strHeaders.length);
@@ -143,6 +159,10 @@ public class MsgCodecImpl implements MsgCodec {
 
     protected boolean isCommand(String command) {
         return !command.isEmpty() && command.matches("[A-Z]+");
+    }
+
+    protected boolean isCommandChar(char c) {
+        return c >= 'A' && c <= 'Z';
     }
 
     protected Message createMessage(String command, List<Header> headers, String payload) {
