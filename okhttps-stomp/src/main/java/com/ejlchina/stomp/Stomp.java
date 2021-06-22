@@ -116,7 +116,6 @@ public class Stomp {
     }
 
     private void doOnException(Throwable throwable) {
-        resetStompStatus();
         OnCallback<Throwable> listener = onException;
         if (listener != null) {
             listener.on(throwable);
@@ -124,21 +123,17 @@ public class Stomp {
     }
 
     private void doOnClosed(WebSocket.Close close) {
-        resetStompStatus();
-        OnCallback<WebSocket.Close> listener = onDisconnected;
-        if (listener != null) {
-            listener.on(close);
-        }
-    }
-
-    private synchronized void resetStompStatus() {
-        for (Subscriber subscriber : subscribers) {
-            subscriber.resetStatus();
-        }
         connected = false;
         connecting = false;
         disconnecting = false;
         websocket = null;
+        for (Subscriber subscriber : subscribers) {
+            subscriber.resetStatus();
+        }
+        OnCallback<WebSocket.Close> listener = onDisconnected;
+        if (listener != null) {
+            listener.on(close);
+        }
     }
 
     /**
