@@ -130,6 +130,7 @@ public class MsgCodecImpl implements MsgCodec {
             char c = pending.charAt(i);
             if (isCommandChar(c)) {
                 index = i;
+                break;
             }
         }
         if (index > 0) {
