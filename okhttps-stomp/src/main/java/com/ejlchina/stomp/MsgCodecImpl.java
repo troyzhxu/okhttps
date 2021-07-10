@@ -98,15 +98,15 @@ public class MsgCodecImpl implements MsgCodec {
         // Headers 结尾符下标
         int hEndIdx = pending.indexOf(headersEnd);
         if (cEndIdx <= 0 || hEndIdx <= cEndIdx || bEndIdx <= hEndIdx) {
-            // 非法数据包，重新解析 bodyEnd 之后的数据
-            decode(out, bEndIdx + bodyEnd.length());
+            // 非法数据包，跳过一个字符重新解析
+            decode(out, 1);
             return;
         }
         // 解析 Command
         String command = pending.substring(0, cEndIdx).trim();
         if (!isCommand(command)) {
-            // 非法数据包，重新解析 bodyEnd 之后的数据
-            decode(out, bEndIdx + bodyEnd.length());
+            // 非法数据包，跳过一个字符重新解析
+            decode(out, 1);
             return;
         }
         // 解析 Headers
