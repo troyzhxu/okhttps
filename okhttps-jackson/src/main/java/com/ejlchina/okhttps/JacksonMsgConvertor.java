@@ -17,7 +17,7 @@ public class JacksonMsgConvertor extends JacksonDataConvertor implements MsgConv
 
 	@Override
 	public String mediaType() {
-		return "application/json";
+		return "application/json; charset={charset}";
 	}
 
 	@Override

@@ -1,6 +1,8 @@
 package com.ejlchina.test;
 
 import com.ejlchina.okhttps.HTTP;
+import com.ejlchina.okhttps.HttpResult;
+import com.ejlchina.okhttps.OkHttps;
 import com.ejlchina.okhttps.Process;
 import org.junit.Test;
 
@@ -31,6 +33,5 @@ public class UploadTests extends BaseTest {
 
         println("响应：" + res);
     }
-
 
 }

@@ -12,16 +12,20 @@ import okhttp3.WebSocketListener;
  */
 public final class OkHttps {
 
+    // 使用 x-www-form-urlencoded 表单格式
     public static final String FORM = "form";
+    // 使用 form-data 表单格式（一般上传文件时使用）
+    public static final String FORM_DATA = "form-data";
     public static final String JSON = "json";
     public static final String XML = "xml";
     public static final String PROTOBUF = "protobuf";
+    public static final String MSGPACK = "msgpack";
 
     private static HTTP http;
 
     private OkHttps() {}
 
-    static synchronized HTTP getHttp() {
+    public static synchronized HTTP getHttp() {
         if (http != null) {
             return http;
         }

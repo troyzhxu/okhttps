@@ -3,10 +3,12 @@ package com.ejlchina.okhttps.internal;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.concurrent.*;
 
 import com.ejlchina.okhttps.*;
 import com.ejlchina.okhttps.HttpResult.State;
+import okhttp3.MediaType;
 import okhttp3.internal.Util;
 
 public final class TaskExecutor {
@@ -100,13 +102,21 @@ public final class TaskExecutor {
 
     public static class Data<T> {
 
-        public T data;
-        public String contentType;
+        public final T data;
+        private final String contentType;
 
         public Data(T data, String contentType) {
             this.data = data;
             this.contentType = contentType;
         }
+
+        public MediaType mediaType(Charset charset) {
+            if (contentType != null) {
+                return MediaType.parse(contentType.replace("{charset}", charset.name()));
+            }
+            return null;
+        }
+
     }
 
     public <V> V doMsgConvert(ConvertFunc<V> callable) {
@@ -122,11 +132,11 @@ public final class TaskExecutor {
                 continue;
             }
             if (callable == null && mediaType != null) {
-                return new Data<>(null, mediaType);
+                return new Data<>(null, mediaType(type, mediaType));
             }
             try {
                 assert callable != null;
-                return new Data<>(callable.apply(convertor), mediaType);
+                return new Data<>(callable.apply(convertor), mediaType(type, mediaType));
             } catch (Exception e) {
                 if (cause != null) {
                     initRootCause(e, cause);
@@ -151,9 +161,16 @@ public final class TaskExecutor {
             throwable.initCause(cause);
         }
     }
-    
+
+    private String mediaType(String type, String mediaType) {
+        return type != null && type.contains("/") ? type : mediaType;
+    }
+
     private String toContentType(String type) {
     	if (type != null) {
+    	    if (type.contains("/")) {
+    	        return type;
+            }
     		for (String contentType : contentTypes) {
     		    if (contentType.contains(type)) {
     		        return contentType;

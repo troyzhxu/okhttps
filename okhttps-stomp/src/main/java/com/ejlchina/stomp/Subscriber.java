@@ -53,6 +53,10 @@ public class Subscriber {
     public void unsubscribe() {
         List<Header> headers = Collections.singletonList(new Header(Header.ID, id));
         stomp.send(new Message(Commands.UNSUBSCRIBE, headers, null));
+        resetStatus();
+    }
+
+    public void resetStatus() {
         subscribed = false;
     }
 

@@ -113,7 +113,11 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * 启动 WebSocket 监听
 	 * @return WebSocket
 	 */
-	public WebSocket listen() {
+	public synchronized WebSocket listen() {
+		if (webSocket != null) {
+			// 如果连接已建立，直接返回
+			return webSocket;
+		}
 		WebSocketImpl socket = new WebSocketImpl();
 		registeTagTask(socket);
 		httpClient.preprocess(this, () -> {
@@ -130,11 +134,26 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		webSocket = socket;
 		return socket;
 	}
-	
-	
+
+	/**
+	 * @since v3.1.0
+	 * @param code 状态码
+	 * @param reason 原因
+	 * @return true: 被关闭, false: 当前尚未建立连接
+	 */
+	public boolean close(int code, String reason) {
+		WebSocket ws = webSocket;
+		if (ws != null) {
+			ws.close(code, reason);
+			webSocket = null;
+			return true;
+		}
+		return false;
+	}
+
 	class MessageListener extends WebSocketListener {
 
-		WebSocketImpl webSocket;
+		final WebSocketImpl webSocket;
 
 		Charset charset;
 
@@ -150,12 +169,13 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			this.webSocket.setStatus(WebSocket.STATUS_CONNECTED);
 			TaskListener<HttpResult> listener = httpClient.executor.getResponseListener();
 			HttpResult result = new RealHttpResult(WebSocketTask.this, response, httpClient.executor);
+			Listener<HttpResult> openListener = onOpen;
 			if (listener != null) {
-				if (listener.listen(WebSocketTask.this, result) && onOpen != null) {
-					execute(() -> onOpen.on(this.webSocket, result), openOnIO);
+				if (listener.listen(WebSocketTask.this, result) && openListener != null) {
+					execute(() -> openListener.on(this.webSocket, result), openOnIO);
 				}
-			} else if (onOpen != null) {
-				execute(() -> onOpen.on(this.webSocket, result), openOnIO);
+			} else if (openListener != null) {
+				execute(() -> openListener.on(this.webSocket, result), openOnIO);
 			}
 			if (pingSeconds > 0) {
 				lastPingSecs = nowSeconds();
@@ -170,8 +190,9 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		// 接收文本数据 仅当  websocket 消息中的 opcode == 1  时
 		@Override
 		public void onMessage(okhttp3.WebSocket webSocket, String text) {
-			if (onMessage != null) {
-				execute(() -> onMessage.on(this.webSocket, new WebSocketMsg(text, httpClient.executor, charset)), messageOnIO);
+			Listener<Message> listener = onMessage;
+			if (listener != null) {
+				execute(() -> listener.on(this.webSocket, new WebSocketMsg(text, httpClient.executor, charset)), messageOnIO);
 			}
 			if (pongSeconds > 0) {
 				lastPongSecs = nowSeconds();
@@ -182,8 +203,9 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		// 接收二进制数据 仅当  websocket 消息中的 opcode == 2  时
 		@Override
 		public void onMessage(okhttp3.WebSocket webSocket, ByteString bytes) {
-			if (onMessage != null) {
-				execute(() -> onMessage.on(this.webSocket, new WebSocketMsg(bytes, httpClient.executor, charset)), messageOnIO);
+			Listener<Message> listener = onMessage;
+			if (listener != null) {
+				execute(() -> listener.on(this.webSocket, new WebSocketMsg(bytes, httpClient.executor, charset)), messageOnIO);
 			}
 			if (pongSeconds > 0) {
 				lastPongSecs = nowSeconds();
@@ -194,8 +216,9 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		@Override
 		public void onClosing(okhttp3.WebSocket webSocket, int code, String reason) {
 			this.webSocket.setStatus(WebSocket.STATUS_DISCONNECTED);
-			if (onClosing != null) {
-				execute(() -> onClosing.on(this.webSocket, new Close(code, reason)), closingOnIO);
+			Listener<Close> listener = onClosing;
+			if (listener != null) {
+				execute(() -> listener.on(this.webSocket, new Close(code, reason)), closingOnIO);
 			}
 		}
 
@@ -205,14 +228,16 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		}
 
 		private void doOnClose(HttpResult.State state, int code, String reason) {
-			TaskListener<HttpResult.State> listener = httpClient.executor.getCompleteListener();
+			WebSocketTask.this.webSocket = null;
 			Close close = updateStatus(state, code, reason);
+			TaskListener<HttpResult.State> listener = httpClient.executor.getCompleteListener();
+			Listener<Close> closeListener = onClosed;
 			if (listener != null) {
-				if (listener.listen(WebSocketTask.this, state) && onClosed != null) {
-					execute(() -> onClosed.on(this.webSocket, close), closedOnIO);
+				if (listener.listen(WebSocketTask.this, state) && closeListener != null) {
+					execute(() -> closeListener.on(this.webSocket, close), closedOnIO);
 				}
-			} else if (onClosed != null) {
-				execute(() -> onClosed.on(this.webSocket, close), closedOnIO);
+			} else if (closeListener != null) {
+				execute(() -> closeListener.on(this.webSocket, close), closedOnIO);
 			}
 		}
 
@@ -242,12 +267,13 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			IOException e = t instanceof IOException ? (IOException) t : new IOException(t.getMessage(), t);
 			doOnClose(toState(e), 0, t.getMessage());
 			TaskListener<IOException> listener = httpClient.executor.getExceptionListener();
+			Listener<Throwable> exceptionListener = onException;
 			if (listener != null) {
-				if (listener.listen(WebSocketTask.this,  e) && onException != null) {
-					execute(() -> onException.on(this.webSocket,  t), exceptionOnIO);
+				if (listener.listen(WebSocketTask.this,  e) && exceptionListener != null) {
+					execute(() -> exceptionListener.on(this.webSocket,  t), exceptionOnIO);
 				}
-			} else if (onException != null) {
-				execute(() -> onException.on(this.webSocket,  t), exceptionOnIO);
+			} else if (exceptionListener != null) {
+				execute(() -> exceptionListener.on(this.webSocket,  t), exceptionOnIO);
 			} else if (!nothrow) {
 				throw new HttpException("WebSockt 连接异常: " + getUrl(), t);
 			}
@@ -259,7 +285,8 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * @return 连接是否已建立
 	 */
 	public boolean isConnected() {
-		return webSocket != null && webSocket.status == WebSocket.STATUS_CONNECTED;
+		WebSocketImpl ws = webSocket;
+		return ws != null && ws.status == WebSocket.STATUS_CONNECTED;
 	}
 
 	/**
@@ -274,10 +301,10 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			if (!isConnected()) {
 				return;
 			}
-			if (nowSeconds() - lastPingSecs >= pingSeconds) {
+			WebSocket ws = webSocket;
+			if (nowSeconds() - lastPingSecs >= pingSeconds && ws != null) {
 				ByteString ping = pingSupplier != null ? pingSupplier.getPing() : ByteString.EMPTY;
-				webSocket.send(ping);
-				Platform.logInfo("PING >>> " + ping.utf8());
+				ws.send(ping);
 				lastPingSecs = nowSeconds();
 			}
 			schedulePing();
@@ -298,8 +325,11 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			}
 			long noPongSeconds = nowSeconds() - lastPongSecs;
 			if (noPongSeconds > 3L * pongSeconds) {
-				Exception e = new SocketTimeoutException("Server didn't pong heart-beat on time. Last received at " + noPongSeconds + " seconds ago.");
-				((RealWebSocket) webSocket.webSocket).failWebSocket(e, null);
+				WebSocketImpl ws = webSocket;
+				if (ws != null) {
+					Exception e = new SocketTimeoutException("Server didn't pong heart-beat on time. Last received at " + noPongSeconds + " seconds ago.");
+					((RealWebSocket) ws.webSocket).failWebSocket(e, null);
+				}
 			} else {
 				schedulePong();
 			}

@@ -35,7 +35,7 @@ public class HttpUtils {
     }
 
 
-    static synchronized HTTP getHttp() {
+    public static synchronized HTTP getHttp() {
         if (http != null) {
             return http;
         }

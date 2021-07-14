@@ -22,18 +22,22 @@ public class Stomp {
     public static final String CLIENT_ACK = "client";
 
     private final boolean autoAck;
-    private boolean connected;
+    private boolean connected = false;      // 是否已连接
+    private boolean connecting = false;     // 是否连接中
+    private boolean disconnecting = false;  // 是否断开连接中
     private final WebSocketTask task;
     private WebSocket websocket;
-    private boolean legacyWhitespace = false;
-    private final List<Subscriber> subscribers;
 
+    private final List<Subscriber> subscribers;
 
     private OnCallback<Stomp> onConnected;
     private OnCallback<WebSocket.Close> onDisconnected;
+    private OnCallback<Throwable> onException;
     private OnCallback<Message> onError;
 
     private final String disReceipt;
+
+    private MsgCodec msgCodec = new MsgCodecImpl();
 
 
     private Stomp(WebSocketTask task, boolean autoAck) {
@@ -83,37 +87,53 @@ public class Stomp {
      * @param headers Stomp 头信息
      * @return Stomp
      */
-    public Stomp connect(List<Header> headers) {
-        if (connected) {
+    public synchronized Stomp connect(List<Header> headers) {
+        if (connected || connecting) {
             return this;
         }
-        websocket = task.setOnOpen((ws, res) -> {
-                int pingSecs = task.pingSeconds();
-                int pongSecs = task.pongSeconds();
-                List<Header> cHeaders = new ArrayList<>();
-                cHeaders.add(new Header(Header.VERSION, SUPPORTED_VERSIONS));
-                if (pingSecs > 0 && pongSecs > 0) {
-                    cHeaders.add(new Header(Header.HEART_BEAT, pingSecs * 1000 + "," + pongSecs * 1000));
-                }
-                if (headers != null) {
-                    cHeaders.addAll(headers);
-                }
-                send(new Message(Commands.CONNECT, cHeaders, null));
-            })
-            .setOnMessage((ws, msg) -> {
-        		Message message = Message.from(msg.toString());
-        		if (message != null) {
-        			receive(message);
-        		}
-        	})
-            .setOnClosed((ws, close) -> {
-                if (onDisconnected != null) {
-                    onDisconnected.on(close);
-                }
-                connected = false;
-            })
+        websocket = task
+            .setOnOpen((ws, res) -> doOnOpened(headers))
+            .setOnMessage((ws, msg) -> msgCodec.decode(msg.toString(), this::receive))
+            .setOnException((ws, e) -> doOnException(e))
+            .setOnClosed((ws, close) -> doOnClosed(close))
             .listen();
+        connecting = true;
         return this;
+    }
+
+    private void doOnOpened(List<Header> headers) {
+        int pingSecs = task.pingSeconds();
+        int pongSecs = task.pongSeconds();
+        List<Header> cHeaders = new ArrayList<>();
+        cHeaders.add(new Header(Header.VERSION, SUPPORTED_VERSIONS));
+        if (pingSecs > 0 && pongSecs > 0) {
+            cHeaders.add(new Header(Header.HEART_BEAT, pingSecs * 1000 + "," + pongSecs * 1000));
+        }
+        if (headers != null) {
+            cHeaders.addAll(headers);
+        }
+        send(new Message(Commands.CONNECT, cHeaders, null));
+    }
+
+    private void doOnException(Throwable throwable) {
+        OnCallback<Throwable> listener = onException;
+        if (listener != null) {
+            listener.on(throwable);
+        }
+    }
+
+    private void doOnClosed(WebSocket.Close close) {
+        connected = false;
+        connecting = false;
+        disconnecting = false;
+        websocket = null;
+        for (Subscriber subscriber : subscribers) {
+            subscriber.resetStatus();
+        }
+        OnCallback<WebSocket.Close> listener = onDisconnected;
+        if (listener != null) {
+            listener.on(close);
+        }
     }
 
     /**
@@ -121,14 +141,66 @@ public class Stomp {
      * @return 是否已连接
      */
     public boolean isConnected() {
-        return connected && websocket.status() == WebSocket.STATUS_CONNECTED;
+        return connected;
+    }
+
+    /**
+     * @since 3.1.0
+     * @return 是否正在连接
+     */
+    public boolean isConnecting() {
+        return connecting;
+    }
+
+    /**
+     * @since 3.1.0
+     * @return 是否正在断开连接
+     */
+    public boolean isDisconnecting() {
+        return disconnecting;
+    }
+
+    /**
+     * 断开连接，将先发送 DISCONNECT 消息给服务器，服务器回复后断开连接
+     * 默认等待服务器为 10 秒，10秒后自动关闭
+     */
+    public void disconnect() {
+        disconnect(10);
+    }
+
+    /**
+     * @since v3.1.0
+     * 断开连接，将先发送 DISCONNECT 消息给服务器，服务器回复后断开连接
+     * @param maxWaitSeconds 最大等待服务器回复时间，超出后自动关闭
+     */
+    public void disconnect(int maxWaitSeconds) {
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                disconnect(true);
+            }
+        }, 1000L * maxWaitSeconds);
+        Header header = new Header(Header.RECEIPT, disReceipt);
+        List<Header> headers = Collections.singletonList(header);
+        send(new Message(Commands.DISCONNECT, headers));
+        disconnecting = true;
     }
 
     /**
      * 断开连接
+     * @param immediate 是否立即断开
+     * @since v3.1.0
      */
-    public void disconnect() {
-        send(new Message(Commands.DISCONNECT, Collections.singletonList(new Header(Header.RECEIPT, disReceipt))));
+    public void disconnect(boolean immediate) {
+        if (immediate) {
+            WebSocket ws = websocket;
+            if (ws != null) {
+                ws.close(1000, "disconnect by user");
+                websocket = null;
+            }
+        } else {
+            disconnect(10);
+        }
     }
 
     /**
@@ -150,7 +222,18 @@ public class Stomp {
         this.onDisconnected = onDisconnected;
         return this;
     }
-    
+
+    /**
+     * 错误回调（底层连接异常）
+     * @since v3.1.1
+     * @param onException 异常回调
+     * @return Stomp
+     */
+    public Stomp setOnException(OnCallback<Throwable> onException) {
+        this.onException = onException;
+        return this;
+    }
+
     /**
      * 错误回调（服务器返回的错误信息）
      * @param onError 错误回调
@@ -195,10 +278,11 @@ public class Stomp {
      * @param message 消息
      */
     public void send(Message message) {
-        if (websocket == null) {
+        WebSocket ws = websocket;
+        if (ws == null) {
             throw new IllegalArgumentException("You must call connect before send");
         }
-        websocket.send(message.compile(legacyWhitespace));
+        ws.send(msgCodec.encode(message));
     }
 
     /**
@@ -318,28 +402,7 @@ public class Stomp {
         String command = msg.getCommand();
         if (Commands.CONNECTED.equals(command)) {
             String hbHeader = msg.headerValue(Header.HEART_BEAT);
-            int pingSecs = task.pingSeconds();
-            int pongSecs = task.pongSeconds();
-            if (hbHeader != null && (pingSecs > 0 || pongSecs > 0)) {
-                String[] heartbeats = hbHeader.split(",");
-                int pingSeconds = Integer.parseInt(heartbeats[1]) / 1000;
-                int pongSeconds = Integer.parseInt(heartbeats[0]) / 1000;
-                if (pingSeconds > 0 || pongSeconds > 0) {
-                    if (task.pingSupplier() == null) {
-                        task.pingSupplier(() -> ByteString.of((byte) 0x0A));
-                    }
-                    task.heatbeat(Math.max(pingSeconds, pingSecs), Math.max(pongSeconds, pongSecs));
-                }
-            }
-            synchronized (this) {
-                connected = true;
-                for (Subscriber s: subscribers) {
-                    s.subscribe();
-                }
-            }
-            if (onConnected != null) {
-                onConnected.on(this);
-            }
+            onConnectedFrameReceived(hbHeader);
         } else if (Commands.MESSAGE.equals(command)) {
             String id = msg.headerValue(Header.SUBSCRIPTION);
             if (id != null) {
@@ -352,19 +415,49 @@ public class Stomp {
         } else if (Commands.RECEIPT.equals(command)) {
             if (disReceipt.equals(msg.headerValue(Header.RECEIPT_ID))) {
                 // 断开连接
-                if (websocket != null) {
-                    websocket.close(1000, "disconnect by user");
-                }
+                disconnect(true);
             }
         } else if (Commands.ERROR.equals(command)) {
-        	if (onError != null) {
-        		onError.on(msg);
+            OnCallback<Message> listener = onError;
+        	if (listener != null) {
+                listener.on(msg);
         	}
         }
     }
 
-    public void setLegacyWhitespace(boolean legacyWhitespace) {
-        this.legacyWhitespace = legacyWhitespace;
+    private void onConnectedFrameReceived(String hbHeader) {
+        int pingSecs = task.pingSeconds();
+        int pongSecs = task.pongSeconds();
+        if (hbHeader != null && (pingSecs > 0 || pongSecs > 0)) {
+            String[] heartbeats = hbHeader.split(",");
+            int pingSeconds = Integer.parseInt(heartbeats[1]) / 1000;
+            int pongSeconds = Integer.parseInt(heartbeats[0]) / 1000;
+            if (pingSeconds > 0 || pongSeconds > 0) {
+                if (task.pingSupplier() == null) {
+                    task.pingSupplier(() -> ByteString.of((byte) 0x0A));
+                }
+                task.heatbeat(Math.max(pingSeconds, pingSecs), Math.max(pongSeconds, pongSecs));
+            }
+        }
+        synchronized (this) {
+            for (Subscriber s: subscribers) {
+                s.subscribe();
+            }
+            connected = true;
+            connecting = false;
+        }
+        OnCallback<Stomp> listener = onConnected;
+        if (listener != null) {
+            listener.on(this);
+        }
+    }
+
+    public MsgCodec getMsgCodec() {
+        return msgCodec;
+    }
+
+    public void setMsgCodec(MsgCodec msgCodec) {
+        this.msgCodec = msgCodec;
     }
 
 }
