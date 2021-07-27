@@ -18,7 +18,7 @@ public interface Process {
 	long getTotalBytes();
 	
 	/**
-	 * @return 已完成任务量
+	 * @return 已完成字节数
 	 */
 	long getDoneBytes();
 	

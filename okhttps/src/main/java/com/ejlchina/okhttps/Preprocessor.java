@@ -2,13 +2,13 @@ package com.ejlchina.okhttps;
 
 /**
  * 预处理器，支持异步
- * 在HTTP请求任务正式开始之前执行
+ * 在 HTTP 请求任务正式开始之前执行
  * @author Troy.Zhou
  */
 public interface Preprocessor {
 
 	/**
-	 * 在HTTP请求开始之前执行
+	 * 在 HTTP 请求开始之前执行
 	 * @param chain 预处理器链
 	 */
 	void doProcess(PreChain chain);
@@ -22,12 +22,12 @@ public interface Preprocessor {
 		HttpTask<?> getTask();
 
 		/**
-		 * @return HTTP
+		 * @return 当前使用的 HTTP 实例
 		 */
 		HTTP getHttp();
 		
 		/**
-		 * 继续HTTP请求任务
+		 * 继续 HTTP 请求任务
 		 */
 		void proceed();
 		
