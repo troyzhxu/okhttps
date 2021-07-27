@@ -22,7 +22,7 @@ public interface MsgConvertor extends DataConvertor {
 	String mediaType();
 
 	/**
-	 * 表单转换器，可用于自动系列化表单参数
+	 * 表单转换器，可用于自动序列化表单参数
 	 */
 	class FormConvertor implements MsgConvertor {
 
@@ -34,7 +34,7 @@ public interface MsgConvertor extends DataConvertor {
 
 		@Override
 		public String mediaType() {
-			return "application/x-www-form-urlencoded";
+			return "application/x-www-form-urlencoded; charset={charset}";
 		}
 
 		@Override
