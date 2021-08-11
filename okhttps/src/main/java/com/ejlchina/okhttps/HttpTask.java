@@ -724,26 +724,33 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         return sb.toString();
     }
 
+    /**
+     * 参数冲突校验
+     */
     protected void assertNotConflict(boolean bodyCantUsed) {
         if (bodyCantUsed) {
             if (requestBody != null) {
                 throw new HttpException("GET | HEAD 请求 不能调用 setBodyPara 方法！");
             }
-            if (bodyParams != null) {
+            if (isNotEmpty(bodyParams)) {
                 throw new HttpException("GET | HEAD 请求 不能调用 addBodyPara 方法！");
             }
-            if (files != null) {
+            if (isNotEmpty(files)) {
                 throw new HttpException("GET | HEAD 请求 不能调用 addFilePara 方法！");
             }
         }
         if (requestBody != null) {
-            if (bodyParams != null) {
-                throw new HttpException("方法 addBodyPara 与 setBodyPara 不能同时调用！");
+            if (isNotEmpty(bodyParams)) {
+                throw new HttpException("方法 addBodyPara 与 setBodyPara 不能同时使用！");
             }
-            if (files != null) {
-                throw new HttpException("方法 addFilePara 与 setBodyPara 不能同时调用！");
+            if (isNotEmpty(files)) {
+                throw new HttpException("方法 addFilePara 与 setBodyPara 不能同时使用！");
             }
         }
+    }
+
+    private static boolean isNotEmpty(Map<String, ?> map) {
+        return map != null && !map.isEmpty();
     }
 
     /**
