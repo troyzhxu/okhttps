@@ -11,14 +11,14 @@
 <dependency>
      <groupId>com.ejlchina</groupId>
      <artifactId>okhttps-fastjson</artifactId>
-     <version>3.1.3</version>
+     <version>3.1.4</version>
 </dependency>
 ```
 
 ##### Gradle
 
 ```groovy
-implementation 'com.ejlchina:okhttps-fastjson:3.1.3'
+implementation 'com.ejlchina:okhttps-fastjson:3.1.4'
 ```
 
 #### 更多请参阅 [http://okhttps.ejlchina.com/](http://okhttps.ejlchina.com/)
