@@ -2,11 +2,15 @@ package com.ejlchina.okhttps;
 
 import com.ejlchina.data.Array;
 import com.ejlchina.data.DataConvertor;
+import com.ejlchina.data.DataSet;
 import com.ejlchina.data.Mapper;
+import com.ejlchina.okhttps.internal.HttpException;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.List;
 
@@ -27,9 +31,19 @@ public interface MsgConvertor extends DataConvertor {
 	class FormConvertor implements MsgConvertor {
 
 		private final DataConvertor convertor;
+		private final boolean urlEncoded;
 
 		public FormConvertor(DataConvertor convertor) {
+			this(convertor, false);
+		}
+
+		/**
+		 * @param convertor DataConvertor
+		 * @param urlEncoded 是否进行 URLEncode 编码
+		 */
+		public FormConvertor(DataConvertor convertor, boolean urlEncoded) {
 			this.convertor = convertor;
+			this.urlEncoded = urlEncoded;
 		}
 
 		@Override
@@ -49,16 +63,27 @@ public interface MsgConvertor extends DataConvertor {
 
 		@Override
 		public byte[] serialize(Object object, Charset charset) {
-			byte[] data = convertor.serialize(object, charset);
-			Mapper mapper = convertor.toMapper(new ByteArrayInputStream(data), charset);
+			byte[] result = convertor.serialize(object, charset);
+			Mapper mapper = convertor.toMapper(new ByteArrayInputStream(result), charset);
 			StringBuilder sb = new StringBuilder();
-			for (String key: mapper.keySet()) {
-				sb.append(key).append('=').append(mapper.getString(key)).append('&');
+			mapper.forEach((key, data) -> {
+				String value = encodeValue(data, charset);
+				sb.append(key).append('=').append(value).append('&');
+			});
+			int endIndex = sb.length() > 1 ? sb.length() - 1 : sb.length();
+			return sb.substring(0, endIndex).getBytes(charset);
+		}
+
+		private String encodeValue(DataSet.Data data, Charset charset) {
+			String value = data.toString();
+			if (urlEncoded) {
+				try {
+					return URLEncoder.encode(value, charset.name());
+				} catch (UnsupportedEncodingException e) {
+					throw new HttpException("UnsupportedEncoding: " + charset.name(), e);
+				}
 			}
-			if (sb.length() > 1) {
-				sb.deleteCharAt(sb.length() - 1);
-			}
-			return sb.toString().getBytes(charset);
+			return value;
 		}
 
 		@Override
@@ -69,6 +94,14 @@ public interface MsgConvertor extends DataConvertor {
 		@Override
 		public <T> List<T> toList(Class<T> type, InputStream in, Charset charset) {
 			return convertor.toList(type, in, charset);
+		}
+
+		public DataConvertor getConvertor() {
+			return convertor;
+		}
+
+		public boolean isUrlEncoded() {
+			return urlEncoded;
 		}
 
 	}
