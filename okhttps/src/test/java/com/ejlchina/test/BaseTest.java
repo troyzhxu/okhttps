@@ -1,5 +1,6 @@
 package com.ejlchina.test;
 
+import com.ejlchina.okhttps.HTTP;
 import okhttp3.mockwebserver.MockWebServer;
 
 import java.text.SimpleDateFormat;
@@ -10,7 +11,9 @@ public class BaseTest {
 	protected MockWebServer server = new MockWebServer();
 	
 	protected String mockUrl = "http://" + server.getHostName() + ":" + server.getPort();
-	
+
+    protected HTTP http = HTTP.builder().baseUrl(mockUrl).build();
+
 
     public static void sleep(int millis) {
         try {

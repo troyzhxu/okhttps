@@ -1,21 +1,11 @@
 package com.ejlchina.test;
 
-import com.ejlchina.okhttps.HTTP;
-import com.ejlchina.okhttps.HttpResult;
 import com.ejlchina.okhttps.OkHttps;
 import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class SimpleTests extends BaseTest {
-
-
-	MockWebServer server = new MockWebServer();
-	
-    HTTP http = HTTP.builder()
-            .baseUrl("http://" + server.getHostName() + ":" + server.getPort())
-            .build();
 
     @Test
     public void testSyncPost() throws InterruptedException {
@@ -24,7 +14,6 @@ public class SimpleTests extends BaseTest {
         http.async("/").bodyType(OkHttps.FORM).post();
         Assert.assertEquals(server.takeRequest().getHeader("Content-Type"), "application/x-www-form-urlencoded; charset=UTF-8");
     }
-
 
     /**
      * 同步请求示例
@@ -46,6 +35,8 @@ public class SimpleTests extends BaseTest {
         String userAgent = server.takeRequest().getHeader("User-Agent");
         Assert.assertEquals("123456", userAgent);
     }
+
+
 
     /**
      * 同步请求示例
@@ -82,20 +73,6 @@ public class SimpleTests extends BaseTest {
 //                .get();
 //        sleep(5000);
 //    }
-
-    /**
-     * 启用 cache 示例
-     */
-    @Test
-    public void testCache() {
-        String content = "test cache method";
-        server.enqueue(new MockResponse().setBody(content));
-        HttpResult.Body body = http.sync("/users").get().getBody()
-                .cache();   // 启用 cache
-        // 使用 cache 后，可以多次使用 toXXX() 方法
-        Assert.assertEquals(content, body.toString());
-        Assert.assertEquals(content, body.toString());
-    }
 
 }
 
