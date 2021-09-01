@@ -43,7 +43,7 @@ public class RealProcess implements Process {
 		doneBytes++;
 	}
 	
-	public boolean notDoneOrReached(long bytes) {
+	public boolean isUndoneAndUnreached(long bytes) {
 		return doneBytes < bytes && doneBytes < totalBytes;
 	}
 
