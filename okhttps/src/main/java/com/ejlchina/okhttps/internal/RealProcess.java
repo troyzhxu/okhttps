@@ -14,7 +14,11 @@ public class RealProcess implements Process {
 		this.totalBytes = totalBytes;
 		this.doneBytes = doneBytes;
 	}
-	
+
+	public Process clone() {
+		return new RealProcess(totalBytes, doneBytes);
+	}
+
 	@Override
 	public double getRate() {
 		return (double) doneBytes / totalBytes;
