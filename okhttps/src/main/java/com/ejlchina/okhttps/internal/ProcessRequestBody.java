@@ -38,15 +38,24 @@ public class ProcessRequestBody extends RequestBody {
 
 		@Override
 		public void write(Buffer source, long byteCount) throws IOException {
-			//这个方法会循环调用，byteCount 是每次调用上传的字节数。
-			try {
-				super.write(source, byteCount);
-			} catch (IOException e) {
-				throw e;
-			} catch (Exception e) {
-				throw new IOException("请求体写出异常", e);
+			// byteCount 可能很大，也可能很小
+			long written = 0;
+			while (written < byteCount) {
+				long count = Math.min(stepBytes, byteCount - written);
+				try {
+					super.write(source, count);
+				} catch (IOException e) {
+					throw e;
+				} catch (Exception e) {
+					throw new IOException("请求体写出异常", e);
+				}
+				updateProcess(count);
+				written += count;
 			}
-			process.addDoneBytes(byteCount);
+		}
+
+		private void updateProcess(long count) {
+			process.addDoneBytes(count);
 			if (process.isUndoneAndUnreached(step * stepBytes)) {
 				return;
 			}
@@ -57,6 +66,7 @@ public class ProcessRequestBody extends RequestBody {
 				doneCalled = true;
 			}
 			step = (process.getDoneBytes() - 1) / stepBytes + 1;
+			// 因为 process 一直被更新，所有此处应克隆一个新的对象用于回调
 			Process p = process.clone();
 			callbackExecutor.execute(() -> onProcess.on(p));
 		}
