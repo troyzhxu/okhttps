@@ -43,7 +43,8 @@ public class ProcessInputStream extends InputStream {
 			doneCalled = true;
 		}
 		step++;
-		callbackExecutor.execute(() -> onProcess.on(process));
+		Process p = process.clone();
+		callbackExecutor.execute(() -> onProcess.on(p));
 		return data;
 	}
 

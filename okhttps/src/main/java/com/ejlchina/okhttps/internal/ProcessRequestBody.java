@@ -57,7 +57,8 @@ public class ProcessRequestBody extends RequestBody {
 				doneCalled = true;
 			}
 			step = (process.getDoneBytes() - 1) / stepBytes + 1;
-			callbackExecutor.execute(() -> onProcess.on(process));
+			Process p = process.clone();
+			callbackExecutor.execute(() -> onProcess.on(p));
 		}
 
 	}
@@ -84,7 +85,9 @@ public class ProcessRequestBody extends RequestBody {
 
 	@Override
 	public void writeTo(@SuppressWarnings("NullableProblems") BufferedSink sink) throws IOException {
-		requestBody.writeTo(Okio.buffer(new ProcessableSink(sink)));
+		BufferedSink buffer = Okio.buffer(new ProcessableSink(sink));
+		requestBody.writeTo(buffer);
+		buffer.flush();
 	}
 
 }
