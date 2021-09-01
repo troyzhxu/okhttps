@@ -572,6 +572,8 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
                 reqBody = new ProcessRequestBody(reqBody, onProcess,
                         httpClient.executor().getExecutor(processOnIO),
                         contentLength, stepBytes);
+            } else {
+                reqBody = new FixedRequestBody(reqBody);
             }
             builder.method(method, reqBody);
         } else {

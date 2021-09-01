@@ -1,18 +1,15 @@
 package com.ejlchina.okhttps.internal;
 
-import java.io.IOException;
-import java.util.concurrent.Executor;
-
 import com.ejlchina.okhttps.OnCallback;
 import com.ejlchina.okhttps.Process;
-
-import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okio.*;
 
-public class ProcessRequestBody extends RequestBody {
+import java.io.IOException;
+import java.util.concurrent.Executor;
 
-	private final RequestBody requestBody;
+public class ProcessRequestBody extends FixedRequestBody {
+
 	private final OnCallback<Process> onProcess;
 	private final Executor callbackExecutor;
 	private final RealProcess process;
@@ -20,7 +17,7 @@ public class ProcessRequestBody extends RequestBody {
 	
 	public ProcessRequestBody(RequestBody requestBody, OnCallback<Process> onProcess, Executor callbackExecutor,
 			long contentLength, long stepBytes) {
-		this.requestBody = requestBody;
+		super(requestBody);
 		this.onProcess = onProcess;
 		this.callbackExecutor = callbackExecutor;
 		this.stepBytes = stepBytes;
@@ -42,13 +39,7 @@ public class ProcessRequestBody extends RequestBody {
 			long written = 0;
 			while (written < byteCount) {
 				long count = Math.min(stepBytes, byteCount - written);
-				try {
-					super.write(source, count);
-				} catch (IOException e) {
-					throw e;
-				} catch (Exception e) {
-					throw new IOException("请求体写出异常", e);
-				}
+				super.write(source, count);
 				updateProcess(count);
 				written += count;
 			}
@@ -74,29 +65,9 @@ public class ProcessRequestBody extends RequestBody {
 	}
 
 	@Override
-	public long contentLength() {
-		return process.getTotalBytes();
-	}
-
-	@Override
-	public boolean isDuplex() {
-		return requestBody.isDuplex();
-	}
-
-	@Override
-	public boolean isOneShot() {
-		return requestBody.isOneShot();
-	}
-
-	@Override
-	public MediaType contentType() {
-		return requestBody.contentType();
-	}
-
-	@Override
-	public void writeTo(@SuppressWarnings("NullableProblems") BufferedSink sink) throws IOException {
+	public void writeTo(BufferedSink sink) throws IOException {
 		BufferedSink buffer = Okio.buffer(new ProcessableSink(sink));
-		requestBody.writeTo(buffer);
+		super.writeTo(buffer);
 		buffer.flush();
 	}
 
