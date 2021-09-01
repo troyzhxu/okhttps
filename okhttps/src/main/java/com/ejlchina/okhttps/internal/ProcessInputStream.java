@@ -29,23 +29,49 @@ public class ProcessInputStream extends InputStream {
 
 	@Override
 	public int read() throws IOException {
-		int data = input.read();
-		if (data > -1) {
-			process.increaseDoneBytes();
+		byte[] buf = new byte[1];
+		int count = read(buf, 0, 1);
+		if (count > 0) {
+			return buf[0];
 		}
+		return -1;
+	}
+
+	@Override
+	public int read(@SuppressWarnings("NullableProblems") byte[] buf, int off, int len) throws IOException {
+		int total = 0;
+		while (total < len) {
+			// 一次读取长度
+			int length = Math.min(len - total, (int) stepBytes);
+			int read = input.read(buf, off + total, length);
+			if (read == -1) {
+				// 已经读完
+				if (total == 0) {
+					return read;
+				}
+				break;
+			}
+			updateProcess(read);
+			total += read;
+		}
+		return total;
+	}
+
+	private void updateProcess(long count) {
+		process.addDoneBytes(count);
 		if (process.isUndoneAndUnreached(step * stepBytes)) {
-			return data;
+			return;
 		}
 		if (process.isDone()) {
 			if (doneCalled) {
-				return data;
+				return;
 			}
 			doneCalled = true;
 		}
-		step++;
+		step = (process.getDoneBytes() - 1) / stepBytes + 1;
+		// 因为 process 一直被更新，所有此处应克隆一个新的对象用于回调
 		Process p = process.clone();
 		callbackExecutor.execute(() -> onProcess.on(p));
-		return data;
 	}
 
 }
