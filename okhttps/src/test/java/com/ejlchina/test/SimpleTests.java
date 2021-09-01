@@ -36,12 +36,6 @@ public class SimpleTests extends BaseTest {
         Assert.assertEquals("123456", userAgent);
     }
 
-
-
-    /**
-     * 同步请求示例
-     * 同步请求直接得到结果，无需设置回调
-     */
 //    @Test
 //    public void testSyncToList() {
 //    	User u1 = new User(1, "Jack");

@@ -5,7 +5,6 @@ import okhttp3.mockwebserver.MockResponse;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
