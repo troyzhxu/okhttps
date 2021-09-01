@@ -229,30 +229,26 @@ public class DownloadTests extends BaseTest {
 
 
     @Test
-    public void syncHttpExample() {
-
-        HTTP http = HTTP.builder().build();
+    public void syncHttpExample() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
         // 同步请求
-        HttpResult result = http.sync("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1584365400942&di=d9e7890f13b7bc4b76080fdd490ed5d5&imgtype=0&src=http%3A%2F%2Ft8.baidu.com%2Fit%2Fu%3D1484500186%2C1503043093%26fm%3D79%26app%3D86%26f%3DJPEG%3Fw%3D1280%26h%3D853")
-                .get();
+        Download download = http.sync("https://gimg2.baidu.com/image_search/src=http%3A%2F%2F01.minipic.eastday.com%2F20170224%2F20170224133956_9b9688ef44943a76c1abcfbc19d3182d_8.jpeg&refer=http%3A%2F%2F01.minipic.eastday.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633097548&t=9c0530c59afe492fd238e70020ca6786")
+                .get()
+                .getBody()
+                .stepRate(0.2)
+                .setOnProcess(p -> {
+                    println("下载：" + p.getDoneBytes() + "/" + p.getTotalBytes() + "\t" + p.getRate());
+                })
+                .toFile("G:\\Download\\2.jpg");
 
-        result.getBody().toFile("E:/3.jpg");
-//		// 得到状态码
-//		int status = result.getStatus();
-//
-//		// 得到返回头
-//		Headers headers = result.getHeaders();
-//
-//		User user = result.getBody().toBean(User.class);
-//		// 得到目标数据
-//
-//
-//		println("status = " + status);
-//		println("headers = " + headers);
-//		println("user = " + user);
-
-        println("status = " + result.getStatus());
-
+        long t0 = System.nanoTime();
+        download.setOnSuccess(f -> {
+                    long t = System.nanoTime() - t0;
+                    println("下载完成，耗时：" + (t / 1000) + "us");
+                    latch.countDown();
+                })
+                .start();
+        latch.await();
     }
 
 }
