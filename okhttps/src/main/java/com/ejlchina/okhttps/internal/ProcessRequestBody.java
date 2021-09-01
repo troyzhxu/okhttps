@@ -39,7 +39,13 @@ public class ProcessRequestBody extends RequestBody {
 		@Override
 		public void write(Buffer source, long byteCount) throws IOException {
 			//这个方法会循环调用，byteCount 是每次调用上传的字节数。
-			super.write(source, byteCount);
+			try {
+				super.write(source, byteCount);
+			} catch (IOException e) {
+				throw e;
+			} catch (Exception e) {
+				throw new IOException("请求体写出异常", e);
+			}
 			process.addDoneBytes(byteCount);
 			if (process.isUndoneAndUnreached(step * stepBytes)) {
 				return;
@@ -78,13 +84,7 @@ public class ProcessRequestBody extends RequestBody {
 
 	@Override
 	public void writeTo(@SuppressWarnings("NullableProblems") BufferedSink sink) throws IOException {
-		try {
-			requestBody.writeTo(Okio.buffer(new ProcessableSink(sink)));
-		} catch (IOException e) {
-			throw e;
-		} catch (Exception e) {
-			throw new IOException(e);
-		}
+		requestBody.writeTo(Okio.buffer(new ProcessableSink(sink)));
 	}
 
 }
