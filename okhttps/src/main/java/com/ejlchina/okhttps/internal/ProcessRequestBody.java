@@ -58,7 +58,7 @@ public class ProcessRequestBody extends FixedRequestBody {
 			}
 			step = (process.getDoneBytes() - 1) / stepBytes + 1;
 			// 因为 process 一直被更新，所有此处应克隆一个新的对象用于回调
-			Process p = process.clone();
+			Process p = process.newProcess();
 			callbackExecutor.execute(() -> onProcess.on(p));
 		}
 
