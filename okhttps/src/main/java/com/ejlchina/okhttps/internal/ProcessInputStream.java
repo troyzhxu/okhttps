@@ -74,4 +74,14 @@ public class ProcessInputStream extends InputStream {
 		callbackExecutor.execute(() -> onProcess.on(p));
 	}
 
+	@Override
+	public int available() throws IOException {
+		return input.available();
+	}
+
+	@Override
+	public void close() throws IOException {
+		input.close();
+	}
+
 }
