@@ -462,7 +462,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     /**
-     * 添加文件参数
+     * 添加文件参数（以 multipart/form-data 形式上传）
      * @param name 参数名
      * @param filePath 文件路径
      * @return HttpTask 实例
@@ -472,25 +472,50 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     /**
-     * 添加文件参数
+     * 添加文件参数（以 multipart/form-data 形式上传）
+     * @param name 参数名
+     * @param type 文件类型/扩展名: 如 txt、png、jpg、doc 等，参考 @{ HTTP$Builder#mediaTypes }
+     * @param filePath 文件路径
+     * @return HttpTask 实例
+     */
+    public C addFilePara(String name, String type, String filePath) {
+        return addFilePara(name, type, new File(filePath));
+    }
+
+    /**
+     * 添加文件参数（以 multipart/form-data 形式上传）
      * @param name 参数名
      * @param file 文件
      * @return HttpTask 实例
      */
     public C addFilePara(String name, File file) {
-        if (name != null && file != null && file.exists()) {
+        if (file != null && file.exists()) {
             String fileName = file.getName();
             String type = fileName.substring(fileName.lastIndexOf(DOT) + 1);
-            if (files == null) {
-                files = new HashMap<>();
-            }
-            files.put(name, new FilePara(type, fileName, file));
+            return addFilePara(name, type, file);
         }
         return (C) this;
     }
 
     /**
-     * 添加文件参数
+     * 添加文件参数（以 multipart/form-data 形式上传）
+     * @param name 参数名
+     * @param type 文件类型/扩展名: 如 txt、png、jpg、doc 等
+     * @param file 文件
+     * @return HttpTask 实例
+     */
+    public C addFilePara(String name, String type, File file) {
+        if (name != null && file != null && file.exists()) {
+            if (files == null) {
+                files = new HashMap<>();
+            }
+            files.put(name, new FilePara(type, file.getName(), file));
+        }
+        return (C) this;
+    }
+
+    /**
+     * 添加文件参数（以 multipart/form-data 形式上传）
      * @param name 参数名
      * @param type 文件类型/扩展名: 如 txt、png、jpg、doc 等
      * @param content 文件内容
@@ -501,7 +526,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     /**
-     * 添加文件参数
+     * 添加文件参数（以 multipart/form-data 形式上传）
      * @param name 参数名
      * @param type 文件类型: 如 png、jpg、jpeg 等
      * @param fileName 文件名
