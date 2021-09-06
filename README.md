@@ -11,9 +11,13 @@
 
 ## 文档
 
-官网 https://okhttps.ejlchina.com/
+网址：https://okhttps.ejlchina.com/
 
-若以上地址不可用，请访问：http://okhttps.ejlchina-app.com/
+若以上地址不可用，请使用以下备用地址：
+
+* http://okhttps.ejlchina-app.com/
+* http://okhttps.zhoxu.cn/
+* http://okhttps.zhxu.cc/
 
 ## 为什么用
 
