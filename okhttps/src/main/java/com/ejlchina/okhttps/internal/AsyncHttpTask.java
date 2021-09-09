@@ -323,7 +323,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 
     class OkHttpCall implements HttpCall {
 
-		Call call;
+		final Call call;
 		HttpResult result;
 		CountDownLatch latch = new CountDownLatch(1);
 
@@ -347,7 +347,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 
 		@Override
 		public boolean isCanceled() {
-			return call.isCanceled();
+			return call.isCanceled() || (result != null && result.getState() == State.CANCELED);
 		}
 
 		@Override
@@ -377,27 +377,32 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
     private HttpCall executeCall(Call call) {
         OkHttpCall httpCall = new OkHttpCall(call);
         call.enqueue(new Callback() {
+
             @Override
+			@SuppressWarnings("NullableProblems")
             public void onFailure(Call call, IOException error) {
 				State state = toState(error);
 				HttpResult result = new RealHttpResult(AsyncHttpTask.this, state, error);
 				onCallback(httpCall, result, () -> {
 					TaskExecutor executor = httpClient.executor();
 					executor.executeOnComplete(AsyncHttpTask.this, onComplete, state, completeOnIO);
-					if (!executor.executeOnException(AsyncHttpTask.this, onException, error, exceptionOnIO)
+					if (!httpCall.isCanceled() && !executor.executeOnException(AsyncHttpTask.this, httpCall, onException, error, exceptionOnIO)
 							&& !nothrow) {
 						throw new HttpException(state, "异步请求异常：" + getUrl(), error);
 					}
 				});
             }
 
-            @Override
+			@Override
+			@SuppressWarnings("NullableProblems")
             public void onResponse(Call call, Response response) {
             	TaskExecutor executor = httpClient.executor();
 				HttpResult result = new RealHttpResult(AsyncHttpTask.this, response, executor);
 				onCallback(httpCall, result, () -> {
 					executor.executeOnComplete(AsyncHttpTask.this, onComplete, State.RESPONSED, completeOnIO);
-					executor.executeOnResponse(AsyncHttpTask.this, complexOnResponse(), result, true);
+					if (!httpCall.isCanceled()) {
+						executor.executeOnResponse(AsyncHttpTask.this, httpCall, complexOnResponse(httpCall), result, true);
+					}
 				});
             }
 
@@ -405,7 +410,27 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 		return httpCall;
     }
 
-    private synchronized OnCallback<HttpResult> complexOnResponse() {
+	@SuppressWarnings("all")
+	private void onCallback(OkHttpCall httpCall, HttpResult result, Runnable runnable) {
+		synchronized (httpCall) {
+			removeTagTask();
+			if (httpCall.isCanceled() || result.getState() == State.CANCELED) {
+				httpCall.setResult(new RealHttpResult(AsyncHttpTask.this, State.CANCELED));
+			} else {
+				httpCall.setResult(result);
+			}
+			runnable.run();
+		}
+	}
+
+	interface ResponseCallback {
+		void on(Runnable runnable, boolean onIo);
+	}
+
+    private synchronized OnCallback<HttpResult> complexOnResponse(HttpCall call) {
+		ResponseCallback callback = (runnable, onIo) -> execute(() -> {
+				if (!call.isCanceled()) runnable.run();
+			}, onIo);
 		return res -> {
 			int count = responseCallbackCount();
 			HttpResult.Body body = res.getBody();
@@ -414,26 +439,26 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 			}
 			OnCallback<HttpResult> listener1 = onResponse;
 			if (listener1 != null) {
-				execute(() -> listener1.on(res), responseOnIO);
+				callback.on(() -> listener1.on(res), responseOnIO);
 			}
 			OnCallback<HttpResult.Body> listener2 = onResBody;
 			if (listener2 != null) {
-				execute(() -> listener2.on(body), resBodyOnIO);
+				callback.on(() -> listener2.on(body), resBodyOnIO);
 			}
 			OnCallback<Mapper> listener3 = onResMapper;
 			if (listener3 != null) {
 				Mapper mapper = body.toMapper();
-				execute(() -> listener3.on(mapper), resMapperOnIO);
+				callback.on(() -> listener3.on(mapper), resMapperOnIO);
 			}
 			OnCallback<Array> listener4 = onResArray;
 			if (listener4 != null) {
 				Array array = body.toArray();
-				execute(() -> listener4.on(array), resArrayOnIO);
+				callback.on(() -> listener4.on(array), resArrayOnIO);
 			}
 			OnCallback<?> listener5 = onResBean;
 			if (listener5 != null) {
 				Object bean = body.toBean(beanType);
-				execute(() -> {
+				callback.on(() -> {
 					try {
 						callbackMethod(listener5.getClass(), bean.getClass()).invoke(listener5, bean);
 					} catch (IllegalAccessException | InvocationTargetException e) {
@@ -444,7 +469,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 			OnCallback<?> listener6 = onResList;
 			if (listener6 != null) {
 				List<?> list = body.toList(listType);
-				execute(() -> {
+				callback.on(() -> {
 					try {
 						callbackMethod(listener6.getClass(), list.getClass()).invoke(listener6, list);
 					} catch (IllegalAccessException | InvocationTargetException e) {
@@ -455,7 +480,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 			OnCallback<String> listener7 = onResString;
 			if (listener7 != null) {
 				String string = body.toString();
-				execute(() -> listener7.on(string), resStringOnIO);
+				callback.on(() -> listener7.on(string), resStringOnIO);
 			}
 		};
 	}
@@ -492,19 +517,6 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 		if (onResString != null)
 			count++;
 		return count;
-	}
-
-	@SuppressWarnings("all")
-    private void onCallback(OkHttpCall httpCall, HttpResult result, Runnable runnable) {
-		synchronized (httpCall) {
-			removeTagTask();
-			if (httpCall.isCanceled() || result.getState() == State.CANCELED) {
-				httpCall.setResult(new RealHttpResult(AsyncHttpTask.this, State.CANCELED));
-				return;
-			}
-			httpCall.setResult(result);
-			runnable.run();
-		}
 	}
 	
     private void initBeanType(Type type) {
