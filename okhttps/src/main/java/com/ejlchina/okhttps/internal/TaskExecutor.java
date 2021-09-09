@@ -58,32 +58,41 @@ public final class TaskExecutor {
         executor.execute(command);
     }
     
-    public void executeOnResponse(HttpTask<?> task, HttpCall call, OnCallback<HttpResult> onResponse, HttpResult result, boolean onIo) {
+    public void executeOnResponse(HttpTask<?> task, AsyncHttpTask.OkHttpCall call, OnCallback<HttpResult> onResponse, HttpResult result, boolean onIo) {
         Runnable runnable = () -> {
             if (!call.isCanceled()) onResponse.on(result);
         };
         if (responseListener != null) {
             if (responseListener.listen(task, result) && onResponse != null) {
                 execute(runnable, onIo);
+            } else {
+                call.finish();
             }
         } else if (onResponse != null) {
             execute(runnable, onIo);
         } else {
             result.close();
+            call.finish();
         }
     }
 
-    public boolean executeOnException(HttpTask<?> task, HttpCall call, OnCallback<IOException> onException, IOException error, boolean onIo) {
+    public boolean executeOnException(HttpTask<?> task, AsyncHttpTask.OkHttpCall call, OnCallback<IOException> onException, IOException error, boolean onIo) {
         Runnable runnable = () -> {
-            if (!call.isCanceled()) onException.on(error);
+            if (!call.isCanceled()) {
+                onException.on(error);
+            }
+            call.finish();
         };
         if (exceptionListener != null) {
             if (exceptionListener.listen(task, error) && onException != null) {
                 execute(runnable, onIo);
+            } else {
+                call.finish();
             }
         } else if (onException != null) {
             execute(runnable, onIo);
         } else {
+            call.finish();
             return false;
         }
         return true;
