@@ -16,10 +16,6 @@ public class CancelTests extends BaseTest {
 
 	@Test
     public void testCancelByTag() {
-        HTTP http = HTTP.builder()
-                .baseUrl("http://tst-api-mini.cdyun.vip")
-                .build();
-
         new Thread(() -> {
         	sleep(50);
 //        	http.cancelAll();
@@ -51,53 +47,37 @@ public class CancelTests extends BaseTest {
 
     @Test
     public void testCancel() {
-
-        HTTP http = HTTP.builder()
-                .baseUrl("http://localhost:8080")
-                .build();
-
         http.async("/user/show/1")
-                .setOnResponse((HttpResult result) -> {
-                    println(result);
-                })
+                .setOnResponse(BaseTest::println)
                 .setOnException((IOException e) -> {
                     println("异常捕获：" + e.getMessage());
                 })
-                .setOnComplete((HttpResult.State state) -> {
-                    println(state);
-                })
+                .setOnComplete(BaseTest::println)
                 .tag("A")
                 .get();
 
         println(((HttpClient) http).getTagTaskCount());
 
         http.async("/user/show/2")
-                .setOnResponse((HttpResult result) -> {
-                    println(result);
-                })
+                .setOnResponse(BaseTest::println)
                 .tag("A.B")
                 .get();
 
         println(((HttpClient) http).getTagTaskCount());
 
         http.async("/user/show/3")
-                .setOnResponse((HttpResult result) -> {
-                    println(result);
-                })
+                .setOnResponse(BaseTest::println)
                 .tag("B.C")
                 .get();
 
         println(((HttpClient) http).getTagTaskCount());
 
         http.async("/user/show/4")
-                .setOnResponse((HttpResult result) -> {
-                    println(result);
-                })
+                .setOnResponse(BaseTest::println)
                 .tag("C")
                 .get();
 
         println(((HttpClient) http).getTagTaskCount());
-
 
         println("标签取消：" + http.cancel("B"));
 
@@ -114,20 +94,6 @@ public class CancelTests extends BaseTest {
         sleep(5000);
 
         println(((HttpClient) http).getTagTaskCount());
-
-//		println("isDone = " + call.isDone());
-//		println("isCanceled = " + call.isCanceled());
-//
-//		println("取消结果 = " + call.cancel());
-//
-//		println("isDone = " + call.isDone());
-//		println("isCanceled = " + call.isCanceled());
-//
-//		sleep(100);
-//		println("++++++++");
-//
-//		println("isDone = " + call.isDone());
-//		println("isCanceled = " + call.isCanceled());
     }
 
 }

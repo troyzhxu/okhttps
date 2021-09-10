@@ -1,37 +1,46 @@
 package com.ejlchina.test;
 
-import com.ejlchina.okhttps.HTTP;
-import com.ejlchina.okhttps.HttpResult;
-import com.ejlchina.okhttps.OkHttps;
 import com.ejlchina.okhttps.Process;
+import okhttp3.mockwebserver.MockResponse;
+import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 
 public class UploadTests extends BaseTest {
 
+    private byte[] randomFileContent(int length) {
+        Random random = new Random();
+        byte[] content = new byte[length];
+        for (int i = 0; i < length; i++) {
+            content[i] = (byte) (random.nextInt() % 256);
+        }
+        return content;
+    }
+
     @Test
-    public void testUpload() {
-        String data = "0123456789abcdefghijklmnopqrstuvwsyz0123456789abcdefghijklmnopqrstuvwsyz0123456789abcdefghijklmnopqrstuvwsyz0123456789abcdefghijklmnopqrstuvwsyz0123456789abcdefghijklmnopqrstuvwsyz";
-
-        HTTP http = HTTP.builder().build();
-
+    public void testUpload() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        // 512 KB
+        byte[] content = randomFileContent(5 * 1024);
+        server.enqueue(new MockResponse().setResponseCode(200).setBody("OK"));
         long t0 = System.currentTimeMillis();
-
-        String res = http.sync("http://localhost:8080/test/index")
-                .addBodyPara("data", data)
-                .addFilePara("file", "D:\\WorkSpace\\download\\CocosDashboard-v1.0.1-win32-031816.exe")
-                .stepRate(0.01)
-                .setOnProcess((Process process) -> {
-                    println(t0, "上传：" + process.getDoneBytes() + "/" + process.getTotalBytes() + "\t" + process.getRate());
+        http.async("/upload")
+                .addBodyPara("path", "123456")
+                .addFilePara("file", "txt", "222", content)
+                .stepRate(0.1)
+                .setOnProcess((Process process) -> println(t0, "上传：" + process.getDoneBytes() + "/" + process.getTotalBytes() + "\t" + process.getRate()))
+                .setOnResponse(res -> {
+                    String result = res.getBody().toString();
+                    println(result);
+                    Assert.assertEquals(result, "OK");
                 })
-                .post()
-                .getBody()
-                .stepBytes(5)
-                .setOnProcess((Process process) -> {
-                    println(t0, "下载：" + process.getDoneBytes() + "/" + process.getTotalBytes() + "\t" + process.getRate());
-                })
-                .toString();
-
-        println("响应：" + res);
+                .setOnComplete(state -> latch.countDown())
+                .post();
+        byte[] uploadData = server.takeRequest().getBody().buffer().readByteArray();
+        println("数据长度：" + uploadData.length);
+        latch.await();
     }
 
 }

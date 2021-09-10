@@ -1,20 +1,11 @@
 package com.ejlchina.test;
 
-import com.ejlchina.okhttps.HTTP;
 import com.ejlchina.okhttps.OkHttps;
 import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class SimpleTests extends BaseTest {
-
-
-	MockWebServer server = new MockWebServer();
-	
-    HTTP http = HTTP.builder()
-            .baseUrl("http://" + server.getHostName() + ":" + server.getPort())
-            .build();
 
     @Test
     public void testSyncPost() throws InterruptedException {
@@ -24,27 +15,27 @@ public class SimpleTests extends BaseTest {
         Assert.assertEquals(server.takeRequest().getHeader("Content-Type"), "application/x-www-form-urlencoded; charset=UTF-8");
     }
 
-
     /**
      * 同步请求示例
      * 同步请求直接得到结果，无需设置回调
      */
     @Test
-    public void testSyncToBean() {
+    public void testSyncToString() {
     	server.enqueue(new MockResponse().setBody("Hello World!"));
-
         String hello = http.sync("/users")  // http://localhost:8080/users
                 .get()                              // GET请求
                 .getBody()                          // 获取响应报文体
                 .toString();                // 得到目标数据
-
         Assert.assertEquals(hello, "Hello World!");
     }
 
-    /**
-     * 同步请求示例
-     * 同步请求直接得到结果，无需设置回调
-     */
+    @Test
+    public void testUserAgent() throws InterruptedException {
+        http.async("/user").addHeader("User-Agent", "123456").get();
+        String userAgent = server.takeRequest().getHeader("User-Agent");
+        Assert.assertEquals("123456", userAgent);
+    }
+
 //    @Test
 //    public void testSyncToList() {
 //    	User u1 = new User(1, "Jack");
@@ -75,40 +66,6 @@ public class SimpleTests extends BaseTest {
 //                })
 //                .get();
 //        sleep(5000);
-//    }
-//
-//
-//    /**
-//     * 启用 cache 示例
-//     */
-//    @Test
-//    public void testCache() {
-//        Body body = http.sync("/users").get().getBody()
-//                .cache();   // 启用 cache
-//        // 使用 cache 后，可以多次使用 toXXX() 方法
-//        System.out.println(body.toString());
-//        System.out.println(body.toJsonArray());
-//        System.out.println(body.toList(User.class));
-//    }
-//
-//
-//    /**
-//     * 获取文件大小示例
-//     */
-//    @Test
-//    public void testContentLength() {
-//        long t = System.currentTimeMillis();
-//
-//        long size = http.sync("https://download.cocos.com/CocosDashboard/v1.0.1/CocosDashboard-v1.0.1-win32-031816.exe")
-//                .get().getBody()
-//                .close()             // 只是想获得文件大小，不消费报文体，所以直接关闭
-//                .getContentLength(); // 获得待下载文件的大小
-//
-//        t = System.currentTimeMillis() - t;
-//
-//        // 由于未消费报文体，所以本次请求不会消耗下载报文体的时间和网络流量）
-//        System.out.println("耗时：" + t + " 毫秒");
-//        System.out.println("size = " + (size / 1024) + " KB");
 //    }
 
 }

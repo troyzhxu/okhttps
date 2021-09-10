@@ -303,7 +303,7 @@ public class ResultBody extends AbstractBody implements Body {
 		if (dirPath.endsWith("\\") || dirPath.endsWith("/")) {
 			return dirPath + fileName;
 		}
-		return dirPath + "\\" + fileName;
+		return dirPath + File.separator + fileName;
 	}
 
 	private String indexFileName(String fileName, int index) {

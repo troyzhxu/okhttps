@@ -8,13 +8,16 @@ public class RealProcess implements Process {
 	private final long totalBytes;
 	// 已经完成字节数
 	private long doneBytes;
-	
-	
+
 	public RealProcess(long totalBytes, long doneBytes) {
 		this.totalBytes = totalBytes;
 		this.doneBytes = doneBytes;
 	}
-	
+
+	public Process newProcess() {
+		return new RealProcess(totalBytes, doneBytes);
+	}
+
 	@Override
 	public double getRate() {
 		return (double) doneBytes / totalBytes;
@@ -38,12 +41,8 @@ public class RealProcess implements Process {
 	public void addDoneBytes(long delt) {
 		doneBytes += delt;
 	}
-	
-	public void increaseDoneBytes() {
-		doneBytes++;
-	}
-	
-	public boolean notDoneOrReached(long bytes) {
+
+	public boolean isUndoneAndUnreached(long bytes) {
 		return doneBytes < bytes && doneBytes < totalBytes;
 	}
 

@@ -1,72 +1,24 @@
 package com.ejlchina.test;
 
-import com.ejlchina.okhttps.HTTP;
 import com.ejlchina.okhttps.HttpResult;
-import com.ejlchina.okhttps.OnCallback;
-import com.ejlchina.okhttps.HttpResult.State;
-
+import okhttp3.mockwebserver.MockResponse;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class CacheTests extends BaseTest {
 
+    /**
+     * 启用 cache 示例
+     */
     @Test
     public void testCache() {
-        HTTP http = HTTP.builder().build();
-
-        
-        
-//        
-//        
-//        HttpResult.Body body = http.sync("http://xxx.cdyun.vip/comm/provinces")
-//        		
-//                .get()
-//                .getBody()
-//                .cache();
-//
-//        println("result = " + body.toString());
-//        println("result = " + body.toArray());
-//
-//        body.close();
-//
-//        println("result = " + body.toString());
-//        println("result = " + body.toArray());
-//        
-//        
-//        
-//        
-//        http.async("")
-//        	.addBodyPara("", "")
-//        	
-//        	
-//        	.setOnResponse((HttpResult res) -> {
-//        		
-//        		Mapper mapper = res.getBody().toMapper(); 
-//        		
-//        	})
-//        	.setOnComplete(state -> {
-//        		
-//        		testCache();
-//        	})
-//        	.setOnProcess(process -> {
-//        		
-//        		double rate = process.getRate();
-//        		
-//        	})
-//        	.post()
-//        	.cancel()
-//        	;
-
-        
-    }
-    
-    class OnComplete implements OnCallback<HttpResult.State> {
-    	
-    	@Override
-		public void on(State date) {
-			
-    		 testCache();
-		}
-    	
+        String content = "test cache method";
+        server.enqueue(new MockResponse().setBody(content));
+        HttpResult.Body body = http.sync("/users").get().getBody()
+                .cache();   // 启用 cache
+        // 使用 cache 后，可以多次使用 toXXX() 方法
+        Assert.assertEquals(content, body.toString());
+        Assert.assertEquals(content, body.toString());
     }
 
 }
