@@ -115,17 +115,21 @@ public interface HTTP {
 
         private String baseUrl;
 
-        private Map<String, String> mediaTypes;
-
-        private List<String> contentTypes;
-
         private OkConfig config;
+
+        private final Map<String, String> mediaTypes;
+
+        private final List<String> contentTypes;
+
+        private final List<MsgConvertor> msgConvertors;
+
+        private final List<Preprocessor> preprocessors;
+
+        private int preprocTimeoutTimes = 10;
 
         private Executor mainExecutor;
 
         private Scheduler taskScheduler;
-
-        private List<Preprocessor> preprocessors;
 
         private DownListener downloadListener;
 
@@ -134,10 +138,6 @@ public interface HTTP {
         private TaskListener<IOException> exceptionListener;
 
         private TaskListener<HttpResult.State> completeListener;
-
-        private List<MsgConvertor> msgConvertors;
-
-        private int preprocTimeoutTimes = 10;
 
         private Charset charset = StandardCharsets.UTF_8;
 
