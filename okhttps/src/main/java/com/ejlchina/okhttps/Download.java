@@ -18,7 +18,7 @@ public class Download {
 
     private OnCallback<File> onSuccess;
     private OnCallback<Failure> onFailure;
-    private OnCallback<Failure> onComplete;
+    private OnCallback<Status> onComplete;
     private long doneBytes;
     private int buffSize = 0;
     private long seekBytes = 0;
@@ -29,6 +29,7 @@ public class Download {
     protected boolean nextOnIO = false;
     private boolean sOnIO;
     private boolean fOnIO;
+    private boolean cOnIO;
     
     public Download(File file, InputStream input, TaskExecutor taskExecutor, long skipBytes) {
         this.file = file;
@@ -93,7 +94,7 @@ public class Download {
     }
     
     /**
-     * 设置下载失败回调
+     * 设置下载失败回调（取消不执行）
      * @param onFailure 失败回调函数
      * @return Download
      */
@@ -105,13 +106,13 @@ public class Download {
     }
 
     /**
-     * 设置下载结束回调
-     * @param onFailure 失败回调函数
+     * 设置下载结束回调（成功、失败、取消都执行）
+     * @param onComplete 结束回调函数
      * @return Download
      */
-    public Download setOnComplete(OnCallback<Failure> onFailure) {
-        this.onFailure = onFailure;
-        fOnIO = nextOnIO;
+    public Download setOnComplete(OnCallback<Status> onComplete) {
+        this.onComplete = onComplete;
+        cOnIO = nextOnIO;
         nextOnIO = false;
         return this;
     }
@@ -276,7 +277,8 @@ public class Download {
         } catch (FileNotFoundException e) {
             status = Status.ERROR;
             closeQuietly(input);
-            fireDownloadFailure(e);
+            fireOnComplete();
+            fireOnFailure(e);
         }
         return null;
     }
@@ -315,7 +317,7 @@ public class Download {
                 }
             }
             if (status == Status.ERROR) {
-                fireDownloadFailure(e);
+                fireOnFailure(e);
             }
         } finally {
             closeQuietly(raFile);
@@ -323,13 +325,29 @@ public class Download {
             if (status == Status.CANCELED && !file.delete()) {
                 Platform.logError("can not delete canceled file: " + file);
             }
+            fireOnComplete();
         }
-        if (status == Status.DONE && onSuccess != null) {
+        if (status == Status.DONE) {
+            fireOnSuccess();
+        }
+    }
+
+    private void fireOnComplete() {
+        OnCallback<Status> onComplete = this.onComplete;
+        if (onComplete != null) {
+            taskExecutor.execute(() -> onComplete.on(status), cOnIO);
+        }
+    }
+
+    private void fireOnSuccess() {
+        OnCallback<File> onSuccess = this.onSuccess;
+        if (onSuccess != null) {
             taskExecutor.execute(() -> onSuccess.on(file), sOnIO);
         }
     }
 
-    private void fireDownloadFailure(IOException e) {
+    private void fireOnFailure(IOException e) {
+        OnCallback<Failure> onFailure = this.onFailure;
         if (onFailure != null) {
             taskExecutor.execute(() -> onFailure.on(new Failure(e)), fOnIO);
         } else {
