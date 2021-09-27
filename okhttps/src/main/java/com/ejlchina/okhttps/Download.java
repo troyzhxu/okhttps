@@ -125,8 +125,10 @@ public class Download {
             buffSize = Process.DEFAULT_STEP_BYTES;
         }
         RandomAccessFile raFile = randomAccessFile();
-        status = Status.DOWNLOADING;
-        taskExecutor.execute(() -> doDownload(raFile), true);
+        if (raFile != null) {
+            status = Status.DOWNLOADING;
+            taskExecutor.execute(() -> doDownload(raFile), true);
+        }
         return ctrl;
     }
     
@@ -274,8 +276,9 @@ public class Download {
         } catch (FileNotFoundException e) {
             status = Status.ERROR;
             closeQuietly(input);
-            throw new HttpException("无法获取文件[" + file.getAbsolutePath() + "]的输入流", e);
+            fireDownloadFailure(e);
         }
+        return null;
     }
     
     private void doDownload(RandomAccessFile raFile) {
@@ -312,11 +315,7 @@ public class Download {
                 }
             }
             if (status == Status.ERROR) {
-                if (onFailure != null) {
-                    taskExecutor.execute(() -> onFailure.on(new Failure(e)), fOnIO);
-                } else {
-                    throw new HttpException("Download failed: ", e);
-                }
+                fireDownloadFailure(e);
             }
         } finally {
             closeQuietly(raFile);
@@ -327,6 +326,14 @@ public class Download {
         }
         if (status == Status.DONE && onSuccess != null) {
             taskExecutor.execute(() -> onSuccess.on(file), sOnIO);
+        }
+    }
+
+    private void fireDownloadFailure(IOException e) {
+        if (onFailure != null) {
+            taskExecutor.execute(() -> onFailure.on(new Failure(e)), fOnIO);
+        } else {
+            throw new HttpException("Download failed: ", e);
         }
     }
 
