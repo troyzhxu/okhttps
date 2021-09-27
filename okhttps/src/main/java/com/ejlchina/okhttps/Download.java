@@ -106,6 +106,7 @@ public class Download {
     }
 
     /**
+     * @since 3.2.0
      * 设置下载结束回调（成功、失败、取消都执行）
      * @param onComplete 结束回调函数
      * @return Download
@@ -143,6 +144,7 @@ public class Download {
 
     /**
      * 下载状态
+     * @since v3.2.0
      */
     public enum Status {
 
@@ -189,8 +191,7 @@ public class Download {
     public class Ctrl {
 
         /**
-         * @see Status
-         * @return 下载状态
+         * @return 下载状态（v3.2.0 之前方法 返回整型常量，v3.2.0 开始修改为枚举）
          */
         public Status status() {
             return status;
