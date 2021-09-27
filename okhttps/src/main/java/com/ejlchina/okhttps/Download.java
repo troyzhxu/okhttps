@@ -180,6 +180,9 @@ public class Download {
 
     }
 
+    /**
+     * 下载控制器
+     */
     public class Ctrl {
 
         /**
@@ -191,36 +194,45 @@ public class Download {
         }
         
         /**
-         * 暂停下载任务
+         * 暂停下载任务（只有处于下载中状态才能暂停成功）
+         * @return 是否暂停成功
          */
-        public void pause() {
+        public boolean pause() {
             synchronized (lock) {
                 if (status == Status.DOWNLOADING) {
                     status = Status.PAUSED;
+                    return true;
                 }
             }
+            return false;
         }
         
         /**
-         * 继续下载任务
+         * 继续下载任务（只有处于暂停状态才能恢复成功）
+         * @return 是否恢复成功
          */
-        public void resume() {
+        public boolean resume() {
             synchronized (lock) {
                 if (status == Status.PAUSED) {
                     status = Status.DOWNLOADING;
+                    return true;
                 }
             }
+            return false;
         }
         
         /**
-         * 取消下载任务
+         * 取消下载任务（只有处于暂停或下载中状态才能取消成功）
+         * @return 是否取消成功
          */
-        public void cancel() {
+        public boolean cancel() {
             synchronized (lock) {
                 if (status == Status.PAUSED || status == Status.DOWNLOADING) {
                     status = Status.CANCELED;
+                    return true;
                 }
             }
+            return false;
         }
         
     }
