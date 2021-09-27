@@ -18,11 +18,12 @@ public class Download {
 
     private OnCallback<File> onSuccess;
     private OnCallback<Failure> onFailure;
+    private OnCallback<Failure> onComplete;
     private long doneBytes;
     private int buffSize = 0;
     private long seekBytes = 0;
     private boolean appended;
-    private volatile int status;
+    private volatile Status status;
     private final Object lock = new Object();
     
     protected boolean nextOnIO = false;
@@ -102,7 +103,19 @@ public class Download {
         nextOnIO = false;
         return this;
     }
-    
+
+    /**
+     * 设置下载结束回调
+     * @param onFailure 失败回调函数
+     * @return Download
+     */
+    public Download setOnComplete(OnCallback<Failure> onFailure) {
+        this.onFailure = onFailure;
+        fOnIO = nextOnIO;
+        nextOnIO = false;
+        return this;
+    }
+
     /**
      * 开始下载
      * @return 下载控制器
@@ -112,7 +125,7 @@ public class Download {
             buffSize = Process.DEFAULT_STEP_BYTES;
         }
         RandomAccessFile raFile = randomAccessFile();
-        status = Ctrl.STATUS__DOWNLOADING;
+        status = Status.DOWNLOADING;
         taskExecutor.execute(() -> doDownload(raFile), true);
         return ctrl;
     }
@@ -125,41 +138,55 @@ public class Download {
         return ctrl;
     }
 
-    public class Ctrl {
-        
+    /**
+     * 下载状态
+     */
+    public enum Status {
+
         /**
          * 已取消
          */
-        public static final int STATUS__CANCELED = -1;
-        
+        CANCELED(-1),
+
         /**
          * 下载中
          */
-        public static final int STATUS__DOWNLOADING = 1;
-        
+        DOWNLOADING(1),
+
         /**
          * 已暂停
          */
-        public static final int STATUS__PAUSED = 2;
-        
+        PAUSED(2),
+
         /**
-         * 已完成
+         * 成功下载完成
          */
-        public static final int STATUS__DONE = 3;
-        
+        DONE(3),
+
         /**
-         * 错误
+         * 发送错误
          */
-        public static final int STATUS__ERROR = 4;
-        
+        ERROR(4);
+
+        private final int value;
+
+        Status(int value) {
+            this.value = value;
+        }
+
+        public int value() {
+            return value;
+        }
+
+    }
+
+    public class Ctrl {
+
         /**
-         * @see #STATUS__CANCELED
-         * @see #STATUS__DOWNLOADING
-         * @see #STATUS__PAUSED
-         * @see #STATUS__DONE
+         * @see Status
          * @return 下载状态
          */
-        public int status() {
+        public Status status() {
             return status;
         }
         
@@ -168,8 +195,8 @@ public class Download {
          */
         public void pause() {
             synchronized (lock) {
-                if (status == STATUS__DOWNLOADING) {
-                    status = STATUS__PAUSED;
+                if (status == Status.DOWNLOADING) {
+                    status = Status.PAUSED;
                 }
             }
         }
@@ -179,8 +206,8 @@ public class Download {
          */
         public void resume() {
             synchronized (lock) {
-                if (status == STATUS__PAUSED) {
-                    status = STATUS__DOWNLOADING;
+                if (status == Status.PAUSED) {
+                    status = Status.DOWNLOADING;
                 }
             }
         }
@@ -190,8 +217,8 @@ public class Download {
          */
         public void cancel() {
             synchronized (lock) {
-                if (status == STATUS__PAUSED || status == STATUS__DOWNLOADING) {
-                    status = STATUS__CANCELED;
+                if (status == Status.PAUSED || status == Status.DOWNLOADING) {
+                    status = Status.CANCELED;
                 }
             }
         }
@@ -233,7 +260,7 @@ public class Download {
         try {
             return new RandomAccessFile(file, "rw");
         } catch (FileNotFoundException e) {
-            status = Ctrl.STATUS__ERROR;
+            status = Status.ERROR;
             closeQuietly(input);
             throw new HttpException("无法获取文件[" + file.getAbsolutePath() + "]的输入流", e);
         }
@@ -245,22 +272,22 @@ public class Download {
                 // 使支持并行下载到同一个文件
                 raFile.seek(seekBytes);
             }
-            while (status != Ctrl.STATUS__CANCELED && status != Ctrl.STATUS__DONE) {
-                if (status == Ctrl.STATUS__DOWNLOADING) {
+            while (status != Status.CANCELED && status != Status.DONE) {
+                if (status == Status.DOWNLOADING) {
                     byte[] buff = new byte[buffSize];
                     int len;
                     while ((len = input.read(buff)) != -1) {
                         raFile.write(buff, 0, len);
                         doneBytes += len;
-                        if (status == Ctrl.STATUS__CANCELED 
-                                || status == Ctrl.STATUS__PAUSED) {
+                        if (status == Status.CANCELED
+                                || status == Status.PAUSED) {
                             break;
                         }
                     }
                     if (len == -1) {
                         synchronized (lock) {
-                            if (status != Ctrl.STATUS__CANCELED) {
-                                status = Ctrl.STATUS__DONE;
+                            if (status != Status.CANCELED) {
+                                status = Status.DONE;
                             }
                         }
                     }
@@ -268,25 +295,25 @@ public class Download {
             }
         } catch (IOException e) {
             synchronized (lock) {
-                if (status != Ctrl.STATUS__CANCELED) {
-                    status = Ctrl.STATUS__ERROR;
+                if (status != Status.CANCELED) {
+                    status = Status.ERROR;
                 }
             }
-            if (status == Ctrl.STATUS__ERROR) {
+            if (status == Status.ERROR) {
                 if (onFailure != null) {
                     taskExecutor.execute(() -> onFailure.on(new Failure(e)), fOnIO);
                 } else {
-                    throw new HttpException("流传输失败", e);
+                    throw new HttpException("Download failed: ", e);
                 }
             }
         } finally {
             closeQuietly(raFile);
             closeQuietly(input);
-            if (status == Ctrl.STATUS__CANCELED && !file.delete()) {
+            if (status == Status.CANCELED && !file.delete()) {
                 Platform.logError("can not delete canceled file: " + file);
             }
         }
-        if (status == Ctrl.STATUS__DONE && onSuccess != null) {
+        if (status == Status.DONE && onSuccess != null) {
             taskExecutor.execute(() -> onSuccess.on(file), sOnIO);
         }
     }
