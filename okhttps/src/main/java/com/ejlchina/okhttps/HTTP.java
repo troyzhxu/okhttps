@@ -115,7 +115,7 @@ public interface HTTP {
 
         private String baseUrl;
 
-        private OkConfig config;
+        private final List<OkConfig> configs;
 
         private final Map<String, String> mediaTypes;
 
@@ -168,6 +168,7 @@ public interface HTTP {
             contentTypes.add("application/msgpack");
             preprocessors = new ArrayList<>();
             msgConvertors = new ArrayList<>();
+            configs = new ArrayList<>();
         }
 
         public Builder(HttpClient hc) {
@@ -188,17 +189,21 @@ public interface HTTP {
             msgConvertors = new ArrayList<>();
             Collections.addAll(msgConvertors, executor.getMsgConvertors());
             preprocTimeoutTimes = hc.preprocTimeoutTimes();
+            configs = new ArrayList<>();
             bodyType = hc.bodyType();
             charset = hc.charset();
         }
 
         /**
+         * 自 v3.2.0 后可以多次调用
          * 配置 OkHttpClient
          * @param config 配置器
          * @return Builder
          */
         public Builder config(OkConfig config) {
-            this.config = config;
+            if (config != null) {
+                configs.add(config);
+            }
             return this;
         }
 
@@ -425,14 +430,14 @@ public interface HTTP {
          * @return HTTP
          */
         public HTTP build() {
-            if (config != null || okClient == null) {
+            if (configs.size() > 0 || okClient == null) {
                 OkHttpClient.Builder builder;
                 if (okClient != null) {
                     builder = okClient.newBuilder();
                 } else {
                     builder = new OkHttpClient.Builder();
                 }
-                if (config != null) {
+                for (OkConfig config: configs) {
                     config.config(builder);
                 }
                 // fix issue: https://github.com/ejlchina/okhttps/issues/8
