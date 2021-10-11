@@ -717,12 +717,12 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
                 if (url.contains(target)) {
                     url = url.replace(target, pathParams.get(name));
                 } else {
-                    throw new HttpException("pathParameter [ " + name + " ] 不存在于 url [ " + urlPath + " ]");
+                    throw new HttpException("pathPara [ " + name + " ] 不存在于 url [ " + urlPath + " ]");
                 }
             }
         }
         if (url.matches(PATH_PARAM_REGEX)) {
-            throw new HttpException("url 里有 pathParameter 没有设置，你必须先调用 addPathParam 为其设置！");
+            throw new HttpException("url 里有 pathPara 没有设置，你必须先调用 addPathPara 为其设置！");
         }
         if (urlParams != null) {
             url = buildUrl(url.trim());
@@ -735,7 +735,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         if (url.contains("?")) {
             if (!url.endsWith("?")) {
                 if (url.lastIndexOf("=") < url.lastIndexOf("?") + 2) {
-                    throw new HttpException("url 格式错误，'？' 后没有发现 '='");
+                    throw new HttpException("url 格式错误，'?' 后没有发现 '='");
                 }
                 if (!url.endsWith("&")) {
                     sb.append('&');
