@@ -323,9 +323,10 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 
     class OkHttpCall implements HttpCall {
 
-		Call call;
+		final Call call;
 		HttpResult result;
 		CountDownLatch latch = new CountDownLatch(1);
+		boolean finished = false;
 
 		OkHttpCall(Call call) {
 			this.call = call;
@@ -333,7 +334,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 
 		@Override
 		public synchronized boolean cancel() {
-			if (result == null) {
+			if (result == null || !finished) {
 				call.cancel();
 				return true;
 			}
@@ -342,12 +343,12 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 
 		@Override
 		public boolean isDone() {
-			return result != null;
+			return result != null && finished || call.isCanceled();
 		}
 
 		@Override
 		public boolean isCanceled() {
-			return call.isCanceled();
+			return call.isCanceled() || (result != null && result.getState() == State.CANCELED);
 		}
 
 		@Override
@@ -371,33 +372,41 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 			latch.countDown();
 		}
 
-    }
+		public void finish() {
+			this.finished = true;
+		}
+	}
 
 	
     private HttpCall executeCall(Call call) {
         OkHttpCall httpCall = new OkHttpCall(call);
         call.enqueue(new Callback() {
+
             @Override
+			@SuppressWarnings("NullableProblems")
             public void onFailure(Call call, IOException error) {
 				State state = toState(error);
 				HttpResult result = new RealHttpResult(AsyncHttpTask.this, state, error);
 				onCallback(httpCall, result, () -> {
 					TaskExecutor executor = httpClient.executor();
 					executor.executeOnComplete(AsyncHttpTask.this, onComplete, state, completeOnIO);
-					if (!executor.executeOnException(AsyncHttpTask.this, onException, error, exceptionOnIO)
+					if (!httpCall.isCanceled() && !executor.executeOnException(AsyncHttpTask.this, httpCall, onException, error, exceptionOnIO)
 							&& !nothrow) {
 						throw new HttpException(state, "异步请求异常：" + getUrl(), error);
 					}
 				});
             }
 
-            @Override
+			@Override
+			@SuppressWarnings("NullableProblems")
             public void onResponse(Call call, Response response) {
             	TaskExecutor executor = httpClient.executor();
 				HttpResult result = new RealHttpResult(AsyncHttpTask.this, response, executor);
 				onCallback(httpCall, result, () -> {
 					executor.executeOnComplete(AsyncHttpTask.this, onComplete, State.RESPONSED, completeOnIO);
-					executor.executeOnResponse(AsyncHttpTask.this, complexOnResponse(), result, true);
+					if (!httpCall.isCanceled()) {
+						executor.executeOnResponse(AsyncHttpTask.this, httpCall, complexOnResponse(httpCall), result, true);
+					}
 				});
             }
 
@@ -405,57 +414,107 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 		return httpCall;
     }
 
-    private synchronized OnCallback<HttpResult> complexOnResponse() {
+	@SuppressWarnings("all")
+	private void onCallback(OkHttpCall httpCall, HttpResult result, Runnable runnable) {
+		synchronized (httpCall) {
+			removeTagTask();
+			if (httpCall.isCanceled() || result.getState() == State.CANCELED) {
+				httpCall.setResult(new RealHttpResult(AsyncHttpTask.this, State.CANCELED));
+			} else {
+				httpCall.setResult(result);
+			}
+			runnable.run();
+		}
+	}
+
+	interface ResponseCallback {
+		void on(Runnable runnable, boolean onIo);
+	}
+
+    private synchronized OnCallback<HttpResult> complexOnResponse(OkHttpCall call) {
 		return res -> {
-			int count = responseCallbackCount();
+			OnCallback<HttpResult> onResp = onResponse;
+			OnCallback<HttpResult.Body> onBody = onResBody;
+			OnCallback<Mapper> onMapper = onResMapper;
+			OnCallback<Array> onArray = onResArray;
+			OnCallback<?> onBean = onResBean;
+			OnCallback<?> onList = onResList;
+			OnCallback<String> onString = onResString;
+
+			int count = 0;
+			if (onResp != null)
+				count++;
+			if (onBody != null)
+				count++;
+			if (onMapper != null)
+				count++;
+			if (onArray != null)
+				count++;
+			if (onBean != null)
+				count++;
+			if (onList != null)
+				count++;
+			if (onString != null)
+				count++;
+			int callbackCount = count;
+
 			HttpResult.Body body = res.getBody();
-			if (count > 1) {
+			if (callbackCount > 1) {
+				// 如果回调数量多于 1 个，则为报文体自动开启缓存
 				body.cache();
 			}
-			OnCallback<HttpResult> listener1 = onResponse;
-			if (listener1 != null) {
-				execute(() -> listener1.on(res), responseOnIO);
+
+			ResponseCallback callback = (runnable, onIo) -> execute(new Runnable() {
+				// 记录已经回调的次数
+				int count = 0;
+				@Override
+				public void run() {
+					if (!call.isCanceled()) {
+						runnable.run();
+					}
+					if (++count >= callbackCount) {
+						call.finish();
+					}
+				}
+			}, onIo);
+
+			if (onResp != null) {
+				callback.on(() -> onResp.on(res), responseOnIO);
 			}
-			OnCallback<HttpResult.Body> listener2 = onResBody;
-			if (listener2 != null) {
-				execute(() -> listener2.on(body), resBodyOnIO);
+			if (onBody != null) {
+				callback.on(() -> onBody.on(body), resBodyOnIO);
 			}
-			OnCallback<Mapper> listener3 = onResMapper;
-			if (listener3 != null) {
+			if (onMapper != null) {
 				Mapper mapper = body.toMapper();
-				execute(() -> listener3.on(mapper), resMapperOnIO);
+				callback.on(() -> onMapper.on(mapper), resMapperOnIO);
 			}
-			OnCallback<Array> listener4 = onResArray;
-			if (listener4 != null) {
+			if (onArray != null) {
 				Array array = body.toArray();
-				execute(() -> listener4.on(array), resArrayOnIO);
+				callback.on(() -> onArray.on(array), resArrayOnIO);
 			}
-			OnCallback<?> listener5 = onResBean;
-			if (listener5 != null) {
+			if (onBean != null) {
 				Object bean = body.toBean(beanType);
-				execute(() -> {
+				callback.on(() -> {
 					try {
-						callbackMethod(listener5.getClass(), bean.getClass()).invoke(listener5, bean);
+						callbackMethod(onBean.getClass(), bean.getClass()).invoke(onBean, bean);
 					} catch (IllegalAccessException | InvocationTargetException e) {
 						throw new HttpException("回调方法调用失败！", e);
 					}
 				}, resBeanOnIO);
 			}
-			OnCallback<?> listener6 = onResList;
-			if (listener6 != null) {
+			if (onList != null) {
 				List<?> list = body.toList(listType);
-				execute(() -> {
+				callback.on(() -> {
 					try {
-						callbackMethod(listener6.getClass(), list.getClass()).invoke(listener6, list);
+						callbackMethod(onList.getClass(), list.getClass()).invoke(onList, list);
 					} catch (IllegalAccessException | InvocationTargetException e) {
 						throw new HttpException("回调方法调用失败！", e);
 					}
 				}, resListOnIO);
 			}
-			OnCallback<String> listener7 = onResString;
-			if (listener7 != null) {
+			if (onString != null) {
 				String string = body.toString();
-				execute(() -> listener7.on(string), resStringOnIO);
+				callback.on(() -> onString.on(string), resStringOnIO);
 			}
 		};
 	}
@@ -473,38 +532,6 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
 			}
 		}
 		throw new IllegalStateException("没有可调用的方法");
-	}
-
-	private int responseCallbackCount() {
-    	int count = 0;
-		if (onResponse != null)
-			count++;
-		if (onResBody != null)
-			count++;
-		if (onResMapper != null)
-			count++;
-		if (onResArray != null)
-			count++;
-		if (onResBean != null)
-			count++;
-		if (onResList != null)
-			count++;
-		if (onResString != null)
-			count++;
-		return count;
-	}
-
-	@SuppressWarnings("all")
-    private void onCallback(OkHttpCall httpCall, HttpResult result, Runnable runnable) {
-		synchronized (httpCall) {
-			removeTagTask();
-			if (httpCall.isCanceled() || result.getState() == State.CANCELED) {
-				httpCall.setResult(new RealHttpResult(AsyncHttpTask.this, State.CANCELED));
-				return;
-			}
-			httpCall.setResult(result);
-			runnable.run();
-		}
 	}
 	
     private void initBeanType(Type type) {
