@@ -579,31 +579,39 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     protected Request prepareRequest(String method) {
-        boolean bodyCanUsed = HttpMethod.permitsRequestBody(method);
-        assertNotConflict(!bodyCanUsed);
-		Request.Builder builder = new Request.Builder()
-                .url(buildUrlPath());
-        buildHeaders(builder);
-        if (bodyCanUsed) {
-            RequestBody reqBody = buildRequestBody();
-            if (onProcess != null) {
-                long contentLength = contentLength(reqBody);
-                if (stepRate > 0 && stepRate <= 1) {
-                    stepBytes = (long) (contentLength * stepRate);
-                }
-                if (stepBytes <= 0) {
-                    stepBytes = Process.DEFAULT_STEP_BYTES;
-                }
-                reqBody = new ProcessRequestBody(reqBody, onProcess,
-                        httpClient.executor().getExecutor(processOnIO),
-                        contentLength, stepBytes);
-            } else {
-                reqBody = new FixedRequestBody(reqBody);
+        if (requestBody != null) {
+            if (isNotEmpty(bodyParams)) {
+                throw new HttpException("方法 addBodyPara 与 setBodyPara 不能同时使用！");
             }
-            builder.method(method, reqBody);
-        } else {
-            builder.method(method, null);
+            if (isNotEmpty(files)) {
+                throw new HttpException("方法 addFilePara 与 setBodyPara 不能同时使用！");
+            }
         }
+		Request.Builder builder = new Request.Builder().url(buildUrlPath());
+        if (headers != null) {
+            for (String name : headers.keySet()) {
+                String value = headers.get(name);
+                if (value != null) {
+                    builder.addHeader(name, value);
+                }
+            }
+        }
+        RequestBody reqBody = buildRequestBody();
+        if (onProcess != null) {
+            long contentLength = contentLength(reqBody);
+            if (stepRate > 0 && stepRate <= 1) {
+                stepBytes = (long) (contentLength * stepRate);
+            }
+            if (stepBytes <= 0) {
+                stepBytes = Process.DEFAULT_STEP_BYTES;
+            }
+            reqBody = new ProcessRequestBody(reqBody, onProcess,
+                    httpClient.executor().getExecutor(processOnIO),
+                    contentLength, stepBytes);
+        } else {
+            reqBody = new FixedRequestBody(reqBody);
+        }
+        builder.method(method, reqBody);
         if (tag != null) {
             builder.tag(String.class, tag);
         }
@@ -615,17 +623,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             return reqBody.contentLength();
         } catch (IOException e) {
             throw new HttpException("无法获取请求体长度", e);
-        }
-    }
-
-    private void buildHeaders(Request.Builder builder) {
-        if (headers != null) {
-            for (String name : headers.keySet()) {
-                String value = headers.get(name);
-                if (value != null) {
-                    builder.addHeader(name, value);
-                }
-            }
         }
     }
 
@@ -749,31 +746,6 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         }
         sb.delete(sb.length() - 1, sb.length());
         return sb.toString();
-    }
-
-    /**
-     * 参数冲突校验
-     */
-    protected void assertNotConflict(boolean bodyCantUsed) {
-        if (bodyCantUsed) {
-            if (requestBody != null) {
-                throw new HttpException("GET | HEAD 请求 不能调用 setBodyPara 方法！");
-            }
-            if (isNotEmpty(bodyParams)) {
-                throw new HttpException("GET | HEAD 请求 不能调用 addBodyPara 方法！");
-            }
-            if (isNotEmpty(files)) {
-                throw new HttpException("GET | HEAD 请求 不能调用 addFilePara 方法！");
-            }
-        }
-        if (requestBody != null) {
-            if (isNotEmpty(bodyParams)) {
-                throw new HttpException("方法 addBodyPara 与 setBodyPara 不能同时使用！");
-            }
-            if (isNotEmpty(files)) {
-                throw new HttpException("方法 addFilePara 与 setBodyPara 不能同时使用！");
-            }
-        }
     }
 
     private static boolean isNotEmpty(Map<String, ?> map) {
