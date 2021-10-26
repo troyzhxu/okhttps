@@ -19,8 +19,8 @@
 	</modules>
 
 	<properties>
-		<java-version>1.8</java-version>
-		<data.version>1.1.0</data.version>
+		<java.version>1.8</java.version>
+		<data.version>1.1.1</data.version>
 		<okhttp.version>3.14.9</okhttp.version>
 		<okio.version>1.17.5</okio.version>
 		<junit.version>4.13.2</junit.version>
@@ -130,8 +130,8 @@
 					<jdkToolchain>
 						<version>[1.8,17)</version>
 					</jdkToolchain>
-                    <source>${java-version}</source>
-                    <target>${java-version}</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <showWarnings>true</showWarnings>
                 </configuration>
