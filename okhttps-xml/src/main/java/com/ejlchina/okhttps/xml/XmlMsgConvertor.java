@@ -1,7 +1,9 @@
-package com.ejlchina.okhttps;
+package com.ejlchina.okhttps.xml;
 
 import com.ejlchina.data.Deserializer;
 import com.ejlchina.data.xml.XmlDataConvertor;
+import com.ejlchina.okhttps.ConvertProvider;
+import com.ejlchina.okhttps.MsgConvertor;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 

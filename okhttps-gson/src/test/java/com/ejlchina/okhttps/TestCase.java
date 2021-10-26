@@ -1,5 +1,6 @@
 package com.ejlchina.okhttps;
 
+import com.ejlchina.okhttps.gson.GsonMsgConvertor;
 import com.ejlchina.okhttps.test.JsonTestCases;
 import org.junit.Test;
 
