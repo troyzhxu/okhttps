@@ -173,7 +173,7 @@ public interface HTTP {
         Executor mainExecutor();
 
         /**
-         * 配置 任务调度器，可用的调度由 {@link WebSocketTask#heatbeat(int, int) } 指定的心跳任务
+         * 配置 任务调度器，可用的调度由 {@link WHttpTask#heatbeat(int, int) } 指定的心跳任务
          * 若不配置，则生成一个 线程容量为 1 的 ScheduledThreadPoolExecutor 调度器
          * @since v2.3.0
          * @param scheduler 调度器
