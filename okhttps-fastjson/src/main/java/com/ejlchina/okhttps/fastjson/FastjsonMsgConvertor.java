@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.ejlchina.data.fastjson.FastjsonDataConvertor;
 import com.ejlchina.okhttps.ConvertProvider;
 import com.ejlchina.okhttps.MsgConvertor;
-import com.ejlchina.okhttps.internal.HttpException;
+import com.ejlchina.okhttps.OkHttpsException;
 import okio.Okio;
 
 import java.io.IOException;
@@ -34,7 +34,7 @@ public class FastjsonMsgConvertor extends FastjsonDataConvertor implements MsgCo
 		try {
 			return Okio.buffer(Okio.source(in)).readString(charset);
 		} catch (IOException e) {
-			throw new HttpException("读取文本异常", e);
+			throw new OkHttpsException("读取文本异常", e);
 		}
 	}
 

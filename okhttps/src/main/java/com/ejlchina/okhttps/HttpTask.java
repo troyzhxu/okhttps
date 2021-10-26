@@ -580,10 +580,10 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     protected Request prepareRequest(String method) {
         if (requestBody != null) {
             if (isNotEmpty(bodyParams)) {
-                throw new HttpException("方法 addBodyPara 与 setBodyPara 不能同时使用！");
+                throw new OkHttpsException("方法 addBodyPara 与 setBodyPara 不能同时使用！");
             }
             if (isNotEmpty(files)) {
-                throw new HttpException("方法 addFilePara 与 setBodyPara 不能同时使用！");
+                throw new OkHttpsException("方法 addFilePara 与 setBodyPara 不能同时使用！");
             }
         }
 		Request.Builder builder = new Request.Builder().url(buildUrlPath());
@@ -621,7 +621,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         try {
             return reqBody.contentLength();
         } catch (IOException e) {
-            throw new HttpException("无法获取请求体长度", e);
+            throw new OkHttpsException("无法获取请求体长度", e);
         }
     }
 
@@ -705,7 +705,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     private String buildUrlPath() {
         String url = urlPath;
         if (url == null || url.trim().isEmpty()) {
-            throw new HttpException("url 不能为空！");
+            throw new OkHttpsException("url 不能为空！");
         }
         if (pathParams != null) {
             for (String name : pathParams.keySet()) {
@@ -713,12 +713,12 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
                 if (url.contains(target)) {
                     url = url.replace(target, pathParams.get(name));
                 } else {
-                    throw new HttpException("pathPara [ " + name + " ] 不存在于 url [ " + urlPath + " ]");
+                    throw new OkHttpsException("pathPara [ " + name + " ] 不存在于 url [ " + urlPath + " ]");
                 }
             }
         }
         if (url.matches(PATH_PARAM_REGEX)) {
-            throw new HttpException("url 里有 pathPara 没有设置，你必须先调用 addPathPara 为其设置！");
+            throw new OkHttpsException("url 里有 pathPara 没有设置，你必须先调用 addPathPara 为其设置！");
         }
         if (urlParams != null) {
             url = buildUrl(url.trim());
@@ -731,7 +731,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         if (url.contains("?")) {
             if (!url.endsWith("?")) {
                 if (url.lastIndexOf("=") < url.lastIndexOf("?") + 2) {
-                    throw new HttpException("url 格式错误，'?' 后没有发现 '='");
+                    throw new OkHttpsException("url 格式错误，'?' 后没有发现 '='");
                 }
                 if (!url.endsWith("&")) {
                     sb.append('&');
@@ -760,7 +760,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             return latch.await(httpClient.preprocTimeoutMillis(),
                     TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            throw new HttpException("执行超时: " + urlPath, e);
+            throw new OkHttpsException("执行超时: " + urlPath, e);
         }
     }
 
@@ -768,7 +768,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         if (nothrow) {
             return new RealHttpResult(this, State.TIMEOUT);
         }
-        throw new HttpException(State.TIMEOUT, "执行超时: " + urlPath);
+        throw new OkHttpsException(State.TIMEOUT, "执行超时: " + urlPath);
     }
 
     public Charset charset(Response response) {

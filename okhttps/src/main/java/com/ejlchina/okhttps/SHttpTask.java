@@ -2,7 +2,6 @@ package com.ejlchina.okhttps;
 
 import com.ejlchina.okhttps.HttpResult.State;
 import com.ejlchina.okhttps.internal.AbstractHttpClient;
-import com.ejlchina.okhttps.internal.HttpException;
 import com.ejlchina.okhttps.internal.RealHttpResult;
 import okhttp3.Call;
 
@@ -122,7 +121,7 @@ public class SHttpTask extends HttpTask<SHttpTask> {
 		State state = result.getState();
     	if (e != null && state != State.CANCELED
     			&& !nothrow) {
-    		throw new HttpException(state, "同步请求异常：" + getUrl(), e);
+    		throw new OkHttpsException(state, "同步请求异常：" + getUrl(), e);
     	}
         return result;
     }

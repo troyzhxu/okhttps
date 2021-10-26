@@ -4,7 +4,6 @@ import com.ejlchina.okhttps.WebSocket.Close;
 import com.ejlchina.okhttps.WebSocket.Listener;
 import com.ejlchina.okhttps.WebSocket.Message;
 import com.ejlchina.okhttps.internal.AbstractHttpClient;
-import com.ejlchina.okhttps.internal.HttpException;
 import com.ejlchina.okhttps.internal.RealHttpResult;
 import com.ejlchina.okhttps.internal.WebSocketMsg;
 import okhttp3.Request;
@@ -277,7 +276,7 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 			} else if (exceptionListener != null) {
 				execute(() -> exceptionListener.on(this.webSocket,  t), exceptionOnIO);
 			} else if (!nothrow) {
-				throw new HttpException("WebSockt 连接异常: " + getUrl(), t);
+				throw new OkHttpsException("WebSockt 连接异常: " + getUrl(), t);
 			}
 		}
 		

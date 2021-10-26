@@ -391,7 +391,7 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 					executor.executeOnComplete(AHttpTask.this, onComplete, state, completeOnIO);
 					if (!httpCall.isCanceled() && !executor.executeOnException(AHttpTask.this, httpCall, onException, error, exceptionOnIO)
 							&& !nothrow) {
-						throw new HttpException(state, "异步请求异常：" + getUrl(), error);
+						throw new OkHttpsException(state, "异步请求异常：" + getUrl(), error);
 					}
 				});
             }
@@ -497,7 +497,7 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 					try {
 						callbackMethod(onBean.getClass(), bean.getClass()).invoke(onBean, bean);
 					} catch (IllegalAccessException | InvocationTargetException e) {
-						throw new HttpException("回调方法调用失败！", e);
+						throw new OkHttpsException("回调方法调用失败！", e);
 					}
 				}, resBeanOnIO);
 			}
@@ -507,7 +507,7 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 					try {
 						callbackMethod(onList.getClass(), list.getClass()).invoke(onList, list);
 					} catch (IllegalAccessException | InvocationTargetException e) {
-						throw new HttpException("回调方法调用失败！", e);
+						throw new OkHttpsException("回调方法调用失败！", e);
 					}
 				}, resListOnIO);
 			}

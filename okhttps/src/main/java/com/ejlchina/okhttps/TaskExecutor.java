@@ -1,7 +1,6 @@
 package com.ejlchina.okhttps;
 
 import com.ejlchina.okhttps.HttpResult.State;
-import com.ejlchina.okhttps.internal.HttpException;
 import okhttp3.MediaType;
 import okhttp3.internal.Util;
 
@@ -166,9 +165,9 @@ public final class TaskExecutor {
         	return new Data<>(null, toContentType(type));
         }
         if (cause != null) {
-            throw new HttpException("转换失败", cause);
+            throw new OkHttpsException("转换失败", cause);
         }
-        throw new HttpException("没有匹配[" + type + "]类型的转换器！");
+        throw new OkHttpsException("没有匹配[" + type + "]类型的转换器！");
     }
 
     private void initRootCause(Throwable throwable, Throwable cause) {
