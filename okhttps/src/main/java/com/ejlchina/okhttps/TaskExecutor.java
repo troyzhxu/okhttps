@@ -1,15 +1,18 @@
-package com.ejlchina.okhttps.internal;
+package com.ejlchina.okhttps;
+
+import com.ejlchina.okhttps.HttpResult.State;
+import com.ejlchina.okhttps.internal.HttpException;
+import okhttp3.MediaType;
+import okhttp3.internal.Util;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.concurrent.*;
-
-import com.ejlchina.okhttps.*;
-import com.ejlchina.okhttps.HttpResult.State;
-import okhttp3.MediaType;
-import okhttp3.internal.Util;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public final class TaskExecutor {
 
@@ -257,7 +260,7 @@ public final class TaskExecutor {
         return contentTypes;
     }
 
-    boolean isMulitMsgConvertor() {
+    public boolean isMulitMsgConvertor() {
         return msgConvertors.length > 1;
     }
 

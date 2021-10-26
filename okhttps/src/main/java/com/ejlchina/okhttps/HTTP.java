@@ -1,7 +1,5 @@
 package com.ejlchina.okhttps;
 
-import com.ejlchina.okhttps.internal.*;
-
 import com.ejlchina.okhttps.okhttp.OkHttpBuilderImpl;
 import okhttp3.*;
 import okhttp3.WebSocket;

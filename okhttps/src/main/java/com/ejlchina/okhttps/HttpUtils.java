@@ -1,7 +1,5 @@
 package com.ejlchina.okhttps;
 
-import com.ejlchina.okhttps.internal.TaskExecutor;
-
 import okhttp3.Call;
 import okhttp3.Request;
 import okhttp3.WebSocket;

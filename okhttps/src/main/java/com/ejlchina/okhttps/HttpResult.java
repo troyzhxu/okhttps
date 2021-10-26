@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.List;
 
 import com.ejlchina.okhttps.internal.RealHttpResult;
-import com.ejlchina.okhttps.internal.TaskExecutor;
 
 import okhttp3.Headers;
 import okhttp3.MediaType;

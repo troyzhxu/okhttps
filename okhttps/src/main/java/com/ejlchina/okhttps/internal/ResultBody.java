@@ -4,12 +4,10 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URLDecoder;
 
-import com.ejlchina.okhttps.Download;
+import com.ejlchina.okhttps.*;
 import com.ejlchina.okhttps.HttpResult.Body;
-import com.ejlchina.okhttps.HttpTask;
-import com.ejlchina.okhttps.OnCallback;
-import com.ejlchina.okhttps.Process;
 
+import com.ejlchina.okhttps.Process;
 import okhttp3.MediaType;
 import okhttp3.Response;
 import okhttp3.ResponseBody;

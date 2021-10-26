@@ -1,7 +1,6 @@
 package com.ejlchina.okhttps;
 
 import com.ejlchina.okhttps.internal.HttpException;
-import com.ejlchina.okhttps.internal.TaskExecutor;
 
 import java.io.*;
 
