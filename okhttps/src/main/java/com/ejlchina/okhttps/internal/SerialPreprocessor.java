@@ -1,4 +1,6 @@
-package com.ejlchina.okhttps;
+package com.ejlchina.okhttps.internal;
+
+import com.ejlchina.okhttps.Preprocessor;
 
 import java.util.LinkedList;
 import java.util.Queue;
