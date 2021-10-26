@@ -1,15 +1,13 @@
-package com.ejlchina.okhttps.internal;
+package com.ejlchina.okhttps;
+
+import com.ejlchina.okhttps.HttpResult.State;
+import com.ejlchina.okhttps.internal.AbstractHttpClient;
+import com.ejlchina.okhttps.internal.HttpException;
+import com.ejlchina.okhttps.internal.RealHttpResult;
+import okhttp3.Call;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
-
-import com.ejlchina.okhttps.Cancelable;
-import com.ejlchina.okhttps.HTTP;
-import com.ejlchina.okhttps.HttpResult;
-import com.ejlchina.okhttps.HttpTask;
-import com.ejlchina.okhttps.HttpResult.State;
-
-import okhttp3.Call;
 
 
 /**
@@ -18,10 +16,10 @@ import okhttp3.Call;
  * @author Troy.Zhou
  * 
  */
-public class SyncHttpTask extends HttpTask<SyncHttpTask> {
+public class SHttpTask extends HttpTask<SHttpTask> {
 
-	public SyncHttpTask(AbstractHttpImpl client, String url) {
-		super(client, url);
+	public SHttpTask(AbstractHttpClient httpImpl, String url) {
+		super(httpImpl, url);
 	}
 
 

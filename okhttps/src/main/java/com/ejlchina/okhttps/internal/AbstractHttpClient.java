@@ -7,7 +7,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.Executor;
 
-public abstract class AbstractHttpImpl implements HTTP {
+public abstract class AbstractHttpClient implements HTTP {
 
     // 根URL
     final String baseUrl;
@@ -27,7 +27,7 @@ public abstract class AbstractHttpImpl implements HTTP {
     final String bodyType;
 
 
-    public AbstractHttpImpl(HTTP.Builder builder) {
+    public AbstractHttpClient(HTTP.Builder builder) {
         this.baseUrl = builder.baseUrl();
         this.mediaTypes = builder.getMediaTypes();
         this.executor = new TaskExecutor(builder, ioExecutor(builder));
@@ -43,18 +43,18 @@ public abstract class AbstractHttpImpl implements HTTP {
 
 
     @Override
-    public AsyncHttpTask async(String url) {
-        return new AsyncHttpTask(this, urlPath(url, false));
+    public AHttpTask async(String url) {
+        return new AHttpTask(this, urlPath(url, false));
     }
 
     @Override
-    public SyncHttpTask sync(String url) {
-        return new SyncHttpTask(this, urlPath(url, false));
+    public SHttpTask sync(String url) {
+        return new SHttpTask(this, urlPath(url, false));
     }
 
     @Override
-    public WebSocketTask webSocket(String url) {
-        return new WebSocketTask(this, urlPath(url, true));
+    public WHttpTask webSocket(String url) {
+        return new WHttpTask(this, urlPath(url, true));
     }
 
     @Override
@@ -212,7 +212,7 @@ public abstract class AbstractHttpImpl implements HTTP {
 
         @Override
         public HTTP getHttp() {
-            return AbstractHttpImpl.this;
+            return AbstractHttpClient.this;
         }
 
         @Override

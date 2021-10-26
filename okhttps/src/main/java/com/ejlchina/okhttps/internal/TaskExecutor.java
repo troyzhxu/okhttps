@@ -58,7 +58,7 @@ public final class TaskExecutor {
         executor.execute(command);
     }
     
-    public void executeOnResponse(HttpTask<?> task, AsyncHttpTask.OkHttpCall call, OnCallback<HttpResult> onResponse, HttpResult result, boolean onIo) {
+    public void executeOnResponse(HttpTask<?> task, AHttpTask.OkHttpCall call, OnCallback<HttpResult> onResponse, HttpResult result, boolean onIo) {
         Runnable runnable = () -> {
             if (!call.isCanceled()) onResponse.on(result);
         };
@@ -76,7 +76,7 @@ public final class TaskExecutor {
         }
     }
 
-    public boolean executeOnException(HttpTask<?> task, AsyncHttpTask.OkHttpCall call, OnCallback<IOException> onException, IOException error, boolean onIo) {
+    public boolean executeOnException(HttpTask<?> task, AHttpTask.OkHttpCall call, OnCallback<IOException> onException, IOException error, boolean onIo) {
         Runnable runnable = () -> {
             if (!call.isCanceled()) {
                 onException.on(error);

@@ -1,17 +1,17 @@
 package com.ejlchina.okhttps.okhttp;
 
-import com.ejlchina.okhttps.internal.AbstractHttpImpl;
+import com.ejlchina.okhttps.internal.AbstractHttpClient;
 import okhttp3.*;
 
 import java.util.concurrent.Executor;
 
 
-public class OkHttpImpl extends AbstractHttpImpl {
+public class OkHttpClientWrapper extends AbstractHttpClient {
 
     // OkHttpClient
     final OkHttpClient okClient;
 
-    public OkHttpImpl(OkHttpBuilderImpl builder) {
+    public OkHttpClientWrapper(OkHttpBuilderImpl builder) {
         super(builder);
         this.okClient = builder.okClient();
     }

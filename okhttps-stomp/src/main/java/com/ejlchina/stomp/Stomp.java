@@ -3,7 +3,6 @@ package com.ejlchina.stomp;
 import com.ejlchina.okhttps.OnCallback;
 import com.ejlchina.okhttps.Platform;
 import com.ejlchina.okhttps.WebSocket;
-import com.ejlchina.okhttps.internal.WebSocketTask;
 
 import okio.ByteString;
 

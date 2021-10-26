@@ -74,7 +74,7 @@ public class OkHttpBuilderImpl implements HTTP.Builder {
         configs = new ArrayList<>();
     }
 
-    public OkHttpBuilderImpl(OkHttpImpl hc) {
+    public OkHttpBuilderImpl(OkHttpClientWrapper hc) {
         okClient = hc.okClient();
         baseUrl = hc.baseUrl();
         mediaTypes = hc.mediaTypes();
@@ -353,7 +353,7 @@ public class OkHttpBuilderImpl implements HTTP.Builder {
                     .addInterceptor(new CopyInterceptor())
                     .build();
         }
-        return new OkHttpImpl(this);
+        return new OkHttpClientWrapper(this);
     }
 
     private boolean needCopyInterceptor(List<Interceptor> list) {
