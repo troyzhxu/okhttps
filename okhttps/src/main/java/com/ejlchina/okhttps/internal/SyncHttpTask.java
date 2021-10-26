@@ -20,7 +20,7 @@ import okhttp3.Call;
  */
 public class SyncHttpTask extends HttpTask<SyncHttpTask> {
 
-	public SyncHttpTask(HttpClient client, String url) {
+	public SyncHttpTask(AbstractHttpImpl client, String url) {
 		super(client, url);
 	}
 

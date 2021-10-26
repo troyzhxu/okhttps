@@ -2,7 +2,7 @@ package com.ejlchina.okhttps;
 
 import com.ejlchina.okhttps.HttpResult.State;
 import com.ejlchina.okhttps.internal.*;
-import com.ejlchina.okhttps.internal.HttpClient.TagTask;
+import com.ejlchina.okhttps.internal.AbstractHttpImpl.TagTask;
 import okhttp3.*;
 import okhttp3.internal.http.HttpMethod;
 
@@ -27,7 +27,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     private static final String PATH_PARAM_REGEX = "[A-Za-z0-9_\\-/]*\\{[A-Za-z0-9_\\-]+\\}[A-Za-z0-9_\\-/]*";
     private static final String DOT = ".";
 
-    protected HttpClient httpClient;
+    protected AbstractHttpImpl httpClient;
     protected boolean nothrow;
     protected boolean nextOnIO = false;
     
@@ -55,7 +55,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     protected boolean skipSerialPreproc = false;
 
 
-    public HttpTask(HttpClient httpClient, String urlPath) {
+    public HttpTask(AbstractHttpImpl httpClient, String urlPath) {
         this.httpClient = httpClient;
         this.charset = httpClient.charset();
         this.bodyType = httpClient.bodyType();

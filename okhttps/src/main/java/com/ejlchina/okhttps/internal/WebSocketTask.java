@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 
 public class WebSocketTask extends HttpTask<WebSocketTask> {
 
-	
 	private Listener<HttpResult> onOpen;
 	private Listener<Throwable> onException;
 	private Listener<Message> onMessage;
@@ -47,7 +46,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	private boolean flexiblePing = true;
 
 
-	public WebSocketTask(HttpClient httpClient, String url) {
+	public WebSocketTask(AbstractHttpImpl httpClient, String url) {
 		super(httpClient, url);
 	}
 

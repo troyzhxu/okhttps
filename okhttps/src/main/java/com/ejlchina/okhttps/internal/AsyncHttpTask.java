@@ -52,7 +52,7 @@ public class AsyncHttpTask extends HttpTask<AsyncHttpTask> {
     private Type beanType;
 	private Class<?> listType;
     
-	public AsyncHttpTask(HttpClient client, String url) {
+	public AsyncHttpTask(AbstractHttpImpl client, String url) {
 		super(client, url);
 	}
 
