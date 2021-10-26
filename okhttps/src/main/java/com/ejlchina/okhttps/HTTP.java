@@ -109,7 +109,7 @@ public interface HTTP {
 
     /**
      * HTTP 构建器
-     * 自 v3.3.0 开始接口化，努力与 okhttp3 解耦
+     * 自 v3.3.0 开始接口化，在以后版本中将逐步与 okhttp3 解耦
      */
     interface Builder {
 
