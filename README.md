@@ -117,9 +117,11 @@ Websocket 方法：
 
 [**[ Bean Searcher ]** 轻量级数据库条件检索引擎，一行代码实现复杂条件列表检索！](https://gitee.com/ejlchina-zhxu/bean-searcher)
 
-[**[ Json Kit ]** 超轻量级 JSON 门面工具，用法简单，不依赖具体实现，让业务代码与 Jackson、Gson、Fastjson 等解耦！](https://gitee.com/ejlchina-zhxu/jsonkit)
-
 [**[ SA Token ]** 一个轻量级 Java 权限认证框架，让鉴权变得简单、优雅！](https://gitee.com/dromara/sa-token)
+
+[**[ hrun4j ]** 接口自动化测试解决方案 --工具选得好，下班回家早；测试用得对，半夜安心睡 ](https://github.com/lematechvip/hrun4j)
+
+[**[ Json Kit ]** 超轻量级 JSON 门面工具，用法简单，不依赖具体实现，让业务代码与 Jackson、Gson、Fastjson 等解耦！](https://gitee.com/ejlchina-zhxu/jsonkit)
 
 ## 参与贡献
 
