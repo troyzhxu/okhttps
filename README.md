@@ -115,9 +115,9 @@ Websocket 方法：
 
 ## 友情链接
 
-[**[ Bean Searcher ]** 轻量级数据库条件检索引擎，一行代码实现复杂条件列表检索！](https://gitee.com/ejlchina-zhxu/bean-searcher)
+[**[ Bean Searcher ]** 比 MyBatis 效率快 100 倍的条件检索引擎，天生支持联表，使一行代码实现复杂列表检索成为可能！](https://github.com/ejlchina/bean-searcher)
 
-[**[ SA Token ]** 一个轻量级 Java 权限认证框架，让鉴权变得简单、优雅！](https://gitee.com/dromara/sa-token)
+[**[ SA Token ]** 一个轻量级 Java 权限认证框架，让鉴权变得简单、优雅！](https://github.com/dromara/Sa-Token)
 
 [**[ hrun4j ]** 接口自动化测试解决方案 --工具选得好，下班回家早；测试用得对，半夜安心睡 ](https://github.com/lematechvip/hrun4j)
 
