@@ -47,6 +47,9 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 	// Ping 的间隔是否灵活可变
 	private boolean flexiblePing = true;
 
+	// 最大关闭时长，即：执行了 OnClosing 回调后，最晚过多少久就会执行 OnClosed 回调
+	private int maxClosingSecs = 10;
+
 
 	public WHttpTask(AbstractHttpClient httpClient, String url) {
 		super(httpClient, url);
@@ -152,6 +155,7 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 		return false;
 	}
 
+	@SuppressWarnings("NullableProblems")
 	class MessageListener extends WebSocketListener {
 
 		final WebSocketImpl webSocket;
@@ -221,24 +225,32 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 			if (listener != null) {
 				execute(() -> listener.on(this.webSocket, new Close(code, reason)), closingOnIO);
 			}
+			httpClient.executor().requireScheduler().schedule(() -> {
+				doOnClose(webSocket, HttpResult.State.RESPONSED, code, reason);
+			}, maxClosingSecs, TimeUnit.SECONDS);
 		}
 
 		@Override
 		public void onClosed(okhttp3.WebSocket webSocket, int code, String reason) {
-			doOnClose(HttpResult.State.RESPONSED, code, reason);
+			doOnClose(webSocket, HttpResult.State.RESPONSED, code, reason);
 		}
 
-		private void doOnClose(HttpResult.State state, int code, String reason) {
-			WHttpTask.this.webSocket = null;
-			Close close = updateStatus(state, code, reason);
-			TaskListener<HttpResult.State> listener = httpClient.executor().getCompleteListener();
-			Listener<Close> closeListener = onClosed;
-			if (listener != null) {
-				if (listener.listen(WHttpTask.this, state) && closeListener != null) {
+		private void doOnClose(okhttp3.WebSocket webSocket, HttpResult.State state, int code, String reason) {
+			synchronized(WHttpTask.this) {
+				if (WHttpTask.this.webSocket == null || this.webSocket.webSocket != webSocket) {
+					return;		// 回调已经执行过
+				}
+				WHttpTask.this.webSocket = null;
+				Close close = updateStatus(state, code, reason);
+				TaskListener<HttpResult.State> listener = httpClient.executor().getCompleteListener();
+				Listener<Close> closeListener = onClosed;
+				if (listener != null) {
+					if (listener.listen(WHttpTask.this, state) && closeListener != null) {
+						execute(() -> closeListener.on(this.webSocket, close), closedOnIO);
+					}
+				} else if (closeListener != null) {
 					execute(() -> closeListener.on(this.webSocket, close), closedOnIO);
 				}
-			} else if (closeListener != null) {
-				execute(() -> closeListener.on(this.webSocket, close), closedOnIO);
 			}
 		}
 
@@ -266,7 +278,7 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 		@Override
 		public void onFailure(okhttp3.WebSocket webSocket, Throwable t, Response response) {
 			IOException e = t instanceof IOException ? (IOException) t : new IOException(t.getMessage(), t);
-			doOnClose(toState(e), 0, t.getMessage());
+			doOnClose(webSocket, toState(e), 0, t.getMessage());
 			TaskListener<IOException> listener = httpClient.executor().getExceptionListener();
 			Listener<Throwable> exceptionListener = onException;
 			if (listener != null) {
@@ -514,6 +526,14 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 		closedOnIO = nextOnIO;
 		nextOnIO = false;
 		return this;
+	}
+
+	/**
+	 * 设置在 OnClosing 回调执行完毕后，OnClosed 回调执行的最晚延迟时间
+	 * @param maxClosingSecs 最大 Closing 时长（单位：秒，默认：10秒）
+	 */
+	public void setMaxClosingSecs(int maxClosingSecs) {
+		this.maxClosingSecs = maxClosingSecs;
 	}
 
 	public int pingSeconds() {
