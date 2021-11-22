@@ -116,6 +116,7 @@ public class Stomp {
     }
 
     private void doOnException(Throwable throwable) {
+        connecting = false;
         OnCallback<Throwable> listener = onException;
         if (listener != null) {
             listener.on(throwable);
@@ -418,6 +419,7 @@ public class Stomp {
                 disconnect(true);
             }
         } else if (Commands.ERROR.equals(command)) {
+            connecting = false;
             OnCallback<Message> listener = onError;
         	if (listener != null) {
                 listener.on(msg);
