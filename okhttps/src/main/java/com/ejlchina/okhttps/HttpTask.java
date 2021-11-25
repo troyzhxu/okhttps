@@ -34,9 +34,9 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     private final String urlPath;
     private String tag;
     private Map<String, String> headers;
-    private Map<String, String> pathParams;
-    private Map<String, String> urlParams;
-    private Map<String, String> bodyParams;
+    private Map<String, Object> pathParams;
+    private Map<String, Object> urlParams;
+    private Map<String, Object> bodyParams;
     private Map<String, FilePara> files;
     private Object requestBody;
     private String bodyType;
@@ -132,7 +132,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      * @since 2.4.0
      * @return 路径参数
      */
-    public Map<String, String> getPathParas() {
+    public Map<String, Object> getPathParas() {
         return pathParams;
     }
 
@@ -140,7 +140,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      * @since 2.4.0
      * @return URL参数（查询参数）
      */
-    public Map<String, String> getUrlParas() {
+    public Map<String, Object> getUrlParas() {
         return urlParams;
     }
 
@@ -148,7 +148,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      * @since 2.4.0
      * @return 报文体参数
      */
-    public Map<String, String> getBodyParas() {
+    public Map<String, Object> getBodyParas() {
         return bodyParams;
     }
 
@@ -378,7 +378,9 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         if (pathParams == null) {
             pathParams = new HashMap<>();
         }
-        doAddParams(pathParams, params);
+        if (params != null) {
+            pathParams.putAll(params);
+        }
         return (C) this;
     }
 
@@ -407,7 +409,9 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         if (urlParams == null) {
             urlParams = new HashMap<>();
         }
-        doAddParams(urlParams, params);
+        if (params != null) {
+            urlParams.putAll(params);
+        }
         return (C) this;
     }
 
@@ -422,7 +426,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             if (bodyParams == null) {
                 bodyParams = new HashMap<>();
             }
-            bodyParams.put(name, value.toString());
+            bodyParams.put(name, value);
         }
         return (C) this;
     }
@@ -436,19 +440,10 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         if (bodyParams == null) {
             bodyParams = new HashMap<>();
         }
-        doAddParams(bodyParams, params);
-        return (C) this;
-    }
-
-    private void doAddParams(Map<String, String> taskParams, Map<String, ?> params) {
         if (params != null) {
-            for (String name : params.keySet()) {
-                Object value = params.get(name);
-                if (name != null && value != null) {
-                    taskParams.put(name, value.toString());
-                }
-            }
+            bodyParams.putAll(params);
         }
+        return (C) this;
     }
 
     /**
@@ -648,11 +643,12 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
                 || files != null) {
             MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
             if (bodyParams != null) {
-                for (String name : bodyParams.keySet()) {
-                    byte[] value = bodyParams.get(name).getBytes(charset);
-                    RequestBody body = RequestBody.create(null, value);
-                    builder.addPart(MultipartBody.Part.createFormData(name, null, body));
-                }
+                bodyParams.forEach((key, value) -> {
+                    if (value == null) return;
+                    byte[] content = value.toString().getBytes(charset);
+                    RequestBody body = RequestBody.create(null, content);
+                    builder.addPart(MultipartBody.Part.createFormData(key, null, body));
+                });
             }
             if (files != null) {
                 for (String name : files.keySet()) {
@@ -677,10 +673,10 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         }
         if (OkHttps.FORM.equalsIgnoreCase(bodyType)) {
             FormBody.Builder builder = new FormBody.Builder(charset);
-            for (String name : bodyParams.keySet()) {
-                String value = bodyParams.get(name);
-                builder.add(name, value);
-            }
+            bodyParams.forEach((key, value) -> {
+                if (value == null) return;
+                builder.add(key, value.toString());
+            });
             return builder.build();
         }
         return toRequestBody(bodyParams);
@@ -715,7 +711,8 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             for (String name : pathParams.keySet()) {
                 String target = "{" + name + "}";
                 if (url.contains(target)) {
-                    url = url.replace(target, pathParams.get(name));
+                    Object value = pathParams.get(name);
+                    url = url.replace(target, value != null ? value.toString() : "");
                 } else {
                     throw new OkHttpsException("pathPara [ " + name + " ] 不存在于 url [ " + urlPath + " ]");
                 }
