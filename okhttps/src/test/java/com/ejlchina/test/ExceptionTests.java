@@ -2,8 +2,7 @@ package com.ejlchina.test;
 
 import com.ejlchina.okhttps.HTTP;
 import com.ejlchina.okhttps.HttpResult;
-import com.ejlchina.okhttps.internal.HttpException;
-import com.ejlchina.test.BaseTest;
+import com.ejlchina.okhttps.OkHttpsException;
 import okhttp3.OkHttpClient;
 import org.junit.Test;
 
@@ -32,7 +31,7 @@ public class ExceptionTests extends BaseTest {
         try {
             HttpResult result = http.sync("/users/1").get();
             System.out.println("请求结果：" + result);
-        } catch (HttpException e) {
+        } catch (OkHttpsException e) {
             Throwable cause = e.getCause(); // 得到异常原因
             if (cause instanceof ConnectException) {
                 // 当没网络时，会抛出连接异常

@@ -1,15 +1,17 @@
-package com.ejlchina.okhttps.internal;
+package com.ejlchina.okhttps;
+
+import com.ejlchina.okhttps.HttpResult.State;
+import okhttp3.MediaType;
+import okhttp3.internal.Util;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.concurrent.*;
-
-import com.ejlchina.okhttps.*;
-import com.ejlchina.okhttps.HttpResult.State;
-import okhttp3.MediaType;
-import okhttp3.internal.Util;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public final class TaskExecutor {
 
@@ -58,7 +60,7 @@ public final class TaskExecutor {
         executor.execute(command);
     }
     
-    public void executeOnResponse(HttpTask<?> task, AsyncHttpTask.OkHttpCall call, OnCallback<HttpResult> onResponse, HttpResult result, boolean onIo) {
+    public void executeOnResponse(HttpTask<?> task, AHttpTask.OkHttpCall call, OnCallback<HttpResult> onResponse, HttpResult result, boolean onIo) {
         Runnable runnable = () -> {
             if (!call.isCanceled()) onResponse.on(result);
         };
@@ -76,7 +78,7 @@ public final class TaskExecutor {
         }
     }
 
-    public boolean executeOnException(HttpTask<?> task, AsyncHttpTask.OkHttpCall call, OnCallback<IOException> onException, IOException error, boolean onIo) {
+    public boolean executeOnException(HttpTask<?> task, AHttpTask.OkHttpCall call, OnCallback<IOException> onException, IOException error, boolean onIo) {
         Runnable runnable = () -> {
             if (!call.isCanceled()) {
                 onException.on(error);
@@ -163,9 +165,9 @@ public final class TaskExecutor {
         	return new Data<>(null, toContentType(type));
         }
         if (cause != null) {
-            throw new HttpException("转换失败", cause);
+            throw new OkHttpsException("转换失败", cause);
         }
-        throw new HttpException("没有匹配[" + type + "]类型的转换器！");
+        throw new OkHttpsException("没有匹配[" + type + "]类型的转换器！");
     }
 
     private void initRootCause(Throwable throwable, Throwable cause) {
@@ -257,7 +259,7 @@ public final class TaskExecutor {
         return contentTypes;
     }
 
-    boolean isMulitMsgConvertor() {
+    public boolean isMulitMsgConvertor() {
         return msgConvertors.length > 1;
     }
 

@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import com.ejlchina.okhttps.TaskExecutor;
 import com.ejlchina.okhttps.WebSocket.Message;
 
 import okio.ByteString;

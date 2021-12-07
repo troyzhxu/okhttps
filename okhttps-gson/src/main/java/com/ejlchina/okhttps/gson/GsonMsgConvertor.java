@@ -1,6 +1,8 @@
-package com.ejlchina.okhttps;
+package com.ejlchina.okhttps.gson;
 
-import com.ejlchina.data.GsonDataConvertor;
+import com.ejlchina.data.gson.GsonDataConvertor;
+import com.ejlchina.okhttps.ConvertProvider;
+import com.ejlchina.okhttps.MsgConvertor;
 import com.google.gson.Gson;
 
 public class GsonMsgConvertor extends GsonDataConvertor implements MsgConvertor, ConvertProvider {

@@ -1,11 +1,9 @@
-package com.ejlchina.okhttps.internal;
-
-import com.ejlchina.okhttps.HttpResult;
+package com.ejlchina.okhttps;
 
 /**
  * Created by 周旭（Troy.Zhou） on 2016/8/30.
  */
-public class HttpException extends RuntimeException {
+public class OkHttpsException extends RuntimeException {
 
     /**
 	 * 
@@ -14,20 +12,20 @@ public class HttpException extends RuntimeException {
 
 	private HttpResult.State state;
 
-	public HttpException(String detailMessage) {
+	public OkHttpsException(String detailMessage) {
         super(detailMessage);
     }
 
-    public HttpException(String detailMessage, Throwable throwable) {
+    public OkHttpsException(String detailMessage, Throwable throwable) {
         super(detailMessage, throwable);
     }
 
-    public HttpException(HttpResult.State state, String detailMessage, Throwable throwable) {
+    public OkHttpsException(HttpResult.State state, String detailMessage, Throwable throwable) {
         super(detailMessage, throwable);
         this.state = state;
     }
 
-    public HttpException(HttpResult.State state, String detailMessage) {
+    public OkHttpsException(HttpResult.State state, String detailMessage) {
         super(detailMessage);
         this.state = state;
     }

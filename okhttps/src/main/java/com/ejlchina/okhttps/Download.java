@@ -1,8 +1,5 @@
 package com.ejlchina.okhttps;
 
-import com.ejlchina.okhttps.internal.HttpException;
-import com.ejlchina.okhttps.internal.TaskExecutor;
-
 import java.io.*;
 
 /**
@@ -352,7 +349,7 @@ public class Download {
         if (onFailure != null) {
             taskExecutor.execute(() -> onFailure.on(new Failure(e)), fOnIO);
         } else {
-            throw new HttpException("Download failed: ", e);
+            throw new OkHttpsException("Download failed: ", e);
         }
     }
 

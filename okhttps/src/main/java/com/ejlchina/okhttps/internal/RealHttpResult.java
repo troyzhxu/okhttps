@@ -2,6 +2,7 @@ package com.ejlchina.okhttps.internal;
 
 import com.ejlchina.okhttps.HttpResult;
 import com.ejlchina.okhttps.HttpTask;
+import com.ejlchina.okhttps.TaskExecutor;
 import okhttp3.Headers;
 import okhttp3.Response;
 

@@ -2,6 +2,7 @@ package com.ejlchina.okhttps;
 
 import com.ejlchina.data.Mapper;
 import com.ejlchina.okhttps.test.XmlTestCases;
+import com.ejlchina.okhttps.xml.XmlMsgConvertor;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Test;

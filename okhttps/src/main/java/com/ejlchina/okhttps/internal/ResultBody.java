@@ -4,12 +4,10 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URLDecoder;
 
-import com.ejlchina.okhttps.Download;
+import com.ejlchina.okhttps.*;
 import com.ejlchina.okhttps.HttpResult.Body;
-import com.ejlchina.okhttps.HttpTask;
-import com.ejlchina.okhttps.OnCallback;
-import com.ejlchina.okhttps.Process;
 
+import com.ejlchina.okhttps.Process;
 import okhttp3.MediaType;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
@@ -163,7 +161,7 @@ public class ResultBody extends AbstractBody implements Body {
 			}
 		} catch (IOException e) {
 			response.close();
-			throw new HttpException("报文体转化字符串出错", e);
+			throw new OkHttpsException("报文体转化字符串出错", e);
 		}
 		return null;
 	}
@@ -198,7 +196,7 @@ public class ResultBody extends AbstractBody implements Body {
 			}
 		} catch (Exception e) {
 			response.close();
-			throw new HttpException("文件下载失败", e);
+			throw new OkHttpsException("文件下载失败", e);
 		}
 		return taskExecutor.download(httpTask, file, toByteStream(), getRangeStart());
 	}
@@ -228,7 +226,7 @@ public class ResultBody extends AbstractBody implements Body {
 			}
 		} catch (Exception e) {
 			response.close();
-			throw new HttpException("目录创建失败", e);
+			throw new OkHttpsException("目录创建失败", e);
 		}
 		return toFolder(dir.getAbsolutePath());
 	}
@@ -264,7 +262,7 @@ public class ResultBody extends AbstractBody implements Body {
 			try (Buffer buffer = new Buffer()) {
 				return buffer.readFrom(toByteStream()).readByteArray();
 			} catch (IOException e) {
-				throw new HttpException("报文体转化字节数组出错", e);
+				throw new OkHttpsException("报文体转化字节数组出错", e);
 			} finally {
 				response.close();
 			}
@@ -275,7 +273,7 @@ public class ResultBody extends AbstractBody implements Body {
 				return body.bytes();
 			} catch (IOException e) {
 				body.close();
-				throw new HttpException("报文体转化字节数组出错", e);
+				throw new OkHttpsException("报文体转化字节数组出错", e);
 			}
 		}
 		return new byte[0];
@@ -331,7 +329,7 @@ public class ResultBody extends AbstractBody implements Body {
 				    fileName.indexOf("filename=") + 9), "UTF-8");
 			} catch (UnsupportedEncodingException e) {
             	response.close();
-				throw new HttpException("解码文件名失败", e);
+				throw new OkHttpsException("解码文件名失败", e);
 			}
             // 有些文件名会被包含在""里面，所以要去掉，不然无法读取文件后缀
             fileName = fileName.replaceAll("\"", "");

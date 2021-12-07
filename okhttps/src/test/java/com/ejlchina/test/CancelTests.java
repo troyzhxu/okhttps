@@ -1,9 +1,8 @@
 package com.ejlchina.test;
 
-import com.ejlchina.okhttps.HTTP;
 import com.ejlchina.okhttps.HttpResult;
 import com.ejlchina.okhttps.HttpResult.State;
-import com.ejlchina.okhttps.internal.HttpClient;
+import com.ejlchina.okhttps.internal.AbstractHttpClient;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -56,44 +55,44 @@ public class CancelTests extends BaseTest {
                 .tag("A")
                 .get();
 
-        println(((HttpClient) http).getTagTaskCount());
+        println(((AbstractHttpClient) http).getTagTaskCount());
 
         http.async("/user/show/2")
                 .setOnResponse(BaseTest::println)
                 .tag("A.B")
                 .get();
 
-        println(((HttpClient) http).getTagTaskCount());
+        println(((AbstractHttpClient) http).getTagTaskCount());
 
         http.async("/user/show/3")
                 .setOnResponse(BaseTest::println)
                 .tag("B.C")
                 .get();
 
-        println(((HttpClient) http).getTagTaskCount());
+        println(((AbstractHttpClient) http).getTagTaskCount());
 
         http.async("/user/show/4")
                 .setOnResponse(BaseTest::println)
                 .tag("C")
                 .get();
 
-        println(((HttpClient) http).getTagTaskCount());
+        println(((AbstractHttpClient) http).getTagTaskCount());
 
         println("标签取消：" + http.cancel("B"));
 
-        println(((HttpClient) http).getTagTaskCount());
+        println(((AbstractHttpClient) http).getTagTaskCount());
 
         sleep(5000);
 
-        println(((HttpClient) http).getTagTaskCount());
+        println(((AbstractHttpClient) http).getTagTaskCount());
 
         sleep(5000);
 
-        println(((HttpClient) http).getTagTaskCount());
+        println(((AbstractHttpClient) http).getTagTaskCount());
 
         sleep(5000);
 
-        println(((HttpClient) http).getTagTaskCount());
+        println(((AbstractHttpClient) http).getTagTaskCount());
     }
 
 }

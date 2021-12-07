@@ -10,7 +10,7 @@ import java.util.List;
 
 public class CopyInterceptor implements Interceptor {
 
-    static final String TAG = "okhttps-Async-Response-Copy";
+    public static final String TAG = "okhttps-Async-Response-Copy";
 
     public static boolean notIn(List<Interceptor> list) {
         for (Interceptor item : list) {

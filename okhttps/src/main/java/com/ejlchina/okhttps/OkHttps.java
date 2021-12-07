@@ -1,6 +1,5 @@
 package com.ejlchina.okhttps;
 
-import com.ejlchina.okhttps.internal.*;
 import okhttp3.Call;
 import okhttp3.Request;
 import okhttp3.WebSocket;
@@ -41,7 +40,7 @@ public final class OkHttps {
      * @param url 请求地址
      * @return 异步 HttpTask
      */
-    public static AsyncHttpTask async(String url) {
+    public static AHttpTask async(String url) {
         return getHttp().async(url);
     }
 
@@ -50,7 +49,7 @@ public final class OkHttps {
      * @param url 请求地址
      * @return 同步 HttpTask
      */
-    public static SyncHttpTask sync(String url) {
+    public static SHttpTask sync(String url) {
         return getHttp().sync(url);
     }
 
@@ -59,7 +58,7 @@ public final class OkHttps {
      * @param url 连接地址
      * @return WebSocket 任务
      */
-    public static WebSocketTask webSocket(String url) {
+    public static WHttpTask webSocket(String url) {
         return getHttp().webSocket(url);
     }
 

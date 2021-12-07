@@ -2,7 +2,7 @@ package com.ejlchina.test;
 
 import com.ejlchina.okhttps.HTTP;
 import com.ejlchina.okhttps.HttpResult;
-import com.ejlchina.okhttps.internal.HttpClient;
+import com.ejlchina.okhttps.internal.AbstractHttpClient;
 import okhttp3.OkHttpClient;
 import org.junit.Test;
 
@@ -12,7 +12,7 @@ public class TagTests extends BaseTest {
 
     @Test
     public void testTag() {
-        HttpClient http = (HttpClient) HTTP.builder()
+        AbstractHttpClient http = (AbstractHttpClient) HTTP.builder()
                 .config((OkHttpClient.Builder builder) -> {
                     builder.connectTimeout(1, TimeUnit.SECONDS);
                     builder.writeTimeout(1, TimeUnit.SECONDS);

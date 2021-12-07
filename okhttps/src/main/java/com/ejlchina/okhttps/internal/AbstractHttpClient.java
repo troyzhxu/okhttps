@@ -2,16 +2,13 @@ package com.ejlchina.okhttps.internal;
 
 import com.ejlchina.okhttps.*;
 import okhttp3.*;
-import okhttp3.WebSocket;
 
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.concurrent.Executor;
 
+public abstract class AbstractHttpClient implements HTTP {
 
-public class HttpClient implements HTTP {
-
-    // OkHttpClient
-    final OkHttpClient okClient;
     // 根URL
     final String baseUrl;
     // 媒体类型
@@ -30,11 +27,10 @@ public class HttpClient implements HTTP {
     final String bodyType;
 
 
-    public HttpClient(Builder builder) {
-        this.okClient = builder.okClient();
+    public AbstractHttpClient(HTTP.Builder builder) {
         this.baseUrl = builder.baseUrl();
         this.mediaTypes = builder.getMediaTypes();
-        this.executor = new TaskExecutor(builder, okClient.dispatcher().executorService());
+        this.executor = new TaskExecutor(builder, ioExecutor(builder));
         this.preprocessors = builder.preprocessors();
         this.preprocTimeoutTimes = builder.preprocTimeoutTimes();
         this.charset = builder.charset();
@@ -42,21 +38,25 @@ public class HttpClient implements HTTP {
         this.tagTasks = new LinkedList<>();
     }
 
+
+    public abstract Executor ioExecutor(HTTP.Builder builder);
+
+
     @Override
-    public AsyncHttpTask async(String url) {
-        return new AsyncHttpTask(this, urlPath(url, false));
+    public AHttpTask async(String url) {
+        return new AHttpTask(this, urlPath(url, false));
     }
 
     @Override
-    public SyncHttpTask sync(String url) {
-        return new SyncHttpTask(this, urlPath(url, false));
+    public SHttpTask sync(String url) {
+        return new SHttpTask(this, urlPath(url, false));
     }
 
-	@Override
-	public WebSocketTask webSocket(String url) {
-		return new WebSocketTask(this, urlPath(url, true));
-	}
-    
+    @Override
+    public WHttpTask webSocket(String url) {
+        return new WHttpTask(this, urlPath(url, true));
+    }
+
     @Override
     public int cancel(String tag) {
         if (tag == null) {
@@ -64,7 +64,7 @@ public class HttpClient implements HTTP {
         }
         int count = 0;
         synchronized (tagTasks) {
-        	Iterator<TagTask> it = tagTasks.iterator();
+            Iterator<TagTask> it = tagTasks.iterator();
             while (it.hasNext()) {
                 TagTask tagCall = it.next();
                 // 只要任务的标签包含指定的Tag就会被取消
@@ -83,31 +83,19 @@ public class HttpClient implements HTTP {
 
     @Override
     public void cancelAll() {
-        okClient.dispatcher().cancelAll();
+        doCancelAll();
         synchronized (tagTasks) {
-        	tagTasks.clear();
+            tagTasks.clear();
         }
     }
 
-    @Override
-    public Call request(Request request) {
-        return okClient.newCall(request);
-    }
-
-    @Override
-    public WebSocket webSocket(Request request, WebSocketListener listener) {
-        return okClient.newWebSocket(request, listener);
-    }
-
-    public OkHttpClient okClient() {
-        return okClient;
-    }
+    public abstract void doCancelAll();
 
     public int preprocTimeoutMillis() {
-        return preprocTimeoutTimes * (okClient.connectTimeoutMillis()
-        		+ okClient.writeTimeoutMillis()
-        		+ okClient.readTimeoutMillis());
+        return preprocTimeoutTimes * totalTimeoutMillis();
     }
+
+    public abstract int totalTimeoutMillis();
 
     public int getTagTaskCount() {
         return tagTasks.size();
@@ -116,14 +104,14 @@ public class HttpClient implements HTTP {
     public TagTask addTagTask(String tag, Cancelable canceler, HttpTask<?> task) {
         TagTask tagTask = new TagTask(tag, canceler, task);
         synchronized (tagTasks) {
-        	tagTasks.add(tagTask);
+            tagTasks.add(tagTask);
         }
-		return tagTask;
+        return tagTask;
     }
 
     public void removeTagTask(HttpTask<?> task) {
-    	synchronized (tagTasks) {
-    		Iterator<TagTask> it = tagTasks.iterator();
+        synchronized (tagTasks) {
+            Iterator<TagTask> it = tagTasks.iterator();
             while (it.hasNext()) {
                 TagTask tagCall = it.next();
                 if (tagCall.task == task) {
@@ -134,7 +122,7 @@ public class HttpClient implements HTTP {
                     it.remove();
                 }
             }
-    	}
+        }
     }
 
     public class TagTask {
@@ -156,9 +144,9 @@ public class HttpClient implements HTTP {
             return System.nanoTime() - createAt > 1_000_000L * preprocTimeoutMillis();
         }
 
-		public void setTag(String tag) {
-			this.tag = tag;
-		}
+        public void setTag(String tag) {
+            this.tag = tag;
+        }
 
     }
 
@@ -166,6 +154,12 @@ public class HttpClient implements HTTP {
         String mediaType = mediaTypes.get(type);
         if (mediaType != null) {
             return MediaType.parse(mediaType);
+        }
+        if (type != null) {
+            MediaType mType = MediaType.parse(type);
+            if (mType != null) {
+                return mType;
+            }
         }
         return MediaType.parse("application/octet-stream");
     }
@@ -176,77 +170,27 @@ public class HttpClient implements HTTP {
     }
 
 
-    public void preprocess(HttpTask<?> httpTask, Runnable request, 
-    		boolean skipPreproc, boolean skipSerialPreproc) {
-    	if (preprocessors.length == 0 || skipPreproc) {
-    		request.run();
-    		return;
-    	}
-    	int index = 0;
-    	if (skipSerialPreproc) {
-    		while (index < preprocessors.length 
-    				&& preprocessors[index] instanceof SerialPreprocessor) {
-    			index++;
-    		}
-    	}
-    	if (index < preprocessors.length) {
-    		RealPreChain chain = new RealPreChain(preprocessors,
-                    httpTask, request, index + 1, 
+    public void preprocess(HttpTask<?> httpTask, Runnable request,
+                           boolean skipPreproc, boolean skipSerialPreproc) {
+        if (preprocessors.length == 0 || skipPreproc) {
+            request.run();
+            return;
+        }
+        int index = 0;
+        if (skipSerialPreproc) {
+            while (index < preprocessors.length
+                    && preprocessors[index] instanceof SerialPreprocessor) {
+                index++;
+            }
+        }
+        if (index < preprocessors.length) {
+            RealPreChain chain = new RealPreChain(preprocessors,
+                    httpTask, request, index + 1,
                     skipSerialPreproc);
             preprocessors[index].doProcess(chain);
-    	} else {
-    		request.run();
-    	}
-    }
-
-    /**
-     * 串行预处理器
-     * @author Troy.Zhou
-     */
-    public static class SerialPreprocessor implements Preprocessor {
-
-        // 预处理器
-        final Preprocessor preprocessor;
-        // 待处理的任务队列
-        final Queue<PreChain> pendings;
-        // 是否有任务正在执行
-        boolean running = false;
-
-        public SerialPreprocessor(Preprocessor preprocessor) {
-            this.preprocessor = preprocessor;
-            this.pendings = new LinkedList<>();
+        } else {
+            request.run();
         }
-
-        @Override
-        public void doProcess(PreChain chain) {
-            boolean should = true;
-            synchronized (this) {
-                if (running) {
-                    pendings.add(chain);
-                    should = false;
-                } else {
-                    running = true;
-                }
-            }
-            if (should) {
-                preprocessor.doProcess(chain);
-            }
-        }
-
-        public void afterProcess() {
-            PreChain chain = null;
-            synchronized (this) {
-                if (pendings.size() > 0) {
-                    chain = pendings.poll();
-                } else {
-                    running = false;
-                }
-            }
-            if (chain != null) {
-                preprocessor.doProcess(chain);
-            }
-        }
-
     }
 
 
@@ -257,9 +201,9 @@ public class HttpClient implements HTTP {
         final HttpTask<?> httpTask;
         final Runnable request;
         final boolean noSerialPreprocess;
-        
-        public RealPreChain(Preprocessor[] preprocessors, HttpTask<?> httpTask, Runnable request, 
-        		int index, boolean noSerialPreprocess) {
+
+        public RealPreChain(Preprocessor[] preprocessors, HttpTask<?> httpTask, Runnable request,
+                            int index, boolean noSerialPreprocess) {
             this.index = index;		// index 大于等于 1
             this.preprocessors = preprocessors;
             this.httpTask = httpTask;
@@ -274,22 +218,22 @@ public class HttpClient implements HTTP {
 
         @Override
         public HTTP getHttp() {
-            return HttpClient.this;
+            return AbstractHttpClient.this;
         }
 
         @Override
         public void proceed() {
-        	if (noSerialPreprocess) {
-        		while (index < preprocessors.length 
-        				&& preprocessors[index] instanceof SerialPreprocessor) {
-        			index++;
-        		}
-        	} else {
-        		Preprocessor last = preprocessors[index - 1];
+            if (noSerialPreprocess) {
+                while (index < preprocessors.length
+                        && preprocessors[index] instanceof SerialPreprocessor) {
+                    index++;
+                }
+            } else {
+                Preprocessor last = preprocessors[index - 1];
                 if (last instanceof SerialPreprocessor) {
                     ((SerialPreprocessor) last).afterProcess();
                 }
-        	}
+            }
             if (index < preprocessors.length) {
                 preprocessors[index++].doProcess(this);
             } else {
@@ -299,18 +243,13 @@ public class HttpClient implements HTTP {
 
     }
 
-    @Override
-    public Builder newBuilder() {
-        return new Builder(this);
-    }
-
     private String urlPath(String urlPath, boolean websocket) {
         String fullUrl;
         if (urlPath == null) {
             if (baseUrl != null) {
                 fullUrl = baseUrl;
             } else {
-                throw new HttpException("在设置 BaseUrl 之前，您必须指定具体路径才能发起请求！");
+                throw new OkHttpsException("在设置 BaseUrl 之前，您必须指定具体路径才能发起请求！");
             }
         } else {
             urlPath = urlPath.trim();
@@ -323,7 +262,7 @@ public class HttpClient implements HTTP {
             } else if (baseUrl != null) {
                 fullUrl = baseUrl + urlPath;
             } else {
-                throw new HttpException("在设置 BaseUrl 之前，您必须使用全路径URL发起请求，当前URL为：'" + urlPath + "'");
+                throw new OkHttpsException("在设置 BaseUrl 之前，您必须使用全路径URL发起请求，当前URL为：'" + urlPath + "'");
             }
         }
         if (websocket && fullUrl.startsWith("http")) {
@@ -362,6 +301,5 @@ public class HttpClient implements HTTP {
     public String bodyType() {
         return bodyType;
     }
-
 
 }

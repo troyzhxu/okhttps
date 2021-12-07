@@ -2,7 +2,7 @@ package com.ejlchina.okhttps;
 
 import com.ejlchina.okhttps.HttpResult.State;
 import com.ejlchina.okhttps.internal.*;
-import com.ejlchina.okhttps.internal.HttpClient.TagTask;
+import com.ejlchina.okhttps.internal.AbstractHttpClient.TagTask;
 import okhttp3.*;
 import okhttp3.internal.http.HttpMethod;
 
@@ -27,16 +27,16 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     private static final String PATH_PARAM_REGEX = "[A-Za-z0-9_\\-/]*\\{[A-Za-z0-9_\\-]+\\}[A-Za-z0-9_\\-/]*";
     private static final String DOT = ".";
 
-    protected HttpClient httpClient;
+    protected AbstractHttpClient httpClient;
     protected boolean nothrow;
     protected boolean nextOnIO = false;
     
     private final String urlPath;
     private String tag;
     private Map<String, String> headers;
-    private Map<String, String> pathParams;
-    private Map<String, String> urlParams;
-    private Map<String, String> bodyParams;
+    private Map<String, Object> pathParams;
+    private Map<String, Object> urlParams;
+    private Map<String, Object> bodyParams;
     private Map<String, FilePara> files;
     private Object requestBody;
     private String bodyType;
@@ -55,7 +55,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     protected boolean skipSerialPreproc = false;
 
 
-    public HttpTask(HttpClient httpClient, String urlPath) {
+    public HttpTask(AbstractHttpClient httpClient, String urlPath) {
         this.httpClient = httpClient;
         this.charset = httpClient.charset();
         this.bodyType = httpClient.bodyType();
@@ -132,7 +132,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      * @since 2.4.0
      * @return 路径参数
      */
-    public Map<String, String> getPathParas() {
+    public Map<String, Object> getPathParas() {
         return pathParams;
     }
 
@@ -140,7 +140,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      * @since 2.4.0
      * @return URL参数（查询参数）
      */
-    public Map<String, String> getUrlParas() {
+    public Map<String, Object> getUrlParas() {
         return urlParams;
     }
 
@@ -148,7 +148,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
      * @since 2.4.0
      * @return 报文体参数
      */
-    public Map<String, String> getBodyParas() {
+    public Map<String, Object> getBodyParas() {
         return bodyParams;
     }
 
@@ -378,7 +378,9 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         if (pathParams == null) {
             pathParams = new HashMap<>();
         }
-        doAddParams(pathParams, params);
+        if (params != null) {
+            pathParams.putAll(params);
+        }
         return (C) this;
     }
 
@@ -407,7 +409,9 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         if (urlParams == null) {
             urlParams = new HashMap<>();
         }
-        doAddParams(urlParams, params);
+        if (params != null) {
+            urlParams.putAll(params);
+        }
         return (C) this;
     }
 
@@ -422,7 +426,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             if (bodyParams == null) {
                 bodyParams = new HashMap<>();
             }
-            bodyParams.put(name, value.toString());
+            bodyParams.put(name, value);
         }
         return (C) this;
     }
@@ -436,19 +440,10 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         if (bodyParams == null) {
             bodyParams = new HashMap<>();
         }
-        doAddParams(bodyParams, params);
-        return (C) this;
-    }
-
-    private void doAddParams(Map<String, String> taskParams, Map<String, ?> params) {
         if (params != null) {
-            for (String name : params.keySet()) {
-                Object value = params.get(name);
-                if (name != null && value != null) {
-                    taskParams.put(name, value.toString());
-                }
-            }
+            bodyParams.putAll(params);
         }
+        return (C) this;
     }
 
     /**
@@ -614,7 +609,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         try {
             return reqBody.contentLength();
         } catch (IOException e) {
-            throw new HttpException("无法获取请求体长度", e);
+            throw new OkHttpsException("无法获取请求体长度", e);
         }
     }
 
@@ -648,11 +643,12 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
                 || files != null) {
             MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
             if (bodyParams != null) {
-                for (String name : bodyParams.keySet()) {
-                    byte[] value = bodyParams.get(name).getBytes(charset);
-                    RequestBody body = RequestBody.create(null, value);
-                    builder.addPart(MultipartBody.Part.createFormData(name, null, body));
-                }
+                bodyParams.forEach((key, value) -> {
+                    if (value == null) return;
+                    byte[] content = value.toString().getBytes(charset);
+                    RequestBody body = RequestBody.create(null, content);
+                    builder.addPart(MultipartBody.Part.createFormData(key, null, body));
+                });
             }
             if (files != null) {
                 for (String name : files.keySet()) {
@@ -677,10 +673,10 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         }
         if (OkHttps.FORM.equalsIgnoreCase(bodyType)) {
             FormBody.Builder builder = new FormBody.Builder(charset);
-            for (String name : bodyParams.keySet()) {
-                String value = bodyParams.get(name);
-                builder.add(name, value);
-            }
+            bodyParams.forEach((key, value) -> {
+                if (value == null) return;
+                builder.add(key, value.toString());
+            });
             return builder.build();
         }
         return toRequestBody(bodyParams);
@@ -709,20 +705,21 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     private String buildUrlPath() {
         String url = urlPath;
         if (url == null || url.trim().isEmpty()) {
-            throw new HttpException("url 不能为空！");
+            throw new OkHttpsException("url 不能为空！");
         }
         if (pathParams != null) {
             for (String name : pathParams.keySet()) {
                 String target = "{" + name + "}";
                 if (url.contains(target)) {
-                    url = url.replace(target, pathParams.get(name));
+                    Object value = pathParams.get(name);
+                    url = url.replace(target, value != null ? value.toString() : "");
                 } else {
-                    throw new HttpException("pathParameter [ " + name + " ] 不存在于 url [ " + urlPath + " ]");
+                    throw new OkHttpsException("pathPara [ " + name + " ] 不存在于 url [ " + urlPath + " ]");
                 }
             }
         }
         if (url.matches(PATH_PARAM_REGEX)) {
-            throw new HttpException("url 里有 pathParameter 没有设置，你必须先调用 addPathParam 为其设置！");
+            throw new OkHttpsException("url 里有 pathPara 没有设置，你必须先调用 addPathPara 为其设置！");
         }
         if (urlParams != null) {
             url = buildUrl(url.trim());
@@ -735,7 +732,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         if (url.contains("?")) {
             if (!url.endsWith("?")) {
                 if (url.lastIndexOf("=") < url.lastIndexOf("?") + 2) {
-                    throw new HttpException("url 格式错误，'？' 后没有发现 '='");
+                    throw new OkHttpsException("url 格式错误，'?' 后没有发现 '='");
                 }
                 if (!url.endsWith("&")) {
                     sb.append('&');
@@ -757,21 +754,21 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     protected void assertNotConflict(boolean bodyCantUsed) {
         if (bodyCantUsed) {
             if (requestBody != null) {
-                throw new HttpException("GET | HEAD 请求 不能调用 setBodyPara 方法！");
+                throw new OkHttpsException("GET | HEAD 请求 不能调用 setBodyPara 方法！");
             }
             if (isNotEmpty(bodyParams)) {
-                throw new HttpException("GET | HEAD 请求 不能调用 addBodyPara 方法！");
+                throw new OkHttpsException("GET | HEAD 请求 不能调用 addBodyPara 方法！");
             }
             if (isNotEmpty(files)) {
-                throw new HttpException("GET | HEAD 请求 不能调用 addFilePara 方法！");
+                throw new OkHttpsException("GET | HEAD 请求 不能调用 addFilePara 方法！");
             }
         }
         if (requestBody != null) {
             if (isNotEmpty(bodyParams)) {
-                throw new HttpException("方法 addBodyPara 与 setBodyPara 不能同时使用！");
+                throw new OkHttpsException("方法 addBodyPara 与 setBodyPara 不能同时使用！");
             }
             if (isNotEmpty(files)) {
-                throw new HttpException("方法 addFilePara 与 setBodyPara 不能同时使用！");
+                throw new OkHttpsException("方法 addFilePara 与 setBodyPara 不能同时使用！");
             }
         }
     }
@@ -789,7 +786,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             return latch.await(httpClient.preprocTimeoutMillis(),
                     TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            throw new HttpException("执行超时: " + urlPath, e);
+            throw new OkHttpsException("执行超时: " + urlPath, e);
         }
     }
 
@@ -797,7 +794,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         if (nothrow) {
             return new RealHttpResult(this, State.TIMEOUT);
         }
-        throw new HttpException(State.TIMEOUT, "执行超时: " + urlPath);
+        throw new OkHttpsException(State.TIMEOUT, "执行超时: " + urlPath);
     }
 
     public Charset charset(Response response) {

@@ -4,7 +4,6 @@ import com.ejlchina.data.Array;
 import com.ejlchina.data.DataConvertor;
 import com.ejlchina.data.DataSet;
 import com.ejlchina.data.Mapper;
-import com.ejlchina.okhttps.internal.HttpException;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -80,7 +79,7 @@ public interface MsgConvertor extends DataConvertor {
 				try {
 					return URLEncoder.encode(value, charset.name());
 				} catch (UnsupportedEncodingException e) {
-					throw new HttpException("UnsupportedEncoding: " + charset.name(), e);
+					throw new OkHttpsException("UnsupportedEncoding: " + charset.name(), e);
 				}
 			}
 			return value;

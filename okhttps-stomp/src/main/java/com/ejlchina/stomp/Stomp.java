@@ -2,8 +2,8 @@ package com.ejlchina.stomp;
 
 import com.ejlchina.okhttps.OnCallback;
 import com.ejlchina.okhttps.Platform;
+import com.ejlchina.okhttps.WHttpTask;
 import com.ejlchina.okhttps.WebSocket;
-import com.ejlchina.okhttps.internal.WebSocketTask;
 
 import okio.ByteString;
 
@@ -25,7 +25,7 @@ public class Stomp {
     private boolean connected = false;      // 是否已连接
     private boolean connecting = false;     // 是否连接中
     private boolean disconnecting = false;  // 是否断开连接中
-    private final WebSocketTask task;
+    private final WHttpTask task;
     private WebSocket websocket;
 
     private final List<Subscriber> subscribers;
@@ -40,7 +40,7 @@ public class Stomp {
     private MsgCodec msgCodec = new MsgCodecImpl();
 
 
-    private Stomp(WebSocketTask task, boolean autoAck) {
+    private Stomp(WHttpTask task, boolean autoAck) {
         this.task = task;
         this.autoAck = autoAck;
         this.subscribers = Collections.synchronizedList(new ArrayList<>());
@@ -52,7 +52,7 @@ public class Stomp {
      * @param task 底层的 WebSocket 连接
      * @return Stomp
      */
-    public static Stomp over(WebSocketTask task) {
+    public static Stomp over(WHttpTask task) {
         return over(task, true);
     }
 
@@ -62,7 +62,7 @@ public class Stomp {
      * @param autoAck 是否自动确定消息
      * @return Stomp
      */
-    public static Stomp over(WebSocketTask task, boolean autoAck) {
+    public static Stomp over(WHttpTask task, boolean autoAck) {
         return new Stomp(task, autoAck);
     }
 
@@ -116,6 +116,7 @@ public class Stomp {
     }
 
     private void doOnException(Throwable throwable) {
+        connecting = false;
         OnCallback<Throwable> listener = onException;
         if (listener != null) {
             listener.on(throwable);
@@ -418,6 +419,7 @@ public class Stomp {
                 disconnect(true);
             }
         } else if (Commands.ERROR.equals(command)) {
+            connecting = false;
             OnCallback<Message> listener = onError;
         	if (listener != null) {
                 listener.on(msg);

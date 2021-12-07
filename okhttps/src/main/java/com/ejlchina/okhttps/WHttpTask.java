@@ -1,9 +1,11 @@
-package com.ejlchina.okhttps.internal;
+package com.ejlchina.okhttps;
 
-import com.ejlchina.okhttps.*;
 import com.ejlchina.okhttps.WebSocket.Close;
 import com.ejlchina.okhttps.WebSocket.Listener;
 import com.ejlchina.okhttps.WebSocket.Message;
+import com.ejlchina.okhttps.internal.AbstractHttpClient;
+import com.ejlchina.okhttps.internal.RealHttpResult;
+import com.ejlchina.okhttps.internal.WebSocketMsg;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.WebSocketListener;
@@ -18,9 +20,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
-public class WebSocketTask extends HttpTask<WebSocketTask> {
+public class WHttpTask extends HttpTask<WHttpTask> {
 
-	
 	private Listener<HttpResult> onOpen;
 	private Listener<Throwable> onException;
 	private Listener<Message> onMessage;
@@ -46,8 +47,11 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	// Ping 的间隔是否灵活可变
 	private boolean flexiblePing = true;
 
+	// 最大关闭时长，即：执行了 OnClosing 回调后，最晚过多少久就会执行 OnClosed 回调
+	private int maxClosingSecs = 10;
 
-	public WebSocketTask(HttpClient httpClient, String url) {
+
+	public WHttpTask(AbstractHttpClient httpClient, String url) {
 		super(httpClient, url);
 	}
 
@@ -76,7 +80,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * @param pongSeconds 服务器心跳间隔秒数（0 表示不需要心跳）
 	 * @return WebSocketTask
 	 */
-	public WebSocketTask heatbeat(int pingSeconds, int pongSeconds) {
+	public WHttpTask heatbeat(int pingSeconds, int pongSeconds) {
 		if (pingSeconds < 0 || pongSeconds < 0) {
 			throw new IllegalArgumentException("pingSeconds and pongSeconds must greater equal than 0!");
 		}
@@ -91,7 +95,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * @param flexiblePing Ping 的间隔是否灵活可变（默认为 true, 为 false 时客户端 Ping 的间隔固定，普通的消息不做为 Ping）
 	 * @return WebSocketTask
 	 */
-	public WebSocketTask flexiblePing(boolean flexiblePing) {
+	public WHttpTask flexiblePing(boolean flexiblePing) {
 		this.flexiblePing = flexiblePing;
 		return this;
 	}
@@ -100,7 +104,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * @param pingSupplier 心跳数据提供者
 	 * @return WebSocketTask
 	 */
-	public WebSocketTask pingSupplier(PingSupplier pingSupplier) {
+	public WHttpTask pingSupplier(PingSupplier pingSupplier) {
 		this.pingSupplier = pingSupplier;
 		return this;
 	}
@@ -151,6 +155,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		return false;
 	}
 
+	@SuppressWarnings("NullableProblems")
 	class MessageListener extends WebSocketListener {
 
 		final WebSocketImpl webSocket;
@@ -167,11 +172,11 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			this.webSocket.setCharset(charset);
 			this.webSocket.setWebSocket(webSocket);
 			this.webSocket.setStatus(WebSocket.STATUS_CONNECTED);
-			TaskListener<HttpResult> listener = httpClient.executor.getResponseListener();
-			HttpResult result = new RealHttpResult(WebSocketTask.this, response, httpClient.executor);
+			TaskListener<HttpResult> listener = httpClient.executor().getResponseListener();
+			HttpResult result = new RealHttpResult(WHttpTask.this, response, httpClient.executor());
 			Listener<HttpResult> openListener = onOpen;
 			if (listener != null) {
-				if (listener.listen(WebSocketTask.this, result) && openListener != null) {
+				if (listener.listen(WHttpTask.this, result) && openListener != null) {
 					execute(() -> openListener.on(this.webSocket, result), openOnIO);
 				}
 			} else if (openListener != null) {
@@ -192,7 +197,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		public void onMessage(okhttp3.WebSocket webSocket, String text) {
 			Listener<Message> listener = onMessage;
 			if (listener != null) {
-				execute(() -> listener.on(this.webSocket, new WebSocketMsg(text, httpClient.executor, charset)), messageOnIO);
+				execute(() -> listener.on(this.webSocket, new WebSocketMsg(text, httpClient.executor(), charset)), messageOnIO);
 			}
 			if (pongSeconds > 0) {
 				lastPongSecs = nowSeconds();
@@ -205,7 +210,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		public void onMessage(okhttp3.WebSocket webSocket, ByteString bytes) {
 			Listener<Message> listener = onMessage;
 			if (listener != null) {
-				execute(() -> listener.on(this.webSocket, new WebSocketMsg(bytes, httpClient.executor, charset)), messageOnIO);
+				execute(() -> listener.on(this.webSocket, new WebSocketMsg(bytes, httpClient.executor(), charset)), messageOnIO);
 			}
 			if (pongSeconds > 0) {
 				lastPongSecs = nowSeconds();
@@ -220,24 +225,32 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			if (listener != null) {
 				execute(() -> listener.on(this.webSocket, new Close(code, reason)), closingOnIO);
 			}
+			httpClient.executor().requireScheduler().schedule(() -> {
+				doOnClose(webSocket, HttpResult.State.RESPONSED, code, reason);
+			}, maxClosingSecs, TimeUnit.SECONDS);
 		}
 
 		@Override
 		public void onClosed(okhttp3.WebSocket webSocket, int code, String reason) {
-			doOnClose(HttpResult.State.RESPONSED, code, reason);
+			doOnClose(webSocket, HttpResult.State.RESPONSED, code, reason);
 		}
 
-		private void doOnClose(HttpResult.State state, int code, String reason) {
-			WebSocketTask.this.webSocket = null;
-			Close close = updateStatus(state, code, reason);
-			TaskListener<HttpResult.State> listener = httpClient.executor.getCompleteListener();
-			Listener<Close> closeListener = onClosed;
-			if (listener != null) {
-				if (listener.listen(WebSocketTask.this, state) && closeListener != null) {
+		private void doOnClose(okhttp3.WebSocket webSocket, HttpResult.State state, int code, String reason) {
+			synchronized(WHttpTask.this) {
+				if (WHttpTask.this.webSocket == null || this.webSocket.webSocket != webSocket) {
+					return;		// 回调已经执行过
+				}
+				WHttpTask.this.webSocket = null;
+				Close close = updateStatus(state, code, reason);
+				TaskListener<HttpResult.State> listener = httpClient.executor().getCompleteListener();
+				Listener<Close> closeListener = onClosed;
+				if (listener != null) {
+					if (listener.listen(WHttpTask.this, state) && closeListener != null) {
+						execute(() -> closeListener.on(this.webSocket, close), closedOnIO);
+					}
+				} else if (closeListener != null) {
 					execute(() -> closeListener.on(this.webSocket, close), closedOnIO);
 				}
-			} else if (closeListener != null) {
-				execute(() -> closeListener.on(this.webSocket, close), closedOnIO);
 			}
 		}
 
@@ -265,17 +278,17 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 		@Override
 		public void onFailure(okhttp3.WebSocket webSocket, Throwable t, Response response) {
 			IOException e = t instanceof IOException ? (IOException) t : new IOException(t.getMessage(), t);
-			doOnClose(toState(e), 0, t.getMessage());
-			TaskListener<IOException> listener = httpClient.executor.getExceptionListener();
+			doOnClose(webSocket, toState(e), 0, t.getMessage());
+			TaskListener<IOException> listener = httpClient.executor().getExceptionListener();
 			Listener<Throwable> exceptionListener = onException;
 			if (listener != null) {
-				if (listener.listen(WebSocketTask.this,  e) && exceptionListener != null) {
+				if (listener.listen(WHttpTask.this,  e) && exceptionListener != null) {
 					execute(() -> exceptionListener.on(this.webSocket,  t), exceptionOnIO);
 				}
 			} else if (exceptionListener != null) {
 				execute(() -> exceptionListener.on(this.webSocket,  t), exceptionOnIO);
 			} else if (!nothrow) {
-				throw new HttpException("WebSockt 连接异常: " + getUrl(), t);
+				throw new OkHttpsException("WebSockt 连接异常: " + getUrl(), t);
 			}
 		}
 		
@@ -297,7 +310,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			return;
 		}
 		int delay = (int) (pingSeconds + lastPingSecs - nowSeconds());
-		httpClient.executor.requireScheduler().schedule(() -> {
+		httpClient.executor().requireScheduler().schedule(() -> {
 			if (!isConnected()) {
 				return;
 			}
@@ -319,7 +332,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			return;
 		}
 		int delay = (int) (pongSeconds + lastPongSecs - nowSeconds());
-		httpClient.executor.requireScheduler().schedule(() -> {
+		httpClient.executor().requireScheduler().schedule(() -> {
 			if (!isConnected()) {
 				return;
 			}
@@ -449,7 +462,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 			if (msg instanceof byte[]) {
 				return webSocket.send(ByteString.of((byte[]) msg));
 			}
-			byte[] bytes = httpClient.executor.doMsgConvert(msgType, c -> c.serialize(msg, charset)).data;
+			byte[] bytes = httpClient.executor().doMsgConvert(msgType, c -> c.serialize(msg, charset)).data;
 			return webSocket.send(new String(bytes, charset));
 		}
 		
@@ -460,7 +473,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * @param onOpen 监听器
 	 * @return WebSocketTask
 	 */
-	public WebSocketTask setOnOpen(Listener<HttpResult> onOpen) {
+	public WHttpTask setOnOpen(Listener<HttpResult> onOpen) {
 		this.onOpen = onOpen;
 		openOnIO = nextOnIO;
 		nextOnIO = false;
@@ -472,7 +485,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * @param onException 监听器
 	 * @return WebSocketTask
 	 */
-	public WebSocketTask setOnException(Listener<Throwable> onException) {
+	public WHttpTask setOnException(Listener<Throwable> onException) {
 		this.onException = onException;
 		exceptionOnIO = nextOnIO;
 		nextOnIO = false;
@@ -484,7 +497,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * @param onMessage 监听器
 	 * @return WebSocketTask
 	 */
-	public WebSocketTask setOnMessage(Listener<Message> onMessage) {
+	public WHttpTask setOnMessage(Listener<Message> onMessage) {
 		this.onMessage = onMessage;
 		messageOnIO = nextOnIO;
 		nextOnIO = false;
@@ -496,7 +509,7 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * @param onClosing 监听器
 	 * @return WebSocketTask
 	 */
-	public WebSocketTask setOnClosing(Listener<Close> onClosing) {
+	public WHttpTask setOnClosing(Listener<Close> onClosing) {
 		this.onClosing = onClosing;
 		closingOnIO = nextOnIO;
 		nextOnIO = false;
@@ -508,11 +521,19 @@ public class WebSocketTask extends HttpTask<WebSocketTask> {
 	 * @param onClosed 监听器
 	 * @return WebSocketTask
 	 */
-	public WebSocketTask setOnClosed(Listener<Close> onClosed) {
+	public WHttpTask setOnClosed(Listener<Close> onClosed) {
 		this.onClosed = onClosed;
 		closedOnIO = nextOnIO;
 		nextOnIO = false;
 		return this;
+	}
+
+	/**
+	 * 设置在 OnClosing 回调执行完毕后，OnClosed 回调执行的最晚延迟时间
+	 * @param maxClosingSecs 最大 Closing 时长（单位：秒，默认：10秒）
+	 */
+	public void setMaxClosingSecs(int maxClosingSecs) {
+		this.maxClosingSecs = maxClosingSecs;
 	}
 
 	public int pingSeconds() {

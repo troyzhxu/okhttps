@@ -1,7 +1,5 @@
 package com.ejlchina.okhttps;
 
-import com.ejlchina.okhttps.internal.AsyncHttpTask;
-
 public interface HttpCall extends Cancelable {
 
 	/**
@@ -26,6 +24,6 @@ public interface HttpCall extends Cancelable {
 	 * @since 2.2.0
 	 * @return 当前的异步请求任务
 	 */
-	AsyncHttpTask getTask();
+	AHttpTask getTask();
 
 }
