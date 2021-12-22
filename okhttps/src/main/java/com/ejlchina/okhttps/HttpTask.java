@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  * Created by 周旭（Troy.Zhou） on 2020/3/11.
  */
 @SuppressWarnings("unchecked")
-public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
+public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
 
     private static final String PATH_PARAM_REGEX = "[A-Za-z0-9_\\-/]*\\{[A-Za-z0-9_\\-]+\\}[A-Za-z0-9_\\-/]*";
     private static final String DOT = ".";
@@ -40,6 +40,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     private Map<String, FilePara> files;
     private Object requestBody;
     private String bodyType;
+    private String boundary;    // MultipartBody 的 边界符
     private OnCallback<Process> onProcess;
     private boolean processOnIO;
     private long stepBytes = 0;
@@ -538,6 +539,24 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         return (C) this;
     }
 
+    /**
+     * @since v3.4.2
+     * @return MultipartBody 的边界符
+     */
+    public String boundary() {
+        return boundary;
+    }
+
+    /**
+     * 设置 MultipartBody 的边界符
+     * @since v3.4.2
+     * @return this
+     */
+    public C boundary(String boundary) {
+        this.boundary = boundary;
+        return (C) this;
+    }
+
     @Override
     public boolean cancel() {
         if (canceler != null) {
@@ -639,9 +658,9 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
     }
 
     private RequestBody buildRequestBody() {
-        if (bodyParams != null && OkHttps.FORM_DATA.equalsIgnoreCase(bodyType)
+        if (bodyParams != null && (OkHttps.FORM_DATA.equalsIgnoreCase(bodyType) || bodyType.startsWith("multipart"))
                 || files != null) {
-            MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+            MultipartBody.Builder builder = multipartBodyBuilder();
             if (bodyParams != null) {
                 bodyParams.forEach((key, value) -> {
                     if (value == null) return;
@@ -680,6 +699,23 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
             return builder.build();
         }
         return toRequestBody(bodyParams);
+    }
+
+    private MultipartBody.Builder multipartBodyBuilder() {
+        MultipartBody.Builder builder;
+        if (boundary != null) {
+            builder = new MultipartBody.Builder(boundary);
+        } else {
+            builder = new MultipartBody.Builder();
+        }
+        if (bodyType.startsWith("multipart")) {
+            try {
+                builder.setType(MediaType.get(bodyType));
+            } catch (IllegalArgumentException ignore) { }
+        } else {
+            builder.setType(MultipartBody.FORM);
+        }
+        return builder;
     }
 
     private RequestBody emptyRequestBody() {
