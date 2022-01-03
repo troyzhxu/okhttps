@@ -3,6 +3,7 @@ package com.ejlchina.okhttps.internal;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import com.ejlchina.okhttps.*;
 import com.ejlchina.okhttps.HttpResult.Body;
@@ -319,19 +320,14 @@ public class ResultBody extends AbstractBody implements Body {
 	
 	private String resolveFileName() {
 		String fileName = response.header("Content-Disposition");
-        // 通过Content-Disposition获取文件名，这点跟服务器有关，需要灵活变通
+        // 通过 Content-Disposition 获取文件名，这点跟服务器有关，需要灵活变通
         if (fileName == null || fileName.length() < 1) {
         	fileName = response.request().url().encodedPath();
             fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
         } else {
-            try {
-				fileName = URLDecoder.decode(fileName.substring(
-				    fileName.indexOf("filename=") + 9), "UTF-8");
-			} catch (UnsupportedEncodingException e) {
-            	response.close();
-				throw new OkHttpsException("解码文件名失败", e);
-			}
-            // 有些文件名会被包含在""里面，所以要去掉，不然无法读取文件后缀
+			fileName = URLDecoder.decode(fileName.substring(
+				fileName.indexOf("filename=") + 9), StandardCharsets.UTF_8);
+			// 有些文件名会被包含在""里面，所以要去掉，不然无法读取文件后缀
             fileName = fileName.replaceAll("\"", "");
         }
         return fileName;
