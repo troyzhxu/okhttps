@@ -673,6 +673,7 @@ public abstract class HttpTask<C extends HttpTask<?>> implements Cancelable {
         }
         if (OkHttps.FORM.equalsIgnoreCase(bodyType)) {
             FormBody.Builder builder = new FormBody.Builder(charset);
+            // TODO: 此语法不兼容 Android 低版本
             bodyParams.forEach((key, value) -> {
                 if (value == null) return;
                 builder.add(key, value.toString());
