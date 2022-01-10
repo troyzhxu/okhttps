@@ -532,8 +532,9 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 	 * 设置在 OnClosing 回调执行完毕后，OnClosed 回调执行的最晚延迟时间
 	 * @param maxClosingSecs 最大 Closing 时长（单位：秒，默认：10秒）
 	 */
-	public void setMaxClosingSecs(int maxClosingSecs) {
+	public WHttpTask setMaxClosingSecs(int maxClosingSecs) {
 		this.maxClosingSecs = maxClosingSecs;
+		return this;
 	}
 
 	public int pingSeconds() {
