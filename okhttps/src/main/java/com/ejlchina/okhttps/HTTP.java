@@ -289,6 +289,16 @@ public interface HTTP {
         String bodyType();
 
         /**
+         * @since v3.5.0
+         * 设置下载文件名解析器
+         * @param resolver 解析器
+         * @return Builder
+         */
+        Builder fileNameResolver(FileNameResolver resolver);
+
+        FileNameResolver fileNameResolver();
+
+        /**
          * 构建 HTTP 实例
          * @return HTTP
          */

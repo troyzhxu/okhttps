@@ -46,6 +46,7 @@ public class OkHttpBuilderImpl implements HTTP.Builder {
 
     private String bodyType = OkHttps.FORM;
 
+    private FileNameResolver fileNameResolver;
 
     public OkHttpBuilderImpl() {
         mediaTypes = new HashMap<>();
@@ -72,6 +73,7 @@ public class OkHttpBuilderImpl implements HTTP.Builder {
         preprocessors = new ArrayList<>();
         msgConvertors = new ArrayList<>();
         configs = new ArrayList<>();
+        fileNameResolver = new FileNameResolver();
     }
 
     public OkHttpBuilderImpl(OkHttpClientWrapper hc) {
@@ -95,6 +97,7 @@ public class OkHttpBuilderImpl implements HTTP.Builder {
         configs = new ArrayList<>();
         bodyType = hc.bodyType();
         charset = hc.charset();
+        fileNameResolver = hc.fileNameResolver();
     }
 
 
@@ -308,6 +311,17 @@ public class OkHttpBuilderImpl implements HTTP.Builder {
 
     public String bodyType() {
         return bodyType;
+    }
+
+    @Override
+    public HTTP.Builder fileNameResolver(FileNameResolver resolver) {
+        fileNameResolver = resolver;
+        return this;
+    }
+
+    @Override
+    public FileNameResolver fileNameResolver() {
+        return fileNameResolver;
     }
 
 }

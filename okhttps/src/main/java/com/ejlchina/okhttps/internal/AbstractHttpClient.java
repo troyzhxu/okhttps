@@ -26,6 +26,7 @@ public abstract class AbstractHttpClient implements HTTP {
     // 默认的请求体类型
     final String bodyType;
 
+    final FileNameResolver fileNameResolver;
 
     public AbstractHttpClient(HTTP.Builder builder) {
         this.baseUrl = builder.baseUrl();
@@ -36,6 +37,7 @@ public abstract class AbstractHttpClient implements HTTP {
         this.charset = builder.charset();
         this.bodyType = builder.bodyType();
         this.tagTasks = new LinkedList<>();
+        this.fileNameResolver = builder.fileNameResolver();
     }
 
 
@@ -300,6 +302,10 @@ public abstract class AbstractHttpClient implements HTTP {
 
     public String bodyType() {
         return bodyType;
+    }
+
+    public FileNameResolver fileNameResolver() {
+        return fileNameResolver;
     }
 
 }
