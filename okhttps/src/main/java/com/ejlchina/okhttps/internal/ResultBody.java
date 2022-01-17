@@ -16,20 +16,20 @@ import okio.Buffer;
 import okio.ByteString;
 
 public class ResultBody extends AbstractBody implements Body {
-	
+
+	private final HttpResult result;
 	private final Response response;
 	private boolean onIO = false;
 	private OnCallback<Process> onProcess;
 	private long stepBytes = 0;
 	private double stepRate = -1;
 	private boolean rangeIgnored = false;
-	private final HttpTask<?> httpTask;
 	private boolean cached = false;
 	private byte[] data;
 
-	ResultBody(HttpTask<?> httpTask, Response response, TaskExecutor taskExecutor) {
-		super(taskExecutor, httpTask.charset(response));
-		this.httpTask = httpTask;
+	ResultBody(HttpResult result, Response response, TaskExecutor taskExecutor) {
+		super(taskExecutor, result.getTask().charset(response));
+		this.result = result;
 		this.response = response;
 	}
 
@@ -199,18 +199,19 @@ public class ResultBody extends AbstractBody implements Body {
 			response.close();
 			throw new OkHttpsException("文件下载失败", e);
 		}
-		return taskExecutor.download(httpTask, file, toByteStream(), getRangeStart());
+		return taskExecutor.download(result.getTask(), file, toByteStream(), getRangeStart());
 	}
 	
 	@Override
 	public Download toFolder(String dirPath) {
-		String fileName = resolveFileName();
-		String filePath = resolveFilePath(dirPath, fileName);
+		DownloadHelper helper = result.getTask().httpClient().downloadHelper;
+		String fileName = helper.resolveFileName(result);
+		String filePath = helper.resolveFilePath(dirPath, fileName);
 		int index = 0;
 		File file = new File(filePath);
 		while (file.exists()) {
-			String indexFileName = indexFileName(fileName, index++);
-			filePath = resolveFilePath(dirPath, indexFileName);
+			String indexFileName = helper.indexFileName(fileName, index++);
+			filePath = helper.resolveFilePath(dirPath, indexFileName);
 			file = new File(filePath);
 		}
 		return toFile(file);
@@ -296,41 +297,6 @@ public class ResultBody extends AbstractBody implements Body {
 			}
 		}
 		return rangeStart;
-	}
-	
-	private String resolveFilePath(String dirPath, String fileName) {
-		if (dirPath.endsWith("\\") || dirPath.endsWith("/")) {
-			return dirPath + fileName;
-		}
-		return dirPath + File.separator + fileName;
-	}
-
-	private String indexFileName(String fileName, int index) {
-		int i = fileName.lastIndexOf('.');
-		if (i < 0) {
-			return fileName + "(" + index + ")";
-		}
-		String ext = fileName.substring(i);
-		if (i > 0) {
-			String name = fileName.substring(0, i);
-			return name + "(" + index + ")" + ext;
-		}
-		return "(" + index + ")" + ext;
-	}
-	
-	private String resolveFileName() {
-		String fileName = response.header("Content-Disposition");
-        // 通过 Content-Disposition 获取文件名，这点跟服务器有关，需要灵活变通
-        if (fileName == null || fileName.length() < 1) {
-        	fileName = response.request().url().encodedPath();
-            fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
-        } else {
-			fileName = URLDecoder.decode(fileName.substring(
-				fileName.indexOf("filename=") + 9), StandardCharsets.UTF_8);
-			// 有些文件名会被包含在""里面，所以要去掉，不然无法读取文件后缀
-            fileName = fileName.replaceAll("\"", "");
-        }
-        return fileName;
 	}
 
 }

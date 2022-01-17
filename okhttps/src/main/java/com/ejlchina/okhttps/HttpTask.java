@@ -27,7 +27,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     private static final String PATH_PARAM_REGEX = "[A-Za-z0-9_\\-/]*\\{[A-Za-z0-9_\\-]+\\}[A-Za-z0-9_\\-/]*";
     private static final String DOT = ".";
 
-    protected AbstractHttpClient httpClient;
+    protected final AbstractHttpClient httpClient;
     protected boolean nothrow;
     protected boolean nextOnIO = false;
     
@@ -842,6 +842,10 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
 
     protected void execute(Runnable command, boolean onIo) {
         httpClient.executor().execute(command, onIo);
+    }
+
+    public AbstractHttpClient httpClient() {
+        return httpClient;
     }
 
 }

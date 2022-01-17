@@ -1,5 +1,6 @@
 package com.ejlchina.okhttps;
 
+import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
@@ -28,6 +29,36 @@ public class DownloadHelper {
         return fileName;
     }
 
+    /**
+     * 解析文件路径
+     * @param dirPath 目录
+     * @param fileName 文件名
+     * @return 文件路径
+     */
+    public String resolveFilePath(String dirPath, String fileName) {
+        if (dirPath.endsWith("\\") || dirPath.endsWith("/")) {
+            return dirPath + fileName;
+        }
+        return dirPath + File.separator + fileName;
+    }
 
+    /**
+     * 当文件已存在时，根据该方法生成一个新的文件名
+     * @param fileName 原文件名
+     * @param index 重复次数
+     * @return 新的文件名
+     */
+    public String indexFileName(String fileName, int index) {
+        int i = fileName.lastIndexOf('.');
+        if (i < 0) {
+            return fileName + "(" + index + ")";
+        }
+        String ext = fileName.substring(i);
+        if (i > 0) {
+            String name = fileName.substring(0, i);
+            return name + "(" + index + ")" + ext;
+        }
+        return "(" + index + ")" + ext;
+    }
 
 }

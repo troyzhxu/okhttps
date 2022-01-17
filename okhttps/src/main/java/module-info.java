@@ -5,6 +5,7 @@ module okhttps {
     requires okio;
 
     exports com.ejlchina.okhttps;
+    exports com.ejlchina.okhttps.internal;
     exports com.ejlchina.okhttps.okhttp;
 
 }
