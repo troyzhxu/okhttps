@@ -3,6 +3,10 @@ package com.ejlchina.okhttps;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ConcurrentModificationException;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.BiConsumer;
 
 public class Platform {
 
@@ -67,6 +71,23 @@ public class Platform {
             }
         }
         return !okHttpVersion.startsWith("4");
+    }
+
+    // 该方法是为兼容 Android 低版本
+    public static <K, V> void forEach(Map<K, V> map, BiConsumer<? super K, ? super V> action) {
+        Objects.requireNonNull(action);
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            K k;
+            V v;
+            try {
+                k = entry.getKey();
+                v = entry.getValue();
+            } catch (IllegalStateException ise) {
+                // this usually means the entry is no longer in the map.
+                throw new ConcurrentModificationException(ise);
+            }
+            action.accept(k, v);
+        }
     }
 
 }

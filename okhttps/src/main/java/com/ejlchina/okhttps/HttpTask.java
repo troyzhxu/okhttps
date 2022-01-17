@@ -662,7 +662,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
                 || files != null) {
             MultipartBody.Builder builder = multipartBodyBuilder();
             if (bodyParams != null) {
-                bodyParams.forEach((key, value) -> {
+                Platform.forEach(bodyParams, (key, value) -> {
                     if (value == null) return;
                     byte[] content = value.toString().getBytes(charset);
                     RequestBody body = RequestBody.create(null, content);
@@ -692,8 +692,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
         }
         if (OkHttps.FORM.equalsIgnoreCase(bodyType)) {
             FormBody.Builder builder = new FormBody.Builder(charset);
-            // TODO: 此语法不兼容 Android 低版本
-            bodyParams.forEach((key, value) -> {
+            Platform.forEach(bodyParams, (key, value) -> {
                 if (value == null) return;
                 builder.add(key, value.toString());
             });
