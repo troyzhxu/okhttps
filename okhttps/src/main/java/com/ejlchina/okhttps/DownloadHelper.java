@@ -4,11 +4,15 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
 /**
- * 下载文件名解析器
+ * 下载助手，用户解析下载路径与文件名
  */
-public class FileNameResolver {
+public class DownloadHelper {
 
-
+    /**
+     * 解析下载文件名
+     * @param result HTTP 响应结果
+     * @return 文件名
+     */
     public String resolveFileName(HttpResult result) {
         String fileName = result.getHeader("Content-Disposition");
         // 通过 Content-Disposition 获取文件名，这点跟服务器有关，需要灵活变通
@@ -23,5 +27,7 @@ public class FileNameResolver {
         }
         return fileName;
     }
+
+
 
 }

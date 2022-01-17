@@ -294,9 +294,9 @@ public interface HTTP {
          * @param resolver 解析器
          * @return Builder
          */
-        Builder fileNameResolver(FileNameResolver resolver);
+        Builder downloadHelper(DownloadHelper resolver);
 
-        FileNameResolver fileNameResolver();
+        DownloadHelper downloadHelper();
 
         /**
          * 构建 HTTP 实例

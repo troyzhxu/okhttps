@@ -25,8 +25,8 @@ public abstract class AbstractHttpClient implements HTTP {
     final Charset charset;
     // 默认的请求体类型
     final String bodyType;
-
-    final FileNameResolver fileNameResolver;
+    // 下载助手
+    final DownloadHelper downloadHelper;
 
     public AbstractHttpClient(HTTP.Builder builder) {
         this.baseUrl = builder.baseUrl();
@@ -37,7 +37,7 @@ public abstract class AbstractHttpClient implements HTTP {
         this.charset = builder.charset();
         this.bodyType = builder.bodyType();
         this.tagTasks = new LinkedList<>();
-        this.fileNameResolver = builder.fileNameResolver();
+        this.downloadHelper = builder.downloadHelper();
     }
 
 
@@ -304,8 +304,8 @@ public abstract class AbstractHttpClient implements HTTP {
         return bodyType;
     }
 
-    public FileNameResolver fileNameResolver() {
-        return fileNameResolver;
+    public DownloadHelper downloadHelper() {
+        return downloadHelper;
     }
 
 }

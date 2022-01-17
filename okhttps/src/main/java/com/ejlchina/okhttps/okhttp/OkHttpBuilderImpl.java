@@ -46,7 +46,7 @@ public class OkHttpBuilderImpl implements HTTP.Builder {
 
     private String bodyType = OkHttps.FORM;
 
-    private FileNameResolver fileNameResolver;
+    private DownloadHelper downloadHelper;
 
     public OkHttpBuilderImpl() {
         mediaTypes = new HashMap<>();
@@ -73,7 +73,7 @@ public class OkHttpBuilderImpl implements HTTP.Builder {
         preprocessors = new ArrayList<>();
         msgConvertors = new ArrayList<>();
         configs = new ArrayList<>();
-        fileNameResolver = new FileNameResolver();
+        downloadHelper = new DownloadHelper();
     }
 
     public OkHttpBuilderImpl(OkHttpClientWrapper hc) {
@@ -97,7 +97,7 @@ public class OkHttpBuilderImpl implements HTTP.Builder {
         configs = new ArrayList<>();
         bodyType = hc.bodyType();
         charset = hc.charset();
-        fileNameResolver = hc.fileNameResolver();
+        downloadHelper = hc.downloadHelper();
     }
 
 
@@ -314,14 +314,14 @@ public class OkHttpBuilderImpl implements HTTP.Builder {
     }
 
     @Override
-    public HTTP.Builder fileNameResolver(FileNameResolver resolver) {
-        fileNameResolver = resolver;
+    public HTTP.Builder downloadHelper(DownloadHelper downloadHelper) {
+        this.downloadHelper = downloadHelper;
         return this;
     }
 
     @Override
-    public FileNameResolver fileNameResolver() {
-        return fileNameResolver;
+    public DownloadHelper downloadHelper() {
+        return downloadHelper;
     }
 
 }
