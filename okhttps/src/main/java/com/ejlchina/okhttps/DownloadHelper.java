@@ -21,6 +21,7 @@ public class DownloadHelper {
         extMappings.put("application/x-xls", "text/xls");
         extMappings.put("application/vnd.android.package-archive", "apk");
         extMappings.put("application/msword", "doc");
+        extMappings.put("x-zip-compressed", "zip");
     }
 
     /**
@@ -98,6 +99,14 @@ public class DownloadHelper {
 
     public void setExtMappings(Map<String, String> extMappings) {
         this.extMappings = extMappings;
+    }
+
+    public void addExtMappings(Map<String, String> extMappings) {
+        this.extMappings.putAll(extMappings);
+    }
+
+    public void addExtMapping(String mediaType, String ext) {
+        extMappings.put(mediaType, ext);
     }
 
 }
