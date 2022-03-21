@@ -284,6 +284,16 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
         return addHeader("Authorization", "Basic " + authStr);
     }
 
+    /**
+     * Bearer Auth 认证
+     * @param token 令牌
+     * @return HttpTask 实例
+     * @since v3.5.0
+     */
+    public C bearerAuth(String token) {
+        return addHeader("Authorization", "Bearer " + token);
+    }
+
 	/**
      * 添加请求头
      * @param name 请求头名
