@@ -13,6 +13,8 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -268,6 +270,20 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
         return (C) this;
     }
 
+    /**
+     * Basic Auth 认证
+     * @param username 用户名
+     * @param password 密码
+     * @return HttpTask 实例
+     * @since v3.5.0
+     */
+    public C basicAuth(String username, String password) {
+        byte[] authData = (username + ':' + password).getBytes(StandardCharsets.UTF_8);
+        byte[] authBytes = Base64.getEncoder().encode(authData);
+        String authStr = new String(authBytes, StandardCharsets.UTF_8);
+        return addHeader("Authorization", "Basic " + authStr);
+    }
+
 	/**
      * 添加请求头
      * @param name 请求头名
@@ -310,7 +326,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     }
 
     /**
-     * 设置Range头信息
+     * 设置 Range 头信息
      * 设置接收报文体时接收的范围，用于分块下载
      * @param rangeStart 表示从 rangeStart 个字节处开始接收
      * @param rangeEnd 表示接收到 rangeEnd 个字节处
