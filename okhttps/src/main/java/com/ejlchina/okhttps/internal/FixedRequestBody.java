@@ -6,6 +6,11 @@ import okio.BufferedSink;
 
 import java.io.IOException;
 
+/**
+ * 修复报文体在写出过程中会发生无法被异常回调捕获的非 IO 异常的问题
+ * @author Troy.Zhou @ 2021-09-01
+ * @since v3.1.5
+ */
 public class FixedRequestBody extends RequestBody {
 
     private final RequestBody requestBody;

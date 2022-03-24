@@ -3,12 +3,14 @@ package com.ejlchina.okhttps.internal;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okio.BufferedSink;
+import okio.Okio;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
  * 流式请求体
+ * @author Troy.Zhou @ 2021-09-01
  * @since v3.5.0
  */
 public class StreamRequestBody extends RequestBody {
@@ -28,7 +30,12 @@ public class StreamRequestBody extends RequestBody {
 
     @Override
     public void writeTo(BufferedSink sink) throws IOException {
-        // TODO:
+        sink.writeAll(Okio.source(inputStream));
+    }
+
+    @Override
+    public boolean isOneShot() {
+        return true;
     }
 
 }
