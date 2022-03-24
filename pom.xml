@@ -48,7 +48,7 @@
 		<connection>scm:git://gitee.com/ejlchina-zhxu/okhttps.git</connection>
 		<developerConnection>scm:http://gitee.com/ejlchina-zhxu/okhttps</developerConnection>
 		<url>https://gitee.com/ejlchina-zhxu/okhttps</url>
-		<tag>v3.4.2</tag>
+		<tag>v3.4.3</tag>
 	</scm>
 	
 	<dependencies>
