@@ -3,6 +3,7 @@ package com.ejlchina.okhttps;
 import okhttp3.MediaType;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -36,11 +37,14 @@ public class DownloadHelper {
             String urlPath = result.getTask().getUrl();
             String urlName = urlPath.substring(urlPath.lastIndexOf("/") + 1);
             return toFileName(urlName, result);
-        } else {
+        }
+        try {
             String filename = URLDecoder.decode(contentDisposition.substring(
-                    contentDisposition.indexOf("filename=") + 9), StandardCharsets.UTF_8);
+                    contentDisposition.indexOf("filename=") + 9), StandardCharsets.UTF_8.name());
             // 有些文件名会被包含在""里面，所以要去掉，不然无法读取文件后缀
             return filename.replaceAll("\"", "");
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
         }
     }
 
