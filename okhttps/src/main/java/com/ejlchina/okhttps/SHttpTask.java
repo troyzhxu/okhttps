@@ -109,7 +109,7 @@ public class SHttpTask extends HttpTask<SHttpTask> {
     	}, skipPreproc, skipSerialPreproc);
     	boolean timeout = false;
 		if (result.getState() == null) {
-			timeout = !timeoutAwait(latch);
+			timeout = timeoutAwait(latch);
 		}
 		// 移除标签任务
 		removeTagTask();

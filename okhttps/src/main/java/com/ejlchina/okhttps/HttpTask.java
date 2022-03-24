@@ -880,11 +880,11 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
 
     /**
      * @param latch CountDownLatch
-     * @return 是否未超时：false 表示已超时
+     * @return true 表示已超时：false 表示未超时
      */
     protected boolean timeoutAwait(CountDownLatch latch) {
         try {
-            return latch.await(httpClient.preprocTimeoutMillis(),
+            return !latch.await(httpClient.preprocTimeoutMillis(),
                     TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             throw new OkHttpsException("执行超时: " + urlPath, e);

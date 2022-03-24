@@ -303,7 +303,7 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 
 		@Override
 		public HttpResult getResult() {
-			if (!timeoutAwait(latch)) {
+			if (timeoutAwait(latch)) {
 				cancel();
 				return timeoutResult();
 			}
@@ -353,7 +353,7 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 		@Override
 		public HttpResult getResult() {
 			if (result == null) {
-				if (!timeoutAwait(latch)) {
+				if (timeoutAwait(latch)) {
 					cancel();
 					return timeoutResult();
 				}
