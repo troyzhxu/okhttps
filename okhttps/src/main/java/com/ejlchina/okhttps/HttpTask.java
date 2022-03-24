@@ -8,6 +8,7 @@ import okhttp3.internal.http.HttpMethod;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -550,7 +551,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     /**
      * 添加文件参数（以 multipart/form-data 形式上传）
      * @param name 参数名
-     * @param type 文件类型: 如 png、jpg、jpeg 等
+     * @param type 文件类型/扩展名: 如 txt、png、jpg、doc 等
      * @param fileName 文件名
      * @param content 文件内容
      * @return HttpTask 实例
@@ -561,6 +562,37 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
                 files = new HashMap<>();
             }
             files.put(name, new FilePara(type, fileName, content));
+        }
+        return (C) this;
+    }
+
+    /**
+     * 添加文件参数（以 multipart/form-data 形式上传）
+     * @param name 参数名
+     * @param type 文件类型/扩展名: 如 txt、png、jpg、doc 等
+     * @param stream 文件输入流
+     * @return HttpTask 实例
+     * @since v3.5.0
+     */
+    public C addFilePara(String name, String type, InputStream stream) {
+        return addFilePara(name, type, name + DOT + type, stream);
+    }
+
+    /**
+     * 添加文件参数（以 multipart/form-data 形式上传）
+     * @param name 参数名
+     * @param type 文件类型/扩展名: 如 txt、png、jpg、doc 等
+     * @param fileName 文件名
+     * @param stream 文件输入流
+     * @return HttpTask 实例
+     * @since v3.5.0
+     */
+    public C addFilePara(String name, String type, String fileName, InputStream stream) {
+        if (name != null && stream != null) {
+            if (files == null) {
+                files = new HashMap<>();
+            }
+            files.put(name, new FilePara(type, fileName, stream));
         }
         return (C) this;
     }
