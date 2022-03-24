@@ -791,12 +791,15 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
         return httpClient.executor().doMsgConvert(bodyType, null).mediaType(charset);
     }
 
-    private RequestBody toRequestBody(Object object) {
-        if (object instanceof byte[] || object instanceof String) {
-            byte[] body = object instanceof byte[] ? (byte[]) object : ((String) object).getBytes(charset);
+    private RequestBody toRequestBody(Object bodyObj) {
+        if (bodyObj instanceof byte[] || bodyObj instanceof String) {
+            byte[] body = bodyObj instanceof byte[] ? (byte[]) bodyObj : ((String) bodyObj).getBytes(charset);
             return RequestBody.create(mediaType(), body);
         }
-        TaskExecutor.Data<byte[]> data = httpClient.executor().doMsgConvert(bodyType, c -> c.serialize(object, charset));
+        if (bodyObj instanceof InputStream) {
+            return new StreamRequestBody(mediaType(), (InputStream) bodyObj);
+        }
+        TaskExecutor.Data<byte[]> data = httpClient.executor().doMsgConvert(bodyType, c -> c.serialize(bodyObj, charset));
         return RequestBody.create(data.mediaType(charset), data.data);
     }
 
