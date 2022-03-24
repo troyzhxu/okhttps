@@ -1,5 +1,9 @@
 package com.ejlchina.okhttps;
 
+import com.ejlchina.okhttps.internal.StreamRequestBody;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+
 import java.io.File;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -9,11 +13,11 @@ import java.util.Arrays;
  */
 public class FilePara {
 
-    final String type;
-    final String fileName;
-    final byte[] content;
-    final File file;
-    final InputStream stream;
+    private final String type;
+    private final String fileName;
+    private final byte[] content;
+    private final File file;
+    private final InputStream stream;
 
     public FilePara(String type, String fileName, byte[] content) {
         this(type, fileName, null, content, null);
@@ -27,12 +31,45 @@ public class FilePara {
         this(type, fileName, null, null, stream);
     }
 
-    public FilePara(String type, String fileName, File file, byte[] content, InputStream stream) {
+    private FilePara(String type, String fileName, File file, byte[] content, InputStream stream) {
         this.type = type;
         this.fileName = fileName;
         this.file = file;
         this.content = content;
         this.stream = stream;
+    }
+
+    public RequestBody toRequestBody(MediaType contentType) {
+        if (file != null) {
+            return RequestBody.create(contentType, file);
+        }
+        if (content != null) {
+            return RequestBody.create(contentType, content);
+        }
+        if (stream != null) {
+            return new StreamRequestBody(contentType, stream);
+        }
+        throw new IllegalStateException("Invalid FilePara");
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public byte[] getContent() {
+        return content;
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public InputStream getStream() {
+        return stream;
     }
 
     @Override

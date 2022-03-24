@@ -476,7 +476,13 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
 
     /**
      * 设置 请求报文体
-     * @param body 请求体，字节数组、字符串 或 Java对象（由 MsgConvertor 来序列化）
+     * @param body 请求报文体，可以是：
+     * <pre>
+     *  byte[] - 字节数组（直接作为报文体） <br/>
+     *  String - 字符串（比如：JSON 字符串、键值对字符串，也是直接作为报文体）<br/>
+     *  POJO - 普通 Java 数据对象（由 {@link MsgConvertor } 来序列化） <br/>
+     *  InputStream - 输入流（v3.5.0 开始支持）
+     * </pre>
      * @return HttpTask 实例
      **/
     public C setBodyPara(Object body) {
@@ -730,14 +736,12 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
             if (files != null) {
                 for (String name : files.keySet()) {
                     FilePara file = files.get(name);
-                    MediaType type = httpClient.mediaType(file.type);
-                    RequestBody bodyPart;
-                    if (file.file != null) {
-                        bodyPart = RequestBody.create(type, file.file);
-                    } else {
-                        bodyPart = RequestBody.create(type, file.content);
-                    }
-                    builder.addFormDataPart(name, file.fileName, bodyPart);
+                    MediaType type = httpClient.mediaType(file.getType());
+                    builder.addFormDataPart(
+                            name,
+                            file.getFileName(),
+                            file.toRequestBody(type)
+                    );
                 }
             }
             return builder.build();
