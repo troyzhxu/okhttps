@@ -8,4 +8,7 @@ module okhttps {
     exports com.ejlchina.okhttps.internal;
     exports com.ejlchina.okhttps.okhttp;
 
+    uses com.ejlchina.okhttps.ConvertProvider;
+    uses com.ejlchina.okhttps.Config;
+
 }
