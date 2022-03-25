@@ -5,6 +5,9 @@ module okhttps.xml {
     requires data.xml;
     requires java.xml;
 
+    provides com.ejlchina.okhttps.ConvertProvider with
+            com.ejlchina.okhttps.xml.XmlMsgConvertor;
+
     exports com.ejlchina.okhttps.xml;
 
 }
