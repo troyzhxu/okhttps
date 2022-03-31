@@ -26,33 +26,46 @@ public class Subscriber {
     }
 
     public void subscribe() {
-        if (stomp.isConnected() && !subscribed) {
-            List<Header> headers = new ArrayList<>();
-            headers.add(new Header(Header.ID, id));
-            headers.add(new Header(Header.DESTINATION, destination));
-            boolean ackNotAdded = true;
-            if (this.headers != null) {
-                for (Header header : this.headers) {
-                    if (Header.ACK.equals(header.getKey())) {
-                        ackNotAdded = false;
-                    }
-                    String key = header.getKey();
-                    if (!Header.ID.equals(key) && !Header.DESTINATION.equals(key)) {
-                        headers.add(header);
-                    }
-                }
+        synchronized (stomp) {
+            if (subscribed) {
+                return;
             }
-            if (ackNotAdded) {
-                headers.add(new Header(Header.ACK, stomp.isAutoAck() ? Stomp.AUTO_ACK : Stomp.CLIENT_ACK));
+            if (stomp.isConnected()) {
+                doSubscribe();
             }
-            stomp.send(new Message(Commands.SUBSCRIBE, headers, null));
-            subscribed = true;
         }
     }
 
+    private void doSubscribe() {
+        List<Header> headers = new ArrayList<>();
+        headers.add(new Header(Header.ID, id));
+        headers.add(new Header(Header.DESTINATION, destination));
+        boolean ackNotAdded = true;
+        if (this.headers != null) {
+            for (Header header : this.headers) {
+                if (Header.ACK.equals(header.getKey())) {
+                    ackNotAdded = false;
+                }
+                String key = header.getKey();
+                if (!Header.ID.equals(key) && !Header.DESTINATION.equals(key)) {
+                    headers.add(header);
+                }
+            }
+        }
+        if (ackNotAdded) {
+            headers.add(new Header(Header.ACK, stomp.isAutoAck() ? Stomp.AUTO_ACK : Stomp.CLIENT_ACK));
+        }
+        stomp.send(new Message(Commands.SUBSCRIBE, headers, null));
+        subscribed = true;
+    }
+
     public void unsubscribe() {
-        List<Header> headers = Collections.singletonList(new Header(Header.ID, id));
-        stomp.send(new Message(Commands.UNSUBSCRIBE, headers, null));
+        synchronized (stomp) {
+            if (stomp.isConnected()) {
+                List<Header> headers = Collections.singletonList(new Header(Header.ID, id));
+                stomp.send(new Message(Commands.UNSUBSCRIBE, headers, null));
+            }
+        }
         resetStatus();
     }
 
