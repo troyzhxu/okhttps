@@ -98,32 +98,36 @@ public class Stomp {
             .setOnClosed((ws, close) -> doOnClosed(close))
             .listen();
         connecting = true;
+        disconnecting = false;
         return this;
     }
 
-    private void doOnOpened(List<Header> headers) {
-        int pingSecs = task.pingSeconds();
-        int pongSecs = task.pongSeconds();
-        List<Header> cHeaders = new ArrayList<>();
-        cHeaders.add(new Header(Header.VERSION, SUPPORTED_VERSIONS));
-        if (pingSecs > 0 && pongSecs > 0) {
-            cHeaders.add(new Header(Header.HEART_BEAT, pingSecs * 1000 + "," + pongSecs * 1000));
+    private synchronized void doOnOpened(List<Header> headers) {
+        if (websocket != null) {
+            int pingSecs = task.pingSeconds();
+            int pongSecs = task.pongSeconds();
+            List<Header> cHeaders = new ArrayList<>();
+            cHeaders.add(new Header(Header.VERSION, SUPPORTED_VERSIONS));
+            if (pingSecs > 0 && pongSecs > 0) {
+                cHeaders.add(new Header(Header.HEART_BEAT, pingSecs * 1000 + "," + pongSecs * 1000));
+            }
+            if (headers != null) {
+                cHeaders.addAll(headers);
+            }
+            send(new Message(Commands.CONNECT, cHeaders, null));
         }
-        if (headers != null) {
-            cHeaders.addAll(headers);
-        }
-        send(new Message(Commands.CONNECT, cHeaders, null));
     }
 
-    private void doOnException(Throwable throwable) {
-        connecting = false;
+    private synchronized void doOnException(Throwable throwable) {
         OnCallback<Throwable> listener = onException;
         if (listener != null) {
             listener.on(throwable);
         }
+        disconnecting = false;
+        connecting = false;
     }
 
-    private void doOnClosed(WebSocket.Close close) {
+    private synchronized void doOnClosed(WebSocket.Close close) {
         connected = false;
         connecting = false;
         disconnecting = false;
@@ -142,7 +146,7 @@ public class Stomp {
      * @return 是否已连接
      */
     public boolean isConnected() {
-        return connected;
+        return connected && websocket != null;
     }
 
     /**
@@ -150,7 +154,7 @@ public class Stomp {
      * @return 是否正在连接
      */
     public boolean isConnecting() {
-        return connecting;
+        return connecting && websocket != null;
     }
 
     /**
@@ -158,7 +162,7 @@ public class Stomp {
      * @return 是否正在断开连接
      */
     public boolean isDisconnecting() {
-        return disconnecting;
+        return disconnecting && websocket != null;
     }
 
     /**
@@ -185,6 +189,7 @@ public class Stomp {
         List<Header> headers = Collections.singletonList(header);
         send(new Message(Commands.DISCONNECT, headers));
         disconnecting = true;
+        connecting = false;
     }
 
     /**
@@ -192,7 +197,7 @@ public class Stomp {
      * @param immediate 是否立即断开
      * @since v3.1.0
      */
-    public void disconnect(boolean immediate) {
+    public synchronized void disconnect(boolean immediate) {
         if (immediate) {
             WebSocket ws = websocket;
             if (ws != null) {
@@ -399,7 +404,7 @@ public class Stomp {
         }
     }
 
-    private void receive(Message msg) {
+    private synchronized void receive(Message msg) {
         String command = msg.getCommand();
         if (Commands.CONNECTED.equals(command)) {
             String hbHeader = msg.headerValue(Header.HEART_BEAT);
@@ -419,11 +424,11 @@ public class Stomp {
                 disconnect(true);
             }
         } else if (Commands.ERROR.equals(command)) {
-            connecting = false;
             OnCallback<Message> listener = onError;
         	if (listener != null) {
                 listener.on(msg);
         	}
+            connecting = false;
         }
     }
 
