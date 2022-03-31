@@ -144,7 +144,7 @@ public class Stomp {
      * @return 是否已连接
      */
     public boolean isConnected() {
-        return connected;
+        return connected && websocket != null;
     }
 
     /**
