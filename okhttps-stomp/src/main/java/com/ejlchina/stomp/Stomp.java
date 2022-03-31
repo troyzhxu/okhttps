@@ -98,6 +98,7 @@ public class Stomp {
             .setOnClosed((ws, close) -> doOnClosed(close))
             .listen();
         connecting = true;
+        disconnecting = false;
         return this;
     }
 
@@ -118,11 +119,12 @@ public class Stomp {
     }
 
     private synchronized void doOnException(Throwable throwable) {
-        connecting = false;
         OnCallback<Throwable> listener = onException;
         if (listener != null) {
             listener.on(throwable);
         }
+        disconnecting = false;
+        connecting = false;
     }
 
     private synchronized void doOnClosed(WebSocket.Close close) {
@@ -152,7 +154,7 @@ public class Stomp {
      * @return 是否正在连接
      */
     public boolean isConnecting() {
-        return connecting;
+        return connecting && websocket != null;
     }
 
     /**
@@ -160,7 +162,7 @@ public class Stomp {
      * @return 是否正在断开连接
      */
     public boolean isDisconnecting() {
-        return disconnecting;
+        return disconnecting && websocket != null;
     }
 
     /**
@@ -187,6 +189,7 @@ public class Stomp {
         List<Header> headers = Collections.singletonList(header);
         send(new Message(Commands.DISCONNECT, headers));
         disconnecting = true;
+        connecting = false;
     }
 
     /**
@@ -421,11 +424,11 @@ public class Stomp {
                 disconnect(true);
             }
         } else if (Commands.ERROR.equals(command)) {
-            connecting = false;
             OnCallback<Message> listener = onError;
         	if (listener != null) {
                 listener.on(msg);
         	}
+            connecting = false;
         }
     }
 
