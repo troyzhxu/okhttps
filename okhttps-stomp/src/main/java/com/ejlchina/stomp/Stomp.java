@@ -101,21 +101,23 @@ public class Stomp {
         return this;
     }
 
-    private void doOnOpened(List<Header> headers) {
-        int pingSecs = task.pingSeconds();
-        int pongSecs = task.pongSeconds();
-        List<Header> cHeaders = new ArrayList<>();
-        cHeaders.add(new Header(Header.VERSION, SUPPORTED_VERSIONS));
-        if (pingSecs > 0 && pongSecs > 0) {
-            cHeaders.add(new Header(Header.HEART_BEAT, pingSecs * 1000 + "," + pongSecs * 1000));
+    private synchronized void doOnOpened(List<Header> headers) {
+        if (websocket != null) {
+            int pingSecs = task.pingSeconds();
+            int pongSecs = task.pongSeconds();
+            List<Header> cHeaders = new ArrayList<>();
+            cHeaders.add(new Header(Header.VERSION, SUPPORTED_VERSIONS));
+            if (pingSecs > 0 && pongSecs > 0) {
+                cHeaders.add(new Header(Header.HEART_BEAT, pingSecs * 1000 + "," + pongSecs * 1000));
+            }
+            if (headers != null) {
+                cHeaders.addAll(headers);
+            }
+            send(new Message(Commands.CONNECT, cHeaders, null));
         }
-        if (headers != null) {
-            cHeaders.addAll(headers);
-        }
-        send(new Message(Commands.CONNECT, cHeaders, null));
     }
 
-    private void doOnException(Throwable throwable) {
+    private synchronized void doOnException(Throwable throwable) {
         connecting = false;
         OnCallback<Throwable> listener = onException;
         if (listener != null) {
@@ -123,7 +125,7 @@ public class Stomp {
         }
     }
 
-    private void doOnClosed(WebSocket.Close close) {
+    private synchronized void doOnClosed(WebSocket.Close close) {
         connected = false;
         connecting = false;
         disconnecting = false;
@@ -192,7 +194,7 @@ public class Stomp {
      * @param immediate 是否立即断开
      * @since v3.1.0
      */
-    public void disconnect(boolean immediate) {
+    public synchronized void disconnect(boolean immediate) {
         if (immediate) {
             WebSocket ws = websocket;
             if (ws != null) {
@@ -399,7 +401,7 @@ public class Stomp {
         }
     }
 
-    private void receive(Message msg) {
+    private synchronized void receive(Message msg) {
         String command = msg.getCommand();
         if (Commands.CONNECTED.equals(command)) {
             String hbHeader = msg.headerValue(Header.HEART_BEAT);
