@@ -10,8 +10,8 @@ public class Test {
     public static void main(String[] args) throws InterruptedException {
 
         List<Header> headers = new ArrayList<>();
-        headers.add(new Header("login", "admin"));
-        headers.add(new Header("passcode", "eiotyunmq"));
+        headers.add(new Header("login", "xxx"));
+        headers.add(new Header("passcode", "xxx"));
         headers.add(new Header("host", "test"));
 
         Stomp stomp = Stomp.over(OkHttps.webSocket("ws://172.31.0.202:15674/ws").heatbeat(10, 10))
