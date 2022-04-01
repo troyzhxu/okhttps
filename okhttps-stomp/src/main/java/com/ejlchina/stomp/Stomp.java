@@ -408,7 +408,11 @@ public class Stomp {
         String command = msg.getCommand();
         if (Commands.CONNECTED.equals(command)) {
             String hbHeader = msg.headerValue(Header.HEART_BEAT);
-            onConnectedFrameReceived(hbHeader);
+            synchronized (this) {
+                connected = true;
+                connecting = false;
+                onConnectedFrameReceived(hbHeader);
+            }
         } else if (Commands.MESSAGE.equals(command)) {
             String id = msg.headerValue(Header.SUBSCRIPTION);
             if (id != null) {
@@ -446,17 +450,11 @@ public class Stomp {
                 task.heatbeat(Math.max(pingSeconds, pingSecs), Math.max(pongSeconds, pongSecs));
             }
         }
-        synchronized (this) {
-            for (Subscriber s: subscribers) {
-                s.subscribe();
-            }
-            connected = true;
-            connecting = false;
-        }
         OnCallback<Stomp> listener = onConnected;
         if (listener != null) {
             listener.on(this);
         }
+        subscribers.forEach(Subscriber::subscribe);
     }
 
     public MsgCodec getMsgCodec() {
