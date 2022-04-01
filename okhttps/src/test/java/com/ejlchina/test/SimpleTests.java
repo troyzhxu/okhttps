@@ -1,5 +1,7 @@
 package com.ejlchina.test;
 
+import com.ejlchina.okhttps.HTTP;
+import com.ejlchina.okhttps.HttpResult;
 import com.ejlchina.okhttps.OkHttps;
 import okhttp3.mockwebserver.MockResponse;
 import org.junit.Assert;
@@ -14,6 +16,21 @@ public class SimpleTests extends BaseTest {
         http.async("/").bodyType(OkHttps.FORM).post();
         Assert.assertEquals(server.takeRequest().getHeader("Content-Type"), "application/x-www-form-urlencoded; charset=UTF-8");
     }
+
+
+    @Test
+    public void test() {
+        HttpResult res = HTTP.builder()
+                .build()
+                .sync("http://www.baidu.com")
+                .bodyType("application/x-www-form-urlencoded")
+                .addBodyPara("name", "Jack")
+                .addBodyPara("age", 11)
+                .post()
+                .close();
+        System.out.println(res);
+    }
+
 
     /**
      * 同步请求示例
