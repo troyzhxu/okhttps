@@ -1,6 +1,8 @@
-package com.ejlchina.okhttps;
+package com.ejlchina.okhttps.xml;
 
 import com.ejlchina.data.Mapper;
+import com.ejlchina.okhttps.HTTP;
+import com.ejlchina.okhttps.MsgConvertor;
 import com.ejlchina.okhttps.test.XmlTestCases;
 import com.ejlchina.okhttps.xml.XmlMsgConvertor;
 import okhttp3.mockwebserver.MockResponse;
