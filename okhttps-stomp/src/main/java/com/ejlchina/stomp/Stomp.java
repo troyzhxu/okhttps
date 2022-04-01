@@ -346,7 +346,8 @@ public class Stomp {
         }
         for (Subscriber s: subscribers) {
             if (s.destinationEqual(destination)) {
-                throw new IllegalStateException("The destination [" + destination + "] has already been subscribed!");
+                Platform.logError("The destination [" + destination + "] has already been subscribed!");
+                return this;
             }
         }
         Subscriber subscriber = new Subscriber(this, destination, callback, headers);
