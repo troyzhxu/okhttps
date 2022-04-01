@@ -27,6 +27,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     private static final String PATH_PARAM_REGEX = "[A-Za-z0-9_\\-/]*\\{[A-Za-z0-9_\\-]+\\}[A-Za-z0-9_\\-/]*";
     private static final String DOT = ".";
     private static final String MULTIPART = "multipart/";
+    private static final String FORM = "x-www-form-urlencoded";
 
     protected final AbstractHttpClient httpClient;
     protected boolean nothrow;
@@ -691,7 +692,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
         if (bodyParams == null) {
             return emptyRequestBody();
         }
-        if (OkHttps.FORM.equals(bodyType)) {
+        if (OkHttps.FORM.equals(bodyType) || bodyType.endsWith(FORM)) {
             FormBody.Builder builder = new FormBody.Builder(charset);
             Platform.forEach(bodyParams, (key, value) -> {
                 if (value == null) return;
