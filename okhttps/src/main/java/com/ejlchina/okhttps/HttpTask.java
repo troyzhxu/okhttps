@@ -29,6 +29,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
 
     private static final String PATH_PARAM_REGEX = "[A-Za-z0-9_\\-/]*\\{[A-Za-z0-9_\\-]+\\}[A-Za-z0-9_\\-/]*";
     private static final String DOT = ".";
+    private static final String MULTIPART = "multipart/";
 
     protected final AbstractHttpClient httpClient;
     protected boolean nothrow;
@@ -42,7 +43,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     private Map<String, Object> bodyParams;
     private Map<String, FilePara> files;
     private Object requestBody;
-    private String bodyType;
+    private String bodyType;    // 都是小写形式
     private String boundary;    // MultipartBody 的 边界符
     private OnCallback<Process> onProcess;
     private boolean processOnIO;
@@ -722,7 +723,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     }
 
     private RequestBody buildRequestBody() {
-        if (bodyParams != null && (OkHttps.FORM_DATA.equalsIgnoreCase(bodyType) || bodyType.startsWith("multipart"))
+        if (bodyParams != null && (OkHttps.FORM_DATA.equals(bodyType) || bodyType.startsWith(MULTIPART))
                 || files != null) {
             MultipartBody.Builder builder = multipartBodyBuilder();
             if (bodyParams != null) {
@@ -752,7 +753,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
         if (bodyParams == null) {
             return emptyRequestBody();
         }
-        if (OkHttps.FORM.equalsIgnoreCase(bodyType)) {
+        if (OkHttps.FORM.equals(bodyType)) {
             FormBody.Builder builder = new FormBody.Builder(charset);
             Platform.forEach(bodyParams, (key, value) -> {
                 if (value == null) return;
@@ -770,7 +771,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
         } else {
             builder = new MultipartBody.Builder();
         }
-        if (bodyType.startsWith("multipart")) {
+        if (bodyType.startsWith(MULTIPART)) {
             try {
                 builder.setType(MediaType.get(bodyType));
             } catch (IllegalArgumentException ignore) { }
