@@ -148,6 +148,13 @@ public interface HTTP {
         Map<String, String> getMediaTypes();
 
         /**
+         * 清空 ContentType
+         * @return Builder
+         * @since v3.5.0
+         */
+        HTTP.Builder clearContentTypes();
+
+        /**
          * 配置支持的报文体类型
          * @param contentTypes 报文体类型列表
          * @return Builder

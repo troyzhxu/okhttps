@@ -129,6 +129,11 @@ public class OkHttpBuilderImpl implements HTTP.Builder {
         return this;
     }
 
+    public HTTP.Builder clearContentTypes() {
+        contentTypes.clear();
+        return this;
+    }
+
     public HTTP.Builder contentTypes(List<String> contentTypes) {
         if (contentTypes != null) {
             this.contentTypes.addAll(contentTypes);
