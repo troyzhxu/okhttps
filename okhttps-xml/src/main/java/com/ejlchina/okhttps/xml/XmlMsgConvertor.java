@@ -1,6 +1,5 @@
 package com.ejlchina.okhttps.xml;
 
-import com.ejlchina.data.Deserializer;
 import com.ejlchina.data.xml.XmlDataConvertor;
 import com.ejlchina.okhttps.ConvertProvider;
 import com.ejlchina.okhttps.MsgConvertor;
@@ -11,8 +10,8 @@ public class XmlMsgConvertor extends XmlDataConvertor implements MsgConvertor, C
 
     public XmlMsgConvertor() { }
 
-    public XmlMsgConvertor(Deserializer deserializer, DocumentBuilderFactory dbFactory) {
-        super(deserializer, dbFactory);
+    public XmlMsgConvertor(DocumentBuilderFactory dbFactory) {
+        super(dbFactory);
     }
 
     @Override
