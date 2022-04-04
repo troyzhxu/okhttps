@@ -480,9 +480,9 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      * 设置 请求报文体
      * @param body 请求报文体，可以是：
      * <pre>
-     *  byte[] - 字节数组（直接作为报文体） <br></br>
-     *  String - 字符串（比如：JSON 字符串、键值对字符串，也是直接作为报文体）<br></br>
-     *  POJO - 普通 Java 数据对象（由 {@link MsgConvertor } 来序列化） <br></br>
+     *  byte[] - 字节数组（直接作为报文体） <br>
+     *  String - 字符串（比如：JSON 字符串、键值对字符串，也是直接作为报文体）<br>
+     *  POJO - 普通 Java 数据对象（由 {@link MsgConvertor } 来序列化） <br>
      *  InputStream - 输入流（v3.5.0 开始支持）
      * </pre>
      * @return HttpTask 实例
