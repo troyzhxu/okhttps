@@ -30,8 +30,11 @@ public class StreamRequestBody extends RequestBody {
 
     @Override
     public void writeTo(BufferedSink sink) throws IOException {
-        sink.writeAll(Okio.source(inputStream));
-        inputStream.close();
+        try {
+            sink.writeAll(Okio.source(inputStream));
+        } finally {
+            inputStream.close();
+        }
     }
 
     @Override
