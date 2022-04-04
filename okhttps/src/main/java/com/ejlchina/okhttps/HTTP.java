@@ -1,14 +1,14 @@
 package com.ejlchina.okhttps;
 
 import com.ejlchina.okhttps.okhttp.OkHttpBuilderImpl;
-import okhttp3.*;
 import okhttp3.WebSocket;
+import okhttp3.*;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
-import java.util.function.Supplier;
 
 /**
  * HTTP 客户端接口
@@ -88,10 +88,28 @@ public interface HTTP {
     
     /**
      * HTTP 构建器
+     * 自 v3.5.0 起可通过系统环境变量 切换该方法返回的 构建器实现类
      * @return HTTP 构建器
      */
     static Builder builder() {
-        return new OkHttpBuilderImpl();
+        String className = System.getProperty(Builder.class.getName());
+        if (Platform.isNotBlank(className)) {
+            try {
+                Class<?> dClass = Class.forName(className);
+                if (Builder.class.isAssignableFrom(dClass)) {
+                    return (Builder) dClass.getDeclaredConstructor().newInstance();
+                } else {
+                    throw new OkHttpsException("The implementation class [" + className + "] you specified is not a subclass of " + Builder.class.getName());
+                }
+            } catch (ClassNotFoundException e) {
+                throw new OkHttpsException("The implementation class [" + className + "] you specified can not be found", e);
+            } catch (NoSuchMethodException e) {
+                throw new OkHttpsException("There is none default constructor in [" + className + "] you specified", e);
+            } catch (ReflectiveOperationException e) {
+                throw new OkHttpsException("[" + className + "] can not be instanced", e);
+            }
+        }
+        return new OkHttpBuilderImpl();     // 默认构建器
     }
 
     /**
