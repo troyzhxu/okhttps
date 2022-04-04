@@ -30,13 +30,7 @@ public final class OkHttps {
         if (http != null) {
             return http;
         }
-        HTTP.Builder builder = null;
-        for (Config config : ServiceLoader.load(Config.class)) {
-            builder = config.builder();
-        }
-        if (builder == null) {
-            builder = HTTP.builder();
-        }
+        HTTP.Builder builder = HTTP.builder();
         ConvertProvider.inject(builder);
         Config.config(builder);
         http = builder.build();

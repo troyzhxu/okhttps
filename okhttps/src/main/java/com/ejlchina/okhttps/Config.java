@@ -13,15 +13,6 @@ public interface Config {
      */
     void with(HTTP.Builder builder);
 
-    /**
-     * 用于自定义 {@link OkHttps } 内部的 {@link HTTP.Builder }
-     * @return HTTP.Builder
-     * @since v3.5.0
-     */
-    default HTTP.Builder builder() {
-        return HTTP.builder();
-    }
-
     static void config(HTTP.Builder builder) {
         for (Config config : ServiceLoader.load(Config.class)) {
             config.with(builder);
