@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 /**
  * Created by 周旭（Troy.Zhou） on 2020/3/11.
@@ -27,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("unchecked")
 public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
 
-    private static final String PATH_PARAM_REGEX = "[A-Za-z0-9_\\-/]*\\{[A-Za-z0-9_\\-]+\\}[A-Za-z0-9_\\-/]*";
+    private static final Pattern PATH_PARAM_REGEX = Pattern.compile("\\{[A-Za-z0-9_\\-]+\\}");
     private static final String DOT = ".";
     private static final String MULTIPART = "multipart/";
     private static final String FORM = "x-www-form-urlencoded";
@@ -820,17 +821,14 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
                 }
             });
         }
-        String url = sb.toString();
-        if (url.matches(PATH_PARAM_REGEX)) {
-            throw new OkHttpsException("url 里有 pathPara 没有设置，你必须先调用 addPathPara 为其设置！");
-        }
         if (urlParams != null) {
-            if (url.contains("?")) {
-                if (!url.endsWith("?")) {
-                    if (url.lastIndexOf("=") < url.lastIndexOf("?") + 2) {
+            if (sb.indexOf("?") >= 0) {                         // url.contains("?")
+                int lastIndex = sb.length() - 1;
+                if (sb.lastIndexOf("?") < lastIndex) {      // !url.endsWith("?")
+                    if (sb.lastIndexOf("=") < sb.lastIndexOf("?") + 2) {
                         throw new OkHttpsException("url 格式错误，'?' 后没有发现 '='");
                     }
-                    if (!url.endsWith("&")) {
+                    if (sb.lastIndexOf("&") < lastIndex) {  // !url.endsWith("&")
                         sb.append('&');
                     }
                 }
@@ -842,9 +840,8 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
                 sb.append(name).append('=').append(value).append('&');
             });
             sb.delete(sb.length() - 1, sb.length());
-            return sb.toString();
         }
-        return url;
+        return sb.toString();
     }
 
     /**
