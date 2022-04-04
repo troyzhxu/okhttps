@@ -5,6 +5,8 @@ import okhttp3.Request;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 
+import java.util.ServiceLoader;
+
 /**
  * OkHttps 工具类
  * 支持 SPI 方式配置
@@ -28,7 +30,13 @@ public final class OkHttps {
         if (http != null) {
             return http;
         }
-        HTTP.Builder builder = HTTP.builder();
+        HTTP.Builder builder = null;
+        for (Config config : ServiceLoader.load(Config.class)) {
+            builder = config.builder();
+        }
+        if (builder == null) {
+            builder = HTTP.builder();
+        }
         ConvertProvider.inject(builder);
         Config.config(builder);
         http = builder.build();
