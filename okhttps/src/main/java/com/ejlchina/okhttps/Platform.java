@@ -90,4 +90,34 @@ public class Platform {
         }
     }
 
+    /**
+     * 字符串为 null 或者内部字符全部为 ' ' '\t' '\n' '\r' 这四类字符时返回 true
+     * @param str 待判断的字符串
+     * @return str 是否是空白字符串
+     * @since v3.5.0
+     */
+    public static boolean isBlank(String str) {
+        if (str == null) {
+            return true;
+        }
+        int len = str.length();
+        if (len == 0) {
+            return true;
+        }
+        for (int i = 0; i < len; i++) {
+            switch (str.charAt(i)) {
+                case ' ':
+                case '\t':
+                case '\n':
+                case '\r':
+                    // case '\b':
+                    // case '\f':
+                    break;
+                default:
+                    return false;
+            }
+        }
+        return true;
+    }
+
 }

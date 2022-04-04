@@ -701,12 +701,11 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
 
     private void buildHeaders(Request.Builder builder) {
         if (headers != null) {
-            for (String name : headers.keySet()) {
-                String value = headers.get(name);
+            Platform.forEach(headers, (name, value) -> {
                 if (value != null) {
                     builder.addHeader(name, value);
                 }
-            }
+            });
         }
     }
 
@@ -806,49 +805,48 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     }
 
     private String buildUrlPath() {
-        String url = urlPath;
-        if (url == null || url.trim().isEmpty()) {
+        if (Platform.isBlank(urlPath)) {
             throw new OkHttpsException("url 不能为空！");
         }
+        StringBuilder sb = new StringBuilder(urlPath);
         if (pathParams != null) {
-            for (String name : pathParams.keySet()) {
+            Platform.forEach(pathParams, (name, value) -> {
                 String target = "{" + name + "}";
-                if (url.contains(target)) {
-                    Object value = pathParams.get(name);
-                    url = url.replace(target, value != null ? value.toString() : "");
+                int start = sb.indexOf(target);
+                if (start >= 0) {
+                    String newValue = value != null ? value.toString() : "";
+                    sb.replace(start, start + target.length(), newValue);
                 } else {
                     throw new OkHttpsException("pathPara [ " + name + " ] 不存在于 url [ " + urlPath + " ]");
                 }
-            }
+            });
         }
+        String url = sb.toString();
         if (url.matches(PATH_PARAM_REGEX)) {
             throw new OkHttpsException("url 里有 pathPara 没有设置，你必须先调用 addPathPara 为其设置！");
         }
         if (urlParams != null) {
-            url = buildUrl(url.trim());
+            if (url.contains("?")) {
+                if (!url.endsWith("?")) {
+                    if (url.lastIndexOf("=") < url.lastIndexOf("?") + 2) {
+                        throw new OkHttpsException("url 格式错误，'?' 后没有发现 '='");
+                    }
+                    if (!url.endsWith("&")) {
+                        sb.append('&');
+                    }
+                }
+            } else {
+                sb.append('?');
+            }
+            Platform.forEach(urlParams, (name, value) -> {
+                if (value != null) {
+                    sb.append(name).append('=').append(value).append('&');
+                }
+            });
+            sb.delete(sb.length() - 1, sb.length());
+            return sb.toString();
         }
         return url;
-    }
-
-    private String buildUrl(String url) {
-        StringBuilder sb = new StringBuilder(url);
-        if (url.contains("?")) {
-            if (!url.endsWith("?")) {
-                if (url.lastIndexOf("=") < url.lastIndexOf("?") + 2) {
-                    throw new OkHttpsException("url 格式错误，'?' 后没有发现 '='");
-                }
-                if (!url.endsWith("&")) {
-                    sb.append('&');
-                }
-            }
-        } else {
-            sb.append('?');
-        }
-        for (String name : urlParams.keySet()) {
-            sb.append(name).append('=').append(urlParams.get(name)).append('&');
-        }
-        sb.delete(sb.length() - 1, sb.length());
-        return sb.toString();
     }
 
     /**

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
 /**
  * HTTP 客户端接口
@@ -296,7 +297,7 @@ public interface HTTP {
         String bodyType();
 
         /**
-         * @since v3.5.0
+         * @since v3.4.2
          * 设置下载文件名解析器
          * @param resolver 解析器
          * @return Builder
