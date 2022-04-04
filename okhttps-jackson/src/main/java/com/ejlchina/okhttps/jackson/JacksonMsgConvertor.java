@@ -13,10 +13,6 @@ public class JacksonMsgConvertor extends JacksonDataConvertor implements MsgConv
 		super(objectMapper);
 	}
 
-	public JacksonMsgConvertor(ObjectMapper objectMapper, boolean typeCached) {
-		super(objectMapper, typeCached);
-	}
-
 	@Override
 	public String mediaType() {
 		return "application/json; charset={charset}";
