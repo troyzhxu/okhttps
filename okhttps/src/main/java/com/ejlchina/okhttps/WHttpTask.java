@@ -78,7 +78,7 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 	 * @since v2.3.0
 	 * @param pingSeconds 客户端心跳间隔秒数（0 表示不需要心跳）
 	 * @param pongSeconds 服务器心跳间隔秒数（0 表示不需要心跳）
-	 * @return WebSocketTask
+	 * @return WHttpTask
 	 */
 	public WHttpTask heatbeat(int pingSeconds, int pongSeconds) {
 		if (pingSeconds < 0 || pongSeconds < 0) {
@@ -93,7 +93,7 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 	 * 用于兼容某些强制客户端必须以固定的时间间隔发送心跳的服务器
 	 * @since v2.5.0
 	 * @param flexiblePing Ping 的间隔是否灵活可变（默认为 true, 为 false 时客户端 Ping 的间隔固定，普通的消息不做为 Ping）
-	 * @return WebSocketTask
+	 * @return WHttpTask
 	 */
 	public WHttpTask flexiblePing(boolean flexiblePing) {
 		this.flexiblePing = flexiblePing;
@@ -102,7 +102,7 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 
 	/**
 	 * @param pingSupplier 心跳数据提供者
-	 * @return WebSocketTask
+	 * @return WHttpTask
 	 */
 	public WHttpTask pingSupplier(PingSupplier pingSupplier) {
 		this.pingSupplier = pingSupplier;
@@ -471,7 +471,7 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 	/**
 	 * 连接打开监听
 	 * @param onOpen 监听器
-	 * @return WebSocketTask
+	 * @return WHttpTask
 	 */
 	public WHttpTask setOnOpen(Listener<HttpResult> onOpen) {
 		this.onOpen = onOpen;
@@ -483,7 +483,7 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 	/**
 	 * 连接异常监听
 	 * @param onException 监听器
-	 * @return WebSocketTask
+	 * @return WHttpTask
 	 */
 	public WHttpTask setOnException(Listener<Throwable> onException) {
 		this.onException = onException;
@@ -495,7 +495,7 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 	/**
 	 * 消息监听
 	 * @param onMessage 监听器
-	 * @return WebSocketTask
+	 * @return WHttpTask
 	 */
 	public WHttpTask setOnMessage(Listener<Message> onMessage) {
 		this.onMessage = onMessage;
@@ -507,7 +507,7 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 	/**
 	 * 正在关闭监听
 	 * @param onClosing 监听器
-	 * @return WebSocketTask
+	 * @return WHttpTask
 	 */
 	public WHttpTask setOnClosing(Listener<Close> onClosing) {
 		this.onClosing = onClosing;
@@ -519,7 +519,7 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 	/**
 	 * 已关闭监听（当连接被取消或发生异常时，也会走该回调）
 	 * @param onClosed 监听器
-	 * @return WebSocketTask
+	 * @return WHttpTask
 	 */
 	public WHttpTask setOnClosed(Listener<Close> onClosed) {
 		this.onClosed = onClosed;
@@ -531,6 +531,7 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 	/**
 	 * 设置在 OnClosing 回调执行完毕后，OnClosed 回调执行的最晚延迟时间
 	 * @param maxClosingSecs 最大 Closing 时长（单位：秒，默认：10秒）
+	 * @return WHttpTask
 	 */
 	public WHttpTask setMaxClosingSecs(int maxClosingSecs) {
 		this.maxClosingSecs = maxClosingSecs;
