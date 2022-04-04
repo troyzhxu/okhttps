@@ -702,9 +702,8 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     private void buildHeaders(Request.Builder builder) {
         if (headers != null) {
             Platform.forEach(headers, (name, value) -> {
-                if (value != null) {
-                    builder.addHeader(name, value);
-                }
+                if (value == null) return;
+                builder.addHeader(name, value);
             });
         }
     }
@@ -839,9 +838,8 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
                 sb.append('?');
             }
             Platform.forEach(urlParams, (name, value) -> {
-                if (value != null) {
-                    sb.append(name).append('=').append(value).append('&');
-                }
+                if (value == null) return;
+                sb.append(name).append('=').append(value).append('&');
             });
             sb.delete(sb.length() - 1, sb.length());
             return sb.toString();
