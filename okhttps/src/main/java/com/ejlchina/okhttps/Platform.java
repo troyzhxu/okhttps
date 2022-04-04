@@ -91,7 +91,7 @@ public class Platform {
     }
 
     /**
-     * 字符串为 null 或者内部字符全部为 ' ' '\t' '\n' '\r' 这四类字符时返回 true
+     * 判断字符串是否为 null 或 空
      * @param str 待判断的字符串
      * @return str 是否是空白字符串
      * @since v3.5.0
@@ -118,6 +118,16 @@ public class Platform {
             }
         }
         return true;
+    }
+
+    /**
+     * 判断字符串是否非空
+     * @param str 待判断的字符串
+     * @return str 是否是非空字符串
+     * @since v3.5.0
+     */
+    public static boolean isNotBlank(String str) {
+        return !isBlank(str);
     }
 
 }
