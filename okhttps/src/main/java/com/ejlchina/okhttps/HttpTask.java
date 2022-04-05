@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 /**
  * Created by 周旭（Troy.Zhou） on 2020/3/11.
@@ -28,7 +27,6 @@ import java.util.regex.Pattern;
 @SuppressWarnings("unchecked")
 public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
 
-    private static final Pattern PATH_PARAM_REGEX = Pattern.compile("\\{[A-Za-z0-9_\\-]+\\}");
     private static final String DOT = ".";
     private static final String MULTIPART = "multipart/";
     private static final String FORM = "x-www-form-urlencoded";
@@ -822,13 +820,13 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
             });
         }
         if (urlParams != null) {
-            if (sb.indexOf("?") >= 0) {                         // url.contains("?")
+            if (sb.indexOf("?") >= 0) {                         // contains("?")
                 int lastIndex = sb.length() - 1;
-                if (sb.lastIndexOf("?") < lastIndex) {      // !url.endsWith("?")
+                if (sb.lastIndexOf("?") < lastIndex) {      // !endsWith("?")
                     if (sb.lastIndexOf("=") < sb.lastIndexOf("?") + 2) {
                         throw new OkHttpsException("url 格式错误，'?' 后没有发现 '='");
                     }
-                    if (sb.lastIndexOf("&") < lastIndex) {  // !url.endsWith("&")
+                    if (sb.lastIndexOf("&") < lastIndex) {  // !endsWith("&")
                         sb.append('&');
                     }
                 }
