@@ -20,38 +20,45 @@ public class MultiValueMap<K, V> extends AbstractMap<K, V> {
         return null;
     }
 
+    Set<Entry<K, V>> entrySet;
+
+    class EntrySet extends AbstractSet<Entry<K, V>> {
+
+        @Override
+        public Iterator<Entry<K, V>> iterator() {
+            Iterator<K> nit = names.iterator();
+            Iterator<V> vit = values.iterator();
+            return new Iterator<>() {
+
+                @Override
+                public boolean hasNext() {
+                    return nit.hasNext() && vit.hasNext();
+                }
+
+                @Override
+                public Entry<K, V> next() {
+                    return new SimpleEntry<>(nit.next(), vit.next());
+                }
+
+                @Override
+                public void remove() {
+                    nit.remove();
+                    vit.remove();
+                }
+            };
+        }
+
+        @Override
+        public int size() {
+            return names.size();
+        }
+
+    }
+
     @Override
     public Set<Entry<K, V>> entrySet() {
-        return new AbstractSet<>() {
-            @Override
-            public Iterator<Entry<K, V>> iterator() {
-                Iterator<K> nit = names.iterator();
-                Iterator<V> vit = values.iterator();
-                return new Iterator<>() {
-
-                    @Override
-                    public boolean hasNext() {
-                        return nit.hasNext() && vit.hasNext();
-                    }
-
-                    @Override
-                    public Entry<K, V> next() {
-                        return new SimpleEntry<>(nit.next(), vit.next());
-                    }
-
-                    @Override
-                    public void remove() {
-                        nit.remove();
-                        vit.remove();
-                    }
-                };
-            }
-
-            @Override
-            public int size() {
-                return names.size();
-            }
-        };
+        Set<Map.Entry<K,V>> es = entrySet;
+        return es == null ? (entrySet = new EntrySet()) : es;
     }
 
 }
