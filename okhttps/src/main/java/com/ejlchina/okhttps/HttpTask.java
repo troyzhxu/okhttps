@@ -816,7 +816,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
                     String newValue = value != null ? value.toString() : "";
                     sb.replace(start, start + target.length(), newValue);
                 } else {
-                    throw new OkHttpsException("pathPara [ " + name + " ] 不存在于 url [ " + urlPath + " ]");
+                    throw new OkHttpsException("PathPara [ " + name + " ] 不存在于 url [ " + urlPath + " ]");
                 }
             });
         }
@@ -850,21 +850,21 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     protected void assertNotConflict(boolean bodyCantUsed) {
         if (bodyCantUsed) {
             if (requestBody != null) {
-                throw new OkHttpsException("GET | HEAD 请求 不能调用 setBodyPara 方法！");
+                throw new OkHttpsException("GET | HEAD request can not call setBodyPara(..) method!");
             }
             if (isNotEmpty(bodyParams)) {
-                throw new OkHttpsException("GET | HEAD 请求 不能调用 addBodyPara 方法！");
+                throw new OkHttpsException("GET | HEAD request can not call addBodyPara(..) method!");
             }
             if (isNotEmpty(files)) {
-                throw new OkHttpsException("GET | HEAD 请求 不能调用 addFilePara 方法！");
+                throw new OkHttpsException("GET | HEAD request can not call addFilePara(..) method!");
             }
         }
         if (requestBody != null) {
             if (isNotEmpty(bodyParams)) {
-                throw new OkHttpsException("方法 addBodyPara 与 setBodyPara 不能同时使用！");
+                throw new OkHttpsException("can not call addBodyPara(..) and setBodyPara(..) at the same time!");
             }
             if (isNotEmpty(files)) {
-                throw new OkHttpsException("方法 addFilePara 与 setBodyPara 不能同时使用！");
+                throw new OkHttpsException("can not call addFilePara(..) and setBodyPara(..) at the same time!");
             }
         }
     }
@@ -882,7 +882,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
             return !latch.await(httpClient.preprocTimeoutMillis(),
                     TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            throw new OkHttpsException("执行超时: " + urlPath, e);
+            throw new OkHttpsException("execute timeout: " + urlPath, e);
         }
     }
 
@@ -890,7 +890,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
         if (nothrow) {
             return new RealHttpResult(this, State.TIMEOUT);
         }
-        throw new OkHttpsException(State.TIMEOUT, "执行超时: " + urlPath);
+        throw new OkHttpsException(State.TIMEOUT, "execute timeout: " + urlPath);
     }
 
     public Charset charset(Response response) {
