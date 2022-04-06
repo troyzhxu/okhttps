@@ -353,7 +353,7 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 	 * @return 当前时间戳（秒）
 	 */
 	private long nowSeconds() {
-		return System.nanoTime() / 1000_000_000;
+		return System.currentTimeMillis() / 1000;
 	}
 
 	class WebSocketImpl implements WebSocket {

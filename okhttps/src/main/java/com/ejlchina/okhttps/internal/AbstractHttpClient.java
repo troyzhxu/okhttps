@@ -1,10 +1,13 @@
 package com.ejlchina.okhttps.internal;
 
 import com.ejlchina.okhttps.*;
-import okhttp3.*;
+import okhttp3.MediaType;
 
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 
 public abstract class AbstractHttpClient implements HTTP {
@@ -138,12 +141,12 @@ public abstract class AbstractHttpClient implements HTTP {
             this.tag = tag;
             this.canceler = canceler;
             this.task = task;
-            this.createAt = System.nanoTime();
+            this.createAt = System.currentTimeMillis();
         }
 
         boolean isExpired() {
             // 生存时间大于10倍的总超时限值
-            return System.nanoTime() - createAt > 1_000_000L * preprocTimeoutMillis();
+            return System.currentTimeMillis() - createAt > preprocTimeoutMillis();
         }
 
         public void setTag(String tag) {
