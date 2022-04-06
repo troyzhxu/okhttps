@@ -16,7 +16,6 @@ import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -37,11 +36,13 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     
     private final String urlPath;
     private String tag;
-    private Map<String, String> headers;
-    private Map<String, Object> pathParams;
-    private Map<String, Object> urlParams;
-    private Map<String, Object> bodyParams;
-    private Map<String, FilePara> files;
+
+    private MultiValueMap<String> headers;
+    private MultiValueMap<Object> pathParams;
+    private MultiValueMap<Object> urlParams;
+    private MultiValueMap<Object> bodyParams;
+    private MultiValueMap<FilePara> files;
+
     private Object requestBody;
     private String bodyType;    // 都是小写形式
     private String boundary;    // MultipartBody 的 边界符
@@ -129,7 +130,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      * 获取请求任务的头信息
      * @return 头信息
      */
-    public Map<String, String> getHeaders() {
+    public MultiValueMap<String> getHeaders() {
         return headers;
     }
 
@@ -137,7 +138,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      * @since 2.4.0
      * @return 路径参数
      */
-    public Map<String, Object> getPathParas() {
+    public MultiValueMap<Object> getPathParas() {
         return pathParams;
     }
 
@@ -145,7 +146,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      * @since 2.4.0
      * @return URL参数（查询参数）
      */
-    public Map<String, Object> getUrlParas() {
+    public MultiValueMap<Object> getUrlParas() {
         return urlParams;
     }
 
@@ -153,7 +154,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      * @since 2.4.0
      * @return 报文体参数
      */
-    public Map<String, Object> getBodyParas() {
+    public MultiValueMap<Object> getBodyParas() {
         return bodyParams;
     }
 
@@ -161,7 +162,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      * @since 2.4.0
      * @return 文件参数
      */
-    public Map<String, FilePara> getFileParas() {
+    public MultiValueMap<FilePara> getFileParas() {
         return files;
     }
 
@@ -305,7 +306,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addHeader(String name, String value) {
         if (name != null && value != null) {
             if (headers == null) {
-                headers = new HashMap<>();
+                headers = new MultiValueMap<>();
             }
             headers.put(name, value);
         }
@@ -320,7 +321,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addHeader(Map<String, String> headers) {
         if (headers != null) {
             if (this.headers == null) {
-                this.headers = new HashMap<>();
+                this.headers = new MultiValueMap<>();
             }
             this.headers.putAll(headers);
         }
@@ -391,7 +392,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addPathPara(String name, Object value) {
         if (name != null && value != null) {
             if (pathParams == null) {
-                pathParams = new HashMap<>();
+                pathParams = new MultiValueMap<>();
             }
             pathParams.put(name, value.toString());
         }
@@ -405,7 +406,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      **/
     public C addPathPara(Map<String, ?> params) {
         if (pathParams == null) {
-            pathParams = new HashMap<>();
+            pathParams = new MultiValueMap<>();
         }
         if (params != null) {
             pathParams.putAll(params);
@@ -422,7 +423,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addUrlPara(String name, Object value) {
         if (name != null && value != null) {
             if (urlParams == null) {
-                urlParams = new HashMap<>();
+                urlParams = new MultiValueMap<>();
             }
             urlParams.put(name, value.toString());
         }
@@ -436,7 +437,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      **/
     public C addUrlPara(Map<String, ?> params) {
         if (urlParams == null) {
-            urlParams = new HashMap<>();
+            urlParams = new MultiValueMap<>();
         }
         if (params != null) {
             urlParams.putAll(params);
@@ -453,7 +454,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addBodyPara(String name, Object value) {
         if (name != null && value != null) {
             if (bodyParams == null) {
-                bodyParams = new HashMap<>();
+                bodyParams = new MultiValueMap<>();
             }
             bodyParams.put(name, value);
         }
@@ -467,7 +468,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      **/
     public C addBodyPara(Map<String, ?> params) {
         if (bodyParams == null) {
-            bodyParams = new HashMap<>();
+            bodyParams = new MultiValueMap<>();
         }
         if (params != null) {
             bodyParams.putAll(params);
@@ -537,7 +538,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addFilePara(String name, String type, File file) {
         if (name != null && file != null && file.exists()) {
             if (files == null) {
-                files = new HashMap<>();
+                files = new MultiValueMap<>();
             }
             files.put(name, new FilePara(type, file.getName(), file));
         }
@@ -566,7 +567,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addFilePara(String name, String type, String fileName, byte[] content) {
         if (name != null && content != null) {
             if (files == null) {
-                files = new HashMap<>();
+                files = new MultiValueMap<>();
             }
             files.put(name, new FilePara(type, fileName, content));
         }
@@ -597,7 +598,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addFilePara(String name, String type, String fileName, InputStream stream) {
         if (name != null && stream != null) {
             if (files == null) {
-                files = new HashMap<>();
+                files = new MultiValueMap<>();
             }
             files.put(name, new FilePara(type, fileName, stream));
         }
@@ -700,7 +701,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
 
     private void buildHeaders(Request.Builder builder) {
         if (headers != null) {
-            Platform.forEach(headers, (name, value) -> {
+            headers.forEach((name, value) -> {
                 if (value == null) return;
                 builder.addHeader(name, value);
             });
@@ -726,7 +727,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
                 || files != null) {
             MultipartBody.Builder builder = multipartBodyBuilder();
             if (bodyParams != null) {
-                Platform.forEach(bodyParams, (key, value) -> {
+                bodyParams.forEach((key, value) -> {
                     if (value == null) return;
                     byte[] content = value.toString().getBytes(charset);
                     RequestBody body = RequestBody.create(null, content);
@@ -734,7 +735,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
                 });
             }
             if (files != null) {
-                Platform.forEach(files, (name, file) -> {
+                files.forEach((name, file) -> {
                     MediaType type = httpClient.mediaType(file.getType());
                     builder.addFormDataPart(
                             name,
@@ -753,7 +754,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
         }
         if (OkHttps.FORM.equals(bodyType) || bodyType.endsWith(FORM)) {
             FormBody.Builder builder = new FormBody.Builder(charset);
-            Platform.forEach(bodyParams, (key, value) -> {
+            bodyParams.forEach((key, value) -> {
                 if (value == null) return;
                 builder.add(key, value.toString());
             });
@@ -808,7 +809,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
         }
         StringBuilder sb = new StringBuilder(urlPath);
         if (pathParams != null) {
-            Platform.forEach(pathParams, (name, value) -> {
+            pathParams.forEach((name, value) -> {
                 String target = "{" + name + "}";
                 int start = sb.indexOf(target);
                 if (start >= 0) {
@@ -833,7 +834,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
             } else {
                 sb.append('?');
             }
-            Platform.forEach(urlParams, (name, value) -> {
+            urlParams.forEach((name, value) -> {
                 if (value == null) return;
                 sb.append(name).append('=').append(value).append('&');
             });
