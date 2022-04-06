@@ -5,8 +5,6 @@ import com.ejlchina.okhttps.Platform;
 import com.ejlchina.okhttps.WHttpTask;
 import com.ejlchina.okhttps.WebSocket;
 
-import okio.ByteString;
-
 import java.util.*;
 
 /**
@@ -446,7 +444,7 @@ public class Stomp {
             int pongSeconds = Integer.parseInt(heartbeats[0]) / 1000;
             if (pingSeconds > 0 || pongSeconds > 0) {
                 if (task.pingSupplier() == null) {
-                    task.pingSupplier(() -> ByteString.of((byte) 0x0A));
+                    task.pingSupplier(() -> "\n");
                 }
                 task.heatbeat(Math.max(pingSeconds, pingSecs), Math.max(pongSeconds, pongSecs));
             }

@@ -18,6 +18,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 
 public class WHttpTask extends HttpTask<WHttpTask> {
@@ -40,7 +41,7 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 	private long lastPongSecs = 0;
 
 	// 心跳数据提供者
-	private PingSupplier pingSupplier;
+	private Supplier<String> pingSupplier;
 
 	private WebSocketImpl webSocket;
 
@@ -73,7 +74,7 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 	 * 所以如果服务器要求客户端心跳的 opcode 必须是 9 的话，请使用 OkHttp 的原生心跳：
 	 * [http://okhttps.ejlchina.com/v2/websocket.html#%E5%85%A8%E5%B1%80%E5%BF%83%E8%B7%B3%E9%85%8D%E7%BD%AE]
 	 *
-	 * 另若需要 可使用 {@link #pingSupplier(PingSupplier)} 方法指定心跳发送的具体内容
+	 * 另若需要 可使用 {@link #pingSupplier(Supplier<String>)} 方法指定心跳发送的具体内容
 	 *
 	 * @since v2.3.0
 	 * @param pingSeconds 客户端心跳间隔秒数（0 表示不需要心跳）
@@ -104,12 +105,12 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 	 * @param pingSupplier 心跳数据提供者
 	 * @return WHttpTask
 	 */
-	public WHttpTask pingSupplier(PingSupplier pingSupplier) {
+	public WHttpTask pingSupplier(Supplier<String> pingSupplier) {
 		this.pingSupplier = pingSupplier;
 		return this;
 	}
 
-	public PingSupplier pingSupplier() {
+	public Supplier<String> pingSupplier() {
 		return pingSupplier;
 	}
 	
@@ -316,8 +317,7 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 			}
 			WebSocket ws = webSocket;
 			if (nowSeconds() - lastPingSecs >= pingSeconds && ws != null) {
-				ByteString ping = pingSupplier != null ? pingSupplier.getPing() : ByteString.EMPTY;
-				ws.send(ping);
+				ws.send(pingSupplier != null ? pingSupplier.get() : ByteString.EMPTY);
 				lastPingSecs = nowSeconds();
 			}
 			schedulePing();
