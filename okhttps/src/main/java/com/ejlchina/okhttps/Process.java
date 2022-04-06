@@ -13,7 +13,7 @@ public interface Process {
 	double getRate();
 
 	/**
-	 * @return 总
+	 * @return 总字节数
 	 */
 	long getTotalBytes();
 	
