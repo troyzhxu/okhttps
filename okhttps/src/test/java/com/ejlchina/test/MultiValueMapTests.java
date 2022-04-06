@@ -27,7 +27,7 @@ public class MultiValueMapTests {
     }
 
     @Test
-    public void test() {
+    public void test2() {
         MultiValueMap<Object> map = new MultiValueMap<>();
         map.put("name", "Jack");
         map.put("age", 25);
@@ -47,13 +47,13 @@ public class MultiValueMapTests {
                 25, 30, 26
         };
 
-        List<Object> names = map.getValues("name");
+        List<Object> names = map.getAll("name");
         Assert.assertEquals(3, names.size());
         Assert.assertEquals(NAMES[0], names.get(0));
         Assert.assertEquals(NAMES[1], names.get(1));
         Assert.assertEquals(NAMES[2], names.get(2));
 
-        List<Object> ages = map.getValues("age");
+        List<Object> ages = map.getAll("age");
         Assert.assertEquals(3, ages.size());
         Assert.assertEquals(AGES[0], ages.get(0));
         Assert.assertEquals(AGES[1], ages.get(1));
@@ -73,5 +73,36 @@ public class MultiValueMapTests {
         });
     }
 
+
+    @Test
+    public void test3() {
+        MultiValueMap<String> map = new MultiValueMap<>();
+        map.put("name", "Jack");
+        map.put("name", "Ketty");
+        map.put("name", "Tom");
+        map.put("name", "Tom");
+        map.put("name", "Alice");
+        map.put("age", "30");
+
+        Assert.assertEquals(6, map.size());
+        Assert.assertEquals("Alice", map.get("name"));
+        Assert.assertEquals("30", map.get("age"));
+
+        Assert.assertTrue(map.remove("name", "Tom"));
+
+        Assert.assertEquals(4, map.size());
+        Assert.assertEquals("Alice", map.get("name"));
+
+        Assert.assertEquals("Alice", map.remove("name"));
+
+        Assert.assertEquals(3, map.size());
+        Assert.assertEquals("Ketty", map.get("name"));
+
+        Assert.assertArrayEquals(new String[] {"Jack", "Ketty"}, map.removeAll("name").toArray());
+
+        Assert.assertEquals(1, map.size());
+        Assert.assertEquals("30", map.get("age"));
+        Assert.assertNull(map.get("name"));
+    }
 
 }
