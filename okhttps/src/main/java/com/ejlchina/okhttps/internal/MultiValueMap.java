@@ -15,12 +15,39 @@ import java.util.function.BiConsumer;
  */
 public class MultiValueMap<V> extends AbstractMap<String, V> {
 
-
     transient final List<String> keys = new ArrayList<>();
 
     transient final List<V> values = new ArrayList<>();
 
     transient Set<Entry<String, V>> entrySet;
+
+    static class Itr<V> implements Iterator<Entry<String, V>> {
+
+        final Iterator<String> kit;
+        final Iterator<V> vit;
+
+        public Itr(Iterator<String> kit, Iterator<V> vit) {
+            this.kit = kit;
+            this.vit = vit;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return kit.hasNext() && vit.hasNext();
+        }
+
+        @Override
+        public Entry<String, V> next() {
+            return new SimpleEntry<>(kit.next(), vit.next());
+        }
+
+        @Override
+        public void remove() {
+            kit.remove();
+            vit.remove();
+        }
+
+    }
 
     /**
      * 键值对集合类
@@ -29,26 +56,7 @@ public class MultiValueMap<V> extends AbstractMap<String, V> {
 
         @Override
         public Iterator<Entry<String, V>> iterator() {
-            Iterator<String> nit = keys.iterator();
-            Iterator<V> vit = values.iterator();
-            return new Iterator<>() {
-
-                @Override
-                public boolean hasNext() {
-                    return nit.hasNext() && vit.hasNext();
-                }
-
-                @Override
-                public Entry<String, V> next() {
-                    return new SimpleEntry<>(nit.next(), vit.next());
-                }
-
-                @Override
-                public void remove() {
-                    nit.remove();
-                    vit.remove();
-                }
-            };
+            return new Itr<>(keys.iterator(), values.iterator());
         }
 
         @Override
