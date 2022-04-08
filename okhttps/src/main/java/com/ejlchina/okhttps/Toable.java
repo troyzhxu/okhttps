@@ -23,8 +23,10 @@ public interface Toable {
     byte[] toBytes();
 
     /**
+     * will be removed in next version
      * @return ByteString
      */
+    @Deprecated
     ByteString toByteString();
 
     /**
