@@ -74,7 +74,7 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 	 * 所以如果服务器要求客户端心跳的 opcode 必须是 9 的话，请使用 OkHttp 的原生心跳：
 	 * [http://okhttps.ejlchina.com/v2/websocket.html#%E5%85%A8%E5%B1%80%E5%BF%83%E8%B7%B3%E9%85%8D%E7%BD%AE]
 	 *
-	 * 另若需要 可使用 {@link #pingSupplier(Supplier<String>)} 方法指定心跳发送的具体内容
+	 * 另若需要 可使用 {@link #pingSupplier(Supplier)} 方法指定心跳发送的具体内容
 	 *
 	 * @since v2.3.0
 	 * @param pingSeconds 客户端心跳间隔秒数（0 表示不需要心跳）

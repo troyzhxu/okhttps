@@ -134,7 +134,7 @@ public class MulVMap<V> extends AbstractMap<String, V> {
     /**
      * 获取 Key 下的所有 Value
      * @param key 键
-     * @return List<V>
+     * @return List
      */
     public List<V> getAll(String key) {
         return getAll(key, false);
@@ -144,7 +144,7 @@ public class MulVMap<V> extends AbstractMap<String, V> {
      * 获取 Key 下的所有 Value
      * @param key 键
      * @param ic 匹配 key 时是否忽略大小写
-     * @return List<V>
+     * @return List
      */
     public List<V> getAll(String key, boolean ic) {
         List<V> list = new ArrayList<>();
