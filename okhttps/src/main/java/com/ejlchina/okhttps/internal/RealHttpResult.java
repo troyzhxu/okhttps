@@ -81,7 +81,7 @@ public class RealHttpResult implements HttpResult {
     }
 
     @Override
-    public MulVMap<String> getAllHeaders() {
+    public MulVMap<String> allHeaders() {
         MulVMap<String> map = new MulVMap<>();
         if (response != null) {
             Headers hs = response.headers();

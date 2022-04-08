@@ -199,7 +199,7 @@ public interface HttpResult {
 	
 	/**
 	 * @return 响应头
-	 * @see #getAllHeaders()
+	 * @see #allHeaders()
 	 */
 	@Deprecated
 	Headers getHeaders();
@@ -208,7 +208,7 @@ public interface HttpResult {
 	 * @return 所有响应头
 	 * @since v3.5.0
 	 */
-	MulVMap<String> getAllHeaders();
+	MulVMap<String> allHeaders();
 
 	/**
 	 * @param name 头名称
