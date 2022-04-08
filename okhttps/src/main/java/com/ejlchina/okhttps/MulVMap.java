@@ -13,11 +13,20 @@ import java.util.function.BiConsumer;
  */
 public class MulVMap<V> extends AbstractMap<String, V> {
 
-    transient final List<String> keys = new ArrayList<>();
+    transient final List<String> keys;
 
-    transient final List<V> values = new ArrayList<>();
+    transient final List<V> values;
 
     transient Set<Entry<String, V>> entrySet;
+
+    public MulVMap() {
+        this(0);
+    }
+
+    public MulVMap(int initSize) {
+        keys = new ArrayList<>(initSize);
+        values = new ArrayList<>(initSize);
+    }
 
     static class Itr<V> implements Iterator<Entry<String, V>> {
 
