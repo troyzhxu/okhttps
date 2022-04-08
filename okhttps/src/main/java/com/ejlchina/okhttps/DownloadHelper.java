@@ -1,7 +1,5 @@
 package com.ejlchina.okhttps;
 
-import okhttp3.MediaType;
-
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -48,21 +46,32 @@ public class DownloadHelper {
         }
     }
 
-    protected String toFileName(String name, HttpResult result) {
-        int dotIndex = name.lastIndexOf('.');
-        if (dotIndex > -1 && dotIndex < name.length() - 1) {
+    public String toFileName(String name, HttpResult result) {
+        int dotIdx = name.lastIndexOf('.');
+        if (dotIdx > -1 && dotIdx < name.length() - 1) {
             return name;
         }
-        MediaType type = result.getBody().getType();
         // 获取文件扩展名
-        String ext = extMappings.get(type.toString());
+        String ext = getExt(result.getHeader("Content-Type"));
+        if (ext != null) {
+            if (dotIdx == -1) {
+                return name + "." + ext;
+            }
+            return name + ext;
+        }
+        return name;
+    }
+
+
+    public String getExt(String contentType) {
+        String ext = extMappings.get(contentType);
         if (ext == null) {
-            ext = type.subtype();
+            int i = contentType.indexOf('/');
+            if (i > 0 && i < contentType.length() - 1) {
+                return contentType.substring(i + 1);
+            }
         }
-        if (dotIndex == -1) {
-            return name + "." + ext;
-        }
-        return name + ext;
+        return ext;
     }
 
     /**
