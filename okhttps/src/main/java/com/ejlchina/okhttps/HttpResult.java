@@ -199,8 +199,16 @@ public interface HttpResult {
 	
 	/**
 	 * @return 响应头
+	 * @see #getAllHeaders()
 	 */
+	@Deprecated
 	Headers getHeaders();
+
+	/**
+	 * @return 所有响应头
+	 * @since v3.5.0
+	 */
+	MulVMap<String> getAllHeaders();
 
 	/**
 	 * @param name 头名称
