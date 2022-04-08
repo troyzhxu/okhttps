@@ -91,6 +91,7 @@ public interface HttpResult {
 	interface Body extends Toable {
 
 		/**
+		 * will be removed in next version
 		 * @return 媒体类型
 		 */
 		@Deprecated
@@ -200,6 +201,7 @@ public interface HttpResult {
 	boolean isSuccessful();
 	
 	/**
+	 * will be removed in next version
 	 * @return 响应头
 	 * @see #allHeaders()
 	 */
