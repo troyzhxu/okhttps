@@ -38,11 +38,11 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     private final String urlPath;
     private String tag;
 
-    private MulVMap<String> headers;
-    private MulVMap<Object> pathParams;
-    private MulVMap<Object> urlParams;
-    private MulVMap<Object> bodyParams;
-    private MulVMap<FilePara> files;
+    private ListMap<String> headers;
+    private ListMap<Object> pathParams;
+    private ListMap<Object> urlParams;
+    private ListMap<Object> bodyParams;
+    private ListMap<FilePara> files;
 
     private Object requestBody;
     private String bodyType;    // 都是小写形式
@@ -131,7 +131,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      * 获取请求任务的头信息
      * @return 头信息
      */
-    public MulVMap<String> getHeaders() {
+    public ListMap<String> getHeaders() {
         return headers;
     }
 
@@ -139,7 +139,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      * @since 2.4.0
      * @return 路径参数
      */
-    public MulVMap<Object> getPathParas() {
+    public ListMap<Object> getPathParas() {
         return pathParams;
     }
 
@@ -147,7 +147,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      * @since 2.4.0
      * @return URL参数（查询参数）
      */
-    public MulVMap<Object> getUrlParas() {
+    public ListMap<Object> getUrlParas() {
         return urlParams;
     }
 
@@ -155,7 +155,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      * @since 2.4.0
      * @return 报文体参数
      */
-    public MulVMap<Object> getBodyParas() {
+    public ListMap<Object> getBodyParas() {
         return bodyParams;
     }
 
@@ -163,7 +163,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      * @since 2.4.0
      * @return 文件参数
      */
-    public MulVMap<FilePara> getFileParas() {
+    public ListMap<FilePara> getFileParas() {
         return files;
     }
 
@@ -307,7 +307,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addHeader(String name, String value) {
         if (name != null && value != null) {
             if (headers == null) {
-                headers = new MulVMap<>();
+                headers = new ListMap<>();
             }
             headers.put(name, value);
         }
@@ -322,7 +322,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addHeader(Map<String, String> headers) {
         if (headers != null) {
             if (this.headers == null) {
-                this.headers = new MulVMap<>();
+                this.headers = new ListMap<>();
             }
             this.headers.putAll(headers);
         }
@@ -393,7 +393,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addPathPara(String name, Object value) {
         if (name != null && value != null) {
             if (pathParams == null) {
-                pathParams = new MulVMap<>();
+                pathParams = new ListMap<>();
             }
             pathParams.put(name, value.toString());
         }
@@ -407,7 +407,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      **/
     public C addPathPara(Map<String, ?> params) {
         if (pathParams == null) {
-            pathParams = new MulVMap<>();
+            pathParams = new ListMap<>();
         }
         if (params != null) {
             pathParams.putAll(params);
@@ -424,7 +424,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addUrlPara(String name, Object value) {
         if (name != null && value != null) {
             if (urlParams == null) {
-                urlParams = new MulVMap<>();
+                urlParams = new ListMap<>();
             }
             urlParams.put(name, value.toString());
         }
@@ -438,7 +438,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      **/
     public C addUrlPara(Map<String, ?> params) {
         if (urlParams == null) {
-            urlParams = new MulVMap<>();
+            urlParams = new ListMap<>();
         }
         if (params != null) {
             urlParams.putAll(params);
@@ -455,7 +455,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addBodyPara(String name, Object value) {
         if (name != null && value != null) {
             if (bodyParams == null) {
-                bodyParams = new MulVMap<>();
+                bodyParams = new ListMap<>();
             }
             bodyParams.put(name, value);
         }
@@ -469,7 +469,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      **/
     public C addBodyPara(Map<String, ?> params) {
         if (bodyParams == null) {
-            bodyParams = new MulVMap<>();
+            bodyParams = new ListMap<>();
         }
         if (params != null) {
             bodyParams.putAll(params);
@@ -539,7 +539,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addFilePara(String name, String type, File file) {
         if (name != null && file != null && file.exists()) {
             if (files == null) {
-                files = new MulVMap<>();
+                files = new ListMap<>();
             }
             files.put(name, new FilePara(type, file.getName(), file));
         }
@@ -568,7 +568,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addFilePara(String name, String type, String fileName, byte[] content) {
         if (name != null && content != null) {
             if (files == null) {
-                files = new MulVMap<>();
+                files = new ListMap<>();
             }
             files.put(name, new FilePara(type, fileName, content));
         }
@@ -599,7 +599,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addFilePara(String name, String type, String fileName, InputStream stream) {
         if (name != null && stream != null) {
             if (files == null) {
-                files = new MulVMap<>();
+                files = new ListMap<>();
             }
             files.put(name, new FilePara(type, fileName, stream));
         }

@@ -2,7 +2,7 @@ package com.ejlchina.okhttps.internal;
 
 import com.ejlchina.okhttps.HttpResult;
 import com.ejlchina.okhttps.HttpTask;
-import com.ejlchina.okhttps.MulVMap;
+import com.ejlchina.okhttps.ListMap;
 import com.ejlchina.okhttps.TaskExecutor;
 import okhttp3.Headers;
 import okhttp3.Response;
@@ -81,8 +81,8 @@ public class RealHttpResult implements HttpResult {
     }
 
     @Override
-    public MulVMap<String> allHeaders() {
-        MulVMap<String> map = new MulVMap<>();
+    public ListMap<String> allHeaders() {
+        ListMap<String> map = new ListMap<>();
         if (response != null) {
             Headers hs = response.headers();
             for (int i = 0, size = hs.size(); i < size; i++) {

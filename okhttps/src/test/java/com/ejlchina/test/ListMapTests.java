@@ -1,7 +1,7 @@
 package com.ejlchina.test;
 
 import com.ejlchina.okhttps.Platform;
-import com.ejlchina.okhttps.MulVMap;
+import com.ejlchina.okhttps.ListMap;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MulVMapTests {
+public class ListMapTests {
 
     @Test
     public void test1() {
@@ -18,7 +18,7 @@ public class MulVMapTests {
         m.put("sex", "male");
         m.put("school", "School");
 
-        Map<String, String> map = new MulVMap<>();
+        Map<String, String> map = new ListMap<>();
         map.putAll(m);
 
         Assert.assertEquals("male", map.get("sex"));
@@ -28,7 +28,7 @@ public class MulVMapTests {
 
     @Test
     public void test2() {
-        MulVMap<Object> map = new MulVMap<>();
+        ListMap<Object> map = new ListMap<>();
         map.put("name", "Jack");
         map.put("age", 25);
         map.put("name", "Tom");
@@ -76,7 +76,7 @@ public class MulVMapTests {
 
     @Test
     public void test3() {
-        MulVMap<String> map = new MulVMap<>();
+        ListMap<String> map = new ListMap<>();
         map.put("name", "Jack");
         map.put("name", "Ketty");
         map.put("name", "Tom");

@@ -212,7 +212,7 @@ public interface HttpResult {
 	 * @return 所有响应头
 	 * @since v3.5.0
 	 */
-	MulVMap<String> allHeaders();
+	ListMap<String> allHeaders();
 
 	/**
 	 * @param name 头名称

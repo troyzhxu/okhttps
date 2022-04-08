@@ -11,7 +11,7 @@ import java.util.function.BiConsumer;
  * @since v3.5.0
  * @param <V> 泛型 值
  */
-public class MulVMap<V> extends AbstractMap<String, V> {
+public class ListMap<V> extends AbstractMap<String, V> {
 
     transient final List<String> keys;
 
@@ -19,11 +19,11 @@ public class MulVMap<V> extends AbstractMap<String, V> {
 
     transient Set<Entry<String, V>> entrySet;
 
-    public MulVMap() {
+    public ListMap() {
         this(0);
     }
 
-    public MulVMap(int initSize) {
+    public ListMap(int initSize) {
         keys = new ArrayList<>(initSize);
         values = new ArrayList<>(initSize);
     }
