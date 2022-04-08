@@ -506,7 +506,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     /**
      * 添加文件参数（以 multipart/form-data 形式上传）
      * @param name 参数名
-     * @param type 文件类型/扩展名: 如 txt、png、jpg、doc 等，参考 @{ HTTP$Builder#mediaTypes }
+     * @param type 文件类型/扩展名: 如 txt、png、jpg、doc 等，参考 {@link HTTP.Builder#getMediaTypes() }
      * @param filePath 文件路径
      * @return HttpTask 实例
      */

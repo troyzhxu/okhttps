@@ -50,20 +50,22 @@ public class OkHttpBuilderImpl implements HTTP.Builder {
 
     public OkHttpBuilderImpl() {
         mediaTypes = new HashMap<>();
-        mediaTypes.put("*", "application/octet-stream");
         mediaTypes.put("png", "image/png");
         mediaTypes.put("jpg", "image/jpeg");
         mediaTypes.put("jpeg", "image/jpeg");
         mediaTypes.put("wav", "audio/wav");
         mediaTypes.put("mp3", "audio/mp3");
-        mediaTypes.put("mp4", "video/mpeg4");
+        mediaTypes.put("mp4", "video/mp4");
         mediaTypes.put("txt", "text/plain");
         mediaTypes.put("xls", "application/x-xls");
+        mediaTypes.put("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         mediaTypes.put("xml", "text/xml");
         mediaTypes.put("apk", "application/vnd.android.package-archive");
         mediaTypes.put("doc", "application/msword");
-        mediaTypes.put("pdf", "application/pdf");
+        mediaTypes.put("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
         mediaTypes.put("html", "text/html");
+        mediaTypes.put("rar", "application/x-rar");
+        mediaTypes.put("jar", "application/x-java-archive");
         contentTypes = new ArrayList<>();
         contentTypes.add("application/x-www-form-urlencoded; charset={charset}");
         contentTypes.add("application/json; charset={charset}");

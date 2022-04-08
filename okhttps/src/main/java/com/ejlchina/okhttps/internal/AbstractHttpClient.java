@@ -161,12 +161,15 @@ public abstract class AbstractHttpClient implements HTTP {
             return MediaType.parse(mediaType);
         }
         if (type != null) {
+            if (type.indexOf('/') < 0) {
+                type = "application/" + type;
+            }
             MediaType mType = MediaType.parse(type);
             if (mType != null) {
                 return mType;
             }
         }
-        return MediaType.parse("application/octet-stream");
+        return MediaType.parse("application/unknown");
     }
 
     @Override
