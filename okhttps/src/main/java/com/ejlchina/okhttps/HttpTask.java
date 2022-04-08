@@ -19,6 +19,7 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * Created by 周旭（Troy.Zhou） on 2020/3/11.
@@ -46,7 +47,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     private Object requestBody;
     private String bodyType;    // 都是小写形式
     private String boundary;    // MultipartBody 的 边界符
-    private OnCallback<Process> onProcess;
+    private Consumer<Process> onProcess;
     private boolean processOnIO;
     private long stepBytes = 0;
     private double stepRate = -1;
@@ -354,7 +355,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      * @param onProcess 进度回调函数
      * @return HttpTask 实例
      */
-    public C setOnProcess(OnCallback<Process> onProcess) {
+    public C setOnProcess(Consumer<Process> onProcess) {
         this.onProcess = onProcess;
         processOnIO = nextOnIO;
         nextOnIO = false;

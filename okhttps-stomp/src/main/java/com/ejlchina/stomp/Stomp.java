@@ -1,11 +1,11 @@
 package com.ejlchina.stomp;
 
-import com.ejlchina.okhttps.OnCallback;
 import com.ejlchina.okhttps.Platform;
 import com.ejlchina.okhttps.WHttpTask;
 import com.ejlchina.okhttps.WebSocket;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * 基于 OkHttps websockt 的 Stomp 客户端
@@ -28,10 +28,10 @@ public class Stomp {
 
     private final List<Subscriber> subscribers;
 
-    private OnCallback<Stomp> onConnected;
-    private OnCallback<WebSocket.Close> onDisconnected;
-    private OnCallback<Throwable> onException;
-    private OnCallback<Message> onError;
+    private Consumer<Stomp> onConnected;
+    private Consumer<WebSocket.Close> onDisconnected;
+    private Consumer<Throwable> onException;
+    private Consumer<Message> onError;
 
     private final String disReceipt;
 
@@ -117,9 +117,9 @@ public class Stomp {
     }
 
     private synchronized void doOnException(Throwable throwable) {
-        OnCallback<Throwable> listener = onException;
+        Consumer<Throwable> listener = onException;
         if (listener != null) {
-            listener.on(throwable);
+            listener.accept(throwable);
         }
         disconnecting = false;
         connecting = false;
@@ -133,9 +133,9 @@ public class Stomp {
         for (Subscriber subscriber : subscribers) {
             subscriber.resetStatus();
         }
-        OnCallback<WebSocket.Close> listener = onDisconnected;
+        Consumer<WebSocket.Close> listener = onDisconnected;
         if (listener != null) {
-            listener.on(close);
+            listener.accept(close);
         }
     }
 
@@ -212,7 +212,7 @@ public class Stomp {
      * @param onConnected 连接成功回调
      * @return Stomp
      */
-    public Stomp setOnConnected(OnCallback<Stomp> onConnected) {
+    public Stomp setOnConnected(Consumer<Stomp> onConnected) {
         this.onConnected = onConnected;
         return this;
     }
@@ -222,7 +222,7 @@ public class Stomp {
      * @param onDisconnected 断开连接回调
      * @return Stomp
      */
-    public Stomp setOnDisconnected(OnCallback<WebSocket.Close> onDisconnected) {
+    public Stomp setOnDisconnected(Consumer<WebSocket.Close> onDisconnected) {
         this.onDisconnected = onDisconnected;
         return this;
     }
@@ -233,7 +233,7 @@ public class Stomp {
      * @param onException 异常回调
      * @return Stomp
      */
-    public Stomp setOnException(OnCallback<Throwable> onException) {
+    public Stomp setOnException(Consumer<Throwable> onException) {
         this.onException = onException;
         return this;
     }
@@ -243,7 +243,7 @@ public class Stomp {
      * @param onError 错误回调
      * @return Stomp
      */
-    public Stomp setOnError(OnCallback<Message> onError) {
+    public Stomp setOnError(Consumer<Message> onError) {
 		this.onError = onError;
 		return this;
 	}
@@ -295,7 +295,7 @@ public class Stomp {
      * @param callback 消息回调
      * @return Stomp
      */
-    public Stomp topic(String destination, OnCallback<Message> callback) {
+    public Stomp topic(String destination, Consumer<Message> callback) {
         return topic(destination, null, callback);
     }
 
@@ -306,7 +306,7 @@ public class Stomp {
      * @param callback 消息回调
      * @return Stomp
      */
-    public Stomp topic(String destination, List<Header> headers, OnCallback<Message> callback) {
+    public Stomp topic(String destination, List<Header> headers, Consumer<Message> callback) {
         return subscribe(TOPIC + destination, headers, callback);
     }
 
@@ -316,7 +316,7 @@ public class Stomp {
      * @param callback 消息回调
      * @return Stomp
      */
-    public Stomp queue(String destination, OnCallback<Message> callback) {
+    public Stomp queue(String destination, Consumer<Message> callback) {
         return queue(destination, null, callback);
     }
 
@@ -327,7 +327,7 @@ public class Stomp {
      * @param callback 消息回调
      * @return Stomp
      */
-    public Stomp queue(String destination, List<Header> headers, OnCallback<Message> callback) {
+    public Stomp queue(String destination, List<Header> headers, Consumer<Message> callback) {
         return subscribe(QUEUE + destination, headers, callback);
     }
 
@@ -338,7 +338,7 @@ public class Stomp {
      * @param callback 消息回调
      * @return Stomp
      */
-    public synchronized Stomp subscribe(String destination, List<Header> headers, OnCallback<Message> callback) {
+    public synchronized Stomp subscribe(String destination, List<Header> headers, Consumer<Message> callback) {
         if (destination == null || destination.isEmpty()) {
             throw new IllegalArgumentException("destination can not be empty!");
         }
@@ -427,9 +427,9 @@ public class Stomp {
                 disconnect(true);
             }
         } else if (Commands.ERROR.equals(command)) {
-            OnCallback<Message> listener = onError;
+            Consumer<Message> listener = onError;
         	if (listener != null) {
-                listener.on(msg);
+                listener.accept(msg);
         	}
             connecting = false;
         }
@@ -449,9 +449,9 @@ public class Stomp {
                 task.heatbeat(Math.max(pingSeconds, pingSecs), Math.max(pongSeconds, pongSecs));
             }
         }
-        OnCallback<Stomp> listener = onConnected;
+        Consumer<Stomp> listener = onConnected;
         if (listener != null) {
-            listener.on(this);
+            listener.accept(this);
         }
         subscribers.forEach(Subscriber::subscribe);
     }

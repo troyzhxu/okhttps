@@ -1,6 +1,6 @@
 package com.ejlchina.stomp;
 
-import com.ejlchina.okhttps.OnCallback;
+import java.util.function.Consumer;
 
 /**
  * Stomp 消息编解码器
@@ -20,6 +20,6 @@ public interface MsgCodec {
      * @param input 输入
      * @param out 输出
      */
-    void decode(String input, OnCallback<Message> out);
+    void decode(String input, Consumer<Message> out);
 
 }

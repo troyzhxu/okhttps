@@ -15,6 +15,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
 
 
 /**
@@ -26,20 +27,20 @@ import java.util.concurrent.CountDownLatch;
 public class AHttpTask extends HttpTask<AHttpTask> {
 
 
-    private OnCallback<HttpResult> onResponse;
-    private OnCallback<IOException> onException;
-    private OnCallback<State> onComplete;
+    private Consumer<HttpResult> onResponse;
+    private Consumer<IOException> onException;
+    private Consumer<State> onComplete;
 
     private boolean responseOnIO;
     private boolean exceptionOnIO;
     private boolean completeOnIO;
 
-    private OnCallback<HttpResult.Body> onResBody;
-    private OnCallback<Mapper> onResMapper;
-    private OnCallback<Array> onResArray;
-    private OnCallback<String> onResString;
-    private OnCallback<?> onResBean;
-    private OnCallback<?> onResList;
+    private Consumer<HttpResult.Body> onResBody;
+    private Consumer<Mapper> onResMapper;
+    private Consumer<Array> onResArray;
+    private Consumer<String> onResString;
+    private Consumer<?> onResBean;
+    private Consumer<?> onResList;
 
     private boolean resBodyOnIO;
     private boolean resMapperOnIO;
@@ -66,7 +67,7 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 	 * @param onException 请求异常回调
 	 * @return HttpTask 实例
 	 */
-    public AHttpTask setOnException(OnCallback<IOException> onException) {
+    public AHttpTask setOnException(Consumer<IOException> onException) {
         this.onException = onException;
         exceptionOnIO = nextOnIO;
         nextOnIO = false;
@@ -78,7 +79,7 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 	 * @param onComplete 请求完成回调
 	 * @return HttpTask 实例
 	 */
-    public AHttpTask setOnComplete(OnCallback<State> onComplete) {
+    public AHttpTask setOnComplete(Consumer<State> onComplete) {
         this.onComplete = onComplete;
         completeOnIO = nextOnIO;
         nextOnIO = false;
@@ -90,7 +91,7 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 	 * @param onResponse 请求响应回调
 	 * @return HttpTask 实例
 	 */
-    public synchronized AHttpTask setOnResponse(OnCallback<HttpResult> onResponse) {
+    public synchronized AHttpTask setOnResponse(Consumer<HttpResult> onResponse) {
         this.onResponse = onResponse;
         responseOnIO = nextOnIO;
         nextOnIO = false;
@@ -102,7 +103,7 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 	 * @param onResBody 响应报文体回调
 	 * @return HttpTask 实例
 	 */
-    public synchronized AHttpTask setOnResBody(OnCallback<HttpResult.Body> onResBody) {
+    public synchronized AHttpTask setOnResBody(Consumer<HttpResult.Body> onResBody) {
     	this.onResBody = onResBody;
     	resBodyOnIO = nextOnIO;
         nextOnIO = false;
@@ -116,7 +117,7 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 	 * @param onResBean 响应 Bean 回调
 	 * @return HttpTask 实例
 	 */
-    public synchronized <T> AHttpTask setOnResBean(Class<T> type, OnCallback<T> onResBean) {
+    public synchronized <T> AHttpTask setOnResBean(Class<T> type, Consumer<T> onResBean) {
     	initBeanType(type);
     	this.onResBean = onResBean;
     	resBeanOnIO = nextOnIO;
@@ -131,7 +132,7 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 	 * @param onResBean 响应 Bean 回调
 	 * @return HttpTask 实例
 	 */
-	public synchronized <T> AHttpTask setOnResBean(TypeRef<T> type, OnCallback<T> onResBean) {
+	public synchronized <T> AHttpTask setOnResBean(TypeRef<T> type, Consumer<T> onResBean) {
 		initBeanType(type.getType());
 		this.onResBean = onResBean;
 		resBeanOnIO = nextOnIO;
@@ -146,7 +147,7 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 	 * @param onResList 请求响应回调
 	 * @return HttpTask 实例
 	 */
-    public synchronized <T> AHttpTask setOnResList(Class<T> type, OnCallback<List<T>> onResList) {
+    public synchronized <T> AHttpTask setOnResList(Class<T> type, Consumer<List<T>> onResList) {
 		if (type == null) {
 			throw new IllegalArgumentException(" list type can not be null!");
 		}
@@ -164,7 +165,7 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 	 * @param onResMapper 请求响应回调
 	 * @return HttpTask 实例
 	 */
-    public synchronized AHttpTask setOnResMapper(OnCallback<Mapper> onResMapper) {
+    public synchronized AHttpTask setOnResMapper(Consumer<Mapper> onResMapper) {
     	this.onResMapper = onResMapper;
     	resMapperOnIO = nextOnIO;
         nextOnIO = false;
@@ -176,7 +177,7 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 	 * @param onResArray 请求响应回调
 	 * @return HttpTask 实例
 	 */
-    public synchronized AHttpTask setOnResArray(OnCallback<Array> onResArray) {
+    public synchronized AHttpTask setOnResArray(Consumer<Array> onResArray) {
     	this.onResArray = onResArray;
     	resArrayOnIO = nextOnIO;
         nextOnIO = false;
@@ -188,7 +189,7 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 	 * @param onResString 请求响应回调
 	 * @return HttpTask 实例
 	 */
-    public synchronized AHttpTask setOnResString(OnCallback<String> onResString) {
+    public synchronized AHttpTask setOnResString(Consumer<String> onResString) {
     	this.onResString = onResString;
     	resStringOnIO = nextOnIO;
         nextOnIO = false;
@@ -430,15 +431,15 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 		void on(Runnable runnable, boolean onIo);
 	}
 
-    private synchronized OnCallback<HttpResult> complexOnResponse(OkHttpCall call) {
+    private synchronized Consumer<HttpResult> complexOnResponse(OkHttpCall call) {
 		return res -> {
-			OnCallback<HttpResult> onResp = onResponse;
-			OnCallback<HttpResult.Body> onBody = onResBody;
-			OnCallback<Mapper> onMapper = onResMapper;
-			OnCallback<Array> onArray = onResArray;
-			OnCallback<?> onBean = onResBean;
-			OnCallback<?> onList = onResList;
-			OnCallback<String> onString = onResString;
+			Consumer<HttpResult> onResp = onResponse;
+			Consumer<HttpResult.Body> onBody = onResBody;
+			Consumer<Mapper> onMapper = onResMapper;
+			Consumer<Array> onArray = onResArray;
+			Consumer<?> onBean = onResBean;
+			Consumer<?> onList = onResList;
+			Consumer<String> onString = onResString;
 
 			int count = 0;
 			if (onResp != null)
@@ -478,18 +479,18 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 			}, onIo);
 
 			if (onResp != null) {
-				callback.on(() -> onResp.on(res), responseOnIO);
+				callback.on(() -> onResp.accept(res), responseOnIO);
 			}
 			if (onBody != null) {
-				callback.on(() -> onBody.on(body), resBodyOnIO);
+				callback.on(() -> onBody.accept(body), resBodyOnIO);
 			}
 			if (onMapper != null) {
 				Mapper mapper = body.toMapper();
-				callback.on(() -> onMapper.on(mapper), resMapperOnIO);
+				callback.on(() -> onMapper.accept(mapper), resMapperOnIO);
 			}
 			if (onArray != null) {
 				Array array = body.toArray();
-				callback.on(() -> onArray.on(array), resArrayOnIO);
+				callback.on(() -> onArray.accept(array), resArrayOnIO);
 			}
 			if (onBean != null) {
 				Object bean = body.toBean(beanType);
@@ -513,12 +514,12 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 			}
 			if (onString != null) {
 				String string = body.toString();
-				callback.on(() -> onString.on(string), resStringOnIO);
+				callback.on(() -> onString.accept(string), resStringOnIO);
 			}
 		};
 	}
 
-	static final String OnCallbackMethod = OnCallback.class.getDeclaredMethods()[0].getName();
+	static final String OnCallbackMethod = Consumer.class.getDeclaredMethods()[0].getName();
 
 	private Method callbackMethod(Class<?> clazz, Class<?> paraType) {
 		Method[] methods = clazz.getDeclaredMethods();

@@ -1,6 +1,7 @@
 package com.ejlchina.okhttps;
 
 import java.io.*;
+import java.util.function.Consumer;
 
 /**
  * 文件下载
@@ -13,9 +14,9 @@ public class Download {
     private final TaskExecutor taskExecutor;
     private final Ctrl ctrl;
 
-    private OnCallback<File> onSuccess;
-    private OnCallback<Failure> onFailure;
-    private OnCallback<Status> onComplete;
+    private Consumer<File> onSuccess;
+    private Consumer<Failure> onFailure;
+    private Consumer<Status> onComplete;
     private long doneBytes;
     private int buffSize = 0;
     private long seekBytes = 0;
@@ -83,7 +84,7 @@ public class Download {
      * @param onSuccess 成功回调函数
      * @return Download
      */
-    public Download setOnSuccess(OnCallback<File> onSuccess) {
+    public Download setOnSuccess(Consumer<File> onSuccess) {
         this.onSuccess = onSuccess;
         sOnIO = nextOnIO;
         nextOnIO = false;
@@ -95,7 +96,7 @@ public class Download {
      * @param onFailure 失败回调函数
      * @return Download
      */
-    public Download setOnFailure(OnCallback<Failure> onFailure) {
+    public Download setOnFailure(Consumer<Failure> onFailure) {
         this.onFailure = onFailure;
         fOnIO = nextOnIO;
         nextOnIO = false;
@@ -108,7 +109,7 @@ public class Download {
      * @param onComplete 结束回调函数
      * @return Download
      */
-    public Download setOnComplete(OnCallback<Status> onComplete) {
+    public Download setOnComplete(Consumer<Status> onComplete) {
         this.onComplete = onComplete;
         cOnIO = nextOnIO;
         nextOnIO = false;
@@ -331,23 +332,23 @@ public class Download {
     }
 
     private void fireOnComplete() {
-        OnCallback<Status> onComplete = this.onComplete;
+        Consumer<Status> onComplete = this.onComplete;
         if (onComplete != null) {
-            taskExecutor.execute(() -> onComplete.on(status), cOnIO);
+            taskExecutor.execute(() -> onComplete.accept(status), cOnIO);
         }
     }
 
     private void fireOnSuccess() {
-        OnCallback<File> onSuccess = this.onSuccess;
+        Consumer<File> onSuccess = this.onSuccess;
         if (onSuccess != null) {
-            taskExecutor.execute(() -> onSuccess.on(file), sOnIO);
+            taskExecutor.execute(() -> onSuccess.accept(file), sOnIO);
         }
     }
 
     private void fireOnFailure(IOException e) {
-        OnCallback<Failure> onFailure = this.onFailure;
+        Consumer<Failure> onFailure = this.onFailure;
         if (onFailure != null) {
-            taskExecutor.execute(() -> onFailure.on(new Failure(e)), fOnIO);
+            taskExecutor.execute(() -> onFailure.accept(new Failure(e)), fOnIO);
         } else {
             throw new OkHttpsException("Download failed: ", e);
         }

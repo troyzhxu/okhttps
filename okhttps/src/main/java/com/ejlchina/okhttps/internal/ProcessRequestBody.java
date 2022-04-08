@@ -1,22 +1,22 @@
 package com.ejlchina.okhttps.internal;
 
-import com.ejlchina.okhttps.OnCallback;
 import com.ejlchina.okhttps.Process;
 import okhttp3.RequestBody;
 import okio.*;
 
 import java.io.IOException;
 import java.util.concurrent.Executor;
+import java.util.function.Consumer;
 
 public class ProcessRequestBody extends FixedRequestBody {
 
-	private final OnCallback<Process> onProcess;
+	private final Consumer<Process> onProcess;
 	private final Executor callbackExecutor;
 	private final RealProcess process;
 	private final long stepBytes;
 	
-	public ProcessRequestBody(RequestBody requestBody, OnCallback<Process> onProcess, Executor callbackExecutor,
-			long contentLength, long stepBytes) {
+	public ProcessRequestBody(RequestBody requestBody, Consumer<Process> onProcess, Executor callbackExecutor,
+							  long contentLength, long stepBytes) {
 		super(requestBody);
 		this.onProcess = onProcess;
 		this.callbackExecutor = callbackExecutor;
@@ -59,7 +59,7 @@ public class ProcessRequestBody extends FixedRequestBody {
 			step = (process.getDoneBytes() - 1) / stepBytes + 1;
 			// 因为 process 一直被更新，所有此处应克隆一个新的对象用于回调
 			Process p = process.newProcess();
-			callbackExecutor.execute(() -> onProcess.on(p));
+			callbackExecutor.execute(() -> onProcess.accept(p));
 		}
 
 	}

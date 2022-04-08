@@ -1,26 +1,24 @@
 package com.ejlchina.okhttps.internal;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-
 import com.ejlchina.okhttps.*;
-import com.ejlchina.okhttps.HttpResult.Body;
-
 import com.ejlchina.okhttps.Process;
+import com.ejlchina.okhttps.HttpResult.Body;
 import okhttp3.MediaType;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okio.Buffer;
 import okio.ByteString;
 
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.util.function.Consumer;
+
 public class ResultBody extends AbstractBody implements Body {
 
 	private final HttpResult result;
 	private final Response response;
 	private boolean onIO = false;
-	private OnCallback<Process> onProcess;
+	private Consumer<Process> onProcess;
 	private long stepBytes = 0;
 	private double stepRate = -1;
 	private boolean rangeIgnored = false;
@@ -59,7 +57,7 @@ public class ResultBody extends AbstractBody implements Body {
     }
 
 	@Override
-	public Body setOnProcess(OnCallback<Process> onProcess) {
+	public Body setOnProcess(Consumer<Process> onProcess) {
 		if (taskExecutor == null) {
 			response.close();
 			throw new IllegalStateException("没有 taskExecutor，不可设置下载进度回调！");

@@ -1,25 +1,21 @@
 package com.ejlchina.stomp;
 
-import com.ejlchina.okhttps.OnCallback;
-import com.ejlchina.okhttps.test.BaseTest;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.ejlchina.okhttps.OkHttps;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
 
 
 public class MsgCodecTestCases {
 
-	static class DecodeCallback implements OnCallback<Message> {
+	static class DecodeCallback implements Consumer<Message> {
 
 		private final List<Message> list = new ArrayList<>();
 
 		@Override
-		public void on(Message data) {
+		public void accept(Message data) {
 			list.add(data);
 		}
 

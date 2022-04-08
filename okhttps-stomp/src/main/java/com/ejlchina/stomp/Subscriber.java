@@ -1,11 +1,10 @@
 package com.ejlchina.stomp;
 
-import com.ejlchina.okhttps.OnCallback;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 
 public class Subscriber {
@@ -13,11 +12,11 @@ public class Subscriber {
     private final Stomp stomp;
     private final String id;
     private final String destination;
-    private final OnCallback<Message> callback;
+    private final Consumer<Message> callback;
     private final List<Header> headers;
     private boolean subscribed;
 
-    public Subscriber(Stomp stomp, String destination, OnCallback<Message> callback, List<Header> headers) {
+    public Subscriber(Stomp stomp, String destination, Consumer<Message> callback, List<Header> headers) {
         this.stomp = stomp;
         this.id = UUID.randomUUID().toString();
         this.destination = destination;
@@ -79,7 +78,7 @@ public class Subscriber {
 
     public boolean tryCallback(String id, Message msg) {
         if (this.id.equals(id)) {
-            callback.on(msg);
+            callback.accept(msg);
             return true;
         }
         return false;

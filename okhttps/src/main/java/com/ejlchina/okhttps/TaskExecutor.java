@@ -12,6 +12,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.function.Consumer;
 
 public final class TaskExecutor {
 
@@ -60,9 +61,9 @@ public final class TaskExecutor {
         executor.execute(command);
     }
     
-    public void executeOnResponse(HttpTask<?> task, AHttpTask.OkHttpCall call, OnCallback<HttpResult> onResponse, HttpResult result, boolean onIo) {
+    public void executeOnResponse(HttpTask<?> task, AHttpTask.OkHttpCall call, Consumer<HttpResult> onResponse, HttpResult result, boolean onIo) {
         Runnable runnable = () -> {
-            if (!call.isCanceled()) onResponse.on(result);
+            if (!call.isCanceled()) onResponse.accept(result);
         };
         if (responseListener != null) {
             if (responseListener.listen(task, result) && onResponse != null) {
@@ -78,10 +79,10 @@ public final class TaskExecutor {
         }
     }
 
-    public boolean executeOnException(HttpTask<?> task, AHttpTask.OkHttpCall call, OnCallback<IOException> onException, IOException error, boolean onIo) {
+    public boolean executeOnException(HttpTask<?> task, AHttpTask.OkHttpCall call, Consumer<IOException> onException, IOException error, boolean onIo) {
         Runnable runnable = () -> {
             if (!call.isCanceled()) {
-                onException.on(error);
+                onException.accept(error);
             }
             call.finish();
         };
@@ -100,13 +101,13 @@ public final class TaskExecutor {
         return true;
     }
     
-    public void executeOnComplete(HttpTask<?> task, OnCallback<State> onComplete, State state, boolean onIo) {
+    public void executeOnComplete(HttpTask<?> task, Consumer<State> onComplete, State state, boolean onIo) {
         if (completeListener != null) {
             if (completeListener.listen(task, state) && onComplete != null) {
-                execute(() -> onComplete.on(state), onIo);
+                execute(() -> onComplete.accept(state), onIo);
             }
         } else if (onComplete != null) {
-            execute(() -> onComplete.on(state), onIo);
+            execute(() -> onComplete.accept(state), onIo);
         }
     }
 

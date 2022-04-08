@@ -1,24 +1,24 @@
 package com.ejlchina.okhttps.internal;
 
+import com.ejlchina.okhttps.Process;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Executor;
-
-import com.ejlchina.okhttps.OnCallback;
-import com.ejlchina.okhttps.Process;
+import java.util.function.Consumer;
 
 public class ProcessInputStream extends InputStream {
 
 	private final InputStream input;
-	private final OnCallback<Process> onProcess;
+	private final Consumer<Process> onProcess;
 	private final Executor callbackExecutor;
 	private final long stepBytes;
 	private final RealProcess process;
 	private boolean doneCalled = false;
 	private long step;
 	
-	public ProcessInputStream(InputStream input, OnCallback<Process> onProcess, long totalBytes, long stepBytes,
-			long doneBytes, Executor callbackExecutor) {
+	public ProcessInputStream(InputStream input, Consumer<Process> onProcess, long totalBytes, long stepBytes,
+							  long doneBytes, Executor callbackExecutor) {
 		this.input = input;
 		this.onProcess = onProcess;
 		this.stepBytes = stepBytes;
@@ -71,7 +71,7 @@ public class ProcessInputStream extends InputStream {
 		step = (process.getDoneBytes() - 1) / stepBytes + 1;
 		// 因为 process 一直被更新，所有此处应克隆一个新的对象用于回调
 		Process p = process.newProcess();
-		callbackExecutor.execute(() -> onProcess.on(p));
+		callbackExecutor.execute(() -> onProcess.accept(p));
 	}
 
 	@Override

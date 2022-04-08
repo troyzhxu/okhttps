@@ -1,9 +1,8 @@
 package com.ejlchina.stomp;
 
-import com.ejlchina.okhttps.OnCallback;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Stomp 消息编解码器
@@ -71,7 +70,7 @@ public class MsgCodecImpl implements MsgCodec {
     }
 
     @Override
-    public synchronized void decode(String input, OnCallback<Message> out) {
+    public synchronized void decode(String input, Consumer<Message> out) {
         if (input == null || input.isEmpty()) {
             return;
         }
@@ -85,7 +84,7 @@ public class MsgCodecImpl implements MsgCodec {
      * @param out 输出
      * @param start 开始解析的问题
      */
-    protected void decode(OnCallback<Message> out, int start) {
+    protected void decode(Consumer<Message> out, int start) {
         cleanPendingStartData(start);
         // Body 结尾符下标
         int bEndIdx = pending.indexOf(bodyEnd);
@@ -114,7 +113,7 @@ public class MsgCodecImpl implements MsgCodec {
         // 解析 Body
         String payload = pending.substring(hEndIdx + headersEnd.length(), bEndIdx);
         // 输出解析结果
-        out.on(createMessage(command, headers, payload));
+        out.accept(createMessage(command, headers, payload));
         // 重新解析 bodyEnd 之后的数据
         decode(out, bEndIdx + bodyEnd.length());
     }

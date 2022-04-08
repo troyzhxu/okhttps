@@ -1,14 +1,14 @@
 package com.ejlchina.okhttps;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 import com.ejlchina.okhttps.internal.RealHttpResult;
-
 import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.Response;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.function.Consumer;
 
 
 /**
@@ -111,7 +111,7 @@ public interface HttpResult {
 		 * @param onProcess 进度回调函数
 		 * @return Body
 		 */
-		Body setOnProcess(OnCallback<Process> onProcess);
+		Body setOnProcess(Consumer<Process> onProcess);
 		
 		/**
 		 * 设置进度回调的步进字节，默认 8K（8192）
