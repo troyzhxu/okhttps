@@ -106,10 +106,26 @@ public class MulVMap<V> extends AbstractMap<String, V> {
     @Override
     public V get(Object key) {
         if (key instanceof String) {
-            for (int i = keys.size() - 1; i >= 0; i--) {
-                if (keys.get(i).equals(key)) {
+            return get((String) key, false);
+        }
+        return null;
+    }
+
+    /**
+     * 获取 Key 对应的最后（新）的一个值
+     * @param key 键
+     * @param ic 匹配 key 时是否忽略大小写
+     * @return 匹配 key 的最后（新）的一个值
+     */
+    public V get(String key, boolean ic) {
+        for (int i = keys.size() - 1; i >= 0; i--) {
+            String k = keys.get(i);
+            if (ic) {
+                if (k.equalsIgnoreCase(key)) {
                     return values.get(i);
                 }
+            } else if (k.equals(key)) {
+                return values.get(i);
             }
         }
         return null;
@@ -121,10 +137,25 @@ public class MulVMap<V> extends AbstractMap<String, V> {
      * @return List<V>
      */
     public List<V> getAll(String key) {
+        return getAll(key, false);
+    }
+
+    /**
+     * 获取 Key 下的所有 Value
+     * @param key 键
+     * @param ic 匹配 key 时是否忽略大小写
+     * @return List<V>
+     */
+    public List<V> getAll(String key, boolean ic) {
         List<V> list = new ArrayList<>();
         if (key != null) {
             for (int i = 0; i < keys.size(); i++) {
-                if (keys.get(i).equals(key)) {
+                String k = keys.get(i);
+                if (ic) {
+                    if (k.equalsIgnoreCase(key)) {
+                        list.add(values.get(i));
+                    }
+                } else if (k.equals(key)) {
                     list.add(values.get(i));
                 }
             }
