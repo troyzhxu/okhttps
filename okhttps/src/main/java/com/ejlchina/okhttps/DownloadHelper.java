@@ -14,13 +14,22 @@ public class DownloadHelper {
 
     private Map<String, String> extMappings = new HashMap<>();
 
+
     public DownloadHelper() {
-        extMappings.put("video/mpeg4", "mp4");
         extMappings.put("text/plain", "txt");
-        extMappings.put("application/x-xls", "text/xls");
+        extMappings.put("audio/mpeg", "mp3");
+        extMappings.put("video/mpeg4", "mp4");
+        extMappings.put("video/quicktime", "mov");
+        extMappings.put("application/x-genesis-rom", "md");
+        extMappings.put("application/x-xls", "xls");
+        extMappings.put("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx");
         extMappings.put("application/vnd.android.package-archive", "apk");
         extMappings.put("application/msword", "doc");
-        extMappings.put("x-zip-compressed", "zip");
+        extMappings.put("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx");
+        extMappings.put("application/x-java-archive", "jar");
+        extMappings.put("application/x-zip-compressed", "zip");
+        extMappings.put("application/x-compressed-tar", "tar.gz");
+        extMappings.put("application/x-rar", "rar");
     }
 
     /**
