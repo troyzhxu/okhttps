@@ -13,47 +13,14 @@ import java.util.function.BiConsumer;
  */
 public class ListMap<V> extends AbstractMap<String, V> {
 
-    transient final List<String> keys;
-
-    transient final List<V> values;
-
-    transient Set<Entry<String, V>> entrySet;
+    transient final List<Entry<String, V>> entries;
 
     public ListMap() {
         this(0);
     }
 
     public ListMap(int initSize) {
-        keys = new ArrayList<>(initSize);
-        values = new ArrayList<>(initSize);
-    }
-
-    static class Itr<V> implements Iterator<Entry<String, V>> {
-
-        final Iterator<String> kit;
-        final Iterator<V> vit;
-
-        public Itr(Iterator<String> kit, Iterator<V> vit) {
-            this.kit = kit;
-            this.vit = vit;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return kit.hasNext() && vit.hasNext();
-        }
-
-        @Override
-        public Entry<String, V> next() {
-            return new SimpleEntry<>(kit.next(), vit.next());
-        }
-
-        @Override
-        public void remove() {
-            kit.remove();
-            vit.remove();
-        }
-
+        entries = new ArrayList<>(initSize);
     }
 
     /**
@@ -63,15 +30,17 @@ public class ListMap<V> extends AbstractMap<String, V> {
 
         @Override
         public Iterator<Entry<String, V>> iterator() {
-            return new Itr<>(keys.iterator(), values.iterator());
+            return entries.iterator();
         }
 
         @Override
         public int size() {
-            return keys.size();
+            return entries.size();
         }
 
     }
+
+    transient Set<Entry<String, V>> entrySet;
 
     /**
      * @return 键值对集合
@@ -90,16 +59,14 @@ public class ListMap<V> extends AbstractMap<String, V> {
      */
     @Override
     public V put(String key, V value) {
-        // 只存放非空值
-        if (key != null && value != null) {
-            keys.add(key);
-            values.add(value);
+        if (key != null) {
+            entries.add(new SimpleEntry<>(key, value));
         }
         return null;
     }
 
     /**
-     * 获取 Key 对应的最后（新）的一个值
+     * 获取与指定 key 匹配的最后（新）的一个值
      * @param key 键
      * @return 最后（新）的一个值
      */
@@ -112,55 +79,110 @@ public class ListMap<V> extends AbstractMap<String, V> {
     }
 
     /**
-     * 获取 Key 对应的最后（新）的一个值
+     * 获取与指定 key 匹配的最后（新）的一个值
      * @param key 键
      * @param ic 匹配 key 时是否忽略大小写
      * @return 匹配 key 的最后（新）的一个值
      */
     public V get(String key, boolean ic) {
-        for (int i = keys.size() - 1; i >= 0; i--) {
-            String k = keys.get(i);
-            if (ic) {
-                if (k.equalsIgnoreCase(key)) {
-                    return values.get(i);
+        if (key != null) {
+            for (int i = entries.size() - 1; i >= 0; i--) {
+                Entry<String, V> entry = entries.get(i);
+                String k = entry.getKey();
+                if (ic && key.equalsIgnoreCase(k) || !ic && key.equals(k)) {
+                    return entry.getValue();
                 }
-            } else if (k.equals(key)) {
-                return values.get(i);
             }
         }
         return null;
     }
 
     /**
-     * 获取 Key 下的所有 Value
+     * 获取与指定 key 匹配的所有值列表
      * @param key 键
      * @return List
      */
-    public List<V> getAll(String key) {
-        return getAll(key, false);
+    public List<V> list(String key) {
+        return list(key, false);
     }
 
     /**
-     * 获取 Key 下的所有 Value
+     * 获取与指定 key 匹配的所有值列表
      * @param key 键
      * @param ic 匹配 key 时是否忽略大小写
      * @return List
      */
-    public List<V> getAll(String key, boolean ic) {
+    public List<V> list(String key, boolean ic) {
         List<V> list = new ArrayList<>();
         if (key != null) {
-            for (int i = 0; i < keys.size(); i++) {
-                String k = keys.get(i);
-                if (ic) {
-                    if (k.equalsIgnoreCase(key)) {
-                        list.add(values.get(i));
-                    }
-                } else if (k.equals(key)) {
-                    list.add(values.get(i));
+            for (Entry<String, V> entry : entries) {
+                String k = entry.getKey();
+                if (ic && key.equalsIgnoreCase(k) || !ic && key.equals(k)) {
+                    list.add(entry.getValue());
                 }
             }
         }
         return list;
+    }
+
+    public boolean replace(String key, V oldValue, V newValue) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * 替换与指定 key 匹配的最后（新）的一个值
+     * @param key 键
+     * @return 被替换的值
+     */
+    public V replace(String key, V value) {
+        return replace(key, value, false);
+    }
+
+    /**
+     * 替换与指定 key 匹配的最后（新）的一个值
+     * @param key 键
+     * @param ic 匹配 key 时是否忽略大小写
+     * @return 被替换的值
+     */
+    public V replace(String key, V value, boolean ic) {
+        if (key != null) {
+            for (int i = entries.size() - 1; i >= 0; i--) {
+                Entry<String, V> entry = entries.get(i);
+                String k = entry.getKey();
+                if (ic && key.equalsIgnoreCase(k) || !ic && key.equals(k)) {
+                    return entry.setValue(value);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 替换与指定 key 匹配的所有值
+     * @param key 键
+     * @return 被替换的键值对数量
+     */
+    public int replaceAll(String key, V value) {
+        return replaceAll(key, value, false);
+    }
+
+    /**
+     * 替换与指定 key 匹配的所有值
+     * @param key 键
+     * @param ic 匹配 key 时是否忽略大小写
+     * @return 被替换的键值对数量
+     */
+    public int replaceAll(String key, V value, boolean ic) {
+        int count = 0;
+        if (key != null) {
+            for (Entry<String, V> entry : entries) {
+                String k = entry.getKey();
+                if (ic && key.equalsIgnoreCase(k) || !ic && key.equals(k)) {
+                    entry.setValue(value);
+                }
+            }
+        }
+        return count;
     }
 
     /**
@@ -171,40 +193,34 @@ public class ListMap<V> extends AbstractMap<String, V> {
         Platform.forEach(this, action);
     }
 
-    /**
-     * 移除指定 键 和 值 的所有键值对
-     * @param key 键
-     * @param value 值
-     * @return true if the value was removed
-     */
     public boolean remove(Object key, Object value) {
-        boolean removed = false;
-        if (key instanceof String && value != null) {
-            Iterator<Entry<String, V>> it = entrySet().iterator();
-            while (it.hasNext()) {
-                Entry<String, V> e = it.next();
-                String k = e.getKey();
-                V v = e.getValue();
-                if (k.equals(key) && v.equals(value)) {
-                    it.remove();
-                    removed = true;
-                }
-            }
-        }
-        return removed;
+        throw new UnsupportedOperationException();
     }
 
     /**
-     * 移除指定 指定键 的最后（新）一个值
+     * 移除与指定 key 匹配的最后（新）一个值
      * @param key 键
      * @return the value was removed
      */
     public V remove(Object key) {
         if (key instanceof String) {
-            for (int i = keys.size() - 1; i >= 0; i--) {
-                if (keys.get(i).equals(key)) {
-                    keys.remove(i);
-                    return values.remove(i);
+            return remove((String) key, false);
+        }
+        return null;
+    }
+
+    /**
+     * 移除与指定 key 匹配的最后（新）一个值
+     * @param key 键
+     * @param ic 匹配 key 时是否忽略大小写
+     * @return the value was removed
+     */
+    public V remove(String key, boolean ic) {
+        if (key != null) {
+            for (int i = entries.size() - 1; i >= 0; i--) {
+                String k = entries.get(i).getKey();
+                if (ic && key.equalsIgnoreCase(k) || !ic && key.equals(k)) {
+                    return entries.remove(i).getValue();
                 }
             }
         }
@@ -212,17 +228,27 @@ public class ListMap<V> extends AbstractMap<String, V> {
     }
 
     /**
-     * 移除指定 指定键 的 所有值
+     * 移除与指定 key 匹配的所有值
      * @param key 键
      * @return the value was removed
      */
     public List<V> removeAll(String key) {
+        return removeAll(key, false);
+    }
+
+    /**
+     * 移除与指定 key 匹配的所有值
+     * @param key 键
+     * @param ic 匹配 key 时是否忽略大小写
+     * @return the value was removed
+     */
+    public List<V> removeAll(String key, boolean ic) {
         List<V> list = new ArrayList<>();
         if (key != null) {
-            for (int i = keys.size() - 1; i >= 0; i--) {
-                if (keys.get(i).equals(key)) {
-                    list.add(values.remove(i));
-                    keys.remove(i);
+            for (int i = entries.size() - 1; i >= 0; i--) {
+                String k = entries.get(i).getKey();
+                if (ic && key.equalsIgnoreCase(k) || !ic && key.equals(k)) {
+                    list.add(entries.remove(i).getValue());
                 }
             }
         }

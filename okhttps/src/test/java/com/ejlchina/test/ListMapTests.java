@@ -47,13 +47,13 @@ public class ListMapTests {
                 25, 30, 26
         };
 
-        List<Object> names = map.getAll("name");
+        List<Object> names = map.list("name");
         Assert.assertEquals(3, names.size());
         Assert.assertEquals(NAMES[0], names.get(0));
         Assert.assertEquals(NAMES[1], names.get(1));
         Assert.assertEquals(NAMES[2], names.get(2));
 
-        List<Object> ages = map.getAll("age");
+        List<Object> ages = map.list("age");
         Assert.assertEquals(3, ages.size());
         Assert.assertEquals(AGES[0], ages.get(0));
         Assert.assertEquals(AGES[1], ages.get(1));
