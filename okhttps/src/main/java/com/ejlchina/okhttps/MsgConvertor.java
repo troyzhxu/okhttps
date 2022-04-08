@@ -47,7 +47,7 @@ public interface MsgConvertor extends DataConvertor {
 
 		@Override
 		public String mediaType() {
-			return "application/x-www-form-urlencoded; charset={charset}";
+			return "application/x-www-form-urlencoded";
 		}
 
 		@Override

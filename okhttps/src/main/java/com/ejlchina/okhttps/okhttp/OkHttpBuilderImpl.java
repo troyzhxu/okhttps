@@ -67,9 +67,9 @@ public class OkHttpBuilderImpl implements HTTP.Builder {
         mediaTypes.put("rar", "application/x-rar");
         mediaTypes.put("jar", "application/x-java-archive");
         contentTypes = new ArrayList<>();
-        contentTypes.add("application/x-www-form-urlencoded; charset={charset}");
-        contentTypes.add("application/json; charset={charset}");
-        contentTypes.add("application/xml; charset={charset}");
+        contentTypes.add("application/x-www-form-urlencoded");
+        contentTypes.add("application/json");
+        contentTypes.add("application/xml");
         contentTypes.add("application/protobuf");
         contentTypes.add("application/msgpack");
         preprocessors = new ArrayList<>();

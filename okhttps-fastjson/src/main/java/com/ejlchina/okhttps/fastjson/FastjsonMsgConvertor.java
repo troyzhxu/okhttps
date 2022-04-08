@@ -16,7 +16,7 @@ public class FastjsonMsgConvertor extends FastjsonDataConvertor implements MsgCo
 
 	@Override
 	public String mediaType() {
-		return "application/json; charset={charset}";
+		return "application/json";
 	}
 
 	@Override

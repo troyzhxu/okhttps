@@ -15,7 +15,7 @@ public class GsonMsgConvertor extends GsonDataConvertor implements MsgConvertor,
 
 	@Override
 	public String mediaType() {
-		return "application/json; charset={charset}";
+		return "application/json";
 	}
 
 	@Override
