@@ -1,6 +1,4 @@
-package com.ejlchina.okhttps.internal;
-
-import com.ejlchina.okhttps.Platform;
+package com.ejlchina.okhttps;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -13,7 +11,7 @@ import java.util.function.BiConsumer;
  * @since v3.5.0
  * @param <V> 泛型 值
  */
-public class MultiValueMap<V> extends AbstractMap<String, V> {
+public class MulVMap<V> extends AbstractMap<String, V> {
 
     transient final List<String> keys = new ArrayList<>();
 
