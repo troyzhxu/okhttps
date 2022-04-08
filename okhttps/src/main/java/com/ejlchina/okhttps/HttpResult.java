@@ -93,9 +93,11 @@ public interface HttpResult {
 		/**
 		 * @return 媒体类型
 		 */
+		@Deprecated
 		MediaType getType();
 
 		/**
+		 * 依赖于 Content-Length 响应头
 		 * @return 报文体字节长度
 		 */
 		long getLength();
