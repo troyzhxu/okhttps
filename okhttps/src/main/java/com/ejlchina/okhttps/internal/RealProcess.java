@@ -4,7 +4,7 @@ import com.ejlchina.okhttps.Process;
 
 public class RealProcess implements Process {
 
-	// 总字节数
+	// 总字节数（流式上传时该字段为 -1）
 	private final long totalBytes;
 	// 已经完成字节数
 	private long doneBytes;
@@ -20,6 +20,12 @@ public class RealProcess implements Process {
 
 	@Override
 	public double getRate() {
+		if (totalBytes == 0) {
+			return 1;
+		}
+		if (totalBytes < 0) {
+			return -1;
+		}
 		return (double) doneBytes / totalBytes;
 	}
 
@@ -35,7 +41,7 @@ public class RealProcess implements Process {
 	
 	@Override
 	public boolean isDone() {
-		return doneBytes >= totalBytes;
+		return doneBytes >= totalBytes && totalBytes >= 0;
 	}
 	
 	public void addDoneBytes(long delt) {
@@ -43,11 +49,12 @@ public class RealProcess implements Process {
 	}
 
 	public boolean isUndoneAndUnreached(long bytes) {
-		return doneBytes < bytes && doneBytes < totalBytes;
+		return doneBytes < bytes && (totalBytes < 0 || doneBytes < totalBytes);
 	}
 
 	@Override
 	public String toString() {
 		return "Process[" + doneBytes + " / " + totalBytes + " | " + getRate() + ']';
 	}
+
 }
