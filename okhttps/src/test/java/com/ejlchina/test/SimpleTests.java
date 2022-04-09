@@ -17,7 +17,6 @@ public class SimpleTests extends BaseTest {
         Assert.assertEquals(server.takeRequest().getHeader("Content-Type"), "application/x-www-form-urlencoded; charset=UTF-8");
     }
 
-
     @Test
     public void test() {
         HttpResult res = HTTP.builder()

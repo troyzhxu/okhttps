@@ -1,5 +1,6 @@
 package com.ejlchina.okhttps;
 
+import com.ejlchina.data.ListMap;
 import com.ejlchina.okhttps.internal.RealHttpResult;
 import okhttp3.Headers;
 import okhttp3.MediaType;

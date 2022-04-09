@@ -1,5 +1,7 @@
 package com.ejlchina.okhttps;
 
+import com.ejlchina.data.ArrayListMap;
+import com.ejlchina.data.ListMap;
 import com.ejlchina.okhttps.HttpResult.State;
 import com.ejlchina.okhttps.internal.*;
 import com.ejlchina.okhttps.internal.AbstractHttpClient.TagTask;
@@ -307,7 +309,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addHeader(String name, String value) {
         if (name != null && value != null) {
             if (headers == null) {
-                headers = new ListMap<>();
+                headers = new ArrayListMap<>();
             }
             headers.put(name, value);
         }
@@ -322,7 +324,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addHeader(Map<String, String> headers) {
         if (headers != null) {
             if (this.headers == null) {
-                this.headers = new ListMap<>();
+                this.headers = new ArrayListMap<>();
             }
             this.headers.putAll(headers);
         }
@@ -393,7 +395,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addPathPara(String name, Object value) {
         if (name != null && value != null) {
             if (pathParams == null) {
-                pathParams = new ListMap<>();
+                pathParams = new ArrayListMap<>();
             }
             pathParams.put(name, value.toString());
         }
@@ -407,7 +409,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      **/
     public C addPathPara(Map<String, ?> params) {
         if (pathParams == null) {
-            pathParams = new ListMap<>();
+            pathParams = new ArrayListMap<>();
         }
         if (params != null) {
             pathParams.putAll(params);
@@ -424,7 +426,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addUrlPara(String name, Object value) {
         if (name != null && value != null) {
             if (urlParams == null) {
-                urlParams = new ListMap<>();
+                urlParams = new ArrayListMap<>();
             }
             urlParams.put(name, value.toString());
         }
@@ -438,7 +440,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      **/
     public C addUrlPara(Map<String, ?> params) {
         if (urlParams == null) {
-            urlParams = new ListMap<>();
+            urlParams = new ArrayListMap<>();
         }
         if (params != null) {
             urlParams.putAll(params);
@@ -455,7 +457,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addBodyPara(String name, Object value) {
         if (name != null && value != null) {
             if (bodyParams == null) {
-                bodyParams = new ListMap<>();
+                bodyParams = new ArrayListMap<>();
             }
             bodyParams.put(name, value);
         }
@@ -469,7 +471,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      **/
     public C addBodyPara(Map<String, ?> params) {
         if (bodyParams == null) {
-            bodyParams = new ListMap<>();
+            bodyParams = new ArrayListMap<>();
         }
         if (params != null) {
             bodyParams.putAll(params);
@@ -539,7 +541,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addFilePara(String name, String type, File file) {
         if (name != null && file != null && file.exists()) {
             if (files == null) {
-                files = new ListMap<>();
+                files = new ArrayListMap<>();
             }
             files.put(name, new FilePara(type, file.getName(), file));
         }
@@ -568,7 +570,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addFilePara(String name, String type, String fileName, byte[] content) {
         if (name != null && content != null) {
             if (files == null) {
-                files = new ListMap<>();
+                files = new ArrayListMap<>();
             }
             files.put(name, new FilePara(type, fileName, content));
         }
@@ -599,7 +601,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     public C addFilePara(String name, String type, String fileName, InputStream stream) {
         if (name != null && stream != null) {
             if (files == null) {
-                files = new ListMap<>();
+                files = new ArrayListMap<>();
             }
             files.put(name, new FilePara(type, fileName, stream));
         }
