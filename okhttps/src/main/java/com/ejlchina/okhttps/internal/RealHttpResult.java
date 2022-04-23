@@ -68,6 +68,10 @@ public class RealHttpResult implements HttpResult {
     @Override
     public boolean isSuccessful() {
         if (response != null) {
+            if (httpTask != null && httpTask.isWebsocket()
+                    && response.code() == 101) {
+                return true;
+            }
             return response.isSuccessful();
         }
         return false;

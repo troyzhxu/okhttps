@@ -197,6 +197,7 @@ public interface HttpResult {
 	int getStatus();
 
 	/**
+	 * WebSocket 返回 101 也返回 true (v3.5.1)
 	 * @return 是否响应成功，状态码在 [200..300) 之间
 	 */
 	boolean isSuccessful();
