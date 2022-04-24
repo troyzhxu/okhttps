@@ -130,8 +130,3 @@ Websocket 方法：
 3.  提交代码
 4.  新建 Pull Request
 
-## Next
-
-* Java 9 的模块系统
-* 请求参数支持重复的 key
-* 验证 nps 代理
