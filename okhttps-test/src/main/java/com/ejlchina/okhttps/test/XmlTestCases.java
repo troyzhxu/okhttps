@@ -10,12 +10,12 @@ public class XmlTestCases extends BaseTestCases {
 	}
 
 	@Override
-	String getUserObjectStr() {
+	String getUser1Str() {
 		return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><user><id>1</id><name>Jack</name></user>";
 	}
 
 	@Override
-	String getResultUserObjectStr() {
+	String getUser1ResultStr() {
 		return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><result>\n" +
 				"\t<code>200</code>\n" +
 				"\t<msg>ok</msg>\n" +

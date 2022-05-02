@@ -19,12 +19,12 @@ public class JsonTestCases extends BaseTestCases {
 	}
 
 	@Override
-	String getUserObjectStr() {
+	String getUser1Str() {
 		return "{\"id\":1,\"name\":\"Jack\"}";
 	}
 
 	@Override
-	String getResultUserObjectStr() {
+	String getUser1ResultStr() {
 		return "{\"code\": 200, \"data\": {\"id\":1,\"name\":\"Jack\"}, \"msg\": \"ok\"}";
 	}
 
