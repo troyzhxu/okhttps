@@ -239,7 +239,7 @@ public abstract class BaseTestCases {
                     latch.countDown();
                 })
                 .get();
-        Assert.assertTrue(latch.await(1, TimeUnit.SECONDS));
+        Assert.assertTrue(latch.await(1000, TimeUnit.SECONDS));
         System.out.println("case 11 passed!");
     }
 
@@ -314,10 +314,6 @@ public abstract class BaseTestCases {
                     assertArray(body.toArray());
                     latch.countDown();
                 })
-                .setOnResBean(new TypeRef<List<User>>() {}, list -> {
-                    assertList(list);
-                    latch.countDown();
-                })
                 .setOnResList(User.class ,list -> {
                     assertList(list);
                     latch.countDown();
@@ -332,7 +328,7 @@ public abstract class BaseTestCases {
                 })
                 .get();
         Assert.assertTrue(latch.await(1, TimeUnit.SECONDS));
-        System.out.println("case 14 passed!");
+        System.out.println("case 15 passed!");
     }
 
     void testHttpSync() {
