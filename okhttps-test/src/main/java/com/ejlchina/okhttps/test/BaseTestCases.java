@@ -186,6 +186,7 @@ public abstract class BaseTestCases {
                     assertUser1(res.getBody().toBean(User.class));
                     latch.countDown();
                 })
+                .setOnException(Throwable::printStackTrace)
                 .get();
         Assert.assertTrue(latch.await(1, TimeUnit.SECONDS));
         System.out.println("case 07 passed!");
@@ -199,6 +200,7 @@ public abstract class BaseTestCases {
                     assertUser1(body.toBean(User.class));
                     latch.countDown();
                 })
+                .setOnException(Throwable::printStackTrace)
                 .get();
         Assert.assertTrue(latch.await(1, TimeUnit.SECONDS));
         System.out.println("case 08 passed!");
@@ -212,6 +214,7 @@ public abstract class BaseTestCases {
                     assertMapper1(mapper);
                     latch.countDown();
                 })
+                .setOnException(Throwable::printStackTrace)
                 .get();
         Assert.assertTrue(latch.await(1, TimeUnit.SECONDS));
         System.out.println("case 09 passed!");
@@ -225,6 +228,7 @@ public abstract class BaseTestCases {
                     assertArray(array);
                     latch.countDown();
                 })
+                .setOnException(Throwable::printStackTrace)
                 .get();
         Assert.assertTrue(latch.await(1, TimeUnit.SECONDS));
         System.out.println("case 10 passed!");
@@ -238,6 +242,7 @@ public abstract class BaseTestCases {
                     assertUser1(user);
                     latch.countDown();
                 })
+                .setOnException(Throwable::printStackTrace)
                 .get();
         Assert.assertTrue(latch.await(1000, TimeUnit.SECONDS));
         System.out.println("case 11 passed!");
@@ -251,6 +256,7 @@ public abstract class BaseTestCases {
                     assertList(list);
                     latch.countDown();
                 })
+                .setOnException(Throwable::printStackTrace)
                 .get();
         Assert.assertTrue(latch.await(1, TimeUnit.SECONDS));
         System.out.println("case 12 passed!");
@@ -265,6 +271,7 @@ public abstract class BaseTestCases {
                     Assert.assertEquals(body, str);
                     latch.countDown();
                 })
+                .setOnException(Throwable::printStackTrace)
                 .get();
         Assert.assertTrue(latch.await(1, TimeUnit.SECONDS));
         System.out.println("case 13 passed!");
@@ -295,6 +302,7 @@ public abstract class BaseTestCases {
                     Assert.assertEquals(user1Str, str);
                     latch.countDown();
                 })
+                .setOnException(Throwable::printStackTrace)
                 .get();
         Assert.assertTrue(latch.await(1, TimeUnit.SECONDS));
         System.out.println("case 14 passed!");
@@ -304,7 +312,7 @@ public abstract class BaseTestCases {
     void test_15_httpMultiCallback() throws InterruptedException {
         String userListStr = getUserListStr();
         server.enqueue(new MockResponse().setBody(userListStr));
-        CountDownLatch latch = new CountDownLatch(6);
+        CountDownLatch latch = new CountDownLatch(5);
         http.async("/")
                 .setOnResponse(res -> {
                     assertList(res.getBody().toList(User.class));
@@ -326,6 +334,7 @@ public abstract class BaseTestCases {
                     Assert.assertEquals(userListStr, str);
                     latch.countDown();
                 })
+                .setOnException(Throwable::printStackTrace)
                 .get();
         Assert.assertTrue(latch.await(1, TimeUnit.SECONDS));
         System.out.println("case 15 passed!");
