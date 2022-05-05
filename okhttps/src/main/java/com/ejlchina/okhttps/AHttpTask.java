@@ -4,19 +4,18 @@ import com.ejlchina.data.Array;
 import com.ejlchina.data.Mapper;
 import com.ejlchina.data.TypeRef;
 import com.ejlchina.okhttps.HttpResult.State;
-import com.ejlchina.okhttps.internal.*;
+import com.ejlchina.okhttps.internal.AbstractHttpClient;
+import com.ejlchina.okhttps.internal.CopyInterceptor;
+import com.ejlchina.okhttps.internal.RealHttpResult;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
-
 
 /**
  * 异步 Http 请求任务
@@ -431,14 +430,15 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 		void on(Runnable runnable, boolean onIo);
 	}
 
+	@SuppressWarnings("unchecked")
     private synchronized Consumer<HttpResult> complexOnResponse(OkHttpCall call) {
 		return res -> {
 			Consumer<HttpResult> onResp = onResponse;
 			Consumer<HttpResult.Body> onBody = onResBody;
 			Consumer<Mapper> onMapper = onResMapper;
 			Consumer<Array> onArray = onResArray;
-			Consumer<?> onBean = onResBean;
-			Consumer<?> onList = onResList;
+			Consumer<Object> onBean = (Consumer<Object>) onResBean;
+			Consumer<Object> onList = (Consumer<Object>) onResList;
 			Consumer<String> onString = onResString;
 
 			int count = 0;
@@ -494,23 +494,11 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 			}
 			if (onBean != null) {
 				Object bean = body.toBean(beanType);
-				callback.on(() -> {
-					try {
-						callbackMethod(onBean.getClass(), bean.getClass()).invoke(onBean, bean);
-					} catch (IllegalAccessException | InvocationTargetException e) {
-						throw new OkHttpsException("回调方法调用失败！", e);
-					}
-				}, resBeanOnIO);
+				callback.on(() -> onBean.accept(bean), resBeanOnIO);
 			}
 			if (onList != null) {
 				List<?> list = body.toList(listType);
-				callback.on(() -> {
-					try {
-						callbackMethod(onList.getClass(), list.getClass()).invoke(onList, list);
-					} catch (IllegalAccessException | InvocationTargetException e) {
-						throw new OkHttpsException("回调方法调用失败！", e);
-					}
-				}, resListOnIO);
+				callback.on(() -> onList.accept(list), resListOnIO);
 			}
 			if (onString != null) {
 				String string = body.toString();
@@ -519,21 +507,6 @@ public class AHttpTask extends HttpTask<AHttpTask> {
 		};
 	}
 
-	static final String OnCallbackMethod = Consumer.class.getDeclaredMethods()[0].getName();
-
-	private Method callbackMethod(Class<?> clazz, Class<?> paraType) {
-		Method[] methods = clazz.getDeclaredMethods();
-		for (Method method : methods) {
-			Class<?>[] paraTypes = method.getParameterTypes();
-			if (method.getName().equals(OnCallbackMethod) && paraTypes.length == 1
-					&& paraTypes[0].isAssignableFrom(paraType)) {
-				method.setAccessible(true);
-				return method;
-			}
-		}
-		throw new IllegalStateException("没有可调用的方法");
-	}
-	
     private void initBeanType(Type type) {
     	if (type == null) {
     		throw new IllegalArgumentException(" bean type can not be null!");
