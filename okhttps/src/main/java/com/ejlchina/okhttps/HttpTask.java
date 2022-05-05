@@ -562,6 +562,26 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
     /**
      * 添加文件参数（以 multipart/form-data 形式上传）
      * @param name 参数名
+     * @param content 文件内容
+     * @param fileName 文件名: 如 xxx.txt、xxx.png、xxx.doc 等
+     * @return HttpTask 实例
+     * @since v3.5.1
+     */
+    public C addFilePara(String name, byte[] content, String fileName) {
+        if (fileName != null) {
+            int dotIdx = fileName.indexOf(DOT);
+            if (dotIdx >= 0 && dotIdx < fileName.length() - 1) {
+                String type = fileName.substring(dotIdx + 1);
+                return addFilePara(name, type, fileName, content);
+            }
+            return addFilePara(name, null, fileName, content);
+        }
+        return (C) this;
+    }
+
+    /**
+     * 添加文件参数（以 multipart/form-data 形式上传）
+     * @param name 参数名
      * @param type 文件类型/扩展名: 如 txt、png、jpg、doc 等
      * @param fileName 文件名
      * @param content 文件内容
@@ -587,6 +607,26 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      */
     public C addFilePara(String name, String type, InputStream stream) {
         return addFilePara(name, type, name + DOT + type, stream);
+    }
+
+    /**
+     * 添加文件参数（以 multipart/form-data 形式上传）
+     * @param name 参数名
+     * @param stream 文件输入流
+     * @param fileName 文件名: 如 xxx.txt、xxx.png、xxx.doc 等
+     * @return HttpTask 实例
+     * @since v3.5.1
+     */
+    public C addFilePara(String name, InputStream stream, String fileName) {
+        if (fileName != null) {
+            int dotIdx = fileName.indexOf(DOT);
+            if (dotIdx >= 0 && dotIdx < fileName.length() - 1) {
+                String type = fileName.substring(dotIdx + 1);
+                return addFilePara(name, type, fileName, stream);
+            }
+            return addFilePara(name, null, fileName, stream);
+        }
+        return (C) this;
     }
 
     /**
