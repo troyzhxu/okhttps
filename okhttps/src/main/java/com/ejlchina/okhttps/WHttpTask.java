@@ -219,25 +219,25 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 		}
 
 		@Override
-		public void onClosing(okhttp3.WebSocket webSocket, int code, String reason) {
+		public void onClosing(okhttp3.WebSocket ws, int code, String reason) {
 			this.webSocket.setStatus(WebSocket.STATUS_DISCONNECTED);
 			Listener<Close> listener = onClosing;
 			if (listener != null) {
 				execute(() -> listener.on(this.webSocket, new Close(code, reason)), closingOnIO);
 			}
 			httpClient.executor().requireScheduler().schedule(() -> {
-				doOnClose(webSocket, HttpResult.State.RESPONSED, code, reason);
+				doOnClose(HttpResult.State.RESPONSED, code, reason);
 			}, maxClosingSecs, TimeUnit.SECONDS);
 		}
 
 		@Override
-		public void onClosed(okhttp3.WebSocket webSocket, int code, String reason) {
-			doOnClose(webSocket, HttpResult.State.RESPONSED, code, reason);
+		public void onClosed(okhttp3.WebSocket ws, int code, String reason) {
+			doOnClose(HttpResult.State.RESPONSED, code, reason);
 		}
 
-		private void doOnClose(okhttp3.WebSocket webSocket, HttpResult.State state, int code, String reason) {
+		private void doOnClose(HttpResult.State state, int code, String reason) {
 			synchronized(WHttpTask.this) {
-				if (WHttpTask.this.webSocket == null || this.webSocket.webSocket != webSocket) {
+				if (WHttpTask.this.webSocket == null || this.webSocket != WHttpTask.this.webSocket) {
 					return;		// 回调已经执行过
 				}
 				WHttpTask.this.webSocket = null;
@@ -276,9 +276,11 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 		}
 
 		@Override
-		public void onFailure(okhttp3.WebSocket webSocket, Throwable t, Response response) {
+		public void onFailure(okhttp3.WebSocket ws, Throwable t, Response response) {
 			IOException e = t instanceof IOException ? (IOException) t : new IOException(t.getMessage(), t);
-			doOnClose(webSocket, toState(e), 0, t.getMessage());
+			doOnClose(toState(e), 0, t.getMessage());
+
+
 			TaskListener<IOException> listener = httpClient.executor().getExceptionListener();
 			Listener<Throwable> exceptionListener = onException;
 			if (listener != null) {
