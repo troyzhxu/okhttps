@@ -280,8 +280,6 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 		public void onFailure(okhttp3.WebSocket ws, Throwable t, Response response) {
 			IOException e = t instanceof IOException ? (IOException) t : new IOException(t.getMessage(), t);
 			doOnClose(toState(e), 0, t.getMessage());
-
-
 			TaskListener<IOException> listener = httpClient.executor().getExceptionListener();
 			Listener<Throwable> exceptionListener = onException;
 			if (listener != null) {
