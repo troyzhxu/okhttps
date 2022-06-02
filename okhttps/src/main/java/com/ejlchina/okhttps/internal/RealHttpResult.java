@@ -21,22 +21,22 @@ public class RealHttpResult implements HttpResult {
     private TaskExecutor taskExecutor;
     private final HttpTask<?> httpTask;
     private Body body;
-    
+
     public RealHttpResult(HttpTask<?> httpTask, State state) {
         this.httpTask = httpTask;
         this.state = state;
     }
-    
+
     public RealHttpResult(HttpTask<?> httpTask, Response response, TaskExecutor taskExecutor) {
         this(httpTask, taskExecutor);
         response(response);
     }
-    
+
     public RealHttpResult(HttpTask<?> httpTask, TaskExecutor taskExecutor) {
         this.httpTask = httpTask;
         this.taskExecutor = taskExecutor;
     }
-    
+
     public RealHttpResult(HttpTask<?> httpTask, State state, IOException error) {
         this.httpTask = httpTask;
         exception(state, error);
@@ -46,12 +46,12 @@ public class RealHttpResult implements HttpResult {
         this.state = state;
         this.error = error;
     }
-    
+
     public void response(Response response) {
         this.state = State.RESPONSED;
         this.response = response;
     }
-    
+
     @Override
     public State getState() {
         return state;
@@ -76,7 +76,7 @@ public class RealHttpResult implements HttpResult {
         }
         return false;
     }
-    
+
     @Override
     public Headers getHeaders() {
         if (response != null) {
@@ -119,7 +119,8 @@ public class RealHttpResult implements HttpResult {
         if (length != null) {
             try {
                 return Long.parseLong(length);
-            } catch (Exception ignore) {}
+            } catch (Exception ignore) {
+            }
         }
         return 0;
     }
@@ -142,6 +143,14 @@ public class RealHttpResult implements HttpResult {
         return error;
     }
 
+    @Override
+    public HttpResult closeChain() {
+        if (response != null) {
+            response.close();
+        }
+        return this;
+    }
+
     public Response getResponse() {
         return response;
     }
@@ -149,7 +158,7 @@ public class RealHttpResult implements HttpResult {
     @Override
     public String toString() {
         Body body = getBody();
-        String str = "HttpResult [\n  state: " + state + ",\n  status: " + getStatus() 
+        String str = "HttpResult [\n  state: " + state + ",\n  status: " + getStatus()
                 + ",\n  headers: " + getHeaders();
         if (body != null) {
             str += ",\n  contentType: " + body.getType();
@@ -158,11 +167,8 @@ public class RealHttpResult implements HttpResult {
     }
 
     @Override
-    public HttpResult close() {
-        if (response != null) {
-            response.close();
-        }
-        return this;
+    public void close() throws Exception {
+        closeChain();
     }
 
 }

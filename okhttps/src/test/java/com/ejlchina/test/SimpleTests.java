@@ -26,7 +26,7 @@ public class SimpleTests extends BaseTest {
                 .addBodyPara("name", "Jack")
                 .addBodyPara("age", 11)
                 .post()
-                .close();
+                .closeChain();
         System.out.println(res);
     }
 

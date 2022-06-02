@@ -74,7 +74,7 @@ public final class TaskExecutor {
         } else if (onResponse != null) {
             execute(runnable, onIo);
         } else {
-            result.close();
+            result.closeChain();
             call.finish();
         }
     }
