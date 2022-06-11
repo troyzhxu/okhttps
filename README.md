@@ -11,13 +11,7 @@
 
 ## 文档
 
-网址：https://okhttps.ejlchina.com/
-
-若以上地址不可用，请使用以下备用地址：
-
-* http://okhttps.ejlchina-app.com/
-* http://okhttps.zhoxu.cn/
-* http://okhttps.zhxu.cc/
+网址：https://ok.zhxu.cn
 
 ## 为什么用
 
@@ -103,15 +97,13 @@ Websocket 方法：
 [okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-stomp) | 3.5.2 | 超级轻量的 Stomp 客户端
 [okhttps-xml](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-xml) | 3.5.2 | XML 解析扩展
 
-## 超详细教程，请查看：https://okhttps.ejlchina.com/
-若以上地址不可用，请访问：http://okhttps.ejlchina-app.com/
+## 超详细教程，请查看：https://ok.zhxu.cn
 
 ## 联系方式
 
 * 微信：<img src="https://images.gitee.com/uploads/images/2020/0718/142637_87d27a5c_1393412.png" width="700px">
 * 由于近期交流群的二维码被爬，扫码入群方式已被关闭
 库的使用上若有疑问，可先加微信【18556739726】（请备注 OkHttps）再入群交流
-* 邮箱：zhou.xu@ejlchina.com
 
 ## 友情链接
 
