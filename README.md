@@ -1,12 +1,12 @@
 <p align="center">
-  <a href="http://okhttps.ejlchina.com/" target="_blank">
+  <a href="https://ok.zhxu.cn/" target="_blank">
     <img width="128" src="https://images.gitee.com/uploads/images/2020/0511/091408_c26f1306_1393412.png" alt="logo">
   </a>
 </p>
 <p align="center">
     <a href="https://maven-badges.herokuapp.com/maven-central/com.ejlchina/okhttps/"><img src="https://maven-badges.herokuapp.com/maven-central/com.ejlchina/okhttps/badge.svg" alt="Maven Central"></a>
-    <a href="https://gitee.com/ejlchina-zhxu/okhttps/blob/master/LICENSE"><img src="https://img.shields.io/hexpm/l/plug.svg" alt="License"></a>
-    <a href="https://github.com/ejlchina"><img src="https://img.shields.io/badge/%E4%BD%9C%E8%80%85-ejlchina-orange.svg" alt="Troy.Zhou"></a>
+    <a href="https://gitee.com/troyzhxu/okhttps/blob/master/LICENSE"><img src="https://img.shields.io/hexpm/l/plug.svg" alt="License"></a>
+    <a href="https://github.com/troyzhxu"><img src="https://img.shields.io/badge/%E4%BD%9C%E8%80%85-troyzhxu-orange.svg" alt="Troy.Zhou"></a>
 </p>
 
 ## 文档
