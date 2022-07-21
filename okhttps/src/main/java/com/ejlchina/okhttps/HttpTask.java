@@ -487,6 +487,7 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
      *  String - 字符串（比如：JSON 字符串、键值对字符串，也是直接作为报文体）<br>
      *  POJO - 普通 Java 数据对象（由 {@link MsgConvertor } 来序列化） <br>
      *  InputStream - 输入流（v3.5.0 开始支持）
+     *  RequestBody - 外部构建的 RequestBody
      * </pre>
      * @return HttpTask 实例
      **/
@@ -842,6 +843,11 @@ public abstract class HttpTask<C extends HttpTask<C>> implements Cancelable {
         if (bodyObj instanceof InputStream) {
             return new StreamRequestBody(mediaType(), (InputStream) bodyObj);
         }
+	
+	if (bodyObj instanceof RequestBody) {
+	    return (RequestBody)bodyObj;
+	}
+	    
         TaskExecutor.Data<byte[]> data = httpClient.executor().doMsgConvert(bodyType, c -> c.serialize(bodyObj, charset));
         return RequestBody.create(data.mediaType(charset), data.data);
     }
