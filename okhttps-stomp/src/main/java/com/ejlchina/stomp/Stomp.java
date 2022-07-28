@@ -367,7 +367,7 @@ public class Stomp {
             headers.add(msgId);
             send(new Message(Commands.ACK, headers, null));
         } else {
-            Platform.logError("subscription and message-id not found in " + message.toString() + ", so it can not be ack!");
+            Platform.logError("subscription and message-id not found in " + message + ", so it can not be ack!");
         }
     }
 
@@ -453,7 +453,10 @@ public class Stomp {
         if (listener != null) {
             listener.accept(this);
         }
-        subscribers.forEach(Subscriber::subscribe);
+        // 为兼容 Android 低版本，这里不使用 JDK8 的 List.forEach(..) 方法
+        for (Subscriber subscriber: subscribers) {
+            subscriber.subscribe();
+        }
     }
 
     public MsgCodec getMsgCodec() {
