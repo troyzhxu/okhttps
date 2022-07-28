@@ -202,7 +202,6 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 			}
 			if (pongSeconds > 0) {
 				lastPongSecs = nowSeconds();
-				Platform.logInfo("PONG <<< " + text);
 			}
 		}
 
@@ -215,7 +214,6 @@ public class WHttpTask extends HttpTask<WHttpTask> {
 			}
 			if (pongSeconds > 0) {
 				lastPongSecs = nowSeconds();
-				Platform.logInfo("PONG <<< " + bytes.utf8());
 			}
 		}
 
