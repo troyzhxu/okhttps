@@ -1,23 +1,17 @@
 <p align="center">
-  <a href="http://okhttps.ejlchina.com/" target="_blank">
+  <a href="https://ok.zhxu.cn/" target="_blank">
     <img width="128" src="https://images.gitee.com/uploads/images/2020/0511/091408_c26f1306_1393412.png" alt="logo">
   </a>
 </p>
 <p align="center">
     <a href="https://maven-badges.herokuapp.com/maven-central/com.ejlchina/okhttps/"><img src="https://maven-badges.herokuapp.com/maven-central/com.ejlchina/okhttps/badge.svg" alt="Maven Central"></a>
-    <a href="https://gitee.com/ejlchina-zhxu/okhttps/blob/master/LICENSE"><img src="https://img.shields.io/hexpm/l/plug.svg" alt="License"></a>
-    <a href="https://github.com/ejlchina"><img src="https://img.shields.io/badge/%E4%BD%9C%E8%80%85-ejlchina-orange.svg" alt="Troy.Zhou"></a>
+    <a href="https://gitee.com/troyzhxu/okhttps/blob/master/LICENSE"><img src="https://img.shields.io/hexpm/l/plug.svg" alt="License"></a>
+    <a href="https://github.com/troyzhxu"><img src="https://img.shields.io/badge/%E4%BD%9C%E8%80%85-troyzhxu-orange.svg" alt="Troy.Zhou"></a>
 </p>
 
 ## 文档
 
-网址：https://okhttps.ejlchina.com/
-
-若以上地址不可用，请使用以下备用地址：
-
-* http://okhttps.ejlchina-app.com/
-* http://okhttps.zhoxu.cn/
-* http://okhttps.zhxu.cc/
+网址：https://ok.zhxu.cn
 
 ## 为什么用
 
@@ -103,15 +97,13 @@ Websocket 方法：
 [okhttps-stomp](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-stomp) | 3.5.3 | 超级轻量的 Stomp 客户端
 [okhttps-xml](https://gitee.com/ejlchina-zhxu/okhttps/tree/dev/okhttps-xml) | 3.5.3 | XML 解析扩展
 
-## 超详细教程，请查看：https://okhttps.ejlchina.com/
-若以上地址不可用，请访问：http://okhttps.ejlchina-app.com/
+## 超详细教程，请查看：https://ok.zhxu.cn
 
 ## 联系方式
 
 * 微信：<img src="https://images.gitee.com/uploads/images/2020/0718/142637_87d27a5c_1393412.png" width="700px">
 * 由于近期交流群的二维码被爬，扫码入群方式已被关闭
 库的使用上若有疑问，可先加微信【18556739726】（请备注 OkHttps）再入群交流
-* 邮箱：zhou.xu@ejlchina.com
 
 ## 友情链接
 
