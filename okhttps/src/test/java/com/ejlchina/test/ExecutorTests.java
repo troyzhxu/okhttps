@@ -24,7 +24,7 @@ public class ExecutorTests extends BaseTest {
                 })
 //				.nextOnIO()
                 .setOnResponse((HttpResult result) -> {
-                    println("status： " + result.close().getStatus());
+                    println("status： " + result.closeChain().getStatus());
                 })
                 .nextOnIO()
                 .setOnComplete((HttpResult.State state) -> {
