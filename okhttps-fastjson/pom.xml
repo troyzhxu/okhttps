@@ -18,7 +18,7 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.ejlchina</groupId>
+            <groupId>cn.zhxu</groupId>
             <artifactId>data-fastjson</artifactId>
             <version>${data.version}</version>
         </dependency>

@@ -1,8 +1,8 @@
 package com.ejlchina.okhttps;
 
-import com.ejlchina.data.Array;
-import com.ejlchina.data.Mapper;
-import com.ejlchina.data.TypeRef;
+import cn.zhxu.data.Array;
+import cn.zhxu.data.Mapper;
+import cn.zhxu.data.TypeRef;
 import com.ejlchina.okhttps.HttpResult.State;
 import com.ejlchina.okhttps.internal.AbstractHttpClient;
 import com.ejlchina.okhttps.internal.CopyInterceptor;

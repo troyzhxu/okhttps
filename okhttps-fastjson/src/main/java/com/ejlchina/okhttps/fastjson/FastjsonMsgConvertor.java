@@ -1,7 +1,7 @@
 package com.ejlchina.okhttps.fastjson;
 
 import com.alibaba.fastjson.JSON;
-import com.ejlchina.data.fastjson.FastjsonDataConvertor;
+import cn.zhxu.data.fastjson.FastjsonDataConvertor;
 import com.ejlchina.okhttps.ConvertProvider;
 import com.ejlchina.okhttps.MsgConvertor;
 import com.ejlchina.okhttps.OkHttpsException;

@@ -13,7 +13,7 @@
 	
 	<dependencies>
 		<dependency>
-			<groupId>com.ejlchina</groupId>
+			<groupId>cn.zhxu</groupId>
 			<artifactId>data-core</artifactId>
 			<version>${data.version}</version>
 		</dependency>

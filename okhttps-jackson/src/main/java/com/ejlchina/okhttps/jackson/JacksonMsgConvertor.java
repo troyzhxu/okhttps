@@ -1,6 +1,6 @@
 package com.ejlchina.okhttps.jackson;
 
-import com.ejlchina.data.jackson.JacksonDataConvertor;
+import cn.zhxu.data.jackson.JacksonDataConvertor;
 import com.ejlchina.okhttps.ConvertProvider;
 import com.ejlchina.okhttps.MsgConvertor;
 import com.fasterxml.jackson.databind.ObjectMapper;

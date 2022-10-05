@@ -1,8 +1,8 @@
 package com.ejlchina.test;
 
-import com.ejlchina.data.ArrayListMap;
-import com.ejlchina.data.LinkedListMap;
-import com.ejlchina.data.ListMap;
+import cn.zhxu.data.ArrayListMap;
+import cn.zhxu.data.LinkedListMap;
+import cn.zhxu.data.ListMap;
 import org.junit.Test;
 
 public class ListMapTests {
