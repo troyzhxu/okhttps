@@ -1,9 +1,9 @@
 package com.ejlchina.test;
 
-import com.ejlchina.okhttps.HTTP;
-import com.ejlchina.okhttps.HttpResult;
-import com.ejlchina.okhttps.WebSocket;
-import com.ejlchina.okhttps.WebSocket.Message;
+import cn.zhxu.okhttps.HTTP;
+import cn.zhxu.okhttps.HttpResult;
+import cn.zhxu.okhttps.WebSocket;
+import cn.zhxu.okhttps.WebSocket.Message;
 import org.junit.Test;
 
 public class WebSocketTests {

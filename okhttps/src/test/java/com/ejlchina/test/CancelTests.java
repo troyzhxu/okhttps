@@ -1,8 +1,8 @@
 package com.ejlchina.test;
 
-import com.ejlchina.okhttps.HttpResult;
-import com.ejlchina.okhttps.HttpResult.State;
-import com.ejlchina.okhttps.internal.AbstractHttpClient;
+import cn.zhxu.okhttps.HttpResult;
+import cn.zhxu.okhttps.HttpResult.State;
+import cn.zhxu.okhttps.internal.AbstractHttpClient;
 import org.junit.Test;
 
 import java.io.IOException;

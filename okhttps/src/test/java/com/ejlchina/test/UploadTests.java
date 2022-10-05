@@ -1,6 +1,6 @@
 package com.ejlchina.test;
 
-import com.ejlchina.okhttps.Process;
+import cn.zhxu.okhttps.Process;
 import okhttp3.mockwebserver.MockResponse;
 import org.junit.Assert;
 import org.junit.Test;

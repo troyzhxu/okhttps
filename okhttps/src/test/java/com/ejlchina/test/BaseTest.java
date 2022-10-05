@@ -1,6 +1,6 @@
 package com.ejlchina.test;
 
-import com.ejlchina.okhttps.HTTP;
+import cn.zhxu.okhttps.HTTP;
 import okhttp3.mockwebserver.MockWebServer;
 
 import java.text.SimpleDateFormat;
