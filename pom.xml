@@ -15,6 +15,7 @@
 		<module>okhttps-jackson</module>
 		<module>okhttps-fastjson</module>
 		<module>okhttps-fastjson2</module>
+		<module>okhttps-fastjson2-jsonb</module>
 		<module>okhttps-test</module>
 	</modules>
 
