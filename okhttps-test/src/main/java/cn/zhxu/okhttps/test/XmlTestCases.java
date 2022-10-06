@@ -27,7 +27,7 @@ public class XmlTestCases extends BaseTestCases {
 
 	@Override
 	String getUserListStr() {
-		return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><list><user><id>1</id><name>Jack</name></user><user><id>2</id><name>Tom</name></user></list>";
+		return "<list><user><id>1</id><name>Jack</name></user><user><id>2</id><name>Tom</name></user></list>";
 	}
     
 }
