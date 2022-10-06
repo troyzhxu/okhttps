@@ -1,8 +1,7 @@
 package com.ejlchina.test;
 
-import cn.zhxu.okhttps.*;
 import cn.zhxu.okhttps.Process;
-import com.ejlchina.okhttps.*;
+import cn.zhxu.okhttps.*;
 import okhttp3.OkHttpClient;
 import org.junit.Test;
 
@@ -166,7 +165,7 @@ public class DownloadTests extends BaseTest {
                 })
                 .build();
 
-        String url = "https://gitee.com/ejlchina-zhxu/okhttps/blob/master/README.md";
+        String url = "https://gitee.com/troyzhxu/okhttps/blob/master/README.md";
 //		String url = "http://47.100.7.202/ejl-test.zip";
 
         long t0 = now();

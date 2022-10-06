@@ -3,7 +3,7 @@
 	
 	<groupId>com.ejlchina</groupId>
 	<artifactId>okhttps-parent</artifactId>
-	<version>3.5.3</version>
+	<version>4.0.0</version>
 	<name>OkHttps</name>
 
 	<packaging>pom</packaging>
@@ -49,10 +49,10 @@
 	</developers>
 	
 	<scm>
-		<connection>scm:git://gitee.com/ejlchina-zhxu/okhttps.git</connection>
-		<developerConnection>scm:http://gitee.com/ejlchina-zhxu/okhttps</developerConnection>
-		<url>https://gitee.com/ejlchina-zhxu/okhttps</url>
-		<tag>v3.5.3</tag>
+		<connection>scm:git://gitee.com/troyzhxu/okhttps.git</connection>
+		<developerConnection>scm:http://gitee.com/troyzhxu/okhttps</developerConnection>
+		<url>https://gitee.com/troyzhxu/okhttps</url>
+		<tag>v${project.version}</tag>
 	</scm>
 	
 	<dependencies>
@@ -186,13 +186,13 @@
         </plugins>
 	</build>
   
-	<url>https://gitee.com/ejlchina-zhxu/okhttps</url>
+	<url>https://gitee.com/troyzhxu/okhttps</url>
 	<description>比 Retrofit 更好用的网络框架！ OkHttp3 轻量封装 ，开箱即用、Java领域前后端处理 Http问题的新选择。</description>
 	<organization>
 		<name>江苏一键联信息科技有限公司</name>
 		<url>http://www.ejlchina.com/</url>
 	</organization>
 	<issueManagement>
-		<url>https://gitee.com/ejlchina-zhxu/okhttps/issues</url>
+		<url>https://gitee.com/troyzhxu/okhttps/issues</url>
 	</issueManagement>
 </project>
