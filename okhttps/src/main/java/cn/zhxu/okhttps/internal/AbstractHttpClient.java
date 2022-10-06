@@ -1,7 +1,6 @@
 package cn.zhxu.okhttps.internal;
 
 import cn.zhxu.okhttps.*;
-import com.ejlchina.okhttps.*;
 import okhttp3.MediaType;
 
 import java.nio.charset.Charset;

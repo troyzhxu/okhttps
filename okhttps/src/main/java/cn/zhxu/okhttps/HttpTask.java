@@ -4,7 +4,6 @@ import cn.zhxu.data.ArrayListMap;
 import cn.zhxu.data.ListMap;
 import cn.zhxu.okhttps.HttpResult.State;
 import cn.zhxu.okhttps.internal.*;
-import com.ejlchina.okhttps.internal.*;
 import cn.zhxu.okhttps.internal.AbstractHttpClient.TagTask;
 import okhttp3.*;
 import okhttp3.internal.http.HttpMethod;

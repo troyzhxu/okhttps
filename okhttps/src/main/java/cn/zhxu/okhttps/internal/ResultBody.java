@@ -1,8 +1,7 @@
 package cn.zhxu.okhttps.internal;
 
-import cn.zhxu.okhttps.*;
 import cn.zhxu.okhttps.Process;
-import com.ejlchina.okhttps.*;
+import cn.zhxu.okhttps.*;
 import okhttp3.MediaType;
 import okhttp3.Response;
 import okhttp3.ResponseBody;

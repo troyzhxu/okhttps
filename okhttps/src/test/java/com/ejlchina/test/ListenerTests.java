@@ -1,8 +1,7 @@
 package com.ejlchina.test;
 
-import cn.zhxu.okhttps.*;
 import cn.zhxu.okhttps.Process;
-import com.ejlchina.okhttps.*;
+import cn.zhxu.okhttps.*;
 import org.junit.Test;
 
 import java.io.File;

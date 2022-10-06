@@ -3,8 +3,6 @@ package cn.zhxu.okhttps.okhttp;
 import cn.zhxu.okhttps.*;
 import cn.zhxu.okhttps.internal.CopyInterceptor;
 import cn.zhxu.okhttps.internal.SerialPreprocessor;
-import com.ejlchina.okhttps.*;
-import com.ejlchina.okhttps.internal.*;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 

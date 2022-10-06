@@ -1,16 +1,15 @@
 package cn.zhxu.okhttps.internal;
 
-import java.io.InputStream;
-import java.lang.reflect.Type;
-import java.nio.charset.Charset;
-import java.util.List;
-
 import cn.zhxu.data.Array;
 import cn.zhxu.data.Mapper;
 import cn.zhxu.data.TypeRef;
 import cn.zhxu.okhttps.TaskExecutor;
 import cn.zhxu.okhttps.Toable;
-import com.ejlchina.okhttps.*;
+
+import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.nio.charset.Charset;
+import java.util.List;
 
 public abstract class AbstractBody implements Toable {
 

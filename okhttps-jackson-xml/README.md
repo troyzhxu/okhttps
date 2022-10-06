@@ -9,7 +9,7 @@
 
 ```xml
 <dependency>
-     <groupId>com.ejlchina</groupId>
+     <groupId>cn.zhxu</groupId>
      <artifactId>okhttps-jackson-xml</artifactId>
      <version>3.5.3</version>
 </dependency>
@@ -18,7 +18,7 @@
 ##### Gradle
 
 ```groovy
-implementation 'com.ejlchina:okhttps-jackson-xml:3.5.3'
+implementation 'cn.zhxu:okhttps-jackson-xml:3.5.3'
 ```
 
 #### 更多请参阅 [https://ok.zhxu.cn/](https://ok.zhxu.cn/)
