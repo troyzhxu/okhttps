@@ -21,4 +21,4 @@
 implementation 'com.ejlchina:okhttps-stomp:3.5.3'
 ```
 
-#### 更多请参阅 [http://okhttps.ejlchina.com/v2/stomp.html](http://okhttps.ejlchina.com/v2/stomp.html)
+#### 更多请参阅 [https://ok.zhxu.cn/v2/stomp.html](https://ok.zhxu.cn/v2/stomp.html)

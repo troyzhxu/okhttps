@@ -21,4 +21,4 @@
 implementation 'com.ejlchina:okhttps-jackson-yaml:3.5.3'
 ```
 
-#### 更多请参阅 [http://okhttps.ejlchina.com/](http://okhttps.ejlchina.com/)
+#### 更多请参阅 [https://ok.zhxu.cn/](https://ok.zhxu.cn/)
