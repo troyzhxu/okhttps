@@ -31,6 +31,6 @@
     </dependencies>
 
 	<build>
-		<finalName>okhttps-fastjson</finalName>
+		<finalName>okhttps-fastjson2</finalName>
 	</build>
 </project>

@@ -31,6 +31,6 @@
     </dependencies>
 
 	<build>
-		<finalName>okhttps-jackson</finalName>
+		<finalName>okhttps-jackson-xml</finalName>
 	</build>
 </project>

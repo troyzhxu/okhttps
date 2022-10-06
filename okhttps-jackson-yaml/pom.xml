@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
-	<artifactId>okhttps-fastjson2-jsonb</artifactId>
-	<name>OkHttps Fastjson2 JSONB</name>
+
+	<artifactId>okhttps-jackson-yaml</artifactId>
+	<name>OkHttps Jackson Yaml</name>
    	<packaging>jar</packaging>
    	
     <parent>
@@ -19,7 +19,7 @@
         </dependency>
         <dependency>
             <groupId>cn.zhxu</groupId>
-            <artifactId>data-fastjson2-jsonb</artifactId>
+            <artifactId>data-jackson-yaml</artifactId>
             <version>${data.version}</version>
         </dependency>
         <dependency>
@@ -31,6 +31,6 @@
     </dependencies>
 
 	<build>
-		<finalName>okhttps-fastjson2-jsonb</finalName>
+		<finalName>okhttps-jackson-yaml</finalName>
 	</build>
 </project>
