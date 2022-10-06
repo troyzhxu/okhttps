@@ -1,7 +1,5 @@
-package com.ejlchina.test;
+package cn.zhxu.okhttps;
 
-import cn.zhxu.okhttps.HTTP;
-import cn.zhxu.okhttps.Preprocessor;
 import org.junit.Test;
 
 public class PreprocessorTests extends BaseTest {

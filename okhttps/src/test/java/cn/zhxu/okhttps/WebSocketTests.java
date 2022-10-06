@@ -1,4 +1,4 @@
-package com.ejlchina.test;
+package cn.zhxu.okhttps;
 
 import cn.zhxu.okhttps.HTTP;
 import cn.zhxu.okhttps.HttpResult;

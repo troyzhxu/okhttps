@@ -1,8 +1,5 @@
-package com.ejlchina.test;
+package cn.zhxu.okhttps;
 
-import cn.zhxu.okhttps.HTTP;
-import cn.zhxu.okhttps.HttpResult;
-import cn.zhxu.okhttps.Process;
 import org.junit.Test;
 
 public class ExecutorTests extends BaseTest {

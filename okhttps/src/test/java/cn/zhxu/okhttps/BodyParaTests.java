@@ -1,4 +1,4 @@
-package com.ejlchina.test;
+package cn.zhxu.okhttps;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 
 public class BodyParaTests extends BaseTest {
 
