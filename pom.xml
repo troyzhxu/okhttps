@@ -3,7 +3,7 @@
 	
 	<groupId>cn.zhxu</groupId>
 	<artifactId>okhttps-parent</artifactId>
-	<version>4.0.0</version>
+	<version>4.0.1</version>
 	<name>OkHttps</name>
 
 	<packaging>pom</packaging>
