@@ -24,9 +24,9 @@
 
 	<properties>
 		<java.version>1.8</java.version>
-		<data.version>1.5.2</data.version>
+		<data.version>1.5.3</data.version>
 		<okhttp.version>3.14.9</okhttp.version>
-		<okio.version>1.17.5</okio.version>
+		<okio.version>1.17.6</okio.version>
 		<junit.version>4.13.2</junit.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</sonatypeOssDistMgmtSnapshotsUrl>
