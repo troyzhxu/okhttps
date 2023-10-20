@@ -8,7 +8,7 @@
     <parent>
         <groupId>cn.zhxu</groupId>
         <artifactId>okhttps-parent</artifactId>
-        <version>4.0.1</version>
+        <version>4.0.2</version>
     </parent>
 	
 	<dependencies>
