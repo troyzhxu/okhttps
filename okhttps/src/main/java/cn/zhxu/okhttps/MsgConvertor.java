@@ -61,7 +61,7 @@ public interface MsgConvertor extends DataConvertor {
 		}
 
 		@Override
-		public byte[] serialize(Object object, Charset charset) {
+		public byte[] serialize(Object object, Charset charset, boolean pretty) {
 			byte[] result = convertor.serialize(object, charset);
 			Mapper mapper = convertor.toMapper(new ByteArrayInputStream(result), charset);
 			StringBuilder sb = new StringBuilder();
