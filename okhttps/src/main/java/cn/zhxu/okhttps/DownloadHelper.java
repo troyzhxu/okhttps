@@ -43,13 +43,14 @@ public class DownloadHelper {
         if (contentDisposition == null || contentDisposition.length() < 1) {
             String urlPath = result.getTask().getUrl();
             String urlName = urlPath.substring(urlPath.lastIndexOf("/") + 1);
-            return toFileName(urlName, result);
+            return toFileName(urlName, result).replaceAll("[\"\\\\]", "");
         }
         try {
             String filename = URLDecoder.decode(contentDisposition.substring(
                     contentDisposition.indexOf("filename=") + 9), StandardCharsets.UTF_8.name());
             // 有些文件名会被包含在""里面，所以要去掉，不然无法读取文件后缀
-            return filename.replaceAll("\"", "");
+            // 同时去掉 / 与 \ 符，避免发生目录穿越问题：https://github.com/troyzhxu/okhttps/issues/89
+            return filename.replaceAll("[\"/\\\\]", "");
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         }
