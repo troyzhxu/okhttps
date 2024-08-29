@@ -24,7 +24,7 @@
 
 	<properties>
 		<java.version>1.8</java.version>
-		<data.version>1.5.3</data.version>
+		<data.version>1.6.0</data.version>
 		<okhttp.version>3.14.9</okhttp.version>
 		<okio.version>1.17.6</okio.version>
 		<junit.version>4.13.2</junit.version>
