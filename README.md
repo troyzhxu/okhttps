@@ -90,16 +90,16 @@ Websocket 方法：
 
 项目 | 最新版本 | 描述
 -|-|-
-[okhttps](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps) | 4.0.2 | OkHttps 核心模块
-[okhttps-fastjson](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps-fastjson) | 4.0.2 | 与 fastjson 集成
-[okhttps-fastjson](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps-fastjson2) | 4.0.2 | 与 fastjson2 集成
-[okhttps-fastjson](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps-fastjson2-jsonb) | 4.0.2 | 与 fastjson2-jsonb 集成
-[okhttps-gson](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps-gson) | 4.0.2 | 与 gson 集成
-[okhttps-jackson](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps-jackson) | 4.0.2 | 与 jackson 集成
-[okhttps-jackson](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps-jackson-xml) | 4.0.2 | 与 jackson-xml 集成
-[okhttps-jackson](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps-jackson-yaml) | 4.0.2 | 与 jackson-yaml 集成
-[okhttps-jackson](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps-snack3) | 4.0.2 | 与 jackson-yaml 集成
-[okhttps-stomp](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps-stomp) | 4.0.2 | 超级轻量的 Stomp 客户端
+[okhttps](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps) | 4.0.3 | OkHttps 核心模块
+[okhttps-fastjson](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps-fastjson) | 4.0.3 | 与 fastjson 集成
+[okhttps-fastjson](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps-fastjson2) | 4.0.3 | 与 fastjson2 集成
+[okhttps-fastjson](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps-fastjson2-jsonb) | 4.0.3 | 与 fastjson2-jsonb 集成
+[okhttps-gson](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps-gson) | 4.0.3 | 与 gson 集成
+[okhttps-jackson](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps-jackson) | 4.0.3 | 与 jackson 集成
+[okhttps-jackson](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps-jackson-xml) | 4.0.3 | 与 jackson-xml 集成
+[okhttps-jackson](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps-jackson-yaml) | 4.0.3 | 与 jackson-yaml 集成
+[okhttps-jackson](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps-snack3) | 4.0.3 | 与 jackson-yaml 集成
+[okhttps-stomp](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps-stomp) | 4.0.3 | 超级轻量的 Stomp 客户端
 [okhttps-xml](https://gitee.com/troyzhxu/okhttps/tree/dev/okhttps-xml) | 3.5.3 | XML 解析扩展
 
 ## 超详细教程，请查看：https://ok.zhxu.cn
