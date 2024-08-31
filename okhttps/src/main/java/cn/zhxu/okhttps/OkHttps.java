@@ -20,7 +20,7 @@ public final class OkHttps {
     public static final String PROTOBUF = "protobuf";
     public static final String MSGPACK = "msgpack";
 
-    private static HTTP instance;
+    private static volatile HTTP instance;
 
     private OkHttps() {}
 
