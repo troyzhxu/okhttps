@@ -1,0 +1,36 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<artifactId>okhttps-fastjson2-jsonb</artifactId>
+	<name>OkHttps Fastjson2 JSONB</name>
+   	<packaging>jar</packaging>
+   	
+    <parent>
+        <groupId>cn.zhxu</groupId>
+        <artifactId>okhttps-parent</artifactId>
+        <version>4.1.0</version>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>cn.zhxu</groupId>
+            <artifactId>okhttps</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.zhxu</groupId>
+            <artifactId>data-fastjson2-jsonb</artifactId>
+            <version>${data.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.zhxu</groupId>
+            <artifactId>okhttps-test</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+	<build>
+		<finalName>okhttps-fastjson2-jsonb</finalName>
+	</build>
+</project>
