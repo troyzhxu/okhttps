@@ -1,0 +1,48 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<artifactId>okhttps</artifactId>
+	<name>OkHttps</name>
+  	<packaging>jar</packaging>
+
+    <parent>
+        <groupId>cn.zhxu</groupId>
+        <artifactId>okhttps-parent</artifactId>
+        <version>4.1.0</version>
+    </parent>
+	
+	<dependencies>
+		<dependency>
+			<groupId>cn.zhxu</groupId>
+			<artifactId>data-core</artifactId>
+			<version>${data.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>${okhttp.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>okio</artifactId>
+					<groupId>com.squareup.okio</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.okio</groupId>
+			<artifactId>okio</artifactId>
+			<version>${okio.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>mockwebserver</artifactId>
+			<version>${okhttp.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+  
+	<build>
+		<finalName>okhttps</finalName>
+	</build>
+  
+</project>
